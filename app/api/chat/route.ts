@@ -255,9 +255,13 @@ export async function POST(request: NextRequest) {
       }
 
       if (process.env.NODE_ENV === "development" && groqErr) {
+        const tpmHint =
+          groqHttpStatus === 413 || /TPM|too large|tokens per minute/i.test(groqErr)
+            ? " For on-demand TPM limits, lower PORTFOLIO_KNOWLEDGE_MAX_CHARS (see .env.example), use a smaller GROQ_MODEL, or set OPENAI_API_KEY as fallback."
+            : "";
         return NextResponse.json(
           {
-            error: `Groq request failed (${groqHttpStatus ?? "?"}): ${groqErr}. If the model was retired, set GROQ_MODEL in .env.local to a current id from https://console.groq.com/docs/models`,
+            error: `Groq request failed (${groqHttpStatus ?? "?"}): ${groqErr}. If the model was retired, set GROQ_MODEL in .env.local to a current id from https://console.groq.com/docs/models.${tpmHint}`,
           },
           { status: 502, headers: jsonHeaders() }
         );

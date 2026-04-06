@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const API_KEY = process.env.OPENWEATHER_API_KEY;
+/** Same env name as v3 (`components/Terminal/data/weather.js`). */
+const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY?.trim();
 const GEO_URL = "https://api.openweathermap.org/geo/1.0/direct";
 const WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
 const FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";

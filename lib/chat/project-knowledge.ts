@@ -1,8 +1,18 @@
 import type { Project, ProjectSection } from "@/lib/data/projects.schema";
 import { getAllProjects } from "@/lib/data/projects";
 
-/** Cap embedded knowledge to limit token load; index always included in full. */
-const MAX_DETAILED_CHARS = 95_000;
+/**
+ * Detailed project text fed into λlambda’s system prompt. Groq on-demand tiers enforce a low
+ * TPM ceiling (~12.8k); the full catalog at 95k chars blows past that (~16k+ tokens).
+ * Default stays conservative; raise via PORTFOLIO_KNOWLEDGE_MAX_CHARS or upgrade Groq / use OpenAI fallback.
+ */
+function maxDetailedChars(): number {
+  const raw = process.env.PORTFOLIO_KNOWLEDGE_MAX_CHARS;
+  const parsed = raw ? Number.parseInt(raw.trim(), 10) : NaN;
+  const fallback = 12_000;
+  if (!Number.isFinite(parsed) || parsed < 4_000) return fallback;
+  return Math.min(parsed, 95_000);
+}
 
 function cleanText(value: string): string {
   return String(value ?? "")
@@ -99,10 +109,11 @@ export function buildProjectKnowledgeBlock(): string {
     const body = formatProjectDetail(project);
     return [`=== ${project.title} ===`, body].join("\n");
   });
+  const cap = maxDetailedChars();
   let combined = parts.join("\n\n");
-  if (combined.length > MAX_DETAILED_CHARS) {
+  if (combined.length > cap) {
     combined =
-      combined.slice(0, MAX_DETAILED_CHARS) +
+      combined.slice(0, cap) +
       "\n\n[Portfolio knowledge truncated for size. Prefer the project index and ask for specifics.]";
   }
   return combined;
