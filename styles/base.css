@@ -7,15 +7,46 @@
     box-sizing: border-box;
   }
 
+  :root {
+    --window: 12 18 28;
+    --header: 18 28 40;
+    --border: 28 214 151;
+    --green: 28 214 151;
+    --yellow: 240 214 90;
+    --red: 232 98 98;
+    --blue: 84 170 255;
+    --text: 224 235 228;
+    --muted: 118 144 130;
+    --cyan: 87 220 255;
+    --dimmed: 72 92 82;
+    --magenta: 214 120 255;
+    --pink: 255 130 200;
+    --purple: 154 112 255;
+    --orange: 255 170 92;
+    --white: 245 249 246;
+    --bg: 5 11 18;
+    --panel: 8 14 22;
+    --text-color: 224 235 228;
+    --muted-color: 118 144 130;
+    --neon: 28 214 151;
+    --accent: 87 220 255;
+    --warn: 240 214 90;
+    --danger: 232 98 98;
+    --ring: 28 214 151;
+    --text-secondary: 175 194 182;
+    --text-meta: 108 130 117;
+    --text-label: 132 175 150;
+    --surface: 9 15 24;
+    --chrome: 12 20 30;
+    --identity: 28 214 151;
+  }
+
   html {
     font-size: 16px;
     scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-
-  html:not(.theme-loaded) {
-    visibility: hidden;
+    background-color: rgb(var(--bg));
   }
 
   body {
@@ -26,6 +57,7 @@
     font-family: var(--font-ibm), ui-monospace, monospace;
     line-height: 1.6;
     overflow-x: hidden;
+    min-height: 100vh;
   }
 
   body::after {
