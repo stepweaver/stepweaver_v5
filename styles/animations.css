@@ -1,0 +1,80 @@
+@layer utilities {
+  @keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes glitch {
+    0% { transform: translate(0); }
+    20% { transform: translate(-2px, 2px); }
+    40% { transform: translate(-2px, -2px); }
+    60% { transform: translate(2px, 2px); }
+    80% { transform: translate(2px, -2px); }
+    100% { transform: translate(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideIn {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+
+  @keyframes typewriter {
+    from { width: 0; }
+    to { width: 100%; }
+  }
+
+  @keyframes textGlitch {
+    0% { text-shadow: 2px 0 rgb(var(--red)), -2px 0 rgb(var(--cyan)); }
+    25% { text-shadow: -2px 0 rgb(var(--red)), 2px 0 rgb(var(--cyan)); }
+    50% { text-shadow: 2px 2px rgb(var(--red)), -2px -2px rgb(var(--cyan)); }
+    75% { text-shadow: -2px 2px rgb(var(--red)), 2px -2px rgb(var(--cyan)); }
+    100% { text-shadow: 2px 0 rgb(var(--red)), -2px 0 rgb(var(--cyan)); }
+  }
+
+  @keyframes scanlines {
+    0% { background-position: 0 0; }
+    100% { background-position: 0 4px; }
+  }
+
+  @keyframes matrixBlink {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+
+  @keyframes terminalCaret {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  @keyframes hudSlide {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+
+  @keyframes progressFill {
+    from { width: 0%; }
+    to { width: 100%; }
+  }
+
+  .animate-blink { animation: blink 1s step-end infinite; }
+  .animate-glitch { animation: glitch 0.3s ease-in-out infinite; }
+  .animate-fade-in { animation: fadeIn 0.5s ease-out; }
+  .animate-slide-in { animation: slideIn 0.3s ease-out; }
+  .animate-typewriter { animation: typewriter 2s steps(40) 1s 1 normal both; }
+  .animate-text-glitch { animation: textGlitch 0.3s ease-in-out infinite; }
+  .animate-scanlines { animation: scanlines 0.1s linear infinite; }
+  .animate-matrix-blink { animation: matrixBlink 2s ease-in-out infinite; }
+  .animate-caret { animation: terminalCaret 1s step-end infinite; }
+  .animate-hud-slide { animation: hudSlide 0.4s ease-out; }
+  .animate-progress { animation: progressFill 1s ease-out; }
+
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-600 { animation-delay: 600ms; }
+  .animation-delay-800 { animation-delay: 800ms; }
+}

@@ -1,0 +1,52 @@
+@layer theme {
+  @theme {
+    --font-ocr: var(--font-ocr);
+    --font-ibm: var(--font-ibm);
+    --font-mono: var(--font-ibm), ui-monospace, monospace;
+    --font-sans: var(--font-ibm), system-ui, sans-serif;
+
+    --color-terminal-dark: rgb(var(--window));
+    --color-terminal-light: rgb(var(--header));
+    --color-terminal-border: rgb(var(--border));
+    --color-terminal-green: rgb(var(--green));
+    --color-terminal-yellow: rgb(var(--yellow));
+    --color-terminal-red: rgb(var(--red));
+    --color-terminal-blue: rgb(var(--blue));
+    --color-terminal-text: rgb(var(--text));
+    --color-terminal-muted: rgb(var(--muted));
+    --color-terminal-cyan: rgb(var(--cyan));
+    --color-terminal-dimmed: rgb(var(--dimmed));
+    --color-terminal-magenta: rgb(var(--magenta));
+    --color-terminal-pink: rgb(var(--pink));
+    --color-terminal-purple: rgb(var(--purple));
+    --color-terminal-orange: rgb(var(--orange));
+    --color-terminal-white: rgb(var(--white));
+
+    --color-bg: rgb(var(--bg));
+    --color-panel: rgb(var(--panel));
+    --color-text: rgb(var(--text-color));
+    --color-muted: rgb(var(--muted-color));
+    --color-neon: rgb(var(--neon));
+    --color-accent: rgb(var(--accent));
+    --color-warn: rgb(var(--warn));
+    --color-danger: rgb(var(--danger));
+    --color-ring: rgb(var(--ring));
+    --color-text-secondary: rgb(var(--text-secondary));
+    --color-text-meta: rgb(var(--text-meta));
+    --color-text-label: rgb(var(--text-label));
+    --color-surface: rgb(var(--surface));
+    --color-chrome: rgb(var(--chrome));
+    --color-identity: rgb(var(--identity));
+
+    --shadow-terminal-green: 0 0 10px rgb(var(--green) / 0.5), 0 0 20px rgb(var(--green) / 0.2);
+    --shadow-neon: 0 0 8px rgb(var(--neon) / 0.6), 0 0 16px rgb(var(--neon) / 0.3);
+    --shadow-accent: 0 0 8px rgb(var(--accent) / 0.6), 0 0 16px rgb(var(--accent) / 0.3);
+    --shadow-neon-sm: 0 0 4px rgb(var(--neon) / 0.4);
+
+    --animate-blink: blink 1s step-end infinite;
+    --animate-glitch: glitch 0.3s ease-in-out infinite;
+    --animate-fade-in: fadeIn 0.5s ease-out;
+    --animate-slide-in: slideIn 0.3s ease-out;
+    --animate-typewriter: typewriter 2s steps(40) 1s 1 normal both;
+  }
+}

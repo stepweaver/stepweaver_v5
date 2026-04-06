@@ -1,0 +1,93 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "plugin": [
+    "superpowers@git+https://github.com/obra/superpowers.git",
+    "ecc-universal"
+  ],
+  "instructions": [
+    ".opencode/instructions/rebuild-rules.md",
+    ".opencode/instructions/stepweaver-target.md"
+  ],
+  "permission": {
+    "*": "allow",
+    "read": {
+      "*": "allow",
+      "*.env": "deny",
+      "*.env.*": "deny",
+      "*.pem": "deny",
+      "*.key": "deny",
+      "*.p12": "deny",
+      "*.crt": "deny"
+    },
+    "list": "allow",
+    "glob": "allow",
+    "grep": "allow",
+    "skill": "allow",
+    "task": "allow",
+    "external_directory": {
+      "C:/Users/stephen/source/stepweaver_v3/**": "allow",
+      "C:/Users/stephen/source/ai-references/**": "allow"
+    },
+    "edit": {
+      "C:/Users/stephen/source/stepweaver_v5/**": "allow",
+      "C:/Users/stephen/source/stepweaver_v3/**": "deny",
+      "C:/Users/stephen/source/ai-references/**": "deny",
+      "*": "deny"
+    },
+    "bash": {
+      "*": "allow",
+      "git status*": "allow",
+      "git diff*": "allow",
+      "git log*": "allow",
+      "git branch*": "allow",
+      "git rev-parse*": "allow",
+      "dir *": "allow",
+      "tree *": "allow",
+      "type *": "allow",
+      "findstr *": "allow",
+      "rg *": "allow",
+      "grep *": "allow",
+      "npm install*": "allow",
+      "npm run*": "allow",
+      "pnpm install*": "allow",
+      "pnpm run*": "allow",
+      "bun install*": "allow",
+      "bun run*": "allow",
+      "node *": "allow",
+      "npx *": "allow",
+      "copy *": "deny",
+      "xcopy *": "deny",
+      "robocopy *": "deny",
+      "cp *": "deny",
+      "mv *": "deny",
+      "move *": "deny",
+      "rm *": "deny",
+      "del *": "deny",
+      "rmdir *": "deny",
+      "git commit *": "ask",
+      "git push *": "deny"
+    }
+  },
+  "agent": {
+    "plan": {
+      "permission": {
+        "edit": "deny",
+        "bash": {
+          "*": "ask",
+          "git status*": "allow",
+          "git diff*": "allow",
+          "dir *": "allow",
+          "tree *": "allow",
+          "type *": "allow",
+          "findstr *": "allow",
+          "rg *": "allow",
+          "grep *": "allow",
+          "copy *": "deny",
+          "xcopy *": "deny",
+          "robocopy *": "deny",
+          "cp *": "deny"
+        }
+      }
+    }
+  }
+}

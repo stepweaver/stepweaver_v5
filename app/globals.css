@@ -1,0 +1,6 @@
+@import "tailwindcss";
+@import "../styles/base.css" layer(base);
+@import "../styles/tokens.css" layer(theme);
+@import "../styles/components.css" layer(components);
+@import "../styles/animations.css" layer(utilities);
+@import "../styles/themes.css" layer(theme);

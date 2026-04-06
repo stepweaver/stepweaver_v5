@@ -1,0 +1,344 @@
+/* Auto-generated theme definitions */
+@layer theme {
+
+  [data-theme="monochrome"] {
+    --window: 30 30 30;
+    --header: 40 40 40;
+    --border: 180 180 180;
+    --green: 180 180 180;
+    --yellow: 160 160 160;
+    --red: 140 140 140;
+    --blue: 120 120 120;
+    --text: 200 200 200;
+    --muted: 100 100 100;
+    --cyan: 170 170 170;
+    --dimmed: 70 70 70;
+    --magenta: 150 150 150;
+    --pink: 160 160 160;
+    --purple: 130 130 130;
+    --orange: 155 155 155;
+    --white: 230 230 230;
+    --bg: 15 15 15;
+    --panel: 22 22 22;
+    --text-color: 200 200 200;
+    --muted-color: 100 100 100;
+    --neon: 180 180 180;
+    --accent: 170 170 170;
+    --warn: 160 160 160;
+    --danger: 140 140 140;
+    --ring: 180 180 180;
+    --text-secondary: 150 150 150;
+    --text-meta: 90 90 90;
+    --text-label: 120 120 120;
+    --surface: 18 18 18;
+    --chrome: 28 28 28;
+    --identity: 180 180 180;
+  }
+
+  [data-theme="monochrome-inverted"] {
+    --window: 230 230 230;
+    --header: 220 220 220;
+    --border: 80 80 80;
+    --green: 80 80 80;
+    --yellow: 100 100 100;
+    --red: 120 120 120;
+    --blue: 140 140 140;
+    --text: 30 30 30;
+    --muted: 120 120 120;
+    --cyan: 90 90 90;
+    --dimmed: 160 160 160;
+    --magenta: 110 110 110;
+    --pink: 100 100 100;
+    --purple: 130 130 130;
+    --orange: 105 105 105;
+    --white: 10 10 10;
+    --bg: 240 240 240;
+    --panel: 235 235 235;
+    --text-color: 30 30 30;
+    --muted-color: 120 120 120;
+    --neon: 80 80 80;
+    --accent: 90 90 90;
+    --warn: 100 100 100;
+    --danger: 120 120 120;
+    --ring: 80 80 80;
+    --text-secondary: 100 100 100;
+    --text-meta: 140 140 140;
+    --text-label: 120 120 120;
+    --surface: 245 245 245;
+    --chrome: 230 230 230;
+    --identity: 80 80 80;
+  }
+
+  [data-theme="vintage"] {
+    --window: 40 35 25;
+    --header: 50 45 35;
+    --border: 200 180 120;
+    --green: 180 200 100;
+    --yellow: 220 200 100;
+    --red: 200 100 80;
+    --blue: 100 150 200;
+    --text: 220 200 160;
+    --muted: 140 130 100;
+    --cyan: 140 200 180;
+    --dimmed: 100 90 70;
+    --magenta: 200 140 180;
+    --pink: 220 160 140;
+    --purple: 160 120 200;
+    --orange: 220 160 60;
+    --white: 240 230 210;
+    --bg: 25 22 15;
+    --panel: 32 28 20;
+    --text-color: 220 200 160;
+    --muted-color: 140 130 100;
+    --neon: 200 180 120;
+    --accent: 140 200 180;
+    --warn: 220 200 100;
+    --danger: 200 100 80;
+    --ring: 200 180 120;
+    --text-secondary: 180 170 140;
+    --text-meta: 120 110 80;
+    --text-label: 150 140 110;
+    --surface: 28 25 18;
+    --chrome: 38 34 26;
+    --identity: 200 180 120;
+  }
+
+  [data-theme="amber"] {
+    --window: 30 25 10;
+    --header: 40 35 15;
+    --border: 255 180 50;
+    --green: 255 180 50;
+    --yellow: 255 200 80;
+    --red: 255 120 30;
+    --blue: 200 160 80;
+    --text: 255 200 100;
+    --muted: 160 120 50;
+    --cyan: 200 180 80;
+    --dimmed: 120 90 30;
+    --magenta: 220 160 80;
+    --pink: 255 180 120;
+    --purple: 200 140 80;
+    --orange: 255 160 40;
+    --white: 255 220 140;
+    --bg: 15 12 5;
+    --panel: 22 18 8;
+    --text-color: 255 200 100;
+    --muted-color: 160 120 50;
+    --neon: 255 180 50;
+    --accent: 200 180 80;
+    --warn: 255 200 80;
+    --danger: 255 120 30;
+    --ring: 255 180 50;
+    --text-secondary: 200 160 80;
+    --text-meta: 140 100 40;
+    --text-label: 180 140 70;
+    --surface: 18 15 6;
+    --chrome: 28 24 10;
+    --identity: 255 180 50;
+  }
+
+  [data-theme="synthwave"] {
+    --window: 30 15 50;
+    --header: 40 20 60;
+    --border: 255 100 220;
+    --green: 0 255 180;
+    --yellow: 255 220 50;
+    --red: 255 50 80;
+    --blue: 100 120 255;
+    --text: 255 200 240;
+    --muted: 160 100 180;
+    --cyan: 0 220 255;
+    --dimmed: 100 60 140;
+    --magenta: 255 100 220;
+    --pink: 255 120 200;
+    --purple: 180 80 255;
+    --orange: 255 140 50;
+    --white: 255 240 255;
+    --bg: 15 8 30;
+    --panel: 22 12 40;
+    --text-color: 255 200 240;
+    --muted-color: 160 100 180;
+    --neon: 255 100 220;
+    --accent: 0 220 255;
+    --warn: 255 220 50;
+    --danger: 255 50 80;
+    --ring: 255 100 220;
+    --text-secondary: 200 160 220;
+    --text-meta: 140 80 160;
+    --text-label: 180 120 200;
+    --surface: 18 10 35;
+    --chrome: 28 15 45;
+    --identity: 255 100 220;
+  }
+
+  [data-theme="dracula"] {
+    --window: 40 42 54;
+    --header: 50 52 64;
+    --border: 139 233 253;
+    --green: 80 250 123;
+    --yellow: 241 250 140;
+    --red: 255 85 85;
+    --blue: 98 114 164;
+    --text: 248 248 242;
+    --muted: 98 114 164;
+    --cyan: 139 233 253;
+    --dimmed: 68 71 90;
+    --magenta: 255 121 198;
+    --pink: 255 121 198;
+    --purple: 189 147 249;
+    --orange: 255 184 108;
+    --white: 248 248 242;
+    --bg: 25 25 35;
+    --panel: 32 32 44;
+    --text-color: 248 248 242;
+    --muted-color: 98 114 164;
+    --neon: 80 250 123;
+    --accent: 139 233 253;
+    --warn: 241 250 140;
+    --danger: 255 85 85;
+    --ring: 80 250 123;
+    --text-secondary: 200 200 190;
+    --text-meta: 80 90 130;
+    --text-label: 120 130 170;
+    --surface: 28 28 38;
+    --chrome: 38 38 50;
+    --identity: 80 250 123;
+  }
+
+  [data-theme="solarized"] {
+    --window: 238 232 213;
+    --header: 230 224 205;
+    --border: 38 139 210;
+    --green: 133 153 0;
+    --yellow: 181 137 0;
+    --red: 220 50 47;
+    --blue: 38 139 210;
+    --text: 101 123 131;
+    --muted: 147 161 161;
+    --cyan: 42 161 152;
+    --dimmed: 160 170 170;
+    --magenta: 211 54 130;
+    --pink: 220 80 150;
+    --purple: 108 113 196;
+    --orange: 203 75 22;
+    --white: 238 232 213;
+    --bg: 253 246 227;
+    --panel: 248 240 220;
+    --text-color: 101 123 131;
+    --muted-color: 147 161 161;
+    --neon: 133 153 0;
+    --accent: 42 161 152;
+    --warn: 181 137 0;
+    --danger: 220 50 47;
+    --ring: 133 153 0;
+    --text-secondary: 88 110 117;
+    --text-meta: 147 161 161;
+    --text-label: 120 140 150;
+    --surface: 250 243 224;
+    --chrome: 240 234 215;
+    --identity: 133 153 0;
+  }
+
+  [data-theme="nord"] {
+    --window: 46 52 64;
+    --header: 59 66 82;
+    --border: 136 192 208;
+    --green: 163 190 140;
+    --yellow: 235 203 139;
+    --red: 191 97 106;
+    --blue: 129 161 193;
+    --text: 216 222 233;
+    --muted: 143 161 179;
+    --cyan: 136 192 208;
+    --dimmed: 76 86 106;
+    --magenta: 180 142 173;
+    --pink: 200 160 180;
+    --purple: 150 130 190;
+    --orange: 208 135 112;
+    --white: 236 239 244;
+    --bg: 30 34 46;
+    --panel: 38 42 56;
+    --text-color: 216 222 233;
+    --muted-color: 143 161 179;
+    --neon: 163 190 140;
+    --accent: 136 192 208;
+    --warn: 235 203 139;
+    --danger: 191 97 106;
+    --ring: 163 190 140;
+    --text-secondary: 180 190 200;
+    --text-meta: 120 135 150;
+    --text-label: 150 165 180;
+    --surface: 34 38 50;
+    --chrome: 44 48 62;
+    --identity: 163 190 140;
+  }
+
+  [data-theme="cobalt"] {
+    --window: 20 30 50;
+    --header: 25 35 55;
+    --border: 0 180 255;
+    --green: 0 200 100;
+    --yellow: 255 220 50;
+    --red: 255 60 60;
+    --blue: 0 150 255;
+    --text: 200 220 255;
+    --muted: 100 140 180;
+    --cyan: 0 200 200;
+    --dimmed: 60 90 130;
+    --magenta: 200 100 255;
+    --pink: 255 120 200;
+    --purple: 160 100 255;
+    --orange: 255 160 40;
+    --white: 230 240 255;
+    --bg: 10 18 30;
+    --panel: 15 24 40;
+    --text-color: 200 220 255;
+    --muted-color: 100 140 180;
+    --neon: 0 180 255;
+    --accent: 0 200 200;
+    --warn: 255 220 50;
+    --danger: 255 60 60;
+    --ring: 0 180 255;
+    --text-secondary: 160 190 230;
+    --text-meta: 80 110 150;
+    --text-label: 120 155 195;
+    --surface: 12 20 34;
+    --chrome: 20 30 48;
+    --identity: 0 180 255;
+  }
+
+  [data-theme="skynet"] {
+    --window: 40 10 10;
+    --header: 50 15 15;
+    --border: 255 0 0;
+    --green: 0 255 0;
+    --yellow: 255 255 0;
+    --red: 255 0 0;
+    --blue: 0 100 255;
+    --text: 255 50 50;
+    --muted: 150 40 40;
+    --cyan: 0 255 255;
+    --dimmed: 100 30 30;
+    --magenta: 255 0 255;
+    --pink: 255 80 120;
+    --purple: 180 0 255;
+    --orange: 255 120 0;
+    --white: 255 200 200;
+    --bg: 15 5 5;
+    --panel: 22 8 8;
+    --text-color: 255 50 50;
+    --muted-color: 150 40 40;
+    --neon: 255 0 0;
+    --accent: 0 255 255;
+    --warn: 255 255 0;
+    --danger: 255 0 0;
+    --ring: 255 0 0;
+    --text-secondary: 200 40 40;
+    --text-meta: 120 30 30;
+    --text-label: 170 35 35;
+    --surface: 18 6 6;
+    --chrome: 28 10 10;
+    --identity: 255 0 0;
+  }
+
+}
