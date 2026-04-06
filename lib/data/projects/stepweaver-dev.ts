@@ -9,7 +9,7 @@ export const stepweaverDev: Project = {
   tags: ["Next.js", "React", "App Router", "Terminal UI", "AI Chat", "Notion API", "Portfolio Platform", "Vercel"],
   keywords: ["portfolio", "platform", "terminal", "notion", "security"],
   imageUrl: "/images/stepweaver-dev.png",
-  githubRepo: "stepweaver/stepwever_v3",
+  githubRepo: "stepweaver/stepweaver_v5",
   builtFor: "Visitors who want the whole system story, not a single UI trick",
   solved: "Treating the portfolio as a brochure when the repo is a small app platform",
   delivered: [

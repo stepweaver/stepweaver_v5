@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
   }
 
   const ip = clientIp(request);
-  const rl = rateLimit(`notion-image:${ip}`, 60, 60_000);
+  const rl = await rateLimit(`notion-image:${ip}`, 60, 60_000);
   if (!rl.allowed) {
     return json(
       { error: "Too many image requests. Please try again shortly." },

@@ -8,7 +8,7 @@ export const googleAnalytics: Project = {
   status: "live",
   tags: ["Measurement Strategy", "GA4", "Event Design", "Next.js", "SEO"],
   keywords: ["analytics", "ga4", "events", "measurement", "seo"],
-  githubRepo: "stepweaver/stepwever_v3",
+  githubRepo: "stepweaver/stepweaver_v5",
   builtFor: "Businesses that need useful measurement, not only traffic totals",
   solved: "Analytics present on the page but not wired to real business questions",
   delivered: [

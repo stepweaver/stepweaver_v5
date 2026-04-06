@@ -7,25 +7,11 @@ import {
   useState,
   useCallback,
 } from "react";
+import { THEMES, META_COLORS, type ThemeId } from "@/lib/theme/themes";
 
-const VALID_THEMES = [
-  "dark",
-  "light",
-  "monochrome",
-  "monochrome-inverted",
-  "vintage",
-  "apple",
-  "c64",
-  "amber",
-  "synthwave",
-  "dracula",
-  "solarized",
-  "nord",
-  "cobalt",
-  "skynet",
-] as const;
+export type Theme = ThemeId;
 
-export type Theme = (typeof VALID_THEMES)[number];
+const VALID_THEMES = THEMES;
 
 interface ThemeContextValue {
   theme: Theme;
@@ -33,23 +19,6 @@ interface ThemeContextValue {
   toggleTheme: () => void;
   mounted: boolean;
 }
-
-const META_COLORS: Record<Theme, string> = {
-  dark: "#050b12",
-  light: "#f5f7fa",
-  monochrome: "#0f0f0f",
-  "monochrome-inverted": "#f0f0f0",
-  vintage: "#19160f",
-  apple: "#f5f5f7",
-  c64: "#221b54",
-  amber: "#0f0c05",
-  synthwave: "#0f081e",
-  dracula: "#191923",
-  solarized: "#fdf6e3",
-  nord: "#1e222e",
-  cobalt: "#0a121e",
-  skynet: "#0f0505",
-};
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
 
@@ -61,7 +30,7 @@ function getSystemTheme(): Theme {
 }
 
 function isValidTheme(value: string | null): value is Theme {
-  return !!value && VALID_THEMES.includes(value as Theme);
+  return !!value && (VALID_THEMES as readonly string[]).includes(value);
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {

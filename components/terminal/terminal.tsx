@@ -2,12 +2,17 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import type { TerminalLine, TerminalMode, ContactState } from "./types";
+import type { TerminalLine, TerminalMode, ContactState, WeatherPickOption } from "./types";
 import { processCommand } from "./commands";
 import { handleResumeCommand } from "@/lib/terminal/resume-content";
 import { handleCodexCommand, resetCodexSession } from "@/lib/terminal/codex-terminal";
 import { handleBlackjackInput, isBlackjackActive } from "@/lib/terminal/blackjack-engine";
-import { handleCaveInput, isCaveActive } from "@/lib/terminal/cave-adventure";
+import {
+  handleZorkInput,
+  isZorkGameActive,
+  resetZorkGame,
+} from "@/lib/terminal/zork-terminal";
+import { formatWeatherApiLines } from "@/lib/terminal/format-weather-lines";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 let lineCounter = 0;
@@ -36,6 +41,10 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
     data: { name: "", email: "", message: "" },
     timestamp: null,
   });
+  const [weatherSelection, setWeatherSelection] = useState<{
+    options: WeatherPickOption[];
+    forecast: boolean;
+  } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const previousLinesLength = useRef(lines.length);
@@ -128,6 +137,19 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
     [contact, addLines]
   );
 
+  const getGeoPosition = useCallback((): Promise<{ lat: number; lon: number } | null> => {
+    if (typeof navigator === "undefined" || !navigator.geolocation) {
+      return Promise.resolve(null);
+    }
+    return new Promise((resolve) => {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
+        () => resolve(null),
+        { timeout: 10_000, maximumAge: 300_000, enableHighAccuracy: false }
+      );
+    });
+  }, []);
+
   const handleCommand = useCallback(
     async (rawInput: string) => {
       const trimmed = rawInput.trim().toLowerCase();
@@ -135,6 +157,48 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
       if (contact.isActive) {
         addLines([{ content: "user@stepweaver.dev:~$ " + rawInput, variant: "prompt" }]);
         await handleContactInput(rawInput);
+        return;
+      }
+
+      if (mode === "selection" && weatherSelection) {
+        addLines([{ content: "user@stepweaver.dev:~$ " + rawInput, variant: "prompt" }]);
+        if (rawInput.trim()) {
+          setHistory((prev) => [...prev, rawInput]);
+          setHistoryIndex(-1);
+        }
+        if (trimmed === "cancel") {
+          setWeatherSelection(null);
+          setMode("normal");
+          addLines([{ content: "Selection cancelled.", variant: "dimmed" }]);
+          return;
+        }
+        const n = parseInt(trimmed, 10);
+        if (!Number.isFinite(n) || n < 1 || n > weatherSelection.options.length) {
+          addLines([
+            {
+              content: `Choose 1-${weatherSelection.options.length}, or type cancel.`,
+              variant: "warning",
+            },
+          ]);
+          return;
+        }
+        const opt = weatherSelection.options[n - 1]!;
+        const wantForecast = weatherSelection.forecast;
+        setWeatherSelection(null);
+        setMode("normal");
+        try {
+          const params = new URLSearchParams({ lat: String(opt.lat), lon: String(opt.lon) });
+          if (wantForecast) params.set("forecast", "true");
+          const res = await fetch("/api/weather?" + params.toString());
+          const data = await res.json();
+          if (!res.ok) {
+            addLines([{ content: (data as { error?: string }).error || "Weather fetch failed.", variant: "error" }]);
+            return;
+          }
+          addLines(formatWeatherApiLines(data));
+        } catch {
+          addLines([{ content: "Weather fetch failed.", variant: "error" }]);
+        }
         return;
       }
 
@@ -146,8 +210,10 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
       }
 
       if (trimmed === "clear") {
-        if (mode === "normal") {
+        setWeatherSelection(null);
+        if (mode === "normal" || mode === "selection") {
           setLines(BANNER.map((l) => ({ ...l, id: makeId() })));
+          setMode("normal");
         } else {
           resetScreen(mode);
         }
@@ -179,10 +245,13 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
         return;
       }
 
-      if (mode === "zork" || isCaveActive()) {
-        const r = handleCaveInput(rawInput);
+      if (mode === "zork" || isZorkGameActive()) {
+        const r = handleZorkInput(rawInput);
         if (r.lines.length) addLines(r.lines);
-        if (r.exit) setMode("normal");
+        if (r.exit) {
+          resetZorkGame();
+          setMode("normal");
+        }
         return;
       }
 
@@ -192,7 +261,12 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
           addLines,
           setMode,
           navigate: (p) => router.push(p),
+          getGeoPosition,
         });
+        if (result.weatherSelection) {
+          setWeatherSelection(result.weatherSelection);
+          setMode("selection");
+        }
         if (result.mode === "contact") {
           setContact({
             isActive: true,
@@ -201,13 +275,13 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
             timestamp: Date.now(),
           });
         }
-        if (result.mode) setMode(result.mode);
+        if (result.mode && !result.weatherSelection) setMode(result.mode);
         if (result.lines.length > 0) addLines(result.lines);
       } catch (err) {
         addLines([{ content: "Error: " + (err instanceof Error ? err.message : "Unknown error"), variant: "error" }]);
       }
     },
-    [contact.isActive, addLines, mode, resetScreen, handleContactInput, router]
+    [contact.isActive, addLines, mode, resetScreen, handleContactInput, router, weatherSelection, getGeoPosition]
   );
 
   const handleKeyDown = useCallback(
@@ -217,8 +291,13 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
           setContact({ isActive: false, step: 0, data: { name: "", email: "", message: "" }, timestamp: null });
           addLines([{ content: "Contact form cancelled.", variant: "dimmed" }]);
           setMode("normal");
+        } else if (mode === "selection") {
+          setWeatherSelection(null);
+          setMode("normal");
+          addLines([{ content: "Selection cancelled.", variant: "dimmed" }]);
         } else if (mode !== "normal") {
           if (mode === "codex") resetCodexSession();
+          if (mode === "zork" || isZorkGameActive()) resetZorkGame();
           setMode("normal");
           addLines([{ content: "Returned to normal shell.", variant: "dimmed" }]);
         }

@@ -10,7 +10,7 @@ export const llambdaLlmAgent: Project = {
   keywords: ["lambda", "chat", "api", "groq", "openai", "terminal"],
   imageUrl: "/images/chatbot.png",
   link: "/terminal",
-  githubRepo: "stepweaver/stepwever_v3",
+  githubRepo: "stepweaver/stepweaver_v5",
   builtFor: "Recruiters and clients trying to understand what I build",
   solved: "Too much portfolio clicking and not enough context",
   delivered: [

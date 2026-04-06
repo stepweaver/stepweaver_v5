@@ -1,7 +1,7 @@
 import { getInitialBlogEntries } from "@/lib/blog";
 import { getAllProjects } from "@/lib/data/projects";
 import type { Project } from "@/lib/data/projects.schema";
-import { normalizePostFromBlogEntry, sortPosts, formatCodexDate, type CodexPost } from "@/lib/codex/selectors";
+import { normalizePostFromBlogEntry, sortPosts, type CodexPost } from "@/lib/codex/selectors";
 
 export type HomeIntelPayload = {
   post: CodexPost;

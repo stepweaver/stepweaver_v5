@@ -30,7 +30,7 @@ const EMAIL_UNCONFIGURED_DEV =
 export async function POST(request: NextRequest) {
   return withProtectedRoute(request, async (_req, body) => {
     const rlKey = "contact:" + (request.headers.get("x-forwarded-for") || "unknown");
-    const rl = rateLimit(rlKey, 5, 60_000);
+    const rl = await rateLimit(rlKey, 5, 60_000);
     if (!rl.allowed) {
       return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
     }
@@ -54,23 +54,32 @@ export async function POST(request: NextRequest) {
     const content = renderContactEmail({ name, email, message });
 
     const transport = getTransporter();
-    await transport.sendMail({
-      from: emailUser,
-      to: emailTo,
-      replyTo: email,
-      subject: content.subject,
-      html: content.html,
-      text: content.text,
-    });
-
-    if (process.env.SEND_CONFIRMATION_EMAIL === "true") {
-      const { html } = renderConfirmationEmail({ name, email, message });
+    try {
       await transport.sendMail({
         from: emailUser,
-        to: email,
-        subject: "Thank you for contacting λstepweaver",
-        html,
+        to: emailTo,
+        replyTo: email,
+        subject: content.subject,
+        html: content.html,
+        text: content.text,
       });
+
+      if (process.env.SEND_CONFIRMATION_EMAIL === "true") {
+        const { html } = renderConfirmationEmail({ name, email, message });
+        await transport.sendMail({
+          from: emailUser,
+          to: email,
+          subject: "Thank you for contacting λstepweaver",
+          html,
+        });
+      }
+    } catch (err) {
+      const messageText =
+        process.env.NODE_ENV === "development" && err instanceof Error
+          ? err.message
+          : "Message could not be sent.";
+      console.error("[api/contact] sendMail failed", err);
+      return NextResponse.json({ error: messageText }, { status: 502 });
     }
 
     return NextResponse.json({ success: true });

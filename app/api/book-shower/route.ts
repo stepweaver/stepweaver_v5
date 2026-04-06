@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     }
 
     const ip = clientIp(request);
-    const rl = rateLimit(`book-shower-get:${ip}`, 30, 60_000);
+    const rl = await rateLimit(`book-shower-get:${ip}`, 30, 60_000);
     if (!rl.allowed) {
       return json({ error: "Too many requests. Please try again shortly." }, 429);
     }
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     }
 
     const ip = clientIp(request);
-    const rl = rateLimit(`book-shower-post:${ip}`, 10, 60_000);
+    const rl = await rateLimit(`book-shower-post:${ip}`, 10, 60_000);
     if (!rl.allowed) {
       return json({ error: "Too many requests. Please try again shortly." }, 429);
     }

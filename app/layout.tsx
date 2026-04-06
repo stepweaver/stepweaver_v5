@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
+import { META_COLORS, THEMES, THEME_BOOTSTRAP_FALLBACK_META } from "@/lib/theme/themes";
 import { ThemeProvider } from "@/components/theme-provider";
 import { AppChrome } from "@/components/app-chrome";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -75,39 +76,8 @@ export default async function RootLayout({
             __html: `
               (function () {
                 try {
-                  var VALID_THEMES = [
-                    "dark",
-                    "light",
-                    "monochrome",
-                    "monochrome-inverted",
-                    "vintage",
-                    "apple",
-                    "c64",
-                    "amber",
-                    "synthwave",
-                    "dracula",
-                    "solarized",
-                    "nord",
-                    "cobalt",
-                    "skynet"
-                  ];
-
-                  var META_COLORS = {
-                    dark: "#050b12",
-                    light: "#f5f7fa",
-                    monochrome: "#0f0f0f",
-                    "monochrome-inverted": "#f0f0f0",
-                    vintage: "#19160f",
-                    apple: "#f5f5f7",
-                    c64: "#221b54",
-                    amber: "#0f0c05",
-                    synthwave: "#0f081e",
-                    dracula: "#191923",
-                    solarized: "#fdf6e3",
-                    nord: "#1e222e",
-                    cobalt: "#0a121e",
-                    skynet: "#0f0505"
-                  };
+                  var VALID_THEMES = ${JSON.stringify(THEMES)};
+                  var META_COLORS = ${JSON.stringify(META_COLORS)};
 
                   var stored = null;
                   try {
@@ -130,7 +100,7 @@ export default async function RootLayout({
                   document.documentElement.classList.add("theme-loaded");
                   var meta = document.querySelector('meta[name="theme-color"]');
                   if (meta) {
-                    meta.setAttribute("content", "#050b12");
+                    meta.setAttribute("content", ${JSON.stringify(THEME_BOOTSTRAP_FALLBACK_META)});
                   }
                 }
               })();

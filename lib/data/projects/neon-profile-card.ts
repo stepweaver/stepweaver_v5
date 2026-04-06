@@ -8,7 +8,7 @@ export const neonProfileCard: Project = {
   status: "live",
   tags: ["Next.js", "React", "UI Architecture", "Animation", "Portfolio Engineering"],
   keywords: ["hero", "operator", "matrix", "animation", "identity"],
-  githubRepo: "stepweaver/stepwever_v3",
+  githubRepo: "stepweaver/stepweaver_v5",
   builtFor: "Portfolio hero identity",
   solved: "Hero elements with more signal than a static text block, without one-off flash",
   delivered: [

@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
 
   return withProtectedRoute(request, async (_req, body) => {
     const rlKey = "chat:" + (request.headers.get("x-forwarded-for") || "unknown");
-    const rl = rateLimit(rlKey, 20, 60_000);
+    const rl = await rateLimit(rlKey, 20, 60_000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Rate limit exceeded" },

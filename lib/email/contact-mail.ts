@@ -44,7 +44,7 @@ Timestamp: ${new Date().toLocaleString()}
 }
 
 export function renderConfirmationEmail(formData: { name: string; email: string; message: string }) {
-  const { name, email, message } = formData;
+  const { name, message } = formData;
   const safeName = escapeHtmlForEmail(name);
   const safeMessage = escapeHtmlForEmail(message);
 

@@ -9,7 +9,7 @@ export const itConsulting: Project = {
   tags: ["IT Consulting", "Systems Analysis", "Integration Planning", "Business Systems"],
   keywords: ["consulting", "systems", "integration", "operations"],
   imageUrl: "/images/it_consulting.png",
-  githubRepo: "stepweaver/stepwever_v3",
+  githubRepo: "stepweaver/stepweaver_v5",
   builtFor: "Small businesses at the seams between tools and process",
   solved: "Duplicated work, unclear ownership, weak reporting, manual handoffs",
   delivered: [

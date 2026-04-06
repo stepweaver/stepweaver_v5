@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { headers } from "next/headers";
 import { Hero } from "@/components/hero/hero";
 import { InkDivider } from "@/components/ui/ink-divider";

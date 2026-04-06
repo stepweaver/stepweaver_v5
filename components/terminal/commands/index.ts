@@ -1,10 +1,16 @@
-import type { CommandContext, CommandResult } from '../types';
+import type { CommandContext, CommandResult, WeatherPickOption } from '../types';
 import { buildChatRequestPayload } from '@/lib/chat/request-builder';
 import { resumeMenuLines } from '@/lib/terminal/resume-content';
 import { codexHelpLines, ensureCodexPosts } from '@/lib/terminal/codex-terminal';
-import { startCaveAdventure } from '@/lib/terminal/cave-adventure';
+import { startZorkGame } from '@/lib/terminal/zork-terminal';
 import { startBlackjack } from '@/lib/terminal/blackjack-engine';
-import { roll as executeRoll, formatRollResult, parseDiceNotation } from '@/lib/roller';
+import {
+  roll as executeRoll,
+  formatRollResult,
+  parseDiceNotation,
+  rollSingleDie,
+} from '@/lib/roller';
+import { formatWeatherApiLines, type WeatherApiSuccess } from '@/lib/terminal/format-weather-lines';
 
 const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => CommandResult | Promise<CommandResult>> = {
   help: (_args, _ctx) => ({
@@ -24,13 +30,13 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: '  cd contact | codex | dice-roller | github', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Features:', variant: 'lambda' },
-      { content: '  weather [location] [--forecast]', variant: 'default' },
-      { content: '  roll <notation>: e.g. 3d6+2, 1d20, 2d6+1d4+1', variant: 'default' },
+      { content: '  weather [location] [--forecast] - no location: browser location, else New York', variant: 'default' },
+      { content: '  roll <notation> | advantage | disadvantage', variant: 'default' },
       { content: '  contact: Message wizard (send / cancel)', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Games:', variant: 'lambda' },
       { content: '  blackjack | bj: hit, stand, deal, exit', variant: 'default' },
-      { content: '  zork: Text adventure (look, go, inventory, exit)', variant: 'default' },
+      { content: '  zork: Classic-style text adventure (save / restore / restart)', variant: 'default' },
     ],
   }),
 
@@ -87,20 +93,47 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
   },
 
   roll: (args) => {
-    const notation = args.join(' ').trim();
-    if (!notation) {
+    const raw = args.join(' ').trim();
+    if (!raw) {
       return {
         lines: [
-          { content: 'Usage: roll <notation> (e.g. 3d6+2, 1d20, 2d6+1d4+1)', variant: 'warning' },
+          { content: 'Usage: roll <notation> (e.g. 3d6+2, 1d20, advantage, disadvantage)', variant: 'warning' },
+        ],
+      };
+    }
+    const lower = raw.toLowerCase();
+    if (lower === 'advantage' || lower === 'adv') {
+      const a = rollSingleDie(20);
+      const b = rollSingleDie(20);
+      const kept = Math.max(a, b);
+      return {
+        lines: [
+          {
+            content: `Advantage (2d20 keep high): rolled ${a} and ${b} → ${kept}`,
+            variant: 'success',
+          },
+        ],
+      };
+    }
+    if (lower === 'disadvantage' || lower === 'dis') {
+      const a = rollSingleDie(20);
+      const b = rollSingleDie(20);
+      const kept = Math.min(a, b);
+      return {
+        lines: [
+          {
+            content: `Disadvantage (2d20 keep low): rolled ${a} and ${b} → ${kept}`,
+            variant: 'success',
+          },
         ],
       };
     }
     try {
-      const { groups } = parseDiceNotation(notation);
+      const { groups } = parseDiceNotation(raw);
       if (groups.length === 0) {
-        return { lines: [{ content: 'Invalid notation: ' + notation, variant: 'error' }] };
+        return { lines: [{ content: 'Invalid notation: ' + raw, variant: 'error' }] };
       }
-      const result = executeRoll(notation);
+      const result = executeRoll(raw);
       const text = formatRollResult(result);
       const lines = text.split("\n").map((content, i) => ({
         content,
@@ -133,7 +166,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
 
   zork: (_args, ctx) => {
     ctx.setMode('zork');
-    const { lines } = startCaveAdventure();
+    const { lines } = startZorkGame();
     return { mode: 'zork', lines };
   },
 
@@ -170,30 +203,80 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     }
   },
 
-  weather: async (args) => {
-    const location = args.filter((a) => !a.startsWith('--')).join(' ') || 'New York';
-    const forecast = args.includes('--forecast');
+  weather: async (args, ctx) => {
+    const forecast = args.includes('--forecast') || args.includes('-f');
+    const locTokens = args.filter((a) => !a.startsWith('--') && a !== '-f');
+    const location = locTokens.join(' ').trim();
+
+    async function fetchByCoords(lat: number, lon: number): Promise<CommandResult> {
+      const params = new URLSearchParams({ lat: String(lat), lon: String(lon) });
+      if (forecast) params.set('forecast', 'true');
+      const res = await fetch('/api/weather?' + params.toString());
+      const data = await res.json();
+      if (!res.ok) {
+        return {
+          lines: [{ content: (data as { error?: string }).error || 'Weather unavailable', variant: 'error' }],
+        };
+      }
+      return { lines: formatWeatherApiLines(data as WeatherApiSuccess) };
+    }
+
     try {
+      if (!location) {
+        const pos = (await ctx.getGeoPosition?.()) ?? null;
+        if (pos) {
+          return fetchByCoords(pos.lat, pos.lon);
+        }
+        const params = new URLSearchParams({ q: 'New York' });
+        if (forecast) params.set('forecast', 'true');
+        const res = await fetch('/api/weather?' + params.toString());
+        const data = await res.json();
+        if (!res.ok) {
+          return {
+            lines: [{ content: (data as { error?: string }).error || 'Weather unavailable', variant: 'error' }],
+          };
+        }
+        return { lines: formatWeatherApiLines(data as WeatherApiSuccess) };
+      }
+
       const params = new URLSearchParams({ q: location });
       if (forecast) params.set('forecast', 'true');
       const res = await fetch('/api/weather?' + params.toString());
+      const data = (await res.json()) as
+        | { needSelection: true; options: WeatherPickOption[] }
+        | WeatherApiSuccess
+        | { error?: string };
+
       if (!res.ok) {
-        return { lines: [{ content: 'Weather data unavailable for: ' + location, variant: 'error' }] };
+        return {
+          lines: [{ content: (data as { error?: string }).error || 'Weather data unavailable', variant: 'error' }],
+        };
       }
-      const data = await res.json();
-      const lines: Array<{content: string; variant: 'success' | 'lambda' | 'dimmed' | 'default'}> = [
-        { content: 'Weather: ' + data.location, variant: 'success' },
-        { content: '  ' + data.condition + ', ' + data.tempF + 'F (' + data.tempC + 'C)', variant: 'lambda' },
-        { content: '  Humidity: ' + data.humidity + '% | Wind: ' + data.wind + ' mph', variant: 'dimmed' },
-      ];
-      if (data.forecast) {
-        lines.push({ content: '', variant: 'default' });
-        lines.push({ content: '5-Day Forecast:', variant: 'success' });
-        for (const day of data.forecast) {
-          lines.push({ content: '  ' + day.date + ': ' + day.condition + ', ' + day.high + 'F / ' + day.low + 'F', variant: 'dimmed' });
-        }
+
+      if (
+        data &&
+        typeof data === 'object' &&
+        'needSelection' in data &&
+        data.needSelection &&
+        Array.isArray(data.options) &&
+        data.options.length > 0
+      ) {
+        const opts = data.options as WeatherPickOption[];
+        return {
+          lines: [
+            { content: `Multiple locations for "${location}":`, variant: 'warning' },
+            ...opts.map((o, i) => ({
+              content: `  ${i + 1}. ${o.label}`,
+              variant: 'default' as const,
+            })),
+            { content: '', variant: 'default' },
+            { content: `Type a number (1-${opts.length}) to select, or cancel.`, variant: 'dimmed' },
+          ],
+          weatherSelection: { options: opts, forecast },
+        };
       }
-      return { lines };
+
+      return { lines: formatWeatherApiLines(data as WeatherApiSuccess) };
     } catch {
       return { lines: [{ content: 'Failed to fetch weather data.', variant: 'error' }] };
     }

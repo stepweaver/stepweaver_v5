@@ -11,7 +11,7 @@ export const portfolioTerminal: Project = {
   keywords: ["terminal", "cli", "commands", "zork", "interactive"],
   imageUrl: "/images/terminal_ui.png",
   link: "/terminal",
-  githubRepo: "https://github.com/stepweaver/stepwever_v3",
+  githubRepo: "https://github.com/stepweaver/stepweaver_v5",
   builtFor: "People who want proof fast instead of clicking through a brochure",
   solved: "Portfolio browsing that hides the interesting parts behind normal navigation",
   delivered: [

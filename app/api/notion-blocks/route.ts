@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
     }
 
     const ip = clientIp(request);
-    const rl = rateLimit(`notion-blocks:${ip}`, 30, 60_000);
+    const rl = await rateLimit(`notion-blocks:${ip}`, 30, 60_000);
     if (!rl.allowed) {
       return NextResponse.json(
         { error: "Too many requests. Please try again shortly." },
