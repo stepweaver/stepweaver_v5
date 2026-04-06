@@ -2,11 +2,8 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
 import { ThemeProvider } from "@/components/theme-provider";
-import { AppChrome } from "@/components/app-chrome";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Analytics } from "@/components/analytics";
-import { META_COLORS, THEMES } from "@/lib/theme/themes";
-
 import "./globals.css";
 
 const ocr = localFont({
@@ -50,7 +47,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: META_COLORS.dark,
+  themeColor: "#050b12",
   width: "device-width",
   initialScale: 1,
 };
@@ -61,36 +58,83 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
-  const themeInitScript = `
-              (function() {
-                try {
-                  var t = localStorage.getItem('theme');
-                  var themes = ${JSON.stringify(THEMES)};
-                  if (!t || !themes.includes(t)) {
-                    t = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
-                  }
-                  document.documentElement.setAttribute('data-theme', t);
-                  var metaColors = ${JSON.stringify(META_COLORS)};
-                  var mc = document.querySelector('meta[name="theme-color"]');
-                  if (mc) mc.content = metaColors[t] || '${META_COLORS.dark}';
-                  document.documentElement.classList.add('theme-loaded');
-                } catch(e) {
-                  document.documentElement.classList.add('theme-loaded');
-                }
-              })();
-            `;
 
   return (
     <html
       lang="en"
-      className={`${ocr.variable} ${ibm.variable}`}
+      data-theme="dark"
+      className={`${ocr.variable} ${ibm.variable} theme-loaded`}
       suppressHydrationWarning
     >
       <head>
         <script
           nonce={nonce}
           suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: themeInitScript }}
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function () {
+                try {
+                  var VALID_THEMES = [
+                    "dark",
+                    "light",
+                    "monochrome",
+                    "monochrome-inverted",
+                    "vintage",
+                    "apple",
+                    "c64",
+                    "amber",
+                    "synthwave",
+                    "dracula",
+                    "solarized",
+                    "nord",
+                    "cobalt",
+                    "skynet"
+                  ];
+
+                  var META_COLORS = {
+                    dark: "#050b12",
+                    light: "#f5f7fa",
+                    monochrome: "#0f0f0f",
+                    "monochrome-inverted": "#f0f0f0",
+                    vintage: "#19160f",
+                    apple: "#f5f5f7",
+                    c64: "#221b54",
+                    amber: "#0f0c05",
+                    synthwave: "#0f081e",
+                    dracula: "#191923",
+                    solarized: "#fdf6e3",
+                    nord: "#1e222e",
+                    cobalt: "#0a121e",
+                    skynet: "#0f0505"
+                  };
+
+                  var stored = null;
+                  try {
+                    stored = localStorage.getItem("theme");
+                  } catch (_) {}
+
+                  var theme = VALID_THEMES.indexOf(stored) >= 0
+                    ? stored
+                    : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
+
+                  document.documentElement.setAttribute("data-theme", theme);
+                  document.documentElement.classList.add("theme-loaded");
+
+                  var meta = document.querySelector('meta[name="theme-color"]');
+                  if (meta) {
+                    meta.setAttribute("content", META_COLORS[theme] || META_COLORS.dark);
+                  }
+                } catch (_) {
+                  document.documentElement.setAttribute("data-theme", "dark");
+                  document.documentElement.classList.add("theme-loaded");
+                  var meta = document.querySelector('meta[name="theme-color"]');
+                  if (meta) {
+                    meta.setAttribute("content", "#050b12");
+                  }
+                }
+              })();
+            `,
+          }}
         />
       </head>
       <body>
@@ -99,9 +143,7 @@ export default async function RootLayout({
         </a>
         <ErrorBoundary>
           <ThemeProvider>
-            <AppChrome>
-              <main id="main-content">{children}</main>
-            </AppChrome>
+            <main id="main-content">{children}</main>
           </ThemeProvider>
         </ErrorBoundary>
         <Analytics />
