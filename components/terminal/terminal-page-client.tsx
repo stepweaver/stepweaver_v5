@@ -134,7 +134,7 @@ export function TerminalPageClient() {
 
         <MobileBriefBar />
 
-        <div className="flex-1 flex flex-col lg:flex-row min-h-0">
+        <div className="flex-1 flex flex-col lg:flex-row min-h-0 bg-[rgb(var(--panel)/0.22)]">
           <aside className="hidden lg:flex lg:flex-col lg:w-72 2xl:w-80 shrink-0 border-r border-[rgb(var(--neon)/0.15)] overflow-y-auto">
             <div className="p-3 space-y-3 flex-1">
               <SidebarPanel label="SYS.BRIEF">

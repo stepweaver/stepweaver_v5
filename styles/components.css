@@ -161,7 +161,13 @@
     min-height: 200px;
     max-height: 60vh;
     overflow-y: auto;
-    background: rgb(var(--window) / 0.28);
+    /* Match the shell (.terminal-window) so output never looks like a shorter “card” on top of a different tint. */
+    background: transparent;
+  }
+
+  /* Full-height /terminal embed: 60vh cap leaves a second band below the body with different stacking (hard seam). */
+  .terminal-body--embedded {
+    max-height: none;
   }
 
   .status-pill {

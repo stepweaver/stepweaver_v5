@@ -8,6 +8,7 @@ import { handleResumeCommand } from "@/lib/terminal/resume-content";
 import { handleCodexCommand, resetCodexSession } from "@/lib/terminal/codex-terminal";
 import { handleBlackjackInput, isBlackjackActive } from "@/lib/terminal/blackjack-engine";
 import { handleCaveInput, isCaveActive } from "@/lib/terminal/cave-adventure";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 let lineCounter = 0;
 function makeId(): string {
@@ -260,11 +261,10 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
   const core = (
     <div className="terminal-window h-full min-h-0 flex flex-col">
       <div className="terminal-header shrink-0">
-        <span className="text-xs text-[rgb(var(--muted-color))] font-[var(--font-ocr)]">stepweaver-terminal</span>
-        <span className="ml-auto text-xs text-[rgb(var(--neon))] font-[var(--font-ocr)]">{promptText}</span>
+        <BrandWordmark />
       </div>
       <div
-        className="terminal-body flex-1 min-h-0 overflow-y-auto"
+        className={`terminal-body flex-1 min-h-0 overflow-y-auto${embedded ? " terminal-body--embedded" : ""}`}
         onClick={() => inputRef.current?.focus()}
       >
         {lines.map((line) => (

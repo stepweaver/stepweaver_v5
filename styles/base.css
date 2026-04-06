@@ -60,6 +60,36 @@
     min-height: 100vh;
   }
 
+  /* Themed scrollbars (viewport + overflow regions) — Firefox */
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--neon) / 0.42) rgb(var(--panel) / 0.65);
+  }
+
+  /* Chromium / WebKit / legacy Edge */
+  *::-webkit-scrollbar {
+    width: 7px;
+    height: 7px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: rgb(var(--panel) / 0.55);
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: rgb(var(--neon) / 0.28);
+    border-radius: 1px;
+    box-shadow: inset 0 0 0 1px rgb(var(--neon) / 0.12);
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: rgb(var(--neon) / 0.48);
+  }
+
+  *::-webkit-scrollbar-corner {
+    background: rgb(var(--panel) / 0.55);
+  }
+
   body::after {
     content: "";
     position: fixed;
