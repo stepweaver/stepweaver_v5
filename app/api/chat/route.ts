@@ -13,6 +13,10 @@ import {
   toOpenAIResponsesInput,
   type ApiChatMessage,
 } from "@/lib/chat/openai-responses";
+import {
+  extractAssistantTextFromChatCompletion,
+  upstreamErrorMessage,
+} from "@/lib/chat/extract-chat-completion";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -172,6 +176,8 @@ export async function POST(request: NextRequest) {
 
     let provider: string | null = null;
     let assistantText = "";
+    let groqHttpStatus: number | null = null;
+    let groqErr: string | null = null;
 
     if (GROQ_API_KEY) {
       const { res, data } = await callGroq({
@@ -181,12 +187,24 @@ export async function POST(request: NextRequest) {
         temperature,
       });
 
+      groqHttpStatus = res.status;
+
       if (res.ok) {
-        const choices = data?.choices as Array<{ message?: { content?: string } }> | undefined;
-        assistantText = choices?.[0]?.message?.content?.trim() || "";
-        provider = "groq";
-      } else if (process.env.NODE_ENV === "development") {
-        console.error("Groq error:", res.status, data);
+        assistantText = extractAssistantTextFromChatCompletion(data);
+        provider = assistantText ? "groq" : null;
+        if (!assistantText && process.env.NODE_ENV === "development") {
+          const msg = (data?.choices as unknown[] | undefined)?.[0];
+          console.error(
+            "[api/chat] Groq returned 200 but no assistant text. model=%s choices[0].message=",
+            groqModelToUse,
+            JSON.stringify((msg as { message?: unknown })?.message ?? msg)
+          );
+        }
+      } else {
+        groqErr = upstreamErrorMessage(data) || res.statusText || `HTTP ${res.status}`;
+        if (process.env.NODE_ENV === "development") {
+          console.error("Groq error:", res.status, data);
+        }
       }
     }
 
@@ -223,9 +241,36 @@ export async function POST(request: NextRequest) {
     }
 
     if (!assistantText) {
+      const hasAnyKey = Boolean(GROQ_API_KEY?.trim()) || Boolean(OPENAI_API_KEY?.trim());
+      if (!hasAnyKey) {
+        return NextResponse.json(
+          {
+            error:
+              process.env.NODE_ENV === "development"
+                ? "No GROQ_API_KEY or OPENAI_API_KEY is set. Add one to .env.local in the project root and restart the dev server."
+                : "AI chat is not configured. Please contact Stephen directly.",
+          },
+          { status: 503, headers: jsonHeaders() }
+        );
+      }
+
+      if (process.env.NODE_ENV === "development" && groqErr) {
+        return NextResponse.json(
+          {
+            error: `Groq request failed (${groqHttpStatus ?? "?"}): ${groqErr}. If the model was retired, set GROQ_MODEL in .env.local to a current id from https://console.groq.com/docs/models`,
+          },
+          { status: 502, headers: jsonHeaders() }
+        );
+      }
+
       return NextResponse.json(
-        { error: "AI chat is not configured. Please contact Stephen directly." },
-        { status: 503, headers: jsonHeaders() }
+        {
+          error:
+            process.env.NODE_ENV === "development"
+              ? "AI returned no usable text after Groq (and OpenAI if configured). Check the dev server terminal for [api/chat] logs; verify GROQ_MODEL and your Groq project quota."
+              : "Failed to get response from AI. Please try again.",
+        },
+        { status: 502, headers: jsonHeaders() }
       );
     }
 

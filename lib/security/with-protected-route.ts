@@ -4,9 +4,24 @@ import { ZodSchema } from "zod";
 const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || "").split(",").filter(Boolean);
 const ALLOWED_HOSTS = (process.env.ALLOWED_HOSTS || "").split(",").filter(Boolean);
 
+function isLoopbackOrigin(origin: string): boolean {
+  try {
+    const hostname = new URL(origin).hostname;
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+  } catch {
+    return false;
+  }
+}
+
 export function checkOrigin(request: NextRequest): string | null {
   const origin = request.headers.get("origin");
   const host = request.headers.get("host") || request.headers.get("x-forwarded-host");
+
+  // Local dev: production allowlists in .env would otherwise block browser POSTs from localhost.
+  if (process.env.NODE_ENV !== "production" && origin && isLoopbackOrigin(origin)) {
+    return null;
+  }
+
   if (!origin) {
     if (process.env.NODE_ENV !== "production") return null;
     return "missing-origin";

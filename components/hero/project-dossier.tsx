@@ -227,7 +227,8 @@ export const ProjectDossier = memo(function ProjectDossier({ projects = [] }: { 
                   fill
                   className="object-cover scale-110 opacity-20 blur-2xl"
                   sizes="(max-width: 1024px) 100vw, 60vw"
-                  priority={activeIndex === 0}
+                  loading="lazy"
+                  fetchPriority="low"
                 />
               </div>
 

@@ -308,10 +308,10 @@ function TerminalOutputLine({ line }: { line: TerminalLine }) {
     selection: "text-[rgb(var(--accent))]",
   };
   return (
-    <pre
-      className={`text-sm font-[var(--font-ibm)] whitespace-pre-wrap ${variantClasses[line.variant] || variantClasses.default}`}
+    <div
+      className={`m-0 min-w-0 max-w-full text-sm font-[var(--font-ibm)] whitespace-pre-wrap break-words [overflow-wrap:anywhere] [tab-size:4] ${variantClasses[line.variant] || variantClasses.default}`}
     >
       {line.content}
-    </pre>
+    </div>
   );
 }

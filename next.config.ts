@@ -21,7 +21,8 @@ const nextConfig: NextConfig = {
   },
   experimental: {
     optimizePackageImports: ["lucide-react", "react-icons"],
-    viewTransition: true,
+    // Disabled: experimental view transitions have caused hard-to-debug dev crashes / blank pages on some Next 15.x builds.
+    // viewTransition: true,
   },
   compress: true,
 };
