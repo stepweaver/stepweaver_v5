@@ -91,8 +91,8 @@ export function BackgroundCanvas() {
     const mobile = isMobileRef.current;
     const sp = scrollProgressRef.current;
     const scale = mobile ? 0.9 - sp * 0.4 : 1.4 - sp * 0.8;
-    /* Mobile: unchanged (lambda biased left). Desktop: mirror of former tx so lambda sits on the right. */
-    const tx = mobile ? -30 - sp * 20 : 15 + sp * 25;
+    /* Mobile: unchanged (lambda biased left). Desktop: right-biased but inset so the glyph is not clipped off-screen. */
+    const tx = mobile ? -30 - sp * 20 : 4 + sp * 22;
     const ty = mobile ? "2%" : "5%";
     canvasRef.current.style.transform = `scale(${scale}) translateX(${tx}%) translateY(${ty})`;
   }, []);
@@ -220,7 +220,7 @@ export function BackgroundCanvas() {
       <div className="fixed inset-0 z-[9] pointer-events-none" aria-hidden>
         <canvas ref={rainCanvasRef} className="h-full w-full" style={{ opacity: rainOpacity }} />
       </div>
-      <div className="fixed inset-0 z-10 flex items-center justify-start md:justify-end pointer-events-none">
+      <div className="fixed inset-0 z-10 flex items-center justify-start md:justify-end md:pr-10 lg:pr-16 pointer-events-none">
         <canvas
           ref={canvasRef}
           width={1024}
