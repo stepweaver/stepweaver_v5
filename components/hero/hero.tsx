@@ -6,17 +6,17 @@ import { ProjectCarousel } from "./project-carousel";
 export function Hero() {
   return (
     <section className="relative min-h-screen flex items-center">
-      <div className="w-full max-w-[1600px] mx-auto px-3 sm:px-6 md:px-8 lg:px-12 pt-20 pb-12">
-        <div className="grid grid-cols-1 lg:grid-cols-[minmax(280px,420px)_1fr] gap-8 lg:gap-14 xl:gap-20">
-          <div className="order-2 lg:order-1">
+      <div className="w-full max-w-[1920px] mx-auto px-3 sm:px-5 md:px-6 lg:px-10 xl:px-14 2xl:px-16 pt-20 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(260px,380px)_minmax(0,1fr)] xl:grid-cols-[minmax(300px,440px)_minmax(0,1.35fr)] gap-8 lg:gap-10 xl:gap-16 2xl:gap-24 items-start">
+          <div className="order-2 lg:order-1 lg:pt-4 xl:pt-8">
             <HeroOperatorCard />
           </div>
-          <div className="order-1 lg:order-2 flex flex-col justify-center lg:pl-2 xl:pl-6">
+          <div className="order-1 lg:order-2 flex flex-col justify-center min-w-0 lg:pl-4 xl:pl-10 2xl:pl-14 lg:border-l border-[rgb(var(--border)/0.12)]">
             <HeroHeadline />
             <HeroDescription />
           </div>
         </div>
-        <div className="mt-12 lg:mt-16 max-w-none">
+        <div className="mt-14 lg:mt-20 w-full lg:-mx-2 xl:-mx-4 2xl:-mx-6 max-w-none">
           <ProjectCarousel />
         </div>
       </div>

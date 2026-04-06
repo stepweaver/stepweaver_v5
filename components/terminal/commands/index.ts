@@ -1,4 +1,5 @@
 import type { CommandContext, CommandResult } from '../types';
+import { buildChatRequestPayload } from '@/lib/chat/request-builder';
 import { resumeMenuLines } from '@/lib/terminal/resume-content';
 import { codexHelpLines, ensureCodexPosts } from '@/lib/terminal/codex-terminal';
 import { startCaveAdventure } from '@/lib/terminal/cave-adventure';
@@ -151,13 +152,13 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          messages: [{ role: 'user', content: message }],
-          channel: 'terminal',
-          _hp_website: '',
-          _t: Date.now(),
-          _d: 1000,
-        }),
+        body: JSON.stringify(
+          buildChatRequestPayload({
+            channel: 'terminal',
+            messages: [{ role: 'user', content: message }],
+            botFields: { _hp_website: '', _t: Date.now(), _d: 4000 },
+          })
+        ),
       });
       if (!res.ok) {
         return { lines: [{ content: 'Lambda is temporarily offline. Try again later.', variant: 'error' }] };

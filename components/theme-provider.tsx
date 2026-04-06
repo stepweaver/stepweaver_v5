@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { META_COLORS } from "@/lib/theme/themes";
 
 export const VALID_THEMES = [
   "dark", "light", "monochrome", "monochrome-inverted",
@@ -42,15 +43,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     if (!mounted) return;
     document.documentElement.setAttribute("data-theme", theme);
     localStorage.setItem("theme", theme);
-    const metaColors: Record<Theme, string> = {
-      dark: "#0a0a0a", light: "#f5f5f5", monochrome: "#0f0f0f",
-      "monochrome-inverted": "#f0f0f0", vintage: "#19160f", apple: "#f5f5f5",
-      c64: "#2828a0", amber: "#0f0c05", synthwave: "#0f081e",
-      dracula: "#191923", solarized: "#fdf6e3", nord: "#1e222e",
-      cobalt: "#0a121e", skynet: "#0f0505",
-    };
     const mc = document.querySelector('meta[name="theme-color"]');
-    if (mc) mc.setAttribute("content", metaColors[theme]);
+    if (mc) mc.setAttribute("content", META_COLORS[theme]);
   }, [theme, mounted]);
 
   const changeTheme = useCallback((t: Theme) => setTheme(t), []);

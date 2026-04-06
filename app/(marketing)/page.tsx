@@ -3,6 +3,7 @@ import Link from "next/link";
 import { headers } from "next/headers";
 import { Hero } from "@/components/hero/hero";
 import { InkDivider } from "@/components/ui/ink-divider";
+import { TerminalLinkStrip } from "@/components/home/terminal-link-strip";
 import { BackgroundCanvasWrapper } from "@/components/effects/background-canvas-wrapper";
 import { getInitialBlogEntries } from "@/lib/blog";
 import { normalizePostFromBlogEntry, sortPosts } from "@/lib/codex/selectors";
@@ -65,6 +66,10 @@ export default async function HomePage() {
         <BackgroundCanvasWrapper />
         <div className="relative z-10">
           <Hero />
+          <InkDivider showSeal className="py-0.5 sm:py-1" />
+          <div className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 xl:px-14">
+            <TerminalLinkStrip />
+          </div>
           <InkDivider />
           <QuickEntry />
           <RecentIntel />
@@ -83,17 +88,20 @@ function QuickEntry() {
   ];
 
   return (
-    <section className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 pb-10">
-      <div className="max-w-none">
+    <section className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 xl:px-14 pb-10">
+      <div className="max-w-none border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)] p-4 sm:p-5">
+        <p className="font-[var(--font-ocr)] text-xs uppercase tracking-[0.28em] text-[rgb(var(--text-label))] mb-3">
+          Quick entry
+        </p>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
           {links.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="bg-[rgb(var(--panel))] p-4 sm:p-5 hover:bg-[rgb(var(--neon)/0.05)] transition-colors group"
+              className="bg-[rgb(var(--panel))] p-4 sm:p-5 hover:bg-[rgb(var(--neon)/0.06)] transition-colors group border border-transparent hover:border-[rgb(var(--neon)/0.25)]"
             >
               <div className="text-[rgb(var(--neon))] font-[var(--font-ibm)] text-sm group-hover:text-[rgb(var(--accent))] transition-colors">
-                {link.label}
+                {link.label} →
               </div>
               <div className="text-[rgb(var(--text-meta))] text-xs mt-1">{link.desc}</div>
             </a>

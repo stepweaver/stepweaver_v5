@@ -46,7 +46,7 @@ const THEME_GROUPS: { category: string; themes: { value: Theme; label: string }[
 const ALL_THEME_OPTIONS = THEME_GROUPS.flatMap((g) => g.themes);
 
 export function ThemeToggle() {
-  const { theme, changeTheme, toggleTheme, mounted } = useTheme();
+  const { theme, changeTheme, mounted } = useTheme();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -94,7 +94,7 @@ export function ThemeToggle() {
   };
 
   return (
-    <div className="flex items-center gap-1 shrink-0">
+    <div className="shrink-0">
       <div className="theme-dropdown-container" ref={ref}>
         <button
           type="button"
@@ -159,16 +159,6 @@ export function ThemeToggle() {
           </div>
         )}
       </div>
-
-      <button
-        type="button"
-        onClick={() => toggleTheme()}
-        className="font-[var(--font-ocr)] text-[10px] text-[rgb(var(--muted-color))] hover:text-[rgb(var(--neon))] border border-[rgb(var(--border)/0.35)] px-1.5 py-1 transition-colors"
-        title="Cycle theme"
-        aria-label="Cycle to next theme"
-      >
-        ↻
-      </button>
     </div>
   );
 }

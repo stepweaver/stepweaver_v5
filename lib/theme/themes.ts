@@ -21,18 +21,18 @@ export const THEMES: ThemeId[] = [
 ];
 
 export const META_COLORS: Record<ThemeId, string> = {
-  dark: "#0a0a0a",
-  light: "#f5f5f5",
+  dark: "#070a10",
+  light: "#e5e5e5",
   monochrome: "#0f0f0f",
   "monochrome-inverted": "#f0f0f0",
-  vintage: "#19160f",
-  apple: "#f5f5f5",
-  c64: "#2828a0",
-  amber: "#0f0c05",
+  vintage: "#000000",
+  apple: "#000000",
+  c64: "#40318d",
+  amber: "#1a0f00",
   synthwave: "#0f081e",
   dracula: "#191923",
   solarized: "#fdf6e3",
   nord: "#1e222e",
-  cobalt: "#0a121e",
-  skynet: "#0f0505",
+  cobalt: "#001b2e",
+  skynet: "#0a0505",
 };

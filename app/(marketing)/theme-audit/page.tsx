@@ -9,7 +9,7 @@ const THEMES = [
 ] as const;
 
 export default function ThemeAuditPage() {
-  const { changeTheme } = useTheme();
+  const { changeTheme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen pt-20 pb-16">
@@ -17,7 +17,14 @@ export default function ThemeAuditPage() {
         <div className="mb-8">
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">{"// THEME AUDIT"}</div>
           <h1 className="font-[var(--font-ibm)] text-3xl text-[rgb(var(--text-color))] mb-4">Theme Preview</h1>
-          <p className="text-[rgb(var(--text-secondary))] text-sm">Click any theme to activate it.</p>
+          <p className="text-[rgb(var(--text-secondary))] text-sm mb-3">Click any theme to activate it.</p>
+          <button
+            type="button"
+            onClick={() => toggleTheme()}
+            className="font-[var(--font-ocr)] text-xs text-[rgb(var(--muted-color))] hover:text-[rgb(var(--neon))] border border-[rgb(var(--border)/0.35)] px-2 py-1"
+          >
+            Cycle all themes (↻)
+          </button>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
           {THEMES.map((theme) => (

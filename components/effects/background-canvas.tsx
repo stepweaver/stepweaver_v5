@@ -1,182 +1,239 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
+import { usePathname } from "next/navigation";
 import { useTheme } from "@/components/theme-provider";
-import { DEFAULT_GLYPHS } from "@/hooks/use-matrix-sync";
-
-function parseCssRgbTriplet(raw: string): [number, number, number] {
-  const p = raw
-    .trim()
-    .split(/\s+/)
-    .map((x) => parseInt(x, 10));
-  if (p.length >= 3 && p.every((n) => Number.isFinite(n))) {
-    return [p[0]!, p[1]!, p[2]!];
-  }
-  return [0, 255, 65];
-}
-
-type Column = {
-  x: number;
-  y: number;
-  speed: number;
-  chars: string[];
-  length: number;
-};
+import { useSafeScroll } from "@/hooks/use-safe-scroll";
+import { getDocumentScrollProgressY } from "@/lib/document-scroll-progress";
+import { COLOR_PALETTES, GLOW_FILTERS } from "@/lib/effects/background-constants";
+import { useCircuitRainLayer } from "@/components/effects/background-circuit";
 
 export function BackgroundCanvas() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const rainCanvasRef = useRef<HTMLCanvasElement>(null);
+  const scrollProgressRef = useRef(0);
+  const originalImageDataRef = useRef<ImageData | null>(null);
+  const isMobileRef = useRef(typeof window !== "undefined" ? window.innerWidth < 768 : false);
+  const [hasError, setHasError] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(
+    () =>
+      typeof window !== "undefined"
+        ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
+        : false
+  );
   const { theme, mounted } = useTheme();
+  const pathname = usePathname();
 
   useEffect(() => {
-    if (!mounted) return;
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReducedMotion(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setPrefersReducedMotion(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
 
-    const ctx = canvas.getContext("2d");
+  const neonColors = useMemo(() => COLOR_PALETTES[theme] || COLOR_PALETTES.dark, [theme]);
+  const neonColorsRef = useRef(neonColors);
+  neonColorsRef.current = neonColors;
+
+  const rafIdRef = useRef<number | null>(null);
+  const lastColorKeyRef = useRef<string | null>(null);
+
+  const updateCanvasColors = useCallback(() => {
+    const canvas = canvasRef.current;
+    const imgData = originalImageDataRef.current;
+    if (!canvas || !imgData) return;
+
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
     if (!ctx) return;
 
-    const reduced =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const colors = neonColorsRef.current;
+    const progress = scrollProgressRef.current;
 
-    let animationId: number;
-    let columns: Column[] = [];
-    let particles: Array<{ x: number; y: number; vx: number; vy: number; life: number }> = [];
+    const colorProgress = progress * (colors.length - 1);
+    const colorIndex = Math.floor(colorProgress);
+    const nextColorIndex = Math.min(colorIndex + 1, colors.length - 1);
+    const blend = colorProgress - colorIndex;
 
-    const readNeon = (): [number, number, number] => {
-      if (typeof window === "undefined") return [0, 255, 65];
-      return parseCssRgbTriplet(getComputedStyle(document.documentElement).getPropertyValue("--neon"));
-    };
+    const cur = colors[colorIndex]!;
+    const nxt = colors[nextColorIndex]!;
+    const r = Math.round(cur[0]! * (1 - blend) + nxt[0]! * blend);
+    const g = Math.round(cur[1]! * (1 - blend) + nxt[1]! * blend);
+    const b = Math.round(cur[2]! * (1 - blend) + nxt[2]! * blend);
 
-    const resize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      canvas.width = Math.floor(w * dpr);
-      canvas.height = Math.floor(h * dpr);
-      canvas.style.width = `${w}px`;
-      canvas.style.height = `${h}px`;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const colorKey = `${r},${g},${b}`;
+    if (lastColorKeyRef.current === colorKey) return;
+    lastColorKeyRef.current = colorKey;
 
-      const colW = w < 768 ? 14 : 18;
-      const n = Math.ceil(w / colW) + 2;
-      columns = Array.from({ length: n }, (_, i) => ({
-        x: i * colW + (Math.random() - 0.5) * 4,
-        y: Math.random() * h,
-        speed: 1.2 + Math.random() * 2.8,
-        length: 8 + Math.floor(Math.random() * 14),
-        chars: [],
-      }));
-      for (const c of columns) {
-        c.chars = Array.from({ length: c.length }, () => DEFAULT_GLYPHS[Math.floor(Math.random() * DEFAULT_GLYPHS.length)]!);
+    const imageData = new ImageData(new Uint8ClampedArray(imgData.data), imgData.width, imgData.height);
+    const data = imageData.data;
+    for (let i = 0; i < data.length; i += 4) {
+      if (data[i + 3]! > 0) {
+        data[i] = r;
+        data[i + 1] = g;
+        data[i + 2] = b;
       }
-    };
+    }
+    ctx.putImageData(imageData, 0, 0);
+  }, []);
 
-    resize();
-    window.addEventListener("resize", resize);
+  const updateTransform = useCallback(() => {
+    if (!canvasRef.current) return;
+    const mobile = isMobileRef.current;
+    const sp = scrollProgressRef.current;
+    const scale = mobile ? 0.9 - sp * 0.4 : 1.4 - sp * 0.8;
+    const tx = mobile ? -30 - sp * 20 : -15 - sp * 25;
+    const ty = mobile ? "2%" : "5%";
+    canvasRef.current.style.transform = `scale(${scale}) translateX(${tx}%) translateY(${ty})`;
+  }, []);
 
-    let img: HTMLImageElement | null = null;
-    let imgReady = false;
-    const tryLoadWatermark = () => {
-      const el = new Image();
-      el.crossOrigin = "anonymous";
-      el.onload = () => {
-        img = el;
-        imgReady = true;
-      };
-      el.onerror = () => {
-        el.src = "/images/lambda_stepweaver.png";
-      };
-      el.src = "/images/lambda_stepweaver.webp";
-    };
-    tryLoadWatermark();
-
-    const tick = () => {
-      const w = window.innerWidth;
-      const h = window.innerHeight;
-      const [r, g, b] = readNeon();
-      const isLight = theme === "light" || theme === "monochrome-inverted" || theme === "apple";
-      const baseAlpha = isLight ? 0.22 : 0.14;
-      const rainAlpha = isLight ? 0.2 : 0.12;
-
-      ctx.clearRect(0, 0, w, h);
-
-      if (imgReady && img && img.complete && img.naturalWidth > 0) {
-        const maxW = Math.min(w * 0.55, 520);
-        const scale = maxW / img.naturalWidth;
-        const dw = img.naturalWidth * scale;
-        const dh = img.naturalHeight * scale;
-        const dx = w - dw - w * 0.04;
-        const dy = h * 0.12;
-        ctx.save();
-        ctx.globalAlpha = isLight ? 0.07 : 0.11;
-        ctx.filter = `drop-shadow(0 0 24px rgba(${r},${g},${b},0.35))`;
-        ctx.drawImage(img, dx, dy, dw, dh);
-        ctx.restore();
-      }
-
-      if (reduced) {
-        ctx.fillStyle = `rgba(${r},${g},${b},${isLight ? 0.04 : 0.06})`;
-        for (let i = 0; i < 40; i++) {
-          ctx.fillRect((i / 40) * w, (i % 5) * (h / 5), 1, h * 0.15);
-        }
-        animationId = requestAnimationFrame(tick);
-        return;
-      }
-
-      ctx.font = `${w < 768 ? 11 : 13}px ui-monospace, "Cascadia Code", monospace`;
-      ctx.textAlign = "center";
-
-      for (const col of columns) {
-        col.y += col.speed;
-        if (col.y > h + col.length * 14) {
-          col.y = -col.length * 14 * Math.random();
-          col.speed = 1.2 + Math.random() * 2.8;
-          for (let i = 0; i < col.chars.length; i++) {
-            col.chars[i] = DEFAULT_GLYPHS[Math.floor(Math.random() * DEFAULT_GLYPHS.length)]!;
-          }
-        }
-        for (let i = 0; i < col.chars.length; i++) {
-          const alpha = rainAlpha * (1 - i / (col.chars.length + 2));
-          ctx.fillStyle = `rgba(${r},${g},${b},${Math.max(0.04, alpha)})`;
-          ctx.fillText(col.chars[i]!, col.x, col.y - i * 14);
-        }
-      }
-
-      if (particles.length < 70) {
-        particles.push({
-          x: Math.random() * w,
-          y: h + 8,
-          vx: (Math.random() - 0.5) * 0.6,
-          vy: -(Math.random() * 2 + 0.6),
-          life: 1,
+  const handleScroll = useCallback(
+    (scrollData: { scrollProgressY: number }) => {
+      scrollProgressRef.current = scrollData.scrollProgressY;
+      if (rafIdRef.current === null) {
+        rafIdRef.current = requestAnimationFrame(() => {
+          rafIdRef.current = null;
+          updateCanvasColors();
+          updateTransform();
         });
       }
-      particles = particles.filter((p) => p.life > 0);
-      for (const p of particles) {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.life -= 0.0025;
-        ctx.fillStyle = `rgba(${r},${g},${b},${p.life * baseAlpha})`;
-        ctx.fillRect(p.x, p.y, 1.5, 1.5);
-      }
+    },
+    [updateCanvasColors, updateTransform]
+  );
 
-      animationId = requestAnimationFrame(tick);
+  useSafeScroll({ onScroll: handleScroll, throttleMs: 16 });
+
+  const applyScrollDerivedCanvas = useCallback(() => {
+    if (typeof window === "undefined") return;
+    scrollProgressRef.current = getDocumentScrollProgressY();
+    lastColorKeyRef.current = null;
+    updateCanvasColors();
+    updateTransform();
+  }, [updateCanvasColors, updateTransform]);
+
+  useLayoutEffect(() => {
+    let alive = true;
+    const sync = () => {
+      if (alive) applyScrollDerivedCanvas();
     };
-
-    tick();
-
+    sync();
+    let raf2Id: number | null = null;
+    const raf1Id = requestAnimationFrame(() => {
+      sync();
+      raf2Id = requestAnimationFrame(sync);
+    });
+    const t = window.setTimeout(sync, 120);
     return () => {
-      cancelAnimationFrame(animationId);
-      window.removeEventListener("resize", resize);
+      alive = false;
+      cancelAnimationFrame(raf1Id);
+      if (raf2Id != null) cancelAnimationFrame(raf2Id);
+      window.clearTimeout(t);
     };
-  }, [theme, mounted]);
+  }, [pathname, applyScrollDerivedCanvas]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (typeof window === "undefined") return;
+      isMobileRef.current = window.innerWidth < 768;
+      scrollProgressRef.current = getDocumentScrollProgressY();
+      lastColorKeyRef.current = null;
+      updateCanvasColors();
+      updateTransform();
+    };
+    if (typeof window !== "undefined") {
+      window.addEventListener("resize", handleResize, { passive: true });
+      handleResize();
+    }
+    return () => {
+      if (typeof window !== "undefined") {
+        window.removeEventListener("resize", handleResize);
+      }
+    };
+  }, [updateCanvasColors, updateTransform]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas || !mounted) return;
+
+    const ctx = canvas.getContext("2d", { willReadFrequently: true });
+    if (!ctx) return;
+
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+
+    img.onload = () => {
+      try {
+        canvas.width = img.width;
+        canvas.height = img.height;
+        ctx.drawImage(img, 0, 0);
+        originalImageDataRef.current = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        setHasError(false);
+        updateCanvasColors();
+        updateTransform();
+        setTimeout(() => setIsLoaded(true), 100);
+      } catch {
+        setHasError(true);
+      }
+    };
+
+    let webpFailed = false;
+    img.onerror = () => {
+      if (!webpFailed) {
+        webpFailed = true;
+        img.src = "/images/lambda_stepweaver.png";
+      } else {
+        setHasError(true);
+      }
+    };
+    img.src = "/images/lambda_stepweaver.webp";
+  }, [mounted, updateCanvasColors, updateTransform]);
+
+  useLayoutEffect(() => {
+    lastColorKeyRef.current = null;
+    updateCanvasColors();
+  }, [neonColors, updateCanvasColors]);
+
+  useCircuitRainLayer(rainCanvasRef, theme, prefersReducedMotion);
+
+  if (hasError) {
+    return null;
+  }
+
+  const isLightish = theme === "light" || theme === "monochrome-inverted";
+  const isSkynet = theme === "skynet";
+  const glowFilter = GLOW_FILTERS[theme] || GLOW_FILTERS.dark;
+  const rainOpacity = isLightish ? 0.2 : isSkynet ? 0.48 : 0.4;
+  const lambdaOpacity = isLightish ? 0.2 : isSkynet ? 0.34 : 0.3;
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none z-0 motion-reduce:opacity-40"
-      aria-hidden="true"
-    />
+    <>
+      <div className="fixed inset-0 z-[9] pointer-events-none" aria-hidden>
+        <canvas ref={rainCanvasRef} className="h-full w-full" style={{ opacity: rainOpacity }} />
+      </div>
+      <div className="fixed inset-0 z-10 flex items-center justify-start pointer-events-none">
+        <canvas
+          ref={canvasRef}
+          width={1024}
+          height={1536}
+          className={`origin-center transition-opacity duration-700 ease-out ${
+            isLoaded ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            filter: glowFilter,
+            opacity: lambdaOpacity,
+          }}
+          aria-hidden
+        />
+      </div>
+    </>
   );
 }

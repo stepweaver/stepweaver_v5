@@ -21,7 +21,8 @@ export const aiIntegrations: Project = {
       id: "overview",
       title: "Overview",
       type: "overview",
-      content: "A branded AI chat agent (lambda) that serves both the terminal chat command and a web-based chat widget. Built with dual-provider LLM fallback, project knowledge injection, and a citation system.",
+      content:
+        "This case study is proof of a real AI integration pattern—not a generic pitch. The concrete system is λlambda: a shared `/api/chat` route is the single source of truth; the floating widget, project-page chat, and terminal `chat` command all consume the same backend with channel-aware prompting, server-owned system instructions, project knowledge injection, and optional `[[CITE:…]]` markers stripped server-side into a citation rail.",
     },
     {
       id: "problem",
@@ -39,10 +40,10 @@ export const aiIntegrations: Project = {
       title: "The Solution",
       type: "solution",
       bullets: [
-        "Groq primary with OpenAI Responses API fallback",
-        "Project knowledge embedded in system prompt",
-        "Three-layer bot protection (honeypot, timing, gibberish)",
-        "Channel-aware response formatting",
+        "One `/api/chat` route; web surfaces share a `useChat` hook, terminal uses the same JSON contract via `buildChatRequestPayload`",
+        "Groq primary with OpenAI Responses API fallback, vision model when attachments are present",
+        "Portfolio-derived project index + detailed records appended to the system prompt (with an honest truncation cap)",
+        "Honeypot + timing bot checks, same-origin gate, Zod validation, sanitized message normalization",
       ],
     },
     {
@@ -73,17 +74,30 @@ export const aiIntegrations: Project = {
       title: "Engineering Decisions",
       type: "engineering",
       bullets: [
-        "20-second abort timeout prevents hanging",
-        "Message sanitization and truncation",
-        "Assistant output scanning for prompt leakage",
-        "In-memory rate limit fallback for dev",
+        "System prompt and knowledge blocks live server-only; clients cannot override persona rules",
+        "Incoming text stripped of HTML-ish noise; assistant history filtered for obvious injection phrases",
+        "Assistant output passed through prompt-leak redaction before returning to the client",
+        "20-second upstream abort; message count and length caps to control cost and abuse surface",
+        "Rate limiting with in-memory fallback suitable for dev; KV-backed limits where configured",
+      ],
+    },
+    {
+      id: "tradeoffs",
+      title: "Tradeoffs",
+      type: "tradeoffs",
+      bullets: [
+        "No per-user accounts; widget and page chat history live in React state only (terminal calls are effectively single-turn unless the shell grows a transcript)",
+        "Knowledge is curated text from this repo—not live RAG over arbitrary user documents",
+        "Full project knowledge in every request is powerful but heavy; the server may truncate the detailed block with an explicit prompt instruction when needed",
+        "Automated tests cover schema and citation helpers; broader integration tests are still thin",
       ],
     },
     {
       id: "outcome",
       title: "Outcome",
       type: "outcome",
-      content: "A production-ready AI chat system that handles both terminal and web interactions with proper security, validation, and fallback behavior.",
+      content:
+        "Shipped a real AI feature on the live portfolio with visible boundaries: interface layer, protected backend, server-owned prompts, provider routing, and truthful handling of what is and is not grounded in project records.",
     },
     {
       id: "tech-stack",

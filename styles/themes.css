@@ -1,5 +1,141 @@
-/* Auto-generated theme definitions */
+/* Theme tokens: maintained in this file (see gen-themes.js note). */
 @layer theme {
+
+  [data-theme="dark"] {
+    --window: 13 18 17;
+    --header: 19 25 24;
+    --border: 50 62 56;
+    --green: 0 255 65;
+    --yellow: 255 255 0;
+    --red: 255 62 62;
+    --blue: 56 190 255;
+    --text: 236 240 248;
+    --muted: 139 148 158;
+    --cyan: 86 182 194;
+    --dimmed: 106 115 125;
+    --magenta: 255 85 255;
+    --pink: 255 85 255;
+    --purple: 168 85 247;
+    --orange: 255 165 0;
+    --white: 255 255 255;
+    --bg: 7 10 16;
+    --panel: 14 18 28;
+    --text-color: 236 240 248;
+    --muted-color: 150 160 180;
+    --neon: 90 255 140;
+    --accent: 90 210 255;
+    --warn: 255 190 80;
+    --danger: 255 80 110;
+    --ring: 90 255 140;
+    --text-secondary: 196 202 211;
+    --text-meta: 160 167 178;
+    --text-label: 90 255 140;
+    --surface: 20 24 34;
+    --chrome: 35 45 40;
+    --identity: 255 85 255;
+  }
+
+  [data-theme="light"] {
+    --window: 220 220 220;
+    --header: 229 229 229;
+    --border: 200 202 210;
+    --green: 0 204 51;
+    --yellow: 255 170 0;
+    --red: 255 51 51;
+    --blue: 0 102 255;
+    --text: 13 13 13;
+    --muted: 85 85 85;
+    --cyan: 0 204 204;
+    --dimmed: 119 119 119;
+    --magenta: 255 0 255;
+    --pink: 255 0 255;
+    --purple: 153 0 255;
+    --orange: 255 102 0;
+    --white: 0 0 0;
+    --bg: 229 229 229;
+    --panel: 255 255 255;
+    --text-color: 13 13 13;
+    --muted-color: 100 100 100;
+    --neon: 0 153 51;
+    --accent: 153 0 255;
+    --warn: 255 102 0;
+    --danger: 255 51 51;
+    --ring: 0 153 51;
+    --text-secondary: 58 67 76;
+    --text-meta: 86 96 107;
+    --text-label: 0 122 41;
+    --surface: 245 245 245;
+    --chrome: 0 153 51;
+    --identity: 153 0 255;
+  }
+
+  [data-theme="apple"] {
+    --window: 0 0 0;
+    --header: 0 17 0;
+    --border: 55 55 55;
+    --green: 51 255 51;
+    --yellow: 136 255 136;
+    --red: 68 255 68;
+    --blue: 85 255 85;
+    --text: 102 255 102;
+    --muted: 68 204 68;
+    --cyan: 119 255 119;
+    --dimmed: 34 136 34;
+    --magenta: 102 255 102;
+    --pink: 102 255 102;
+    --purple: 85 255 85;
+    --orange: 119 255 119;
+    --white: 153 255 153;
+    --bg: 0 0 0;
+    --panel: 0 17 0;
+    --text-color: 102 255 102;
+    --muted-color: 68 204 68;
+    --neon: 51 255 51;
+    --accent: 136 255 136;
+    --warn: 136 255 136;
+    --danger: 68 255 68;
+    --ring: 51 255 51;
+    --text-secondary: 170 170 170;
+    --text-meta: 140 140 140;
+    --text-label: 51 255 51;
+    --surface: 5 22 5;
+    --chrome: 51 255 51;
+    --identity: 102 255 102;
+  }
+
+  [data-theme="c64"] {
+    --window: 64 49 141;
+    --header: 74 59 159;
+    --border: 80 80 160;
+    --green: 163 230 255;
+    --yellow: 216 216 255;
+    --red: 159 149 230;
+    --blue: 163 163 255;
+    --text: 176 168 232;
+    --muted: 124 112 218;
+    --cyan: 200 200 255;
+    --dimmed: 74 64 153;
+    --magenta: 184 184 255;
+    --pink: 184 184 255;
+    --purple: 149 149 221;
+    --orange: 192 184 255;
+    --white: 232 232 255;
+    --bg: 64 49 141;
+    --panel: 50 38 112;
+    --text-color: 176 168 232;
+    --muted-color: 124 112 218;
+    --neon: 163 230 255;
+    --accent: 124 112 218;
+    --warn: 216 216 255;
+    --danger: 159 149 230;
+    --ring: 163 230 255;
+    --text-secondary: 170 170 255;
+    --text-meta: 140 140 220;
+    --text-label: 134 176 255;
+    --surface: 58 45 125;
+    --chrome: 163 230 255;
+    --identity: 184 184 255;
+  }
 
   [data-theme="monochrome"] {
     --window: 30 30 30;
