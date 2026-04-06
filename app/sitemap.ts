@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getInitialBlogEntries } from "@/lib/blog";
 import { getProjectSlugs } from "@/lib/data/projects";
+import { listPublishedDocs } from "@/lib/notion/meshtastic-docs.repo";
+import { MESHTASTIC_DOCS } from "@/lib/data/meshtastic-content";
 
 const STATIC_ROUTES = [
   "/",
@@ -25,8 +27,6 @@ const STATIC_ROUTES = [
   "/privacy",
   "/theme-audit",
 ];
-
-const MESHTASTIC_STATIC_SLUGS = ["about", "overview", "getting-started", "hardware"];
 
 function staticPriority(route: string): number {
   if (route === "/") return 1;
@@ -55,7 +55,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     });
   }
 
-  for (const slug of MESHTASTIC_STATIC_SLUGS) {
+  const meshtasticSlugs = new Set(MESHTASTIC_DOCS.map((d) => d.slug));
+  if (process.env.NOTION_MESHTASTIC_DOCS_DB_ID && process.env.NOTION_API_KEY) {
+    try {
+      const meshDocs = await listPublishedDocs();
+      for (const d of meshDocs) {
+        if (d.slug) meshtasticSlugs.add(d.slug);
+      }
+    } catch {
+      /* keep static slugs only */
+    }
+  }
+  for (const slug of meshtasticSlugs) {
     entries.push({
       url: `${baseUrl}/meshtastic/${slug}`,
       lastModified: now,

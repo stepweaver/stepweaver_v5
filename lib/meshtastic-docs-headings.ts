@@ -1,3 +1,11 @@
+/**
+ * Tailwind indent class for "On this page" TOC entries.
+ */
+export function headingIndentClass(level: 1 | 2 | 3, isFirst: boolean): string {
+  if (isFirst || level === 1) return "pl-0 font-medium";
+  return level === 2 ? "pl-4" : "pl-6";
+}
+
 export function slugifyHeading(text: string): string {
   if (!text || typeof text !== "string") return "section";
   return (
