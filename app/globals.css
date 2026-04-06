@@ -3,4 +3,5 @@
 @import "../styles/tokens.css" layer(theme);
 @import "../styles/components.css" layer(components);
 @import "../styles/animations.css" layer(utilities);
-@import "../styles/themes.css" layer(theme);
+/* Theme variable blocks must not sit in a weaker cascade layer than :root (base), or data-theme stops applying. */
+@import "../styles/themes.css" layer(base);

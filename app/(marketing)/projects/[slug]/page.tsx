@@ -134,7 +134,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                       src={project.imageUrl}
                       alt={project.title}
                       fill
-                      className="object-contain object-center drop-shadow-[0_0_24px_rgba(0,255,153,0.14)]"
+                      className="object-contain object-center drop-shadow-[0_0_24px_rgb(var(--green)/0.14)]"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 85vw, 900px"
                       priority
                     />

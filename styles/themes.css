@@ -1,5 +1,5 @@
-/* Auto-generated theme definitions */
-@layer theme {
+/* Auto-generated theme definitions (must stay in @layer base — see globals.css). */
+@layer base {
   [data-theme="dark"] {
     --window: 12 18 28;
     --header: 18 28 40;

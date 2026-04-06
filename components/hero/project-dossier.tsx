@@ -190,7 +190,7 @@ export const ProjectDossier = memo(function ProjectDossier({ projects = [] }: { 
           </div>
 
           <div className="mt-2 flex items-center gap-3">
-            <span className="h-2 w-2 bg-[rgb(var(--green))] shadow-[0_0_14px_rgba(0,255,153,0.45)]" />
+            <span className="h-2 w-2 bg-[rgb(var(--green))] shadow-[0_0_14px_rgb(var(--green)/0.45)]" />
             <span className="font-[var(--font-ocr)] text-xs uppercase tracking-[0.16em] text-[rgb(var(--text-secondary))] sm:text-sm">
               {moduleLabel}
             </span>
@@ -233,7 +233,7 @@ export const ProjectDossier = memo(function ProjectDossier({ projects = [] }: { 
               </div>
 
               <div className="absolute inset-0 bg-[linear-gradient(to_bottom,rgba(255,255,255,0.035)_1px,transparent_1px)] bg-[size:100%_12px] opacity-10" />
-              <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(0,255,153,0.04)_1px,transparent_1px)] bg-[size:20px_100%] opacity-10" />
+              <div className="absolute inset-0 bg-[linear-gradient(to_right,rgb(var(--green)/0.04)_1px,transparent_1px)] bg-[size:20px_100%] opacity-10" />
               <div className="absolute inset-0 bg-gradient-to-br from-[rgb(var(--neon)/0.08)] via-transparent to-[rgb(var(--green)/0.08)]" />
             </div>
 
@@ -243,7 +243,7 @@ export const ProjectDossier = memo(function ProjectDossier({ projects = [] }: { 
                   src={imageSrc}
                   alt={active.title || "Project image"}
                   fill
-                  className="object-contain object-center drop-shadow-[0_0_24px_rgba(0,255,153,0.16)]"
+                  className="object-contain object-center drop-shadow-[0_0_24px_rgb(var(--green)/0.16)]"
                   sizes="(max-width: 640px) 92vw, (max-width: 1024px) 60vw, 900px"
                   priority={activeIndex === 0}
                 />
@@ -324,7 +324,7 @@ export const ProjectDossier = memo(function ProjectDossier({ projects = [] }: { 
                 <ul className="space-y-2.5">
                   {proofBullets.map((line) => (
                     <li key={line} className="flex items-start gap-3 font-[var(--font-ibm)] text-sm text-[rgb(var(--text-secondary))]">
-                      <span className="mt-[0.45rem] h-[6px] w-[6px] shrink-0 bg-[rgb(var(--green))] shadow-[0_0_8px_rgba(0,255,153,0.45)]" />
+                      <span className="mt-[0.45rem] h-[6px] w-[6px] shrink-0 bg-[rgb(var(--green))] shadow-[0_0_8px_rgb(var(--green)/0.45)]" />
                       <span className="min-w-0 break-words">{line}</span>
                     </li>
                   ))}
