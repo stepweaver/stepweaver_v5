@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getInitialBlogEntries } from "@/lib/blog";
 import { getProjectSlugs } from "@/lib/data/projects";
-import { listPublishedDocs } from "@/lib/notion/meshtastic-docs.repo";
+import { getMeshtasticNotionConfigIssue, listPublishedDocs } from "@/lib/notion/meshtastic-docs.repo";
 import { MESHTASTIC_DOCS } from "@/lib/data/meshtastic-content";
 
 const STATIC_ROUTES = [
@@ -56,7 +56,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const meshtasticSlugs = new Set(MESHTASTIC_DOCS.map((d) => d.slug));
-  if (process.env.NOTION_MESHTASTIC_DOCS_DB_ID && process.env.NOTION_API_KEY) {
+  if (getMeshtasticNotionConfigIssue() === "ok") {
     try {
       const meshDocs = await listPublishedDocs();
       for (const d of meshDocs) {

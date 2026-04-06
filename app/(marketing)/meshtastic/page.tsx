@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { Radio } from "lucide-react";
-import { listPublishedDocs } from "@/lib/notion/meshtastic-docs.repo";
+import { getMeshtasticNotionConfigIssue, listPublishedDocs } from "@/lib/notion/meshtastic-docs.repo";
 import { getMeshtasticNav } from "@/lib/meshtastic-static-sidebar";
 import { MeshtasticDocsLayout } from "@/components/meshtastic-docs/meshtastic-docs-layout";
 
@@ -39,13 +39,24 @@ export default async function MeshtasticPage() {
     if (process.env.NODE_ENV === "development") console.error("[meshtastic] listPublishedDocs:", err);
   }
 
-  if (notionDocs.length > 0 && process.env.NOTION_MESHTASTIC_DOCS_DB_ID) {
+  if (notionDocs.length > 0) {
     redirect(`/meshtastic/${notionDocs[0].slug}`);
   }
 
   const { grouped, hasFieldNotes } = await getMeshtasticNav();
-  const hasDb = !!process.env.NOTION_MESHTASTIC_DOCS_DB_ID;
-  const notionEmpty = hasDb && notionDocs.length === 0;
+  const configIssue = getMeshtasticNotionConfigIssue();
+  const notionConfiguredButEmpty = configIssue === "ok" && notionDocs.length === 0;
+
+  const configHint =
+    configIssue === "missing_api_key"
+      ? "This server has a Meshtastic database ID but NOTION_API_KEY is missing or blank. On Vercel, open the project’s Environment Variables: ensure NOTION_API_KEY is enabled for Production (not only Preview or Development), save, then trigger a new deployment."
+      : configIssue === "invalid_database_id"
+        ? "NOTION_MESHTASTIC_DOCS_DB_ID must be the full Notion database UUID (32 hex characters, with or without hyphens). Remove stray spaces, quotes, or line breaks from the value."
+        : configIssue === "missing_database_id"
+          ? "Set NOTION_MESHTASTIC_DOCS_DB_ID and NOTION_API_KEY, share the Meshtastic Docs database with your Notion integration, then redeploy. Until then, use the sidebar for bundled static chapters."
+          : notionConfiguredButEmpty
+            ? "The database is linked, but no published chapters were returned. In Notion, set Status = Published on doc pages (normal slugs must not be “field-notes”). If the integration cannot access the DB, check sharing in Notion. Server logs may show [meshtastic] listPublishedDocs for API errors."
+            : "Open a chapter from the sidebar or read Field Notes. Bundled static pages ship with the site; when Notion returns published pages, the first chapter opens automatically from /meshtastic.";
 
   return (
     <MeshtasticDocsLayout
@@ -68,13 +79,7 @@ export default async function MeshtasticPage() {
               <Radio className="h-4 w-4 text-[rgb(var(--neon)/0.5)]" aria-hidden />
               <p className="font-[var(--font-ibm)] text-lg font-semibold text-neon">Meshtastic Field Notes</p>
             </div>
-            <p className="font-[var(--font-ocr)] text-sm leading-relaxed text-[rgb(var(--text-secondary))]">
-              {!hasDb
-                ? "Configure NOTION_MESHTASTIC_DOCS_DB_ID and share the Meshtastic Docs database with your Notion integration to pull published docs from Notion. Until then, use the sidebar for static chapters on this site."
-                : notionEmpty
-                  ? "The database is linked, but no published doc chapters were returned. In Notion, set Status = Published on your doc pages (Slugs must not be “field-notes” for normal chapters)."
-                  : "Open a chapter from the sidebar or read Field Notes. Static bundles ship with the site; publishing in Notion replaces the chapter list when entries exist there."}
-            </p>
+            <p className="font-[var(--font-ocr)] text-sm leading-relaxed text-[rgb(var(--text-secondary))]">{configHint}</p>
             <div className="mt-5 flex flex-wrap gap-3">
               {grouped[0]?.pages?.[0] ? (
                 <Link

@@ -3,11 +3,12 @@ import { Client } from "@notionhq/client";
 let notion: Client | null = null;
 
 export function getNotion(): Client {
-  if (!process.env.NOTION_API_KEY) {
+  const key = process.env.NOTION_API_KEY?.trim();
+  if (!key) {
     throw new Error("Missing env var: NOTION_API_KEY");
   }
   if (!notion) {
-    notion = new Client({ auth: process.env.NOTION_API_KEY });
+    notion = new Client({ auth: key });
   }
   return notion;
 }

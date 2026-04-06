@@ -1,5 +1,10 @@
 import { cache } from "react";
-import { listFieldNotes, listPublishedDocs, groupDocsBySection } from "@/lib/notion/meshtastic-docs.repo";
+import {
+  getMeshtasticNotionConfigIssue,
+  groupDocsBySection,
+  listFieldNotes,
+  listPublishedDocs,
+} from "@/lib/notion/meshtastic-docs.repo";
 import { getPageBlocks } from "@/lib/notion-blocks";
 import { MESHTASTIC_FIELD_NOTES } from "@/lib/data/meshtastic-content";
 import { filterTitleBlocks } from "@/lib/meshtastic-field-notes-filters";
@@ -15,7 +20,7 @@ const SITE_URL = process.env.SITE_URL || "https://stepweaver.dev";
 const absoluteImageUrl = `${SITE_URL}/images/stepweaver-dev.png`;
 
 const getCachedFieldNotes = cache(async () => {
-  if (!process.env.NOTION_API_KEY || !process.env.NOTION_MESHTASTIC_DOCS_DB_ID) return [];
+  if (getMeshtasticNotionConfigIssue() !== "ok") return [];
   return listFieldNotes();
 });
 

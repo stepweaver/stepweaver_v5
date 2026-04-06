@@ -1,7 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { FileText } from "lucide-react";
-import { getDocBySlug, getFlatDocList, listPublishedDocs } from "@/lib/notion/meshtastic-docs.repo";
+import {
+  getDocBySlug,
+  getFlatDocList,
+  getMeshtasticNotionConfigIssue,
+  listPublishedDocs,
+} from "@/lib/notion/meshtastic-docs.repo";
 import { getPageBlocks } from "@/lib/notion-blocks";
 import { getHeadingsFromBlocks } from "@/lib/meshtastic-docs-headings";
 import { NotionBlockBody } from "@/components/codex/notion-block-body";
@@ -28,7 +33,7 @@ const DEFAULT_PREVIEW = "/images/stepweaver-dev.png";
 
 export async function generateStaticParams() {
   const slugs = new Set(MESHTASTIC_DOCS.map((d) => d.slug));
-  if (process.env.NOTION_API_KEY && process.env.NOTION_MESHTASTIC_DOCS_DB_ID) {
+  if (getMeshtasticNotionConfigIssue() === "ok") {
     try {
       const docs = await listPublishedDocs();
       for (const d of docs) {
@@ -82,8 +87,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
   const { slug } = await props.params;
   const base = SITE_URL;
 
-  const notionDoc =
-    process.env.NOTION_API_KEY && process.env.NOTION_MESHTASTIC_DOCS_DB_ID ? await getDocBySlug(slug) : null;
+  const notionDoc = getMeshtasticNotionConfigIssue() === "ok" ? await getDocBySlug(slug) : null;
   const staticDoc = MESHTASTIC_DOC_BY_SLUG[slug];
 
   if (notionDoc) {
@@ -127,8 +131,7 @@ export async function generateMetadata(props: { params: Promise<{ slug: string }
 export default async function MeshtasticDocPage(props: { params: Promise<{ slug: string }> }) {
   const { slug } = await props.params;
 
-  const notionDoc =
-    process.env.NOTION_API_KEY && process.env.NOTION_MESHTASTIC_DOCS_DB_ID ? await getDocBySlug(slug) : null;
+  const notionDoc = getMeshtasticNotionConfigIssue() === "ok" ? await getDocBySlug(slug) : null;
   const staticDoc = MESHTASTIC_DOC_BY_SLUG[slug];
 
   if (!notionDoc && !staticDoc) notFound();
@@ -179,7 +182,10 @@ export default async function MeshtasticDocPage(props: { params: Promise<{ slug:
           </div>
 
           <div className="min-w-0 flex-1">
-            <article className="overflow-hidden rounded-sm border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)]">
+            <article
+              key={doc.slug}
+              className="overflow-hidden rounded-sm border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)]"
+            >
               <div className="flex items-center justify-between border-b border-[rgb(var(--neon)/0.2)] bg-[rgb(var(--panel)/0.5)] px-5 py-2.5 sm:px-6 lg:px-8">
                 <div className="flex items-center gap-2">
                   <FileText className="h-3 w-3 text-[rgb(var(--neon)/0.4)]" aria-hidden />
@@ -267,7 +273,10 @@ export default async function MeshtasticDocPage(props: { params: Promise<{ slug:
         </div>
 
         <div className="min-w-0 flex-1">
-          <article className="overflow-hidden rounded-sm border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)]">
+          <article
+            key={slug}
+            className="overflow-hidden rounded-sm border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)]"
+          >
             <div className="flex items-center justify-between border-b border-[rgb(var(--neon)/0.2)] bg-[rgb(var(--panel)/0.5)] px-5 py-2.5 sm:px-6 lg:px-8">
               <div className="flex items-center gap-2">
                 <FileText className="h-3 w-3 text-[rgb(var(--neon)/0.4)]" aria-hidden />

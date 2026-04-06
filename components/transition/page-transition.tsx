@@ -20,6 +20,14 @@ function pathKeyToPathname(pathKey: string) {
   return q === -1 ? pathKey : pathKey.slice(0, q);
 }
 
+/** Doc ↔ doc within meshtastic or codex: use crossfade instead of terminal-in (avoids timer races + RSC swap glitches). */
+function isSiblingContentDocNav(fromPathname: string, toPathname: string): boolean {
+  if (!fromPathname || !toPathname || fromPathname === toPathname) return false;
+  if (fromPathname.startsWith("/meshtastic/") && toPathname.startsWith("/meshtastic/")) return true;
+  if (fromPathname.startsWith("/codex/") && toPathname.startsWith("/codex/")) return true;
+  return false;
+}
+
 function usePrefersReducedMotion() {
   const [reduced, setReduced] = useState(false);
   useEffect(() => {
@@ -40,6 +48,11 @@ function PageTransitionInner({ children }: { children: ReactNode }) {
   const navCtx = useNavigationTransition();
   const intent = navCtx?.intent ?? null;
   const clearIntent = navCtx?.clearIntent;
+  /** Intent must not be a dep of the route-change effect: clearing it re-runs the effect, cleanup cancels crossfade rAFs, then early-return leaves opacity 0 forever. */
+  const intentRef = useRef(intent);
+  const clearIntentRef = useRef(clearIntent);
+  intentRef.current = intent;
+  clearIntentRef.current = clearIntent;
 
   const reducedMotion = usePrefersReducedMotion();
   const fadeMs = reducedMotion ? REDUCED_MOTION_FADE_MS : FADE_MS;
@@ -120,8 +133,10 @@ function PageTransitionInner({ children }: { children: ReactNode }) {
     const fromKey = prevKeyRef.current;
     prevKeyRef.current = locationKey;
 
-    if (intent && intent.pathKey === locationKey && clearIntent) {
-      clearIntent();
+    const intentNow = intentRef.current;
+    const clearNow = clearIntentRef.current;
+    if (intentNow && intentNow.pathKey === locationKey && clearNow) {
+      clearNow();
     }
 
     const wasEscalated = escalatedRef.current;
@@ -139,13 +154,14 @@ function PageTransitionInner({ children }: { children: ReactNode }) {
     }
 
     const toPathname = pathname;
+    const fromPathname = pathKeyToPathname(fromKey);
 
-    if (isContentRoute(toPathname)) {
+    if (isContentRoute(toPathname) && !isSiblingContentDocNav(fromPathname, toPathname)) {
       scheduleTerminalIn(CONTENT_BODY_MS, "content", locationKey, fromKey);
       return;
     }
 
-    if (wasEscalated) {
+    if (wasEscalated && !isSiblingContentDocNav(fromPathname, toPathname)) {
       scheduleTerminalIn(ESCALATED_BODY_MS, "standard", locationKey, fromKey);
       return;
     }
@@ -172,16 +188,7 @@ function PageTransitionInner({ children }: { children: ReactNode }) {
       cancelAnimationFrame(raf1);
       cancelAnimationFrame(raf2);
     };
-  }, [
-    locationKey,
-    pathname,
-    intent,
-    clearIntent,
-    reducedMotion,
-    clearTimers,
-    scheduleTerminalIn,
-    handoffMs,
-  ]);
+  }, [locationKey, pathname, reducedMotion, clearTimers, scheduleTerminalIn, handoffMs]);
 
   useEffect(() => () => clearTimers(), [clearTimers]);
 

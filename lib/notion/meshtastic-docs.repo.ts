@@ -19,16 +19,43 @@ export type MeshtasticPublishedDoc = {
   createdTime?: string;
 };
 
+/**
+ * Normalize Notion database ID (trim, strip wrapping quotes, re-hyphenate UUID).
+ * Copy/paste from the dashboard often includes trailing newlines — those broke production
+ * while dev `.env.local` stayed clean.
+ */
 function getMeshtasticDbId(): string | null {
-  const id = process.env.NOTION_MESHTASTIC_DOCS_DB_ID;
-  if (!id) return null;
-  const clean = id.replace(/-/g, "");
+  const raw = (process.env.NOTION_MESHTASTIC_DOCS_DB_ID ?? "")
+    .trim()
+    .replace(/^[\s'"`]+|[\s'"`]+$/g, "");
+  if (!raw) return null;
+  const clean = raw.replace(/-/g, "");
   if (clean.length < 32) return null;
   return `${clean.slice(0, 8)}-${clean.slice(8, 12)}-${clean.slice(12, 16)}-${clean.slice(16, 20)}-${clean.slice(20)}`;
 }
 
+/** Why Meshtastic cannot talk to Notion (safe to show in UI — no secrets). */
+export type MeshtasticNotionConfigIssue =
+  | "ok"
+  | "missing_database_id"
+  | "invalid_database_id"
+  | "missing_api_key";
+
+export function getMeshtasticNotionConfigIssue(): MeshtasticNotionConfigIssue {
+  const raw = (process.env.NOTION_MESHTASTIC_DOCS_DB_ID ?? "").trim();
+  if (!raw) return "missing_database_id";
+  if (!getMeshtasticDbId()) return "invalid_database_id";
+  if (!(process.env.NOTION_API_KEY ?? "").trim()) return "missing_api_key";
+  return "ok";
+}
+
 function isMeshtasticNotionConfigured(): boolean {
-  return !!(process.env.NOTION_API_KEY && getMeshtasticDbId());
+  return getMeshtasticNotionConfigIssue() === "ok";
+}
+
+function logMeshtasticNotionError(context: string, err: unknown): void {
+  const message = err instanceof Error ? err.message : String(err);
+  console.error(`[meshtastic] ${context}:`, message);
 }
 
 function getPropertyValue(property: Record<string, unknown> | undefined, type: string): string | null {
@@ -84,7 +111,7 @@ type QueryPage = PageObjectResponse | PartialPageObjectResponse;
 
 async function listPublishedDocsUncached(): Promise<MeshtasticPublishedDoc[]> {
   const dbId = getMeshtasticDbId();
-  if (!dbId || !process.env.NOTION_API_KEY) return [];
+  if (!dbId || !(process.env.NOTION_API_KEY ?? "").trim()) return [];
 
   try {
     const pages = await paginate<QueryPage>((cursor) =>
@@ -109,7 +136,7 @@ async function listPublishedDocsUncached(): Promise<MeshtasticPublishedDoc[]> {
       .filter((page) => page && typeof page === "object" && "properties" in page)
       .map(formatDocPage);
   } catch (err) {
-    if (process.env.NODE_ENV === "development") console.error("[listPublishedDocs]", err);
+    logMeshtasticNotionError("listPublishedDocs", err);
     return [];
   }
 }
@@ -125,7 +152,7 @@ export async function listPublishedDocs(): Promise<MeshtasticPublishedDoc[]> {
 
 async function getDocBySlugUncached(slug: string): Promise<MeshtasticPublishedDoc | null> {
   const dbId = getMeshtasticDbId();
-  if (!dbId || !slug || !process.env.NOTION_API_KEY) return null;
+  if (!dbId || !slug || !(process.env.NOTION_API_KEY ?? "").trim()) return null;
 
   try {
     const res = await getNotion().databases.query({
@@ -142,16 +169,21 @@ async function getDocBySlugUncached(slug: string): Promise<MeshtasticPublishedDo
     if (!page || !("properties" in page)) return null;
     return formatDocPage(page as PageObjectResponse);
   } catch (err) {
-    if (process.env.NODE_ENV === "development") console.error("[getDocBySlug]", err);
+    logMeshtasticNotionError("getDocBySlug", err);
     return null;
   }
 }
 
+/**
+ * Per-slug cache key is required (v3 parity). A static key like `["notion-meshtastic-doc"]` alone can
+ * collapse every chapter into one cached payload in App Router, so clicking sidebar links does not
+ * change the article body.
+ */
 export async function getDocBySlug(slug: string): Promise<MeshtasticPublishedDoc | null> {
   if (!slug || !isMeshtasticNotionConfigured()) return null;
   return unstable_cache(
     async (s: string) => getDocBySlugUncached(s),
-    ["notion-meshtastic-doc"],
+    ["notion-meshtastic-doc", slug],
     { revalidate: NOTION_CACHE_REVALIDATE, tags: ["notion-meshtastic-docs"] }
   )(slug);
 }
@@ -192,7 +224,7 @@ export function getFlatDocList(grouped: GroupedMeshtasticSection[]): MeshtasticP
 
 async function listFieldNotesUncached(): Promise<MeshtasticPublishedDoc[]> {
   const dbId = getMeshtasticDbId();
-  if (!dbId || !process.env.NOTION_API_KEY) return [];
+  if (!dbId || !(process.env.NOTION_API_KEY ?? "").trim()) return [];
 
   try {
     const pages = await paginate<QueryPage>((cursor) =>
@@ -213,7 +245,7 @@ async function listFieldNotesUncached(): Promise<MeshtasticPublishedDoc[]> {
       .filter((page) => page && typeof page === "object" && "properties" in page)
       .map(formatDocPage);
   } catch (err) {
-    if (process.env.NODE_ENV === "development") console.error("[listFieldNotes]", err);
+    logMeshtasticNotionError("listFieldNotes", err);
     return [];
   }
 }
