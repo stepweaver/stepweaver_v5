@@ -22,7 +22,10 @@ export type ChatMsg = {
   attachments?: Array<{ dataUrl: string; type: string }>;
 };
 
-export function useChat(options?: { inputRef?: React.RefObject<HTMLInputElement | null>; isVisible?: boolean }) {
+export function useChat(options?: {
+  inputRef?: React.RefObject<HTMLInputElement | HTMLTextAreaElement | null>;
+  isVisible?: boolean;
+}) {
   const { inputRef, isVisible = true } = options || {};
   const { getBotFields, honeypotProps } = useBotProtection();
   const [messages, setMessages] = useState<ChatMsg[]>([INITIAL_MESSAGE]);
@@ -150,7 +153,7 @@ export function useChat(options?: { inputRef?: React.RefObject<HTMLInputElement 
   );
 
   const handleSubmit = useCallback(
-    (e: React.FormEvent) => {
+    (e: React.SyntheticEvent) => {
       e.preventDefault();
       void sendMessage();
     },

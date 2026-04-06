@@ -1,16 +1,21 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import Image from "next/image";
-import { MessageCircle, X, Send, User, Paperclip, Loader2 } from "lucide-react";
+import { useState, useRef, useEffect, useLayoutEffect, useCallback } from "react";
+import Link from "next/link";
+import { MessageCircle, X, Send, Minimize2, Maximize2, Expand, Shrink } from "lucide-react";
 import { useChat } from "@/hooks/use-chat";
-import { parseChatLinksWithGlitch } from "@/components/chat/parse-chat-links";
-import { SourceCitations } from "@/components/chat/source-citations";
+import { useVisualViewportRect } from "@/hooks/use-visual-viewport-rect";
+import { useAutoScroll } from "@/hooks/use-auto-scroll";
+import { ChatMessageBubble, ChatLoadingIndicator } from "@/components/chat/chat-message";
+import { GlitchLambda } from "@/components/ui/glitch-lambda";
 
 export function ChatWidget() {
-  const [open, setOpen] = useState(false);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const fileRef = useRef<HTMLInputElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMinimized, setIsMinimized] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [hasNewMessage, setHasNewMessage] = useState(false);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+
   const {
     messages,
     input,
@@ -20,183 +25,310 @@ export function ChatWidget() {
     removeAttachment,
     isLoading,
     error,
-    sendMessage,
     handleSubmit,
     honeypotProps,
-  } = useChat({ inputRef, isVisible: open });
-  const endRef = useRef<HTMLDivElement>(null);
+  } = useChat({ inputRef, isVisible: isOpen && !isMinimized });
+
+  const { scrollerRef, endRef, isAtBottom, scrollToBottom, stickToBottom, scrollIfSticky } =
+    useAutoScroll({ bottomThreshold: 120 });
+
+  const visualViewportRect = useVisualViewportRect(isOpen && isFullscreen);
+
+  useLayoutEffect(() => {
+    if (isOpen && !isMinimized) {
+      scrollIfSticky(!isLoading);
+    }
+  }, [messages, isLoading, isOpen, isMinimized, scrollIfSticky]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        stickToBottom();
+        handleSubmit(e);
+      }
+    },
+    [handleSubmit, stickToBottom]
+  );
+
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLTextAreaElement>) => {
+      const items = e.clipboardData?.items;
+      if (!items) return;
+      for (const item of items) {
+        if (item.type.startsWith("image/")) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (!file || file.size > 4 * 1024 * 1024) continue;
+          const reader = new FileReader();
+          reader.onload = () => {
+            const r = reader.result;
+            if (typeof r === "string") addAttachment(r, file.type);
+          };
+          reader.readAsDataURL(file);
+          break;
+        }
+      }
+    },
+    [addAttachment]
+  );
+
+  const prevMessageCount = useRef(messages.length);
+  useEffect(() => {
+    if (messages.length > prevMessageCount.current && isMinimized) {
+      setHasNewMessage(true);
+    }
+    prevMessageCount.current = messages.length;
+  }, [messages.length, isMinimized]);
 
   useEffect(() => {
-    endRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [messages, open]);
+    if (isOpen && !isMinimized) setHasNewMessage(false);
+  }, [isOpen, isMinimized]);
 
-  const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    e.target.value = "";
-    if (!file || !file.type.startsWith("image/")) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result;
-      if (typeof dataUrl === "string") addAttachment(dataUrl, file.type);
-    };
-    reader.readAsDataURL(file);
+  const toggleOpen = () => {
+    if (!isOpen) {
+      setIsOpen(true);
+      setIsMinimized(false);
+      setIsFullscreen(true);
+    } else {
+      setIsOpen(false);
+      setIsFullscreen(false);
+    }
   };
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isFullscreen) setIsFullscreen(false);
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
+  }, [isFullscreen]);
+
+  const onFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    stickToBottom();
+    handleSubmit(e);
+  };
+
+  const vvStyle =
+    isFullscreen && isOpen
+      ? {
+          top: visualViewportRect.top,
+          height: visualViewportRect.height,
+          maxHeight: visualViewportRect.height,
+        }
+      : undefined;
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-6 right-6 z-[100] flex h-12 w-12 items-center justify-center border border-[rgb(var(--neon)/0.4)] bg-[rgb(var(--bg))] text-[rgb(var(--neon))] shadow-lg hover:bg-[rgb(var(--neon)/0.1)] transition-colors font-[var(--font-ocr)] text-xs"
-        aria-label={open ? "Close chat" : "Open lambda chat"}
-      >
-        {open ? <X className="w-5 h-5" /> : <MessageCircle className="w-5 h-5" />}
-      </button>
+      {isOpen ? (
+        <button
+          type="button"
+          aria-label="Close chat"
+          onClick={toggleOpen}
+          className="fixed inset-0 z-[90] bg-black/40 backdrop-blur-md cursor-pointer"
+        />
+      ) : null}
 
-      {open ? (
-        <div className="fixed bottom-24 right-6 z-[100] w-[min(100vw-2rem,380px)] border border-[rgb(var(--neon)/0.35)] bg-[rgb(var(--bg))] shadow-xl flex flex-col max-h-[min(70vh,480px)]">
-          <div className="px-3 py-2 border-b border-[rgb(var(--neon)/0.2)] flex items-center justify-between">
-            <span className="font-[var(--font-ocr)] text-xs tracking-wider text-[rgb(var(--neon))]">λ CHAT</span>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="text-[rgb(var(--muted-color))] hover:text-[rgb(var(--text-color))] p-1"
-              aria-label="Close"
+      {isOpen ? (
+        <div
+          className={`fixed ${
+            isFullscreen
+              ? "left-0 right-0 m-0 z-[200]"
+              : `transition-all duration-300 z-[100] ${
+                  isMinimized
+                    ? "bottom-20 right-4 sm:right-6 w-72 h-14"
+                    : "bottom-20 right-4 sm:right-6 w-[calc(100vw-2rem)] sm:w-[min(28rem,90vw)] md:w-[min(32rem,90vw)] h-[500px] max-h-[70vh]"
+                }`
+          }`}
+          style={vvStyle}
+        >
+          <div
+            className="hud-panel h-full flex flex-col relative overflow-hidden border-[rgb(var(--neon)/0.25)]"
+            style={{
+              background: "rgb(var(--panel))",
+              backdropFilter: "none",
+              boxShadow:
+                "0 0 24px rgb(var(--neon) / 0.25), 0 4px 30px rgba(0,0,0,0.4)",
+            }}
+          >
+            <div
+              className="flex items-center justify-between px-4 pt-4 pb-3 border-b border-[rgb(var(--neon)/0.2)]"
+              style={{ background: "rgb(var(--panel))" }}
             >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="flex-1 overflow-y-auto p-3 space-y-3 text-sm font-[var(--font-ibm)]">
-            {messages.map((m, i) => (
-              <div
-                key={i}
-                className={`flex gap-2 ${m.role === "user" ? "flex-row-reverse" : ""}`}
-              >
-                <div
-                  className={`flex-shrink-0 w-8 h-8 rounded flex items-center justify-center overflow-hidden ${
-                    m.role === "user"
-                      ? "bg-[rgb(var(--accent)/0.2)] text-[rgb(var(--accent))]"
-                      : "bg-[rgb(var(--neon)/0.2)] text-[rgb(var(--neon))]"
-                  }`}
+              <div className="flex items-center gap-2 flex-wrap min-w-0">
+                <span className="font-[var(--font-ibm)] text-base sm:text-lg font-semibold text-neon whitespace-nowrap flex items-center gap-1">
+                  <GlitchLambda className="text-neon" size="small" />
+                  lambda
+                </span>
+                <span className="font-mono text-[10px] text-[rgb(var(--neon)/0.5)] ml-1 shrink-0 hidden sm:inline">
+                  CHAT-00
+                </span>
+                {hasNewMessage && isMinimized ? (
+                  <span className="w-2 h-2 rounded-full bg-[rgb(var(--neon))] animate-pulse shrink-0" />
+                ) : null}
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                {!isMinimized && !isAtBottom ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      stickToBottom();
+                      scrollToBottom("smooth");
+                    }}
+                    className="text-xs text-[rgb(var(--neon)/0.8)] hover:text-neon underline cursor-pointer"
+                  >
+                    Jump to latest
+                  </button>
+                ) : null}
+                {!isMinimized ? (
+                  <button
+                    type="button"
+                    onClick={() => setIsFullscreen(!isFullscreen)}
+                    className="p-1 text-[rgb(var(--muted-color))] hover:text-neon transition-colors cursor-pointer"
+                    aria-label={isFullscreen ? "Exit fullscreen" : "Expand to fullscreen"}
+                  >
+                    {isFullscreen ? <Shrink className="w-4 h-4" /> : <Expand className="w-4 h-4" />}
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (isFullscreen) setIsFullscreen(false);
+                    setIsMinimized(!isMinimized);
+                  }}
+                  className="p-1 text-[rgb(var(--muted-color))] hover:text-neon transition-colors cursor-pointer"
+                  aria-label={isMinimized ? "Expand chat" : "Minimize chat"}
                 >
-                  {m.role === "user" ? (
-                    <User className="w-4 h-4" />
-                  ) : (
-                    <Image
-                      src="/images/lambda_stepweaver.png"
-                      alt=""
-                      width={18}
-                      height={18}
-                      className="object-contain"
-                    />
-                  )}
+                  {isMinimized ? <Maximize2 className="w-4 h-4" /> : <Minimize2 className="w-4 h-4" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={toggleOpen}
+                  className="p-1 text-[rgb(var(--muted-color))] hover:text-neon transition-colors cursor-pointer"
+                  aria-label="Close chat"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+
+            {!isMinimized ? (
+              <>
+                <div
+                  ref={scrollerRef}
+                  className="flex-1 overflow-y-auto p-3 space-y-3 min-h-0"
+                  style={{
+                    WebkitOverflowScrolling: "touch",
+                    overscrollBehavior: "contain",
+                    paddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))",
+                    scrollPaddingBottom: "calc(1rem + env(safe-area-inset-bottom, 0px))",
+                  }}
+                >
+                  {messages.map((message, index) => (
+                    <ChatMessageBubble key={index} message={message} variant="compact" />
+                  ))}
+                  {isLoading ? <ChatLoadingIndicator variant="compact" /> : null}
+                  {error ? (
+                    <div className="p-2.5 bg-[rgb(var(--danger)/0.1)] border border-[rgb(var(--danger)/0.3)] rounded-lg">
+                      <p className="text-danger font-[var(--font-ocr)] text-sm">{error}</p>
+                    </div>
+                  ) : null}
+                  <div ref={endRef} style={{ height: 1 }} />
                 </div>
-                <div
-                  className={`max-w-[80%] p-2.5 rounded font-[var(--font-ocr)] text-sm leading-relaxed border ${
-                    m.role === "user"
-                      ? "bg-[rgb(var(--cyan)/0.1)] border-[rgb(var(--cyan)/0.3)] text-[rgb(var(--text-color))]"
-                      : "bg-[rgb(var(--window)/0.5)] border-[rgb(var(--border)/0.35)] text-[rgb(var(--text-color))]"
-                  }`}
-                >
-                  {m.attachments && m.attachments.length > 0 ? (
-                    <div className="flex flex-wrap gap-1.5 mb-2">
-                      {m.attachments.map((att, j) => (
-                        // eslint-disable-next-line @next/next/no-img-element -- user data URL previews
-                        <img
-                          key={j}
-                          src={att.dataUrl}
-                          alt=""
-                          className="max-w-full max-h-24 object-contain rounded border border-[rgb(var(--border)/0.5)]"
-                        />
+
+                <form onSubmit={onFormSubmit} className="p-3 border-t border-[rgb(var(--neon)/0.2)] relative">
+                  <div
+                    aria-hidden="true"
+                    className="absolute -left-[9999px] opacity-0 h-0 w-0 overflow-hidden pointer-events-none"
+                  >
+                    <input {...honeypotProps} />
+                  </div>
+                  {attachments.length > 0 ? (
+                    <div className="flex flex-wrap gap-2 mb-2">
+                      {attachments.map((att, i) => (
+                        <div key={i} className="relative group inline-block">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={att.dataUrl}
+                            alt="Pasted"
+                            className="w-14 h-14 object-cover rounded border border-[rgb(var(--neon)/0.3)]"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => removeAttachment(i)}
+                            className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[rgb(var(--danger))] text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                            aria-label="Remove image"
+                          >
+                            ×
+                          </button>
+                        </div>
                       ))}
                     </div>
                   ) : null}
-                  {m.content ? (
-                    <div className="whitespace-pre-wrap break-words">
-                      {parseChatLinksWithGlitch(m.content)}
-                    </div>
-                  ) : null}
-                  {m.role === "assistant" && m.citations && m.citations.length > 0 ? (
-                    <SourceCitations citations={m.citations} />
-                  ) : null}
-                </div>
-              </div>
-            ))}
-            {isLoading ? (
-              <div className="flex gap-2">
-                <div className="flex-shrink-0 w-8 h-8 rounded flex items-center justify-center bg-[rgb(var(--neon)/0.2)] overflow-hidden">
-                  <Image
-                    src="/images/lambda_stepweaver.png"
-                    alt=""
-                    width={18}
-                    height={18}
-                    className="object-contain"
-                  />
-                </div>
-                <div className="bg-[rgb(var(--panel)/0.5)] border border-[rgb(var(--neon)/0.2)] p-2.5 rounded-lg">
-                  <Loader2 className="w-4 h-4 text-[rgb(var(--neon))] animate-spin" />
-                </div>
-              </div>
+                  <div className="flex gap-2 items-end">
+                    <textarea
+                      ref={inputRef}
+                      value={input}
+                      onChange={(e) => setInput(e.target.value)}
+                      onKeyDown={handleKeyDown}
+                      onPaste={handlePaste}
+                      placeholder="Ask me anything… (Shift+Enter for new line, paste images)"
+                      rows={3}
+                      className="flex-1 min-w-0 bg-[rgb(var(--panel)/0.4)] border border-[rgb(var(--neon)/0.25)] text-[rgb(var(--text-color))] font-[var(--font-ocr)] text-base sm:text-sm min-h-[5rem] max-h-40 p-2.5 focus:outline-none focus:ring-1 focus:ring-[rgb(var(--neon)/0.4)] focus:border-[rgb(var(--neon)/0.5)] placeholder:text-[rgb(var(--muted-color)/0.6)] resize-y overflow-y-auto"
+                      disabled={isLoading}
+                      style={{ resize: "vertical" }}
+                    />
+                    <button
+                      type="submit"
+                      disabled={isLoading || (!input.trim() && attachments.length === 0)}
+                      className="px-3 py-2 bg-[rgb(var(--neon)/0.1)] border border-[rgb(var(--neon))] text-neon rounded hover:bg-[rgb(var(--neon)/0.2)] disabled:opacity-50 disabled:cursor-not-allowed transition-colors cursor-pointer shrink-0"
+                      aria-label="Send message"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-[rgb(var(--muted-color)/0.85)] font-[var(--font-ocr)] mt-2 text-center">
+                    Conversations are processed by Groq API and not stored.{" "}
+                    <Link
+                      href="/privacy"
+                      className="text-neon hover:text-accent underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Privacy Policy
+                    </Link>
+                  </p>
+                </form>
+              </>
             ) : null}
-            {error ? <div className="text-[rgb(var(--red))] text-xs">{error}</div> : null}
-            <div ref={endRef} />
           </div>
-          <form
-            className="relative p-2 border-t border-[rgb(var(--neon)/0.2)] flex flex-col gap-2"
-            onSubmit={handleSubmit}
-          >
-            <div aria-hidden="true" className="absolute -left-[9999px] opacity-0 h-0 w-0 overflow-hidden pointer-events-none">
-              <input {...honeypotProps} />
-            </div>
-            {attachments.length > 0 ? (
-              <div className="flex flex-wrap gap-1">
-                {attachments.map((a, idx) => (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={() => removeAttachment(idx)}
-                    className="text-[10px] text-[rgb(var(--muted-color))] border border-[rgb(var(--border)/0.4)] px-1 rounded"
-                  >
-                    × img {idx + 1}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-            <div className="flex gap-2">
-              <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/jpg,image/webp,image/gif" className="hidden" onChange={onFile} />
-              <button
-                type="button"
-                onClick={() => fileRef.current?.click()}
-                className="shrink-0 p-2 border border-[rgb(var(--border)/0.5)] text-[rgb(var(--muted-color))] hover:text-[rgb(var(--neon))]"
-                aria-label="Attach image"
-              >
-                <Paperclip className="w-4 h-4" />
-              </button>
-              <input
-                ref={inputRef}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && !e.shiftKey) {
-                    e.preventDefault();
-                    void sendMessage();
-                  }
-                }}
-                placeholder="Message λlambda…"
-                className="flex-1 bg-transparent border border-[rgb(var(--border)/0.5)] px-2 py-1.5 text-sm text-[rgb(var(--text-color))] outline-none focus:border-[rgb(var(--neon)/0.5)]"
-                disabled={isLoading}
-              />
-              <button
-                type="submit"
-                disabled={isLoading || (!input.trim() && attachments.length === 0)}
-                className="px-3 py-1.5 border border-[rgb(var(--neon)/0.4)] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)] disabled:opacity-40"
-                aria-label="Send"
-              >
-                <Send className="w-4 h-4" />
-              </button>
-            </div>
-          </form>
         </div>
+      ) : null}
+
+      {!isFullscreen ? (
+        <button
+          type="button"
+          onClick={toggleOpen}
+          className={`fixed bottom-4 right-4 sm:right-6 z-[100] w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 cursor-pointer border-2 ${
+            isOpen
+              ? "border-[rgb(var(--neon)/0.5)] text-neon hover:bg-[rgb(var(--neon)/0.1)]"
+              : "border-[rgb(var(--neon))] text-neon hover:bg-[rgb(var(--neon)/0.3)] hover:shadow-[0_0_18px_rgb(var(--neon)/0.4)]"
+          }`}
+          style={{ background: "rgb(var(--panel))" }}
+          aria-label={isOpen ? "Close chat" : "Open chat"}
+        >
+          {isOpen ? (
+            <X className="w-6 h-6" />
+          ) : (
+            <>
+              <MessageCircle className="w-6 h-6" />
+              {hasNewMessage ? (
+                <span className="absolute top-0 right-0 w-3 h-3 rounded-full bg-[rgb(var(--neon))] motion-safe:animate-pulse" />
+              ) : null}
+            </>
+          )}
+        </button>
       ) : null}
     </>
   );

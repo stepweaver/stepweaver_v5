@@ -92,7 +92,12 @@ export type RollResult = {
   subtotal: number;
   total: number;
   breakdown: RollBreakdown[];
+  timestamp?: string;
+  /** Set by dice UI when saving to history */
+  comment?: string;
 };
+
+export type DicePoolDie = { sides: number; count: number; color: string };
 
 export function roll(notation: string): RollResult {
   const { groups, modifier } = parseDiceNotation(notation);
@@ -105,6 +110,7 @@ export function roll(notation: string): RollResult {
       subtotal: 0,
       total: modifier,
       breakdown: [],
+      timestamp: new Date().toISOString(),
     };
   }
 
@@ -136,7 +142,78 @@ export function roll(notation: string): RollResult {
     subtotal,
     total: subtotal + modifier,
     breakdown,
+    timestamp: new Date().toISOString(),
   };
+}
+
+export function rerollWithHeldDice(currentResult: RollResult, heldDice: Set<string>): RollResult {
+  if (!currentResult?.breakdown?.length) return currentResult;
+
+  const newBreakdown: RollBreakdown[] = [];
+  const newRolls: RollResult["rolls"] = [];
+  let subtotal = 0;
+
+  currentResult.breakdown.forEach((group, groupIndex) => {
+    const newResults = [...group.results];
+    const sidesMatch = group.notation.match(/\d+d(\d+)/);
+    const sides = sidesMatch ? parseInt(sidesMatch[1]!, 10) : 0;
+
+    group.results.forEach((result, resultIndex) => {
+      const key = `${groupIndex}-${resultIndex}`;
+      if (!heldDice.has(key) && sides >= 2) {
+        newResults[resultIndex] = rollSingleDie(sides);
+      }
+    });
+
+    const groupTotal = newResults.reduce((sum, val) => sum + val, 0);
+
+    newBreakdown.push({
+      notation: group.notation,
+      results: newResults,
+      subtotal: groupTotal,
+    });
+
+    newRolls.push({
+      sides,
+      count: group.results.length,
+      results: newResults,
+      subtotal: groupTotal,
+    });
+
+    subtotal += groupTotal;
+  });
+
+  const total = subtotal + currentResult.modifier;
+
+  return {
+    ...currentResult,
+    breakdown: newBreakdown,
+    rolls: newRolls,
+    subtotal,
+    total,
+    timestamp: new Date().toISOString(),
+  };
+}
+
+export function buildNotation(dicePool: DicePoolDie[], modifier = 0): string {
+  if (!dicePool || dicePool.length === 0) {
+    return modifier !== 0 ? `${modifier > 0 ? "+" : ""}${modifier}` : "";
+  }
+
+  const parts = dicePool.filter((die) => die.count > 0).map((die) => `${die.count}d${die.sides}`);
+
+  let notation = parts.join(" + ");
+
+  if (modifier !== 0) {
+    notation += modifier > 0 ? ` + ${modifier}` : ` - ${Math.abs(modifier)}`;
+  }
+
+  return notation || "0";
+}
+
+export function validateDicePool(dicePool: DicePoolDie[]): boolean {
+  if (!Array.isArray(dicePool) || dicePool.length === 0) return false;
+  return dicePool.some((die) => die.count > 0);
 }
 
 export function formatRollResult(result: RollResult): string {

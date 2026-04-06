@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { getProjectBySlug, getProjectSlugs } from "@/lib/data/projects";
 import { ProjectSectionRenderer } from "@/components/project/section-renderer";
 import { ProjectCaseChat } from "@/components/project/project-case-chat";
@@ -114,7 +115,33 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <ProjectCaseChat slug={slug} title={project.title} summary={project.description} />
           </aside>
 
-          <div className="space-y-6">
+          <div className="space-y-6 min-w-0">
+            {project.imageUrl ? (
+              <div className="relative min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] border border-[rgb(var(--green)/0.15)] bg-[rgb(var(--window)/0.2)] overflow-hidden">
+                <div className="absolute inset-0">
+                  <Image
+                    src={project.imageUrl}
+                    alt=""
+                    fill
+                    className="object-cover scale-110 opacity-15 blur-2xl"
+                    sizes="(max-width: 1024px) 100vw, 70vw"
+                    priority
+                  />
+                </div>
+                <div className="relative flex min-h-[280px] sm:min-h-[360px] lg:min-h-[480px] items-center justify-center px-6 py-8">
+                  <div className="relative h-[220px] w-full max-w-[920px] sm:h-[300px] lg:h-[420px]">
+                    <Image
+                      src={project.imageUrl}
+                      alt={project.title}
+                      fill
+                      className="object-contain object-center drop-shadow-[0_0_24px_rgba(0,255,153,0.14)]"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 85vw, 900px"
+                      priority
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : null}
             {project.sections.map((section) => (
               <ProjectSectionRenderer key={section.id} section={section} />
             ))}

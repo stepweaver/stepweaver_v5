@@ -20,7 +20,7 @@ const BANNER: Omit<TerminalLine, "id">[] = [
   { content: "", variant: "default" },
 ];
 
-export function Terminal() {
+export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
   const router = useRouter();
   const [lines, setLines] = useState<TerminalLine[]>(() =>
     BANNER.map((l) => ({ ...l, id: makeId() }))
@@ -250,38 +250,47 @@ export function Terminal() {
   const promptText =
     contact.isActive ? "[contact]" : mode === "normal" ? "guest@stepweaver:~$" : "[" + mode + "]";
 
+  const core = (
+    <div className="terminal-window h-full min-h-0 flex flex-col">
+      <div className="terminal-header shrink-0">
+        <span className="text-xs text-[rgb(var(--muted-color))] font-[var(--font-ocr)]">stepweaver-terminal</span>
+        <span className="ml-auto text-xs text-[rgb(var(--neon))] font-[var(--font-ocr)]">{promptText}</span>
+      </div>
+      <div
+        className="terminal-body flex-1 min-h-0 overflow-y-auto"
+        onClick={() => inputRef.current?.focus()}
+      >
+        {lines.map((line) => (
+          <TerminalOutputLine key={line.id} line={line} />
+        ))}
+        <div className="flex items-center">
+          <span className="text-[rgb(var(--green))] font-[var(--font-ibm)] text-sm whitespace-pre mr-1">
+            {promptText}
+          </span>
+          <input
+            ref={inputRef}
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            className="flex-1 bg-transparent border-none outline-none text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-sm caret-[rgb(var(--neon))]"
+            autoFocus
+            spellCheck={false}
+            autoComplete="off"
+          />
+        </div>
+        <div ref={bottomRef} />
+      </div>
+    </div>
+  );
+
+  if (embedded) {
+    return core;
+  }
+
   return (
     <div className="min-h-screen pt-14 pb-8">
-      <div className="max-w-4xl mx-auto px-4">
-        <div className="terminal-window">
-          <div className="terminal-header">
-            <span className="text-xs text-[rgb(var(--muted-color))] font-[var(--font-ocr)]">stepweaver-terminal</span>
-            <span className="ml-auto text-xs text-[rgb(var(--neon))] font-[var(--font-ocr)]">{promptText}</span>
-          </div>
-          <div className="terminal-body" onClick={() => inputRef.current?.focus()}>
-            {lines.map((line) => (
-              <TerminalOutputLine key={line.id} line={line} />
-            ))}
-            <div className="flex items-center">
-              <span className="text-[rgb(var(--green))] font-[var(--font-ibm)] text-sm whitespace-pre mr-1">
-                {promptText}
-              </span>
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="flex-1 bg-transparent border-none outline-none text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-sm caret-[rgb(var(--neon))]"
-                autoFocus
-                spellCheck={false}
-                autoComplete="off"
-              />
-            </div>
-            <div ref={bottomRef} />
-          </div>
-        </div>
-      </div>
+      <div className="max-w-4xl mx-auto px-4">{core}</div>
     </div>
   );
 }

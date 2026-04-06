@@ -61,6 +61,14 @@
     to { width: 100%; }
   }
 
+  @keyframes diceRoll {
+    0% { transform: rotate(0deg) scale(1); }
+    25% { transform: rotate(90deg) scale(1.1); }
+    50% { transform: rotate(180deg) scale(0.9); }
+    75% { transform: rotate(270deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+  }
+
   .animate-blink { animation: blink 1s step-end infinite; }
   .animate-glitch { animation: glitch 0.3s ease-in-out infinite; }
   .animate-fade-in { animation: fadeIn 0.5s ease-out; }
@@ -72,6 +80,7 @@
   .animate-caret { animation: terminalCaret 1s step-end infinite; }
   .animate-hud-slide { animation: hudSlide 0.4s ease-out; }
   .animate-progress { animation: progressFill 1s ease-out; }
+  .animate-dice-roll { animation: diceRoll 0.8s ease-in-out infinite; }
 
   .animation-delay-200 { animation-delay: 200ms; }
   .animation-delay-400 { animation-delay: 400ms; }

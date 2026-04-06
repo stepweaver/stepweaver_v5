@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { GlitchLambda } from "@/components/ui/glitch-lambda";
 
 const NAV_LINKS = [
   { label: "Brief", href: "/brief" },
@@ -21,8 +22,12 @@ export function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-14">
-          <Link href="/" className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider hover:text-[rgb(var(--accent))] transition-colors">
-            λstepweaver
+          <Link
+            href="/"
+            className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider hover:text-[rgb(var(--accent))] transition-colors inline-flex items-center gap-0.5"
+          >
+            <GlitchLambda size="small" className="text-[rgb(var(--neon))]" />
+            stepweaver
           </Link>
 
           <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">

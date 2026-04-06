@@ -8,7 +8,7 @@ type Props = {
   glitchInterval?: number;
   initialDelay?: number;
   children?: React.ReactNode;
-  size?: "small" | "normal";
+  size?: "small" | "normal" | "large" | "xl";
 };
 
 export function GlitchLambda({
@@ -36,7 +36,8 @@ export function GlitchLambda({
       };
     }
 
-    const dur = size === "small" ? 300 : 400;
+    const dur =
+      size === "large" ? 400 : size === "xl" ? 500 : size === "small" ? 300 : 300;
     const trigger = () => {
       setGlitching(true);
       setTimeout(() => setGlitching(false), dur);
@@ -63,9 +64,18 @@ export function GlitchLambda({
     };
   }, [autoGlitch, glitchInterval, initialDelay, size]);
 
+  const glitchClass =
+    size === "large" || size === "xl"
+      ? "animate-glitch motion-safe:scale-100"
+      : "animate-glitch";
+
   return (
     <span
-      className={`inline-block font-[var(--font-ocr)] ${glitching ? "animate-glitch" : ""} ${className}`}
+      className={`inline-block font-[var(--font-ocr)] font-bold will-change-[filter] ${
+        glitching
+          ? `text-accent ${glitchClass} motion-safe:drop-shadow-[0_0_6px_rgb(var(--accent)/0.55)]`
+          : "text-neon motion-safe:drop-shadow-[0_0_3px_rgb(var(--neon)/0.4)]"
+      } ${className}`}
       aria-hidden
     >
       {children}
