@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -8,6 +8,10 @@ export default function ContactPage() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const pageOpenedAt = useRef<number | null>(null);
+  useEffect(() => {
+    pageOpenedAt.current = Date.now();
+  }, []);
 
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
@@ -17,7 +21,14 @@ export default function ContactPage() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, message, _hp_website: "", _t: Date.now(), _d: 2000 }),
+        body: JSON.stringify({
+          name,
+          email,
+          message,
+          _hp_website: "",
+          _t: pageOpenedAt.current ?? Date.now(),
+          _d: Math.max(0, Date.now() - (pageOpenedAt.current ?? Date.now())),
+        }),
       });
       if (!res.ok) {
         const data = await res.json();

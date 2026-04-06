@@ -37,9 +37,15 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
   });
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const previousLinesLength = useRef(lines.length);
 
+  // Only scroll when new output is appended (v3 parity: avoid fighting user scroll / smooth re-attachments).
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const increased = lines.length > previousLinesLength.current;
+    previousLinesLength.current = lines.length;
+    if (increased && bottomRef.current) {
+      bottomRef.current.scrollIntoView({ behavior: "auto", block: "end" });
+    }
   }, [lines]);
 
   const addLines = useCallback((newLines: Omit<TerminalLine, "id">[]) => {
@@ -77,13 +83,14 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
         ]);
       } else if (contact.step === 3) {
         if (trimmed === "send") {
+          const flowStart = contact.timestamp ?? Date.now();
           const payload = {
             name: contact.data.name,
             email: contact.data.email,
             message: contact.data.message,
             _hp_website: "",
-            _t: Date.now(),
-            _d: 2000,
+            _t: flowStart,
+            _d: Math.max(0, Date.now() - flowStart),
           };
           try {
             const res = await fetch("/api/contact", {

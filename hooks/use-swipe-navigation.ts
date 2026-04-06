@@ -28,6 +28,8 @@ export function useSwipeNavigation(opts: {
   const draggingRef = useRef(false);
   const startedOnInteractiveRef = useRef(false);
   const lockRef = useRef(false);
+  /** Last offset committed to React state (reduces re-renders on every pointermove). */
+  const lastEmittedOffsetRef = useRef(0);
 
   const [dragOffset, setDragOffset] = useState(0);
 
@@ -37,6 +39,7 @@ export function useSwipeNavigation(opts: {
     startYRef.current = 0;
     draggingRef.current = false;
     startedOnInteractiveRef.current = false;
+    lastEmittedOffsetRef.current = 0;
     setDragOffset(0);
   }, []);
 
@@ -83,9 +86,13 @@ export function useSwipeNavigation(opts: {
       const horizontalIntent = Math.abs(deltaX) > Math.abs(deltaY) * intentRatio;
 
       if (horizontalIntent) {
-        const clamped = Math.max(-24, Math.min(24, deltaX * 0.18));
-        setDragOffset(clamped);
-      } else {
+        const clamped = Math.round(Math.max(-24, Math.min(24, deltaX * 0.18)));
+        if (clamped !== lastEmittedOffsetRef.current) {
+          lastEmittedOffsetRef.current = clamped;
+          setDragOffset(clamped);
+        }
+      } else if (lastEmittedOffsetRef.current !== 0) {
+        lastEmittedOffsetRef.current = 0;
         setDragOffset(0);
       }
     },

@@ -39,16 +39,44 @@ export function checkOrigin(request: NextRequest): string | null {
   return null;
 }
 
+/** Matches v3 `botProtection` timing: page-age via `_d`, or flow duration from anchor `_t`. */
+const MIN_PAGE_AGE_MS = 400;
+const MIN_FLOW_DURATION_MS = 500;
+
 export function checkBotProtection(body: Record<string, unknown>): string | null {
   const honeypot = body._hp_website as string | undefined;
-  if (honeypot && honeypot.length > 0) {
+  if (honeypot && String(honeypot).trim().length > 0) {
     return "honeypot-filled";
   }
-  const timestamp = body._t as number | undefined;
-  if (timestamp) {
-    const now = Date.now();
-    if (timestamp > now + 5000) return "future-timestamp";
-    if (now - timestamp < 500) return "too-fast";
+
+  const submittedAt = Number(body._t);
+  const elapsedField = body._d;
+  const now = Date.now();
+
+  if (!Number.isFinite(submittedAt) || submittedAt <= 0) {
+    return "missing_timestamp";
+  }
+  if (submittedAt > now + 5000) {
+    return "future-timestamp";
+  }
+
+  if (elapsedField !== undefined && elapsedField !== null) {
+    const elapsedMs = Number(elapsedField);
+    if (!Number.isFinite(elapsedMs) || elapsedMs < 0) {
+      return "invalid_elapsed";
+    }
+    if (elapsedMs < MIN_PAGE_AGE_MS) {
+      return "too-fast";
+    }
+    return null;
+  }
+
+  const elapsed = now - submittedAt;
+  if (elapsed < 0) {
+    return "invalid_timestamp";
+  }
+  if (elapsed < MIN_FLOW_DURATION_MS) {
+    return "too-fast";
   }
   return null;
 }
