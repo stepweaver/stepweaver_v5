@@ -49,3 +49,6 @@ credentials.txt
 
 # Agent session exports
 session-*.md
+
+.vercel
+.env*.local
