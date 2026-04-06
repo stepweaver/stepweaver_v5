@@ -11,7 +11,7 @@ if (!fs.existsSync(dataPath)) {
 }
 const themes = require("./theme-data.json");
 let css =
-  "/* Auto-generated from theme-data.json */\n/* Must use @layer base — see globals.css import. */\n@layer base {\n";
+  "/* Auto-generated from theme-data.json */\n/* Must use @layer base; see globals.css import. */\n@layer base {\n";
 for (const [name, t] of Object.entries(themes)) {
   css += `  [data-theme="${name}"] {\n`;
   for (const [k, v] of Object.entries(t)) {

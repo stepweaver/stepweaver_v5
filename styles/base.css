@@ -60,7 +60,7 @@
     min-height: 100vh;
   }
 
-  /* Themed scrollbars (viewport + overflow regions) — Firefox */
+  /* Themed scrollbars (viewport + overflow regions), Firefox */
   * {
     scrollbar-width: thin;
     scrollbar-color: rgb(var(--neon) / 0.42) rgb(var(--panel) / 0.65);

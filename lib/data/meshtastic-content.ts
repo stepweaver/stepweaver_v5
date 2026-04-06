@@ -18,14 +18,14 @@ export const MESHTASTIC_DOCS: MeshtasticDoc[] = [
       },
       {
         type: "p",
-        text: "It is useful when cellular service is absent, expensive, or undesirable—trail coordination, rural property, event ops, and resilient neighborhood comms. Encryption is handled at the application layer; range depends on antennas, terrain, and regulatory power limits.",
+        text: "It is useful when cellular service is absent, expensive, or undesirable: trail coordination, rural property, event ops, and resilient neighborhood comms. Encryption is handled at the application layer; range depends on antennas, terrain, and regulatory power limits.",
       },
       {
         type: "ul",
         items: [
           "Off-grid by default: no ISP required for mesh payloads",
           "Community firmware and clients; active hardware ecosystem",
-          "Regional duty-cycle and power rules still apply—plan legally",
+          "Regional duty-cycle and power rules still apply; plan legally",
         ],
       },
     ],
@@ -62,7 +62,7 @@ export const MESHTASTIC_DOCS: MeshtasticDoc[] = [
       },
       {
         type: "p",
-        text: "Expect learning through measurement—prediction is hard without line-of-sight data. Elevate antennas, reduce obstructions, and avoid detuning from metal cases. Document what works; field notes beat guessing.",
+        text: "Expect learning through measurement; prediction is hard without line-of-sight data. Elevate antennas, reduce obstructions, and avoid detuning from metal cases. Document what works; field notes beat guessing.",
       },
       {
         type: "ul",
@@ -119,7 +119,7 @@ export const MESHTASTIC_FIELD_NOTES: FieldNote[] = [
     summary:
       "Two T-Beams as routers on rooftops, one Heltec client handheld. Through downtown grid, direct hops failed at ~0.4 mi street level; rooftop path held ~1.1 mi LoS with 5 dBi omni.",
     bullets: [
-      "SNR collapsed near steel curtain wall—rerouted via roof router",
+      "SNR collapsed near steel curtain wall; rerouted via roof router",
       " MQTT disabled for this run to isolate RF-only behavior",
     ],
   },
@@ -136,6 +136,6 @@ export const MESHTASTIC_FIELD_NOTES: FieldNote[] = [
     date: "2025-08-30",
     title: "Firmware bump checklist",
     summary:
-      "Flashed 2.6.x → current stable on three nodes; re-applied channel PSKs and verifiedmodem preset. Post-flash, re-pair Bluetooth on phones—UUID cache invalidated.",
+      "Flashed 2.6.x → current stable on three nodes; re-applied channel PSKs and verified modem preset. Post-flash, re-pair Bluetooth on phones; the UUID cache was invalidated.",
   },
 ];

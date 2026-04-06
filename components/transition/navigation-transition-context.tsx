@@ -21,12 +21,14 @@ type Ctx = {
 const NavigationTransitionContext = createContext<Ctx | null>(null);
 
 /**
- * Captures in-app navigation intent on pointerdown so transitions can start before the route commits.
+ * Captures in-app navigation intent on real link activation (click), not on pointerdown.
+ * Touch and pen fire pointerdown on contact; using that caused full-tree re-renders (via setIntent)
+ * when users scrolled past links or explored without tapping. Click only fires after a committed activation.
  * Ported from v3 `NavigationTransitionContext.jsx`.
  */
 function NavigationIntentCapture({ beginNavigation }: { beginNavigation: (_pathKey: string) => void }) {
   useEffect(() => {
-    const onPointerDown = (event: PointerEvent) => {
+    const onClickCapture = (event: MouseEvent) => {
       if (event.button !== 0) return;
       const target = event.target;
       if (!(target instanceof Element)) return;
@@ -59,8 +61,8 @@ function NavigationIntentCapture({ beginNavigation }: { beginNavigation: (_pathK
       beginNavigation(pathKey);
     };
 
-    document.addEventListener("pointerdown", onPointerDown, true);
-    return () => document.removeEventListener("pointerdown", onPointerDown, true);
+    document.addEventListener("click", onClickCapture, true);
+    return () => document.removeEventListener("click", onClickCapture, true);
   }, [beginNavigation]);
 
   return null;
