@@ -1,7 +1,7 @@
 export const metadata = { title: "Services", description: "What I build." };
 
 const SIGNALS = [
-  { title: "Shipped Systems", signal: "8+ projects", explanation: "Production systems across multiple domains", source: "Projects" },
+  { title: "Shipped Systems", signal: "20 case studies", explanation: "Full catalog on /projects, builds and service lines", source: "Projects" },
   { title: "Technical Depth", signal: "Full-stack", explanation: "Architecture through deployment", source: "Capabilities" },
   { title: "Clean Architecture", signal: "TypeScript strict", explanation: "Typed boundaries, validated inputs", source: "Standards" },
 ];

@@ -1,5 +1,5 @@
 /**
- * Optional generator for styles/themes.css — source of truth is themes.css itself.
+ * Optional generator for styles/themes.css; source of truth is themes.css itself.
  * If theme-data.json is added later, run: node gen-themes.js
  */
 const fs = require("fs");

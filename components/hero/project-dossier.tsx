@@ -89,7 +89,7 @@ export const ProjectDossier = memo(function ProjectDossier({ projects = [] }: { 
     if (!active) return [];
     const chips: string[] = [];
     if (active.status === "coming-soon") {
-      chips.push(active.slug === "cerebro" ? "Build in Progress" : "Coming Soon");
+      chips.push(active.slug === "lcerebro" ? "Build in Progress" : "Coming Soon");
     }
     if (active.status === "demo") chips.push("Demo");
     const kw = active.keywords?.[0] ?? active.tags[0];

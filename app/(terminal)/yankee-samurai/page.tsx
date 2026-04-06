@@ -148,7 +148,7 @@ export default function YankeeSamuraiPage() {
 
                   <p>
                     When I was in the service, I was given a creed. It was not written for public consumption. It was
-                    something I internalized. It said &quot;language is my weapon&quot; — not my sword, not my rifle. My
+                    something I internalized. It said &quot;language is my weapon&quot;, not my sword, not my rifle. My
                     language. And it said I must not make an error. Because error could mean miscalculation or escalation.
                     It could mean someone doesn&apos;t come home. That kind of pressure reshapes you. It makes you slower
                     to speak. It makes you suspicious of certainty. It makes you allergic to exaggeration. You begin to
@@ -176,7 +176,7 @@ export default function YankeeSamuraiPage() {
                     So what is a Yankee Samurai? Not a warrior in the cinematic sense. Not a cosplay aesthetic. Not
                     cultural appropriation. It&apos;s discipline under consequence. It&apos;s the understanding that
                     language shapes reality. It&apos;s the refusal to speak casually about things that can cause harm.
-                    It&apos;s living with the knowledge that narratives can mobilize nations — or destroy them.
+                    It&apos;s living with the knowledge that narratives can mobilize nations, or destroy them.
                   </p>
 
                   <p>

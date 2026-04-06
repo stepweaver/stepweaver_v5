@@ -31,7 +31,7 @@ export default function ResumePage() {
             <div className="space-y-4">
               <div>
                 <div className="text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-sm">Independent Technical Operator</div>
-                <div className="text-[rgb(var(--text-meta))] text-xs">stepweaver.dev — Present</div>
+                <div className="text-[rgb(var(--text-meta))] text-xs">stepweaver.dev · Present</div>
                 <p className="text-[rgb(var(--text-secondary))] text-sm mt-1">Architecture, automation, and interfaces for clients across multiple domains.</p>
               </div>
             </div>

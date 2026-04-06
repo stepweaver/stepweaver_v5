@@ -91,7 +91,7 @@ function MobileBriefBar() {
             {COMMAND_GUIDE.map((item) => (
               <div key={item.command} className="font-[var(--font-ocr)] text-xs text-[rgb(var(--neon)/0.5)]">
                 <span className="text-[rgb(var(--neon)/0.7)]">{item.command}</span>
-                <span className="text-[rgb(var(--muted-color)/0.7)]"> - {item.summary}</span>
+                <span className="text-[rgb(var(--muted-color)/0.7)]">: {item.summary}</span>
               </div>
             ))}
           </div>
@@ -215,7 +215,7 @@ export function TerminalPageClient() {
             id="terminal-section"
             className="flex-1 min-h-0 min-w-0 flex flex-col overflow-hidden"
           >
-            <div className="shrink-0 bg-[rgb(var(--panel)/0.5)] border-b border-[rgb(var(--neon)/0.2)] px-4 py-2 flex items-center justify-between">
+            <div className="shrink-0 bg-[rgb(var(--panel)/0.35)] backdrop-blur-sm border-b border-[rgb(var(--neon)/0.2)] px-4 py-2 flex items-center justify-between">
               <div className="flex gap-1.5">
                 <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56]/70 border border-white/10" />
                 <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e]/70 border border-white/10" />

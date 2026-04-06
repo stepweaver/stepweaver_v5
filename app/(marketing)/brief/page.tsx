@@ -23,7 +23,7 @@ export default function BriefPage() {
           <div>
             <div className="text-label mb-2">WHAT</div>
             <p className="text-[rgb(var(--text-secondary))] text-sm">
-              Full-stack systems from first principles — AI agents, n8n workflows, web platforms, terminal experiences.
+              Full-stack systems from first principles: AI agents, n8n workflows, web platforms, terminal experiences.
             </p>
           </div>
           <div>
@@ -35,7 +35,7 @@ export default function BriefPage() {
           <div>
             <div className="text-label mb-2">PROOF</div>
             <div className="flex flex-wrap gap-2">
-              {["8+ projects shipped", "AI agent architecture", "Terminal experience", "Notion CMS integration"].map((p) => (
+              {["Full project catalog", "AI agent architecture", "Terminal experience", "Notion CMS integration"].map((p) => (
                 <span
                   key={p}
                   className="text-xs px-2 py-1 border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-secondary))]"
@@ -89,7 +89,7 @@ export default function BriefPage() {
             </ul>
             <p>
               I don&apos;t treat software as an isolated code problem. I look at the workflow, the handoffs, the data, the
-              integrations, and the risks — then build systems people can use, maintain, and trust.
+              integrations, and the risks. Then I build systems people can use, maintain, and trust.
             </p>
           </div>
 

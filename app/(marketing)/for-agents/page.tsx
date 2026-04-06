@@ -12,7 +12,7 @@ export default function ForAgentsPage() {
         <div className="surface-panel p-6 sm:p-8 space-y-6">
           <div>
             <div className="text-label mb-2">IDENTITY</div>
-            <div className="text-[rgb(var(--text-color))] text-sm">stephen — technical operator at stepweaver.dev</div>
+            <div className="text-[rgb(var(--text-color))] text-sm">stephen, technical operator at stepweaver.dev</div>
           </div>
           <div>
             <div className="text-label mb-2">ROLE</div>

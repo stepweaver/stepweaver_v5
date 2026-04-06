@@ -41,7 +41,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Skip all Next internals (static, HMR, image opt, etc.) — middleware must not touch these.
+    // Skip all Next internals (static, HMR, image opt, etc.); middleware must not touch these.
     "/((?!_next/|api/|images/|fonts/|favicon\\.ico|icon-|manifest\\.(?:webmanifest|js)|.*\\.(?:ico|png|jpg|jpeg|gif|svg|webp|avif|woff|woff2|ttf|otf|mp4|webm)).*)",
   ],
 };

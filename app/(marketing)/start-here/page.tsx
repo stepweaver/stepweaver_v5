@@ -11,7 +11,7 @@ const PATHWAYS = [
   {
     id: "founder",
     label: "Founder / Client",
-    description: "Need systems built — automation, web platforms, or AI.",
+    description: "Need systems built: automation, web platforms, or AI.",
     steps: ["Read the services overview for scope and boundaries", "Check the brief for a one-page summary", "Start a conversation about your project"],
     ctas: [{ label: "View Services", href: "/services" }, { label: "Get in Touch", href: "/contact" }],
   },

@@ -6,7 +6,7 @@ function line(content: string, variant: LineVariant = "default") {
 
 export function resumeMenuLines() {
   return [
-    line("STEPHEN WEAVER — RESUME", "success"),
+    line("STEPHEN WEAVER / RESUME", "success"),
     line("", "default"),
     line("Sections: summary | experience | projects | education | download | exit | help", "dimmed"),
     line("", "default"),
@@ -64,7 +64,7 @@ export function handleResumeCommand(raw: string): { lines: { content: string; va
         lines: [
           line("EDUCATION", "lambda"),
           line("", "default"),
-          line("Degrees and certifications — see PDF resume for full detail.", "default"),
+          line("Degrees and certifications: see PDF resume for full detail.", "default"),
         ],
       };
     case "download":

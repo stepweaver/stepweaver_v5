@@ -31,7 +31,7 @@ export class ErrorBoundary extends Component<Props, State> {
         <div className="min-h-screen flex items-center justify-center bg-[rgb(var(--bg))] text-[rgb(var(--text-color))] font-mono p-8">
           <div className="max-w-md w-full border border-[rgb(var(--border)/0.3)] p-6">
             <div className="text-[rgb(var(--red))] font-[var(--font-ocr)] text-sm tracking-wider uppercase mb-4">
-              SYS.ERROR — Recovery Required
+              SYS.ERROR: Recovery Required
             </div>
             <p className="text-sm mb-4">
               An unexpected error occurred. The system is attempting to recover.

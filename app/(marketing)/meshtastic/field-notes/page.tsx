@@ -10,7 +10,7 @@ export default function FieldNotesPage() {
           <p className="text-[rgb(var(--text-secondary))] text-sm">Operational logs from Meshtastic field deployments.</p>
         </div>
         <div className="surface-panel p-6 sm:p-8">
-          <p className="text-[rgb(var(--text-meta))] text-sm">No field notes yet. Content managed via Notion — not configured in this environment.</p>
+          <p className="text-[rgb(var(--text-meta))] text-sm">No field notes yet. Content managed via Notion; not configured in this environment.</p>
         </div>
       </div>
     </div>

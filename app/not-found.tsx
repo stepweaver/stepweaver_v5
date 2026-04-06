@@ -8,7 +8,7 @@ export default function NotFound() {
           404
         </div>
         <div className="font-[var(--font-ocr)] text-[rgb(var(--yellow))] text-sm tracking-wider uppercase mb-6">
-          Signal Lost — Route Not Found
+          Signal Lost: Route Not Found
         </div>
         <p className="text-[rgb(var(--text-secondary))] text-sm mb-8">
           The requested resource does not exist or has been decommissioned.

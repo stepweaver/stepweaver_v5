@@ -1,8 +1,8 @@
 import type { Project } from "../projects.schema";
 
-/** λcerebro — memory-layer architecture (v3 projectsData parity, adapted to v5 schema). */
-export const cerebro: Project = {
-  slug: "cerebro",
+/** λcerebro: memory-layer architecture (v3 `lcerebro`, v5 schema). */
+export const lcerebro: Project = {
+  slug: "lcerebro",
   title: "λcerebro",
   description:
     "A memory-layer architecture in progress: durable storage in Supabase, pgvector retrieval, and MCP access across AI clients.",
@@ -17,7 +17,7 @@ export const cerebro: Project = {
     "Schema story: thoughts + vector(1536) + metadata + database-side similarity",
     "Security framing: RLS, server paths, MCP access key boundary",
   ],
-  cardDescription: "AI memory layer — Supabase, pgvector, MCP",
+  cardDescription: "AI memory layer: Supabase, pgvector, MCP",
   cardBuiltFor: "Cross-tool AI workflows",
   cardSolved: "Context trapped in single chat products",
   cardDelivered: ["Storage model", "Vector retrieval", "MCP interface"],
@@ -27,7 +27,7 @@ export const cerebro: Project = {
       title: "Overview",
       type: "overview",
       content:
-        "Phase 1 is architecture first. The goal is to make context portable instead of trapping it inside one chat product. λcerebro is the memory layer in a modular agent stack: durable context, retrieval, and knowledge flow between systems—not a UI feature bolted on at the end.",
+        "Phase 1 is architecture first. The goal is to make context portable instead of trapping it inside one chat product. λcerebro is the memory layer in a modular agent stack: durable context, retrieval, and knowledge flow between systems, not a UI feature bolted on at the end.",
     },
     {
       id: "problem",
@@ -87,7 +87,7 @@ export const cerebro: Project = {
       title: "Outcome",
       type: "outcome",
       content:
-        "The case study describes a concrete Phase 1 system shape—storage, retrieval, security, and MCP delivery—while keeping work-in-progress status explicit so claims stay credible.",
+        "The case study describes a concrete Phase 1 system shape (storage, retrieval, security, MCP delivery) while keeping work-in-progress status explicit so claims stay credible.",
     },
     {
       id: "tradeoffs",
@@ -114,4 +114,4 @@ export const cerebro: Project = {
   ],
 };
 
-export default cerebro;
+export default lcerebro;

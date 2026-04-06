@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const entry = await getBlogEntryBySlug(slug);
   if (!entry) return { title: "Not Found", description: "The page you requested was not found" };
   const title = entry.title || "Blog Post";
-  const description = entry.description || `${title} — stepweaver.dev`;
+  const description = entry.description || `${title} · stepweaver.dev`;
   return {
     title,
     description,

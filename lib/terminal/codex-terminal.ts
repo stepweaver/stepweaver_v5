@@ -28,8 +28,8 @@ export async function ensureCodexPosts(): Promise<void> {
 export function codexHelpLines() {
   return [
     line("Codex shell", "success"),
-    line("ls — list posts   cat <n|slug> — open post   grep <tag> — filter", "default"),
-    line("pwd — path   clear — clear screen   exit | cancel — leave codex", "dimmed"),
+    line("ls: list posts   cat <n|slug>: open post   grep <tag>: filter", "default"),
+    line("pwd: path   clear: clear screen   exit | cancel: leave codex", "dimmed"),
     line("", "default"),
   ];
 }

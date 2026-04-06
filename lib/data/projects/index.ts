@@ -1,45 +1,93 @@
 import type { Project } from "../projects.schema";
 import { aiIntegrations } from "./ai-integrations";
-import { cerebro } from "./cerebro";
-import { cashflowLedger } from "./cashflow-ledger";
-import { diceRoller } from "./dice-roller";
-import { lambdaHeatingAir } from "./lambda-heating-air";
+import { billPlanner } from "./bill-planner";
+import { googleAnalytics } from "./google-analytics";
+import { iamResist } from "./iam-resist";
+import { itConsulting } from "./it-consulting";
+import { lambdaOrthodontics } from "./lambda-orthodontics";
+import { lcerebro } from "./lcerebro";
+import { llambdaLlmAgent } from "./llambda-llm-agent";
+import { lsigilSetup } from "./lsigil-setup";
+import { mishawakaShowerBooking } from "./mishawaka-shower-booking";
 import { n8nAutomations } from "./n8n-automations";
+import { neonProfileCard } from "./neon-profile-card";
+import { orthodonticTracker } from "./orthodontic-tracker";
+import { portfolioTerminal } from "./portfolio-terminal";
+import { rpgDiceRoller } from "./rpg-dice-roller";
+import { serviceBusinessDemo } from "./service-business-demo";
+import { silentAuction } from "./silent-auction";
 import { soapStache } from "./soap-stache";
-import { terminalUI } from "./terminal-ui";
+import { stepweaverDev } from "./stepweaver-dev";
+import { websiteRefreshes } from "./website-refreshes";
 
-const ALL_PROJECTS: Project[] = [
+/** Homepage featured dossiers: v3 `carouselProjects.js` FEATURED_ORDER parity (8 entries). */
+export const FEATURED_SLUGS = [
+  "stepweaver-dev",
+  "silent-auction",
+  "bill-planner",
+  "llambda-llm-agent",
+  "portfolio-terminal",
+  "iam-resist",
+  "lcerebro",
+  "lsigil-setup",
+] as const;
+
+/** Full catalog sort: featured block first, then v3 REMAINING_ORDER. */
+const CATALOG_ORDER = [
+  ...FEATURED_SLUGS,
+  "ai-integrations",
+  "lambda-orthodontics",
+  "service-business-demo",
+  "n8n-automations",
+  "mishawaka-shower-booking",
+  "it-consulting",
+  "orthodontic-tracker",
+  "soap-stache",
+  "rpg-dice-roller",
+  "neon-profile-card",
+  "google-analytics",
+  "website-refreshes",
+] as const;
+
+const CATALOG_SLUG_SET = new Set<string>(CATALOG_ORDER);
+
+const RAW_PROJECTS: Project[] = [
   aiIntegrations,
-  cerebro,
-  cashflowLedger,
-  diceRoller,
-  lambdaHeatingAir,
+  billPlanner,
+  googleAnalytics,
+  iamResist,
+  itConsulting,
+  lambdaOrthodontics,
+  lcerebro,
+  llambdaLlmAgent,
+  lsigilSetup,
+  mishawakaShowerBooking,
   n8nAutomations,
+  neonProfileCard,
+  orthodonticTracker,
+  portfolioTerminal,
+  rpgDiceRoller,
+  serviceBusinessDemo,
+  silentAuction,
   soapStache,
-  terminalUI,
+  stepweaverDev,
+  websiteRefreshes,
 ];
 
-const FEATURED_ORDER = [
-  "ai-integrations",
-  "terminal-ui",
-  "n8n-automations",
-  "cerebro",
-  "cashflow-ledger",
-  "dice-roller",
-  "lambda-heating-air",
-  "soap-stache",
-];
+function sortByCatalogOrder(projects: Project[]): Project[] {
+  const map = new Map(projects.map((p) => [p.slug, p]));
+  const ordered: Project[] = [];
+  for (const slug of CATALOG_ORDER) {
+    const p = map.get(slug);
+    if (p) ordered.push(p);
+  }
+  for (const p of projects) {
+    if (!CATALOG_SLUG_SET.has(p.slug)) ordered.push(p);
+  }
+  return ordered;
+}
 
-const HOMEPAGE_CAROUSEL_SLUGS = [
-  "ai-integrations",
-  "terminal-ui",
-  "n8n-automations",
-  "cerebro",
-  "cashflow-ledger",
-  "dice-roller",
-  "lambda-heating-air",
-  "soap-stache",
-];
+const ALL_PROJECTS: Project[] = sortByCatalogOrder(RAW_PROJECTS);
 
 export function getAllProjects(): Project[] {
   return ALL_PROJECTS;
@@ -49,16 +97,14 @@ export function getProjectBySlug(slug: string): Project | undefined {
   return ALL_PROJECTS.find((p) => p.slug === slug);
 }
 
+/** Curated homepage carousel: exactly the 8 featured slugs when all exist. */
 export function getFeaturedProjects(): Project[] {
-  return FEATURED_ORDER
-    .map((slug) => ALL_PROJECTS.find((p) => p.slug === slug))
-    .filter((p): p is Project => p !== undefined);
+  return getHomepageCarouselProjects();
 }
 
 export function getHomepageCarouselProjects(): Project[] {
-  return HOMEPAGE_CAROUSEL_SLUGS
-    .map((slug) => ALL_PROJECTS.find((p) => p.slug === slug))
-    .filter((p): p is Project => p !== undefined);
+  const map = new Map(ALL_PROJECTS.map((p) => [p.slug, p]));
+  return FEATURED_SLUGS.map((slug) => map.get(slug)).filter((p): p is Project => p !== undefined);
 }
 
 export function getProjectsByTag(tag: string): Project[] {

@@ -64,7 +64,7 @@ export function startCaveAdventure(): { lines: { content: string; variant: LineV
   state.doorUnlocked = false;
   return {
     lines: [
-      line("Cave Crawl (demo) — type look, go <dir>, take <item>, use key, inventory, exit", "success"),
+      line("Cave Crawl (demo): type look, go <dir>, take <item>, use key, inventory, exit", "success"),
       line("", "default"),
       ...describeRoom(),
     ],
@@ -155,7 +155,7 @@ export function handleCaveInput(raw: string): { lines: { content: string; varian
     return {
       lines: [
         line("The lock grinds open. Beyond: a faint glow.", "success"),
-        line("(Demo ends — you found the exit.)", "dimmed"),
+        line("(Demo ends: you found the exit.)", "dimmed"),
       ],
     };
   }

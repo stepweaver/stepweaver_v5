@@ -138,7 +138,7 @@ function resolveGame(): { lines: { content: string; variant: LineVariant }[] } {
   if (result === "win") lines.push(line("You win.", "success"));
   else if (result === "loss") lines.push(line("You lose.", "error"));
   else lines.push(line("Push (tie).", "warning"));
-  lines.push(line(`Score — W:${state.wins} L:${state.losses} T:${state.ties}`, "dimmed"));
+  lines.push(line(`Score: W:${state.wins} L:${state.losses} T:${state.ties}`, "dimmed"));
   lines.push(line('Type "deal" for a new hand or "exit" to leave.', "default"));
   return { lines };
 }
@@ -148,7 +148,7 @@ export function startBlackjack(): { lines: { content: string; variant: LineVaria
   dealNewHand();
 
   const lines: { content: string; variant: LineVariant }[] = [
-    line("Blackjack — dealer stands on 17.", "success"),
+    line("Blackjack: dealer stands on 17.", "success"),
     line("", "default"),
     line("Your hand: " + state.playerHand.map(formatCard).join(" "), "lambda"),
     line(`Your total: ${getHandValue(state.playerHand)}`, "default"),
@@ -179,10 +179,10 @@ export function handleBlackjackInput(raw: string): { lines: { content: string; v
   if (cmd === "help" || cmd === "?") {
     return {
       lines: [
-        line("hit — draw a card", "default"),
-        line("stand — hold and resolve", "default"),
-        line("deal — new hand (after round ends)", "default"),
-        line("exit | cancel — leave game", "default"),
+        line("hit: draw a card", "default"),
+        line("stand: hold and resolve", "default"),
+        line("deal: new hand (after round ends)", "default"),
+        line("exit | cancel: leave game", "default"),
       ],
     };
   }

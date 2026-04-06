@@ -8,7 +8,7 @@ const LANE_DATA: Record<string, { title: string; description: string; problems: 
     problems: ["Manual repetitive tasks wasting hours", "Disconnected systems requiring manual data entry", "No visibility into workflow failures", "Fragile integrations that break silently"],
     capabilities: ["Custom n8n workflow design", "Multi-system integrations (APIs, webhooks, databases)", "Error handling with automatic retry", "Execution monitoring and alerting", "Custom webhook endpoints"],
     limits: ["Does not cover enterprise ERP integration", "Requires API access to target systems", "Complex business logic may need custom code"],
-    projects: ["n8n-automations", "cerebro"],
+    projects: ["n8n-automations", "lcerebro"],
   },
   "lead-systems": {
     title: "Lead Systems",
@@ -16,7 +16,7 @@ const LANE_DATA: Record<string, { title: string; description: string; problems: 
     problems: ["Visitors leaving without converting", "Manual appointment scheduling", "Lost leads in email inbox", "No follow-up automation"],
     capabilities: ["Online booking integration (Calendly, custom)", "Contact form wizards with validation", "Lead capture pipelines", "CRM integration", "Automated follow-up sequences"],
     limits: ["Does not include CRM setup from scratch", "Email deliverability depends on your provider", "Payment processing requires separate integration"],
-    projects: ["lambda-heating-air", "ai-integrations"],
+    projects: ["service-business-demo", "ai-integrations"],
   },
   "web-platforms": {
     title: "Web Platforms",
@@ -24,7 +24,7 @@ const LANE_DATA: Record<string, { title: string; description: string; problems: 
     problems: ["Outdated technology stack", "Poor mobile experience", "Slow load times hurting conversions", "No interactive differentiation"],
     capabilities: ["Next.js App Router with TypeScript", "Terminal-forward visual identity", "AI chat integration", "Interactive experiences (terminal, games)", "Notion-backed CMS"],
     limits: ["Does not cover native mobile apps", "E-commerce beyond basic checkout requires separate scope", "Real-time features need additional infrastructure"],
-    projects: ["terminal-ui", "soap-stache", "cashflow-ledger"],
+    projects: ["portfolio-terminal", "soap-stache", "bill-planner"],
   },
 };
 

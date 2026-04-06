@@ -1,5 +1,5 @@
 type Props = {
-  /** Center seal (λ) between ink lines — v3 home parity */
+  /** Center seal (λ) between ink lines; v3 home parity */
   showSeal?: boolean;
   className?: string;
 };

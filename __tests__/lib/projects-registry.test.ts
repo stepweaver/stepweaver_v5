@@ -19,8 +19,8 @@ describe("projects registry", () => {
 
   it("returns carousel projects", () => {
     const carousel = getHomepageCarouselProjects();
-    expect(carousel.length).toBeGreaterThan(0);
-    expect(carousel[0].slug).toBe("ai-integrations");
+    expect(carousel.length).toBe(8);
+    expect(carousel[0].slug).toBe("stepweaver-dev");
   });
 
   it("returns all unique tags", () => {
@@ -30,9 +30,9 @@ describe("projects registry", () => {
   });
 
   it("filters projects by tag", () => {
-    const aiProjects = getProjectsByTag("AI/ML");
+    const aiProjects = getProjectsByTag("Next.js");
     expect(aiProjects.length).toBeGreaterThan(0);
-    aiProjects.forEach((p) => expect(p.tags).toContain("AI/ML"));
+    aiProjects.forEach((p) => expect(p.tags).toContain("Next.js"));
   });
 
   it("returns all project slugs", () => {
