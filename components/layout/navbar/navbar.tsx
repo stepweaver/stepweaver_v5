@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
-import { GlitchLambda } from "@/components/ui/glitch-lambda";
+import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 const NAV_LINKS = [
   { label: "Brief", href: "/brief" },
@@ -80,10 +80,9 @@ export function Navbar() {
         <div className="flex items-center justify-between h-14">
           <Link
             href="/"
-            className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider hover:text-[rgb(var(--accent))] transition-colors inline-flex items-center gap-0.5"
+            className="font-[var(--font-ocr)] text-sm tracking-wider text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))] transition-colors inline-flex items-center"
           >
-            <GlitchLambda size="small" className="text-[rgb(var(--neon))]" />
-            stepweaver
+            <BrandWordmark labelClassName="text-inherit" lambdaClassName="text-inherit" />
           </Link>
 
           <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
@@ -137,10 +136,13 @@ export function Navbar() {
               </div>
 
               <div className="flex items-center justify-between gap-3 px-5 py-4 shrink-0 border-b border-[rgb(var(--neon)/0.1)]">
-                <div className="flex items-baseline gap-2 min-w-0">
-                  <span className="font-[var(--font-ibm)] text-lg font-semibold text-neon truncate inline-flex items-center gap-1.5">
-                    <GlitchLambda autoGlitch size="small" />
-                    stepweaver
+                <div className="flex items-baseline gap-2 min-w-0 text-[rgb(var(--neon))]">
+                  <span className="truncate inline-flex min-w-0">
+                    <BrandWordmark
+                      className="text-lg font-semibold tracking-wide"
+                      labelClassName="text-inherit"
+                      lambdaClassName="text-inherit"
+                    />
                   </span>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">

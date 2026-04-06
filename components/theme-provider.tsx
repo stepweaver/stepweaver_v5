@@ -25,7 +25,7 @@ const VALID_THEMES = [
   "skynet",
 ] as const;
 
-type Theme = (typeof VALID_THEMES)[number];
+export type Theme = (typeof VALID_THEMES)[number];
 
 interface ThemeContextValue {
   theme: Theme;

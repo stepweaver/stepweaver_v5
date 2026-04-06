@@ -3,6 +3,8 @@ import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   async redirects() {
     return [
+      // Browsers request /favicon.ico; middleware skips *.ico, so use a config redirect to app icon.
+      { source: "/favicon.ico", destination: "/icon", permanent: false },
       { source: "/projects/cerebro", destination: "/projects/lcerebro", permanent: true },
       { source: "/projects/cashflow-ledger", destination: "/projects/bill-planner", permanent: true },
       { source: "/projects/dice-roller", destination: "/projects/rpg-dice-roller", permanent: true },
