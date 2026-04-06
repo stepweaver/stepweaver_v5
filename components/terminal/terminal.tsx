@@ -125,12 +125,12 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
       const trimmed = rawInput.trim().toLowerCase();
 
       if (contact.isActive) {
-        addLines([{ content: "guest@stepweaver:~$ " + rawInput, variant: "prompt" }]);
+        addLines([{ content: "user@stepweaver.dev:~$ " + rawInput, variant: "prompt" }]);
         await handleContactInput(rawInput);
         return;
       }
 
-      addLines([{ content: "guest@stepweaver:~$ " + rawInput, variant: "prompt" }]);
+      addLines([{ content: "user@stepweaver.dev:~$ " + rawInput, variant: "prompt" }]);
 
       if (rawInput.trim()) {
         setHistory((prev) => [...prev, rawInput]);
@@ -248,7 +248,7 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
   );
 
   const promptText =
-    contact.isActive ? "[contact]" : mode === "normal" ? "guest@stepweaver:~$" : "[" + mode + "]";
+    contact.isActive ? "[contact]" : mode === "normal" ? "user@stepweaver.dev:~$" : "[" + mode + "]";
 
   const core = (
     <div className="terminal-window h-full min-h-0 flex flex-col">

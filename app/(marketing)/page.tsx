@@ -4,7 +4,6 @@ import { headers } from "next/headers";
 import { Hero } from "@/components/hero/hero";
 import { InkDivider } from "@/components/ui/ink-divider";
 import { TerminalLinkStrip } from "@/components/home/terminal-link-strip";
-import { BackgroundCanvasWrapper } from "@/components/effects/background-canvas-wrapper";
 import { getInitialBlogEntries } from "@/lib/blog";
 import { normalizePostFromBlogEntry, sortPosts } from "@/lib/codex/selectors";
 import { generateStructuredData } from "@/lib/structured-data";
@@ -63,7 +62,6 @@ export default async function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData.breadcrumb) }}
       />
       <div className="relative min-h-screen">
-        <BackgroundCanvasWrapper />
         <div className="relative z-10">
           <Hero />
           <InkDivider showSeal className="py-0.5 sm:py-1" />

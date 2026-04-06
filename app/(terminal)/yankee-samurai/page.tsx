@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { ArrowLeft, BookOpen, Shield, MessageSquare } from "lucide-react";
-import { BackgroundCanvasWrapper } from "@/components/effects/background-canvas-wrapper";
 import { ErrorBoundary } from "@/components/error-boundary";
 
 export const metadata = {
@@ -33,8 +32,6 @@ export default function YankeeSamuraiPage() {
   return (
     <ErrorBoundary>
       <div className="relative h-[calc(100vh-2rem)] flex flex-col overflow-hidden">
-        <BackgroundCanvasWrapper />
-
         <div className="relative z-10 flex flex-col h-full">
           <header className="shrink-0 border-b border-[rgb(var(--neon)/0.2)] bg-[rgb(var(--border)/0.35)] backdrop-blur-sm px-3 sm:px-5 py-2 flex items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">

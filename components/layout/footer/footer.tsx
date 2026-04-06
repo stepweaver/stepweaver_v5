@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export function Footer() {
   return (
-    <footer className="border-t border-[rgb(var(--border)/0.2)] py-6 px-4">
+    <footer className="relative z-[11] border-t border-[rgb(var(--border)/0.2)] bg-[rgb(var(--bg))] py-6 px-4">
       <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="font-[var(--font-ocr)] text-xs text-[rgb(var(--muted-color))]">
           <Link href="/terminal" className="hover:text-[rgb(var(--neon))] transition-colors">

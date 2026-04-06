@@ -69,6 +69,17 @@
     100% { transform: rotate(360deg) scale(1); }
   }
 
+  /* Mobile nav panel — slide from right (translate3d for GPU; matches v3) */
+  @keyframes mobileNavSlideIn {
+    0% { opacity: 0; transform: translate3d(100%, 0, 0); }
+    100% { opacity: 1; transform: translate3d(0, 0, 0); }
+  }
+
+  @keyframes mobileNavSlideOut {
+    0% { opacity: 1; transform: translate3d(0, 0, 0); }
+    100% { opacity: 0; transform: translate3d(100%, 0, 0); }
+  }
+
   .animate-blink { animation: blink 1s step-end infinite; }
   .animate-glitch { animation: glitch 0.3s ease-in-out infinite; }
   .animate-fade-in { animation: fadeIn 0.5s ease-out; }
@@ -82,8 +93,45 @@
   .animate-progress { animation: progressFill 1s ease-out; }
   .animate-dice-roll { animation: diceRoll 0.8s ease-in-out infinite; }
 
+  .animate-mobile-nav-in {
+    animation: mobileNavSlideIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: transform, opacity;
+  }
+
+  .animate-mobile-nav-out {
+    animation: mobileNavSlideOut 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+    will-change: transform, opacity;
+  }
+
   .animation-delay-200 { animation-delay: 200ms; }
   .animation-delay-400 { animation-delay: 400ms; }
   .animation-delay-600 { animation-delay: 600ms; }
   .animation-delay-800 { animation-delay: 800ms; }
+
+  /* Page transition overlay (ported from v3 transition / globals) */
+  @keyframes twPageFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
+  }
+
+  @keyframes twHudLineIn {
+    from { opacity: 0; transform: translateX(-6px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+
+  @keyframes twTerminalProgressScale {
+    from { transform: scaleX(0); }
+    to { transform: scaleX(1); }
+  }
+
+  .animate-tw-hud-line-in {
+    animation: twHudLineIn 0.2s ease-out forwards;
+  }
+
+  .terminal-progress-fill-ported {
+    transform-origin: left center;
+    animation-name: twTerminalProgressScale;
+    animation-timing-function: ease-out;
+    animation-fill-mode: forwards;
+  }
 }

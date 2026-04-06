@@ -1,7 +1,8 @@
 import { Navbar } from "@/components/layout/navbar/navbar";
 import { Footer } from "@/components/layout/footer/footer";
 import { ChatWidget } from "@/components/chat/chat-widget";
-import { GlobalCommandPalette } from "@/components/command-palette/global-command-palette";
+import { BackgroundCanvasWrapper } from "@/components/effects/background-canvas-wrapper";
+import { PageTransition } from "@/components/transition/page-transition";
 
 export default function MarketingLayout({
   children,
@@ -9,10 +10,12 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col">
-      <GlobalCommandPalette />
+    <div className="relative flex min-h-screen flex-col">
+      <BackgroundCanvasWrapper />
       <Navbar />
-      <div className="flex-1">{children}</div>
+      <PageTransition>
+        <div className="relative z-[11] flex-1">{children}</div>
+      </PageTransition>
       <Footer />
       <ChatWidget />
     </div>

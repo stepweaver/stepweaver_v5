@@ -3,7 +3,6 @@
 import { useEffect, useState, useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { BackgroundCanvasWrapper } from "@/components/effects/background-canvas-wrapper";
 import { PostItem } from "./post-item";
 import {
   sortPosts,
@@ -71,7 +70,6 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
 
   return (
     <div className="min-h-screen relative">
-      <BackgroundCanvasWrapper />
       <div className="relative z-10 w-full px-4 sm:px-6 md:px-8 pb-16">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8 space-y-4 md:space-y-5">

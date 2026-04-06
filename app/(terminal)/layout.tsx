@@ -1,5 +1,7 @@
 import { Navbar } from "@/components/layout/navbar/navbar";
 import { ChatWidget } from "@/components/chat/chat-widget";
+import { BackgroundCanvasWrapper } from "@/components/effects/background-canvas-wrapper";
+import { PageTransition } from "@/components/transition/page-transition";
 
 export default function TerminalLayout({
   children,
@@ -7,9 +9,12 @@ export default function TerminalLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-[rgb(var(--bg))] text-[rgb(var(--text-color))]">
+    <div className="relative flex min-h-screen flex-col text-[rgb(var(--text-color))]">
+      <BackgroundCanvasWrapper />
       <Navbar />
-      <div className="flex-1 flex flex-col min-h-0 pt-14">{children}</div>
+      <PageTransition>
+        <div className="relative z-[11] flex min-h-0 flex-1 flex-col pt-14">{children}</div>
+      </PageTransition>
       <ChatWidget />
     </div>
   );

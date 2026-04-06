@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
 import { ThemeProvider } from "@/components/theme-provider";
+import { AppChrome } from "@/components/app-chrome";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Analytics } from "@/components/analytics";
 import { META_COLORS, THEMES } from "@/lib/theme/themes";
@@ -98,7 +99,9 @@ export default async function RootLayout({
         </a>
         <ErrorBoundary>
           <ThemeProvider>
-            <main id="main-content">{children}</main>
+            <AppChrome>
+              <main id="main-content">{children}</main>
+            </AppChrome>
           </ThemeProvider>
         </ErrorBoundary>
         <Analytics />

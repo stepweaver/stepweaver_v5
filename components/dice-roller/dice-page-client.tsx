@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { Dices, History, Zap, Keyboard, Target, ChevronRight } from "lucide-react";
-import { BackgroundCanvasWrapper } from "@/components/effects/background-canvas-wrapper";
 import { DiceRoller } from "@/components/dice-roller/dice-roller";
 
 const FEATURE_MODULES = [
@@ -96,8 +95,6 @@ function MobileBriefBar() {
 export function DicePageClient() {
   return (
     <div className="relative flex flex-col flex-1 min-h-0 h-[calc(100dvh-3.5rem)] overflow-hidden">
-      <BackgroundCanvasWrapper />
-
       <div className="relative z-10 flex flex-col h-full min-h-0">
         <header className="shrink-0 border-b border-[rgb(var(--neon)/0.2)] bg-[rgb(var(--panel)/0.6)] backdrop-blur-sm px-3 sm:px-5 py-2 flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">

@@ -3,8 +3,6 @@ import Link from "next/link";
 import { getBlogEntryBySlug, getInitialBlogEntries } from "@/lib/blog";
 import { getPageBlocks, type NotionBlock } from "@/lib/notion-blocks";
 import { NotionBlockBody } from "@/components/codex/notion-block-body";
-import { BackgroundCanvasWrapper } from "@/components/effects/background-canvas-wrapper";
-
 export const revalidate = 60;
 export const dynamicParams = true;
 
@@ -65,7 +63,6 @@ export default async function CodexPostPage({ params }: { params: Promise<{ slug
 
   return (
     <div className="min-h-screen relative">
-      <BackgroundCanvasWrapper />
       <div className="relative z-10 w-full px-4 sm:px-6 md:px-8 pb-16">
         <div className="max-w-4xl mx-auto">
           <Link
