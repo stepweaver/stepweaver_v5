@@ -310,7 +310,7 @@ export function ChatWidget() {
         <button
           type="button"
           onClick={toggleOpen}
-          className={`fixed bottom-4 right-4 sm:right-6 z-[100] relative flex h-14 w-14 shrink-0 items-center justify-center rounded-sm border-2 transition-all duration-300 cursor-pointer shadow-[inset_0_0_0_1px_rgb(var(--neon)/0.08)] ${
+          className={`fixed bottom-4 right-4 sm:right-6 z-[100] flex h-14 w-14 shrink-0 items-center justify-center rounded-sm border-2 transition-all duration-300 cursor-pointer shadow-[inset_0_0_0_1px_rgb(var(--neon)/0.08)] ${
             isOpen
               ? "border-[rgb(var(--neon)/0.5)] text-neon hover:bg-[rgb(var(--neon)/0.1)]"
               : "border-[rgb(var(--neon))] text-neon hover:bg-[rgb(var(--neon)/0.25)] hover:shadow-[0_0_20px_rgb(var(--neon)/0.35),inset_0_0_0_1px_rgb(var(--neon)/0.12)]"
