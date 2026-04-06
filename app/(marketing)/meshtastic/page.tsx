@@ -1,13 +1,7 @@
 import Link from "next/link";
+import { MESHTASTIC_DOCS } from "@/lib/data/meshtastic-content";
 
 export const metadata = { title: "Meshtastic", description: "Meshtastic documentation." };
-
-const DOCS = [
-  { section: "About", slug: "about" },
-  { section: "Overview", slug: "overview" },
-  { section: "Getting Started", slug: "getting-started" },
-  { section: "Hardware", slug: "hardware" },
-];
 
 export default function MeshtasticPage() {
   return (
@@ -17,13 +11,13 @@ export default function MeshtasticPage() {
           <div className="surface-panel p-4 lg:sticky lg:top-24">
             <div className="text-label mb-3">ON THIS SITE</div>
             <nav className="space-y-1 font-[var(--font-ocr)] text-xs tracking-wider">
-              {DOCS.map((doc) => (
+              {MESHTASTIC_DOCS.map((doc) => (
                 <Link
                   key={doc.slug}
                   href={`/meshtastic/${doc.slug}`}
                   className="block py-1.5 text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--neon))] border-l-2 border-transparent hover:border-[rgb(var(--neon)/0.5)] pl-2 -ml-0.5 transition-colors"
                 >
-                  {doc.section}
+                  {doc.title}
                 </Link>
               ))}
               <Link
@@ -51,13 +45,13 @@ export default function MeshtasticPage() {
           <div className="surface-panel p-6 sm:p-8">
             <div className="text-label mb-4">TABLE OF CONTENTS</div>
             <div className="space-y-4">
-              {DOCS.map((doc) => (
+              {MESHTASTIC_DOCS.map((doc) => (
                 <Link
                   key={doc.slug}
                   href={`/meshtastic/${doc.slug}`}
                   className="block text-[rgb(var(--text-color))] hover:text-[rgb(var(--neon))] transition-colors text-sm font-[var(--font-ibm)]"
                 >
-                  {doc.section} →
+                  {doc.title} →
                 </Link>
               ))}
               <Link

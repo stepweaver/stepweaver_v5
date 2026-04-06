@@ -48,6 +48,14 @@ export function Navbar() {
 
   useEffect(() => setMounted(true), []);
 
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const handleMobileClose = useCallback(() => {
     setMobileClosing(true);
     window.setTimeout(() => {
@@ -75,7 +83,13 @@ export function Navbar() {
   const showMobilePortal = mounted && (mobileOpen || mobileClosing);
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 transition-colors duration-300">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-[background-color,backdrop-filter,box-shadow,border-color] duration-300 ${
+        scrolled
+          ? "bg-[rgb(var(--panel)/0.72)] backdrop-blur-md border-b border-[rgb(var(--neon)/0.12)] shadow-[0_12px_40px_rgba(0,0,0,0.28)]"
+          : "bg-transparent border-b border-transparent"
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="flex items-center justify-between h-14">
           <Link

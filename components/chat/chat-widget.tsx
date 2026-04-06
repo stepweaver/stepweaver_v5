@@ -275,7 +275,7 @@ export function ChatWidget() {
                       onPaste={handlePaste}
                       placeholder="Ask me anything… (Shift+Enter for new line, paste images)"
                       rows={3}
-                      className="flex-1 min-w-0 bg-[rgb(var(--panel)/0.4)] border border-[rgb(var(--neon)/0.25)] text-[rgb(var(--text-color))] font-[var(--font-ocr)] text-base sm:text-sm min-h-[5rem] max-h-40 p-2.5 focus:outline-none focus:ring-1 focus:ring-[rgb(var(--neon)/0.4)] focus:border-[rgb(var(--neon)/0.5)] placeholder:text-[rgb(var(--muted-color)/0.6)] resize-y overflow-y-auto"
+                      className="flex-1 min-w-0 bg-[rgb(var(--panel)/0.4)] border border-[rgb(var(--neon)/0.25)] text-[rgb(var(--text-color))] font-[var(--font-ocr)] text-[16px] md:text-sm min-h-[5rem] max-h-40 p-2.5 focus:outline-none focus:ring-1 focus:ring-[rgb(var(--neon)/0.4)] focus:border-[rgb(var(--neon)/0.5)] placeholder:text-[rgb(var(--muted-color)/0.6)] resize-y overflow-y-auto"
                       disabled={isLoading}
                       style={{ resize: "vertical" }}
                     />

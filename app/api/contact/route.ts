@@ -21,26 +21,34 @@ export async function POST(request: NextRequest) {
 
     const { name, email, message } = parsed.data;
 
-    if (process.env.SMTP_HOST) {
-      const transporter = nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: parseInt(process.env.SMTP_PORT || "587"),
-        secure: false,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
+    if (!process.env.SMTP_HOST?.trim()) {
+      return NextResponse.json(
+        {
+          error:
+            "Email delivery is not configured. Set SMTP_HOST (and SMTP_USER, SMTP_PASS, CONTACT_EMAIL) in the server environment.",
         },
-      });
-
-      await transporter.sendMail({
-        from: `"stepweaver.dev" <${CONTACT_EMAIL}>`,
-        to: CONTACT_EMAIL,
-        subject: `Contact form: ${name}`,
-        replyTo: email,
-        text: `From: ${name} <${email}>\n\n${message}`,
-        html: `<p><strong>From:</strong> ${name} &lt;${email}&gt;</p><p>${message.replace(/\n/g, "<br>")}</p>`,
-      });
+        { status: 503 }
+      );
     }
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST,
+      port: parseInt(process.env.SMTP_PORT || "587", 10),
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      from: `"stepweaver.dev" <${CONTACT_EMAIL}>`,
+      to: CONTACT_EMAIL,
+      subject: `Contact form: ${name}`,
+      replyTo: email,
+      text: `From: ${name} <${email}>\n\n${message}`,
+      html: `<p><strong>From:</strong> ${name} &lt;${email}&gt;</p><p>${message.replace(/\n/g, "<br>")}</p>`,
+    });
 
     return NextResponse.json({ success: true });
   }, contactSchema);

@@ -25,7 +25,7 @@ export function ChatMessageBubble({
   const fontSize = isCompact ? "text-sm" : "text-base";
 
   return (
-    <div className={`flex ${gap} ${isUser ? "flex-row-reverse" : ""}`}>
+    <div className={`flex ${gap} items-start min-w-0 ${isUser ? "flex-row-reverse" : ""}`}>
       <div
         className={`flex-shrink-0 ${avatarSize} rounded flex items-center justify-center overflow-hidden ${
           isUser ? "bg-[rgb(var(--accent)/0.2)] text-accent" : "bg-[rgb(var(--neon)/0.2)] text-neon"
@@ -47,7 +47,7 @@ export function ChatMessageBubble({
       </div>
 
       <div
-        className={`max-w-[80%] ${padding} rounded font-[var(--font-ocr)] ${fontSize} leading-relaxed border ${
+        className={`min-w-0 max-w-[min(100%,80%)] ${padding} rounded font-[var(--font-ocr)] ${fontSize} leading-relaxed border text-left ${
           isUser
             ? "bg-[rgb(var(--cyan)/0.1)] border-[rgb(var(--cyan)/0.3)] text-[rgb(var(--text-color))]"
             : "bg-[rgb(var(--window)/0.5)] border-[rgb(var(--border)/0.35)] text-[rgb(var(--text-color))]"
@@ -67,7 +67,7 @@ export function ChatMessageBubble({
           </div>
         ) : null}
         {message.content ? (
-          <div className="whitespace-pre-wrap break-words">
+          <div className="whitespace-pre-wrap break-words [overflow-wrap:anywhere]">
             {parseChatLinks(message.content, {
               renderAgentName: (key) => <GlitchLambda key={key} size="small" className="inline" />,
             })}
@@ -89,7 +89,7 @@ export function ChatLoadingIndicator({ variant = "default" }: { variant?: "compa
   const iconSize = isCompact ? "w-4 h-4" : "w-5 h-5";
 
   return (
-    <div className={`flex ${isCompact ? "gap-2" : "gap-3"}`}>
+    <div className={`flex items-start min-w-0 ${isCompact ? "gap-2" : "gap-3"}`}>
       <div
         className={`flex-shrink-0 ${avatarSize} rounded flex items-center justify-center bg-[rgb(var(--neon)/0.2)] overflow-hidden`}
       >
