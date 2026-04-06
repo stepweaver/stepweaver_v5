@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { HomeIntelPayload } from "@/lib/home/recent-intel";
 import { formatCodexDate } from "@/lib/codex/selectors";
+import { LoadoutIconMarquee } from "@/components/hero/loadout-icon-marquee";
 
 function statusLabel(status: NonNullable<HomeIntelPayload["relatedProject"]>["status"]) {
   switch (status) {
@@ -20,7 +21,7 @@ function statusLabel(status: NonNullable<HomeIntelPayload["relatedProject"]>["st
 export function HeroRecentIntel({ intel }: { intel: HomeIntelPayload | null }) {
   return (
     <aside
-      className="mt-8 sm:mt-10 flex flex-col flex-1 min-h-[12rem] rounded-sm border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.25)] p-4 sm:p-5 min-w-0"
+      className="mt-8 sm:mt-10 flex flex-col flex-1 rounded-sm border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.25)] p-4 sm:p-5 min-w-0"
       aria-label="Recent codex intel"
     >
       <div className="flex items-start justify-between gap-3 mb-3">
@@ -120,6 +121,8 @@ export function HeroRecentIntel({ intel }: { intel: HomeIntelPayload | null }) {
           </Link>
         </>
       )}
+
+      <LoadoutIconMarquee />
     </aside>
   );
 }

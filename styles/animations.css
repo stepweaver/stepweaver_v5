@@ -134,4 +134,31 @@
     animation-timing-function: ease-out;
     animation-fill-mode: forwards;
   }
+
+  @keyframes loadoutMarquee {
+    from {
+      transform: translate3d(0, 0, 0);
+    }
+    to {
+      transform: translate3d(-50%, 0, 0);
+    }
+  }
+
+  .loadout-marquee-track {
+    animation: loadoutMarquee 55s linear infinite;
+    will-change: transform;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loadout-marquee-track {
+      animation: none;
+      transform: none;
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 0.75rem;
+      column-gap: 1.25rem;
+      width: 100% !important;
+      max-width: 100%;
+    }
+  }
 }
