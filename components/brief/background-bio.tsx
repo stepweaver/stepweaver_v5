@@ -10,7 +10,7 @@ export function BackgroundBio() {
 
       <div className="space-y-4 text-[rgb(var(--text-secondary))] text-sm md:text-base leading-relaxed font-[var(--font-ibm)]">
         <p>
-          I&apos;m Stephen Weaver. I came into software through operations, analysis, and real-world process work:
+          I came into software through operations, analysis, and real-world process work:
           Airborne Cryptologic Linguist in the U.S. Air Force, then restaurant operations and business analysis, then
           development. That path still shapes how I build.
         </p>
