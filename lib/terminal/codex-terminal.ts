@@ -29,7 +29,7 @@ export function codexHelpLines() {
   return [
     line("Codex shell", "success"),
     line("ls — list posts   cat <n|slug> — open post   grep <tag> — filter", "default"),
-    line("pwd — path   clear — clear screen   exit — leave codex", "dimmed"),
+    line("pwd — path   clear — clear screen   exit | cancel — leave codex", "dimmed"),
     line("", "default"),
   ];
 }
@@ -47,7 +47,7 @@ export async function handleCodexCommand(raw: string): Promise<{
   const arg = rest.join(" ").trim();
   const v = verb.toLowerCase();
 
-  if (v === "exit" || v === "quit") {
+  if (v === "exit" || v === "quit" || v === "cancel") {
     resetCodexSession();
     return { lines: [line("Left codex mode.", "dimmed")], exit: true };
   }

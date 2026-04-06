@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import Image from "next/image";
 import { getHomepageCarouselProjects } from "@/lib/data/projects";
 import type { Project } from "@/lib/data/projects.schema";
 
@@ -30,6 +31,17 @@ export function ProjectCarousel() {
           {project.tags[0]}
         </span>
       </div>
+      {project.imageUrl ? (
+        <div className="relative w-full aspect-[16/9] max-h-52 mb-4 border border-[rgb(var(--border)/0.25)] overflow-hidden bg-[rgb(var(--window)/0.25)]">
+          <Image
+            src={project.imageUrl}
+            alt={project.title}
+            fill
+            className="object-cover object-top"
+            sizes="(max-width: 768px) 100vw, 896px"
+          />
+        </div>
+      ) : null}
       <div className="text-[rgb(var(--text-color))] text-lg sm:text-xl font-[var(--font-ibm)] mb-4">
         {project.title}
       </div>

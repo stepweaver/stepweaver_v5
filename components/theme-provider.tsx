@@ -2,13 +2,13 @@
 
 import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
-const VALID_THEMES = [
+export const VALID_THEMES = [
   "dark", "light", "monochrome", "monochrome-inverted",
   "vintage", "apple", "c64", "amber", "synthwave",
   "dracula", "solarized", "nord", "cobalt", "skynet",
 ] as const;
 
-type Theme = (typeof VALID_THEMES)[number];
+export type Theme = (typeof VALID_THEMES)[number];
 
 interface ThemeContextValue {
   theme: Theme;

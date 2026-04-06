@@ -234,4 +234,17 @@
   .skip-link:focus {
     top: 0;
   }
+
+  /* Hero operator portraits (Skynet swap + glitch burst) */
+  .hero-portrait-glitch-burst {
+    animation: glitch 0.48s ease-out;
+  }
+
+  .hero-portrait-skynet-bay {
+    box-shadow: inset 0 0 22px rgb(var(--danger) / 0.22);
+  }
+
+  .hero-portrait-skynet-layer {
+    filter: contrast(1.08) saturate(1.08);
+  }
 }

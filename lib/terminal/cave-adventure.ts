@@ -96,7 +96,7 @@ export function handleCaveInput(raw: string): { lines: { content: string; varian
   const verb = tokens[0];
   const rest = tokens.slice(1).join(" ");
 
-  if (!verb || verb === "exit" || verb === "quit") {
+  if (!verb || verb === "exit" || verb === "quit" || verb === "cancel") {
     state.active = false;
     return { lines: [line("You leave the story.", "dimmed")], exit: true };
   }

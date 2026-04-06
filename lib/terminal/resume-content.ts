@@ -19,6 +19,7 @@ export function handleResumeCommand(raw: string): { lines: { content: string; va
   switch (cmd) {
     case "exit":
     case "quit":
+    case "cancel":
       return { lines: [line("Exited resume mode.", "success")], exit: true };
     case "help":
     case "?":

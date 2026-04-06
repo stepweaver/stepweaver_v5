@@ -1,0 +1,553 @@
+/* CRT-style theme selector (adapted from v3; plain CSS for Tailwind v5 pipeline) */
+
+.theme-dropdown-container {
+  position: relative;
+  font-family: var(--font-ocr), "Courier New", monospace;
+}
+
+/* Dropdown Trigger Button */
+.theme-dropdown-trigger {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  user-select: none;
+  background: transparent;
+  border: none;
+  transition: all 0.2s ease;
+  text-align: left;
+  position: relative;
+}
+
+.theme-dropdown-trigger.dark {
+  color: #00ff41;
+}
+
+.theme-dropdown-trigger.light {
+  color: #ff10f0;
+}
+
+.theme-dropdown-trigger.monochrome {
+  color: #ffffff;
+}
+
+.theme-dropdown-trigger.monochrome-inverted {
+  color: #000000;
+}
+
+.theme-dropdown-trigger.vintage {
+  color: #55ffff;
+}
+
+.theme-dropdown-trigger.apple {
+  color: #33ff33;
+}
+
+.theme-dropdown-trigger.c64 {
+  color: #a3e6ff;
+}
+
+.theme-dropdown-trigger.amber {
+  color: #ffb000;
+}
+
+.theme-dropdown-trigger.synthwave {
+  color: #ff1493;
+}
+
+.theme-dropdown-trigger.dracula {
+  color: #bd93f9;
+}
+
+.theme-dropdown-trigger.solarized {
+  color: #2aa198;
+}
+
+.theme-dropdown-trigger.nord {
+  color: #88c0d0;
+}
+
+.theme-dropdown-trigger.cobalt {
+  color: #ffc600;
+}
+
+.theme-dropdown-trigger.skynet {
+  color: #cc2020;
+}
+
+.theme-dropdown-trigger:hover {
+  filter: brightness(1.2);
+}
+
+.theme-dropdown-trigger:hover .lambda-icon {
+  filter: drop-shadow(0 0 6px currentColor);
+}
+
+.theme-dropdown-label {
+  font-weight: 700;
+  font-size: 0.875rem;
+  letter-spacing: 0.05em;
+  text-shadow: 0 0 8px currentColor;
+}
+
+.theme-dropdown-arrow {
+  font-size: 0.75rem;
+  margin-left: 6px;
+  transition: transform 0.2s ease;
+  text-shadow: 0 0 6px currentColor;
+}
+
+.theme-dropdown-arrow.open {
+  transform: rotate(180deg);
+}
+
+/* Lambda icon styling - colored by theme */
+.lambda-icon {
+  object-fit: contain;
+  transition: all 0.2s ease;
+}
+
+
+.lambda-icon.dark {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(97%) saturate(2488%) hue-rotate(73deg) brightness(101%) contrast(101%) drop-shadow(0 0 6px rgba(0, 255, 0, 0.7));
+}
+
+.lambda-icon.light {
+  filter: brightness(0) saturate(100%) invert(33%) sepia(97%) saturate(6729%) hue-rotate(296deg) brightness(101%) contrast(101%) drop-shadow(0 0 6px rgba(255, 0, 255, 0.7));
+}
+
+.lambda-icon.monochrome {
+  filter: brightness(0) saturate(100%) invert(100%) drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+}
+
+.lambda-icon.monochrome-inverted {
+  filter: brightness(0) saturate(100%) invert(0%) drop-shadow(0 0 6px rgba(0, 0, 0, 0.7));
+}
+
+.lambda-icon.vintage {
+  filter: brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(2076%) hue-rotate(130deg) brightness(104%) contrast(101%) drop-shadow(0 0 6px rgba(85, 255, 255, 0.7));
+}
+
+.lambda-icon.apple {
+  filter: brightness(0) saturate(100%) invert(81%) sepia(55%) saturate(2078%) hue-rotate(66deg) brightness(103%) contrast(101%) drop-shadow(0 0 6px rgba(51, 255, 51, 0.7));
+}
+
+.lambda-icon.c64 {
+  filter: brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(2076%) hue-rotate(170deg) brightness(104%) contrast(101%) drop-shadow(0 0 6px rgba(163, 230, 255, 0.7));
+}
+
+.lambda-icon.amber {
+  filter: brightness(0) saturate(100%) invert(72%) sepia(78%) saturate(1000%) hue-rotate(360deg) brightness(105%) contrast(101%) drop-shadow(0 0 6px rgba(255, 176, 0, 0.7));
+}
+
+.lambda-icon.synthwave {
+  filter: brightness(0) saturate(100%) invert(25%) sepia(99%) saturate(7426%) hue-rotate(318deg) brightness(101%) contrast(101%) drop-shadow(0 0 6px rgba(255, 20, 147, 0.7));
+}
+
+.lambda-icon.dracula {
+  filter: brightness(0) saturate(100%) invert(75%) sepia(31%) saturate(1825%) hue-rotate(214deg) brightness(103%) contrast(96%) drop-shadow(0 0 6px rgba(189, 147, 249, 0.7));
+}
+
+.lambda-icon.solarized {
+  filter: brightness(0) saturate(100%) invert(56%) sepia(30%) saturate(1142%) hue-rotate(131deg) brightness(91%) contrast(86%) drop-shadow(0 0 6px rgba(42, 161, 152, 0.7));
+}
+
+.lambda-icon.nord {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(16%) saturate(1142%) hue-rotate(153deg) brightness(95%) contrast(86%) drop-shadow(0 0 6px rgba(136, 192, 208, 0.7));
+}
+
+.lambda-icon.cobalt {
+  filter: brightness(0) saturate(100%) invert(83%) sepia(65%) saturate(2040%) hue-rotate(360deg) brightness(104%) contrast(101%) drop-shadow(0 0 6px rgba(255, 198, 0, 0.7));
+}
+
+.lambda-icon.skynet {
+  filter: brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(5000%) hue-rotate(350deg) brightness(90%) contrast(110%) drop-shadow(0 0 6px rgba(204, 32, 32, 0.7));
+}
+
+/* Expanded Dropdown Menu */
+.theme-grid-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0.5rem;
+  border-radius: 0.25rem;
+  overflow: hidden;
+  z-index: 9999;
+  background: rgba(0, 0, 0, 0.95);
+  animation: dropdown-fade-in 0.15s ease;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-width: 240px;
+  padding: 4px 0;
+}
+
+@keyframes dropdown-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.theme-grid-menu.dark {
+  box-shadow: 0 8px 24px rgba(0, 255, 0, 0.2);
+  border-color: rgba(0, 255, 0, 0.2);
+}
+
+.theme-grid-menu.light {
+  box-shadow: 0 8px 24px rgba(255, 0, 255, 0.2);
+  border-color: rgba(255, 0, 255, 0.2);
+}
+
+.theme-grid-menu.monochrome {
+  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.theme-grid-menu.monochrome-inverted {
+  box-shadow: 0 8px 24px rgba(136, 136, 136, 0.3);
+  border-color: rgba(136, 136, 136, 0.2);
+}
+
+.theme-grid-menu.vintage {
+  box-shadow: 0 8px 24px rgba(85, 255, 255, 0.2);
+  border-color: rgba(85, 255, 255, 0.2);
+}
+
+.theme-grid-menu.apple {
+  box-shadow: 0 8px 24px rgba(51, 255, 51, 0.2);
+  border-color: rgba(51, 255, 51, 0.2);
+}
+
+.theme-grid-menu.c64 {
+  box-shadow: 0 8px 24px rgba(163, 230, 255, 0.2);
+  border-color: rgba(163, 230, 255, 0.2);
+}
+
+.theme-grid-menu.amber {
+  box-shadow: 0 8px 24px rgba(255, 176, 0, 0.2);
+  border-color: rgba(255, 176, 0, 0.2);
+}
+
+.theme-grid-menu.synthwave {
+  box-shadow: 0 8px 24px rgba(255, 20, 147, 0.2);
+  border-color: rgba(255, 20, 147, 0.2);
+}
+
+.theme-grid-menu.dracula {
+  box-shadow: 0 8px 24px rgba(189, 147, 249, 0.2);
+  border-color: rgba(189, 147, 249, 0.2);
+}
+
+.theme-grid-menu.solarized {
+  box-shadow: 0 8px 24px rgba(42, 161, 152, 0.2);
+  border-color: rgba(42, 161, 152, 0.2);
+}
+
+.theme-grid-menu.nord {
+  box-shadow: 0 8px 24px rgba(136, 192, 208, 0.2);
+  border-color: rgba(136, 192, 208, 0.2);
+}
+
+.theme-grid-menu.cobalt {
+  box-shadow: 0 8px 24px rgba(255, 198, 0, 0.2);
+  border-color: rgba(255, 198, 0, 0.2);
+}
+
+.theme-grid-menu.skynet {
+  box-shadow: 0 8px 24px rgba(204, 32, 32, 0.25);
+  border-color: rgba(204, 32, 32, 0.3);
+}
+
+/* Dropdown Option Items */
+.theme-grid-option {
+  padding: 0.375rem 0.75rem;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+  background: transparent;
+  border: none;
+  border-left: 2px solid transparent;
+  transition: all 0.15s ease;
+  position: relative;
+  min-height: 28px;
+}
+
+.theme-grid-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.theme-grid-option.active {
+  font-weight: 900;
+  border-left-color: currentColor;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.theme-grid-option.dark { color: #00ff41; }
+.theme-grid-option.light { color: #ff10f0; }
+.theme-grid-option.monochrome { color: #ffffff; }
+.theme-grid-option.monochrome-inverted { color: #888888; }
+.theme-grid-option.vintage { color: #55ffff; }
+.theme-grid-option.apple { color: #33ff33; }
+.theme-grid-option.c64 { color: #a3e6ff; }
+.theme-grid-option.amber { color: #ffb000; }
+.theme-grid-option.synthwave { color: #ff1493; }
+.theme-grid-option.dracula { color: #bd93f9; }
+.theme-grid-option.solarized { color: #2aa198; }
+.theme-grid-option.nord { color: #88c0d0; }
+.theme-grid-option.cobalt { color: #ffc600; }
+.theme-grid-option.skynet { color: #cc2020; }
+
+/* Lambda Icons in Dropdown - size via Next/Image width/height to avoid aspect-ratio warning */
+.lambda-icon-grid {
+  object-fit: contain;
+  transition: all 0.15s ease;
+}
+
+.lambda-icon-grid.dark {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(97%) saturate(2488%) hue-rotate(73deg) brightness(101%) contrast(101%) drop-shadow(0 0 4px rgba(0, 255, 65, 0.6));
+}
+
+.lambda-icon-grid.light {
+  filter: brightness(0) saturate(100%) invert(33%) sepia(97%) saturate(6729%) hue-rotate(296deg) brightness(101%) contrast(101%) drop-shadow(0 0 4px rgba(255, 0, 255, 0.6));
+}
+
+.lambda-icon-grid.monochrome {
+  filter: brightness(0) saturate(100%) invert(100%) drop-shadow(0 0 4px rgba(255, 255, 255, 0.6));
+}
+
+.lambda-icon-grid.monochrome-inverted {
+  filter: brightness(0) saturate(100%) invert(53%) drop-shadow(0 0 4px rgba(136, 136, 136, 0.6));
+}
+
+.lambda-icon-grid.vintage {
+  filter: brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(2076%) hue-rotate(130deg) brightness(104%) contrast(101%) drop-shadow(0 0 4px rgba(85, 255, 255, 0.6));
+}
+
+.lambda-icon-grid.apple {
+  filter: brightness(0) saturate(100%) invert(81%) sepia(55%) saturate(2078%) hue-rotate(66deg) brightness(103%) contrast(101%) drop-shadow(0 0 4px rgba(51, 255, 51, 0.6));
+}
+
+.lambda-icon-grid.c64 {
+  filter: brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(2076%) hue-rotate(170deg) brightness(104%) contrast(101%) drop-shadow(0 0 4px rgba(163, 230, 255, 0.6));
+}
+
+.lambda-icon-grid.amber {
+  filter: brightness(0) saturate(100%) invert(72%) sepia(78%) saturate(1000%) hue-rotate(360deg) brightness(105%) contrast(101%) drop-shadow(0 0 4px rgba(255, 176, 0, 0.6));
+}
+
+.lambda-icon-grid.synthwave {
+  filter: brightness(0) saturate(100%) invert(25%) sepia(99%) saturate(7426%) hue-rotate(318deg) brightness(101%) contrast(101%) drop-shadow(0 0 4px rgba(255, 20, 147, 0.6));
+}
+
+.lambda-icon-grid.dracula {
+  filter: brightness(0) saturate(100%) invert(75%) sepia(31%) saturate(1825%) hue-rotate(214deg) brightness(103%) contrast(96%) drop-shadow(0 0 4px rgba(189, 147, 249, 0.6));
+}
+
+.lambda-icon-grid.solarized {
+  filter: brightness(0) saturate(100%) invert(56%) sepia(30%) saturate(1142%) hue-rotate(131deg) brightness(91%) contrast(86%) drop-shadow(0 0 4px rgba(42, 161, 152, 0.6));
+}
+
+.lambda-icon-grid.nord {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(16%) saturate(1142%) hue-rotate(153deg) brightness(95%) contrast(86%) drop-shadow(0 0 4px rgba(136, 192, 208, 0.6));
+}
+
+.lambda-icon-grid.cobalt {
+  filter: brightness(0) saturate(100%) invert(83%) sepia(65%) saturate(2040%) hue-rotate(360deg) brightness(104%) contrast(101%) drop-shadow(0 0 4px rgba(255, 198, 0, 0.6));
+}
+
+.lambda-icon-grid.skynet {
+  filter: brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(5000%) hue-rotate(350deg) brightness(90%) contrast(110%) drop-shadow(0 0 4px rgba(204, 32, 32, 0.6));
+}
+
+.theme-grid-option:hover .lambda-icon-grid {
+  filter: brightness(1.1);
+}
+
+.theme-grid-option.dark:hover .lambda-icon-grid.dark,
+.theme-grid-option.dark.active .lambda-icon-grid.dark {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(97%) saturate(2488%) hue-rotate(73deg) brightness(101%) contrast(101%) drop-shadow(0 0 8px rgba(0, 255, 65, 0.9));
+}
+
+.theme-grid-option.light:hover .lambda-icon-grid.light,
+.theme-grid-option.light.active .lambda-icon-grid.light {
+  filter: brightness(0) saturate(100%) invert(33%) sepia(97%) saturate(6729%) hue-rotate(296deg) brightness(101%) contrast(101%) drop-shadow(0 0 8px rgba(255, 0, 255, 0.9));
+}
+
+.theme-grid-option.monochrome:hover .lambda-icon-grid.monochrome,
+.theme-grid-option.monochrome.active .lambda-icon-grid.monochrome {
+  filter: brightness(0) saturate(100%) invert(100%) drop-shadow(0 0 8px rgba(255, 255, 255, 0.9));
+}
+
+.theme-grid-option.monochrome-inverted:hover .lambda-icon-grid.monochrome-inverted,
+.theme-grid-option.monochrome-inverted.active .lambda-icon-grid.monochrome-inverted {
+  filter: brightness(0) saturate(100%) invert(67%) drop-shadow(0 0 8px rgba(170, 170, 170, 0.9));
+}
+
+.theme-grid-option.vintage:hover .lambda-icon-grid.vintage,
+.theme-grid-option.vintage.active .lambda-icon-grid.vintage {
+  filter: brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(2076%) hue-rotate(130deg) brightness(104%) contrast(101%) drop-shadow(0 0 8px rgba(85, 255, 255, 0.9));
+}
+
+.theme-grid-option.apple:hover .lambda-icon-grid.apple,
+.theme-grid-option.apple.active .lambda-icon-grid.apple {
+  filter: brightness(0) saturate(100%) invert(81%) sepia(55%) saturate(2078%) hue-rotate(66deg) brightness(103%) contrast(101%) drop-shadow(0 0 8px rgba(51, 255, 51, 0.9));
+}
+
+.theme-grid-option.c64:hover .lambda-icon-grid.c64,
+.theme-grid-option.c64.active .lambda-icon-grid.c64 {
+  filter: brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(2076%) hue-rotate(170deg) brightness(104%) contrast(101%) drop-shadow(0 0 8px rgba(163, 230, 255, 0.9));
+}
+
+.theme-grid-option.amber:hover .lambda-icon-grid.amber,
+.theme-grid-option.amber.active .lambda-icon-grid.amber {
+  filter: brightness(0) saturate(100%) invert(72%) sepia(78%) saturate(1000%) hue-rotate(360deg) brightness(105%) contrast(101%) drop-shadow(0 0 8px rgba(255, 176, 0, 0.9));
+}
+
+.theme-grid-option.synthwave:hover .lambda-icon-grid.synthwave,
+.theme-grid-option.synthwave.active .lambda-icon-grid.synthwave {
+  filter: brightness(0) saturate(100%) invert(25%) sepia(99%) saturate(7426%) hue-rotate(318deg) brightness(101%) contrast(101%) drop-shadow(0 0 8px rgba(255, 20, 147, 0.9));
+}
+
+.theme-grid-option.dracula:hover .lambda-icon-grid.dracula,
+.theme-grid-option.dracula.active .lambda-icon-grid.dracula {
+  filter: brightness(0) saturate(100%) invert(75%) sepia(31%) saturate(1825%) hue-rotate(214deg) brightness(103%) contrast(96%) drop-shadow(0 0 8px rgba(189, 147, 249, 0.9));
+}
+
+.theme-grid-option.solarized:hover .lambda-icon-grid.solarized,
+.theme-grid-option.solarized.active .lambda-icon-grid.solarized {
+  filter: brightness(0) saturate(100%) invert(56%) sepia(30%) saturate(1142%) hue-rotate(131deg) brightness(91%) contrast(86%) drop-shadow(0 0 8px rgba(42, 161, 152, 0.9));
+}
+
+.theme-grid-option.nord:hover .lambda-icon-grid.nord,
+.theme-grid-option.nord.active .lambda-icon-grid.nord {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(16%) saturate(1142%) hue-rotate(153deg) brightness(95%) contrast(86%) drop-shadow(0 0 8px rgba(136, 192, 208, 0.9));
+}
+
+.theme-grid-option.cobalt:hover .lambda-icon-grid.cobalt,
+.theme-grid-option.cobalt.active .lambda-icon-grid.cobalt {
+  filter: brightness(0) saturate(100%) invert(83%) sepia(65%) saturate(2040%) hue-rotate(360deg) brightness(104%) contrast(101%) drop-shadow(0 0 8px rgba(255, 198, 0, 0.9));
+}
+
+.theme-grid-option.skynet:hover .lambda-icon-grid.skynet,
+.theme-grid-option.skynet.active .lambda-icon-grid.skynet {
+  filter: brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(5000%) hue-rotate(350deg) brightness(90%) contrast(110%) drop-shadow(0 0 8px rgba(204, 32, 32, 0.9));
+}
+
+/* Theme Labels */
+.theme-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  transition: all 0.15s ease;
+}
+
+/* Theme-specific colors for dropdown items */
+.theme-grid-option.dark .theme-label {
+  color: #00ff41;
+}
+
+.theme-grid-option.light .theme-label {
+  color: #ff10f0;
+}
+
+.theme-grid-option.monochrome .theme-label {
+  color: #ffffff;
+}
+
+.theme-grid-option.monochrome-inverted .theme-label {
+  color: #888888;
+}
+
+.theme-grid-option.vintage .theme-label {
+  color: #55ffff;
+}
+
+.theme-grid-option.apple .theme-label {
+  color: #33ff33;
+}
+
+.theme-grid-option.c64 .theme-label {
+  color: #a3e6ff;
+}
+
+.theme-grid-option.amber .theme-label {
+  color: #ffb000;
+}
+
+.theme-grid-option.synthwave .theme-label {
+  color: #ff1493;
+}
+
+.theme-grid-option.dracula .theme-label {
+  color: #bd93f9;
+}
+
+.theme-grid-option.solarized .theme-label {
+  color: #2aa198;
+}
+
+.theme-grid-option.nord .theme-label {
+  color: #88c0d0;
+}
+
+.theme-grid-option.cobalt .theme-label {
+  color: #ffc600;
+}
+
+.theme-grid-option.skynet .theme-label {
+  color: #cc2020;
+}
+
+.theme-grid-option:hover .theme-label {
+  text-shadow: 0 0 8px currentColor;
+}
+
+.theme-grid-option.active .theme-label {
+  text-shadow: 0 0 12px currentColor;
+}
+
+/* Focus state for accessibility */
+.theme-dropdown-trigger:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+.theme-grid-option:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+/* Category group headers */
+.theme-group-header {
+  padding: 4px 10px 2px;
+  margin-top: 2px;
+  font-family: 'OCR-A', 'Courier New', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  color: rgba(255, 255, 255, 0.30);
+  text-transform: uppercase;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  pointer-events: none;
+  user-select: none;
+}
+
+.theme-group-header-first {
+  margin-top: 0;
+  border-top: none;
+}
+
+/* 2-column grid for theme options within each group */
+.theme-group-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}

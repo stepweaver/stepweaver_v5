@@ -15,6 +15,14 @@ export const chatMessageSchema = z.object({
 export const chatBodySchema = z.object({
   messages: z.array(chatMessageSchema).min(1).max(50),
   channel: z.enum(["widget", "terminal"]).optional(),
+  /** When set, Lambda answers in context of this case study (project detail page). */
+  projectCaseStudy: z
+    .object({
+      slug: z.string().max(160),
+      title: z.string().max(220),
+      summary: z.string().max(8000),
+    })
+    .optional(),
   _hp_website: z.string().optional(),
   _t: z.number().optional(),
   _d: z.number().optional(),

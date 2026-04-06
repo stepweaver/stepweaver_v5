@@ -33,7 +33,7 @@ export default function ForAgentsPage() {
           <div>
             <div className="text-label mb-2">STRUCTURED DATA</div>
             <div className="text-xs text-[rgb(var(--text-meta))] font-mono">
-              JSON-LD available at root. Projects at /api/codex. Contact at /api/contact (POST).
+              JSON-LD (WebSite, Person, BreadcrumbList) is emitted on the homepage. Machine-readable profile: /operator-profile.json and /llms.txt. Codex list: GET /api/codex. Contact: POST /api/contact.
             </div>
           </div>
         </div>

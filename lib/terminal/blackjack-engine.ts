@@ -171,7 +171,7 @@ export function handleBlackjackInput(raw: string): { lines: { content: string; v
     return { lines: [line("Game not active. Type blackjack to start.", "warning")] };
   }
 
-  if (cmd === "exit" || cmd === "quit") {
+  if (cmd === "exit" || cmd === "quit" || cmd === "cancel") {
     state.isActive = false;
     return { lines: [line("Left blackjack.", "dimmed")], exit: true };
   }
@@ -182,7 +182,7 @@ export function handleBlackjackInput(raw: string): { lines: { content: string; v
         line("hit — draw a card", "default"),
         line("stand — hold and resolve", "default"),
         line("deal — new hand (after round ends)", "default"),
-        line("exit — leave game", "default"),
+        line("exit | cancel — leave game", "default"),
       ],
     };
   }

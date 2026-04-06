@@ -3,23 +3,43 @@ import { resumeMenuLines } from '@/lib/terminal/resume-content';
 import { codexHelpLines, ensureCodexPosts } from '@/lib/terminal/codex-terminal';
 import { startCaveAdventure } from '@/lib/terminal/cave-adventure';
 import { startBlackjack } from '@/lib/terminal/blackjack-engine';
+import { roll as executeRoll, formatRollResult, parseDiceNotation } from '@/lib/roller';
 
 const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => CommandResult | Promise<CommandResult>> = {
   help: (_args, _ctx) => ({
     lines: [
       { content: 'Available commands:', variant: 'success' },
       { content: '', variant: 'default' },
-      { content: '  help              Show this help message', variant: 'default' },
-      { content: '  clear             Clear the terminal', variant: 'default' },
-      { content: '  cd <dest>         Navigate (contact, codex, dice-roller, github)', variant: 'default' },
-      { content: '  weather [loc]     Get weather (optionally with --forecast)', variant: 'default' },
-      { content: '  contact           Start contact form wizard', variant: 'default' },
-      { content: '  chat <message>    Send message to Lambda AI', variant: 'default' },
-      { content: '  roll <notation>   Roll dice (e.g. 3d6+2, 1d20)', variant: 'default' },
-      { content: '  resume            View resume sections', variant: 'default' },
-      { content: '  codex             Browse blog posts', variant: 'default' },
-      { content: '  zork              Start text adventure', variant: 'default' },
-      { content: '  blackjack / bj    Start card game', variant: 'default' },
+      { content: 'System:', variant: 'lambda' },
+      { content: '  clear — Clear terminal screen', variant: 'default' },
+      { content: '  cancel — Exit contact wizard or current mode (resume, codex, games)', variant: 'default' },
+      { content: '', variant: 'default' },
+      { content: 'Content:', variant: 'lambda' },
+      { content: '  resume — View resume (sections: summary, experience, …)', variant: 'default' },
+      { content: '  codex — Browse blog (ls, cat, grep, exit)', variant: 'default' },
+      { content: '  chat <message> — Ask Lambda about experience', variant: 'default' },
+      { content: '', variant: 'default' },
+      { content: 'Navigation:', variant: 'lambda' },
+      { content: '  cd contact | codex | dice-roller | github', variant: 'default' },
+      { content: '', variant: 'default' },
+      { content: 'Features:', variant: 'lambda' },
+      { content: '  weather [location] [--forecast]', variant: 'default' },
+      { content: '  roll <notation> — e.g. 3d6+2, 1d20, 2d6+1d4+1', variant: 'default' },
+      { content: '  contact — Message wizard (send / cancel)', variant: 'default' },
+      { content: '', variant: 'default' },
+      { content: 'Games:', variant: 'lambda' },
+      { content: '  blackjack | bj — hit, stand, deal, exit', variant: 'default' },
+      { content: '  zork — Text adventure (look, go, inventory, exit)', variant: 'default' },
+    ],
+  }),
+
+  cancel: (_args, _ctx) => ({
+    lines: [
+      {
+        content:
+          'At main shell — nothing to cancel. In contact/codex/resume/games, type cancel or use Esc.',
+        variant: 'dimmed',
+      },
     ],
   }),
 
@@ -66,26 +86,31 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
   },
 
   roll: (args) => {
-    const notation = args.join(' ');
+    const notation = args.join(' ').trim();
     if (!notation) {
-      return { lines: [{ content: 'Usage: roll <notation> (e.g. 3d6+2, 1d20)', variant: 'warning' }] };
+      return {
+        lines: [
+          { content: 'Usage: roll <notation> (e.g. 3d6+2, 1d20, 2d6+1d4+1)', variant: 'warning' },
+        ],
+      };
     }
-    const match = notation.match(/^(\d+)d(\d+)([+-]\d+)?$/);
-    if (!match) {
-      return { lines: [{ content: 'Invalid notation: ' + notation, variant: 'error' }] };
+    try {
+      const { groups } = parseDiceNotation(notation);
+      if (groups.length === 0) {
+        return { lines: [{ content: 'Invalid notation: ' + notation, variant: 'error' }] };
+      }
+      const result = executeRoll(notation);
+      const text = formatRollResult(result);
+      const lines = text.split("\n").map((content, i) => ({
+        content,
+        variant: i === 0 ? ("success" as const) : ("lambda" as const),
+      }));
+      return { lines };
+    } catch (e) {
+      return {
+        lines: [{ content: e instanceof Error ? e.message : 'Roll failed', variant: 'error' }],
+      };
     }
-    const count = parseInt(match[1], 10);
-    const sides = parseInt(match[2], 10);
-    const modifier = match[3] ? parseInt(match[3], 10) : 0;
-    const rolls = Array.from({ length: count }, () => Math.floor(Math.random() * sides) + 1);
-    const total = rolls.reduce((a, b) => a + b, 0) + modifier;
-    const modStr = modifier > 0 ? '+' + modifier : modifier < 0 ? String(modifier) : '';
-    return {
-      lines: [
-        { content: 'Rolling ' + notation + ':', variant: 'success' },
-        { content: '  [' + rolls.join(', ') + ']' + modStr + ' = ' + total, variant: 'lambda' },
-      ],
-    };
   },
 
   resume: (_args, ctx) => {

@@ -13,9 +13,19 @@ const FALLBACK_MODEL = "gpt-4o-mini";
 const TIMEOUT_MS = 20_000;
 const MAX_MESSAGES = 12;
 
-function buildSystemPrompt(channel?: string): string {
+function buildSystemPrompt(
+  channel?: string,
+  projectCaseStudy?: { slug: string; title: string; summary: string }
+): string {
   let prompt = "You are lambda, a technical operator assistant for stepweaver.dev. ";
   prompt += "Be concise, technical, and direct. ";
+  if (projectCaseStudy) {
+    const clip = projectCaseStudy.summary.slice(0, 2000).replace(/\s+/g, " ").trim();
+    prompt +=
+      `The reader is on the case study "${projectCaseStudy.title}" (slug: ${projectCaseStudy.slug}). ` +
+      `Context: ${clip} ` +
+      "Ground answers in this dossier and Stephen's stated outcomes; say when something is not in the case study. ";
+  }
   if (channel === "terminal") {
     prompt += "Respond in plain text only, 2-5 sentences. Be punchy.";
   } else {
@@ -108,7 +118,7 @@ export async function POST(request: NextRequest) {
     }
 
     const messages = normalizeMessages(parsed.data.messages);
-    const systemPrompt = buildSystemPrompt(channel);
+    const systemPrompt = buildSystemPrompt(channel, parsed.data.projectCaseStudy);
     const hasImages = parsed.data.messages.some(
       (m) => Array.isArray(m.content) && m.content.some((c: Record<string, unknown>) => c.type === "image_url")
     );

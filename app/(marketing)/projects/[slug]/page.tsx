@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { getProjectBySlug, getProjectSlugs } from "@/lib/data/projects";
 import { ProjectSectionRenderer } from "@/components/project/section-renderer";
+import { ProjectCaseChat } from "@/components/project/project-case-chat";
 import type { Project } from "@/lib/data/projects.schema";
 
 export function generateStaticParams() {
@@ -12,9 +13,21 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const { slug } = await params;
   const project = getProjectBySlug(slug);
   if (!project) return { title: "Project Not Found" };
+  const base = process.env.SITE_URL || "https://stepweaver.dev";
   return {
     title: project.title,
     description: project.description,
+    openGraph: {
+      title: project.title,
+      description: project.description,
+      type: "article",
+      url: `${base}/projects/${slug}`,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: project.title,
+      description: project.description,
+    },
   };
 }
 
@@ -97,6 +110,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
             )}
+
+            <ProjectCaseChat slug={slug} title={project.title} summary={project.description} />
           </aside>
 
           <div className="space-y-6">
