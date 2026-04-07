@@ -10,9 +10,10 @@ export function BackgroundBio() {
 
       <div className="space-y-4 text-[rgb(var(--text-secondary))] text-sm md:text-base leading-relaxed font-[var(--font-ibm)]">
         <p>
-          I came into software through operations, analysis, and real-world process work:
-          Airborne Cryptologic Linguist in the U.S. Air Force, then restaurant operations and business analysis, then
-          development. That path still shapes how I build.
+          My path into software came through operations, analysis, and real-world process work: Airborne Cryptologic
+          Linguist in the U.S. Air Force, then restaurant operations, business analysis, and finally development. That
+          background still defines how I build. I start with workflows, handoffs, data, integrations, and risk, then
+          turn them into systems people can use, maintain, and trust.
         </p>
         <p className="text-[rgb(var(--text-color))] text-xs uppercase tracking-wider font-[var(--font-ocr)]">
           Trajectory
@@ -24,10 +25,6 @@ export function BackgroundBio() {
           <li>Self-taught developer</li>
           <li>Current focus: DevOps and infrastructure</li>
         </ul>
-        <p>
-          I don&apos;t treat software as an isolated code problem. I look at the workflow, the handoffs, the data, the
-          integrations, and the risks. Then I build systems people can use, maintain, and trust.
-        </p>
       </div>
 
       <footer className="mt-8 pt-6 border-t border-[rgb(var(--border)/0.2)] space-y-2">
