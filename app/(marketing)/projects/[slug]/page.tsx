@@ -142,6 +142,29 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 </div>
               </div>
             ) : null}
+            {project.caseStudyGallery && project.caseStudyGallery.length > 0 ? (
+              <div className="surface-panel p-4">
+                <div className="text-label mb-3">SCREENSHOTS</div>
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  {project.caseStudyGallery.map((shot) => (
+                    <figure
+                      key={shot.src}
+                      className="overflow-hidden border border-[rgb(var(--border)/0.2)] bg-[rgb(var(--window)/0.2)]"
+                    >
+                      <div className="relative aspect-video w-full">
+                        <Image
+                          src={shot.src}
+                          alt={shot.alt}
+                          fill
+                          className="object-contain object-center"
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 45vw, 560px"
+                        />
+                      </div>
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            ) : null}
             {project.sections.map((section) => (
               <ProjectSectionRenderer key={section.id} section={section} />
             ))}

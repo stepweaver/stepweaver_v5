@@ -83,6 +83,10 @@ function formatProjectDetail(project: Project): string {
   if (project.demoUrl) lines.push(`Demo URL: ${project.demoUrl}`);
   if (project.liveUrl) lines.push(`Live URL: ${project.liveUrl}`);
   if (project.repoUrl) lines.push(`Repo URL: ${project.repoUrl}`);
+  if (project.caseStudyGallery?.length) {
+    const body = project.caseStudyGallery.map((g) => `- ${g.src} (${g.alt})`).join("\n");
+    lines.push(`Case study gallery:\n${indent(body, 2)}`);
+  }
 
   for (const section of project.sections) {
     const block = formatSection(section);

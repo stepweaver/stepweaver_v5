@@ -18,6 +18,7 @@ export const ProjectSectionSchema = z.object({
     "key-features",
     "project-structure",
     "keyboard-shortcuts",
+    "data-flow",
   ]),
   content: z.string().optional(),
   bullets: z.array(z.string()).optional(),
@@ -60,6 +61,16 @@ export const ProjectSchema = z.object({
 
   // Case study sections
   sections: z.array(ProjectSectionSchema),
+
+  /** Optional extra figures below the hero on the project detail page */
+  caseStudyGallery: z
+    .array(
+      z.object({
+        src: z.string(),
+        alt: z.string(),
+      })
+    )
+    .optional(),
 
   // Optional demo/live/repo links
   demoUrl: z.string().optional(),

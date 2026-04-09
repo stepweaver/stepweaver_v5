@@ -19,6 +19,8 @@ export function ProjectSectionRenderer({ section }: { section: ProjectSection })
       return <EvidenceSection section={section} />;
     case "tradeoffs":
       return <TradeoffsSection section={section} />;
+    case "data-flow":
+      return <DataFlowSection section={section} />;
     case "project-structure":
     case "terminal-integration":
       return <ItemListSection section={section} />;
@@ -28,23 +30,27 @@ export function ProjectSectionRenderer({ section }: { section: ProjectSection })
 }
 
 function TextSection({ section }: { section: ProjectSection }) {
-  if (!section.content) return null;
+  const hasContent = Boolean(section.content?.trim());
+  const hasBullets = section.bullets && section.bullets.length > 0;
+  if (!hasContent && !hasBullets) return null;
   return (
     <div className="surface-panel p-6">
       <div className="text-label mb-3">{section.title.toUpperCase()}</div>
-      <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed">
-        {section.content}
-      </p>
-      {section.bullets && section.bullets.length > 0 && (
-        <ul className="mt-4 space-y-2">
-          {section.bullets.map((bullet, i) => (
+      {hasContent ? (
+        <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed whitespace-pre-line">
+          {section.content}
+        </p>
+      ) : null}
+      {hasBullets ? (
+        <ul className={`space-y-2 ${hasContent ? "mt-4" : ""}`}>
+          {section.bullets!.map((bullet, i) => (
             <li key={i} className="text-sm text-[rgb(var(--text-secondary))] flex gap-2">
               <span className="text-[rgb(var(--neon))] shrink-0">▸</span>
               <span>{bullet}</span>
             </li>
           ))}
         </ul>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -114,24 +120,49 @@ function EvidenceSection({ section }: { section: ProjectSection }) {
 }
 
 function TradeoffsSection({ section }: { section: ProjectSection }) {
-  if (!section.items || section.items.length === 0) return null;
+  const hasItems = section.items && section.items.length > 0;
+  const hasBullets = section.bullets && section.bullets.length > 0;
+  if (!hasItems && !hasBullets) return null;
   return (
     <div className="surface-panel p-6">
       <div className="text-label mb-3">{section.title.toUpperCase()}</div>
-      <div className="space-y-3">
-        {section.items.map((item) => (
-          <div key={item.label} className="border-l-2 border-[rgb(var(--warn)/0.4)] pl-4">
-            <div className="text-[rgb(var(--text-color))] text-sm font-[var(--font-ibm)]">
-              {item.label}
-            </div>
-            {item.description && (
-              <div className="text-[rgb(var(--text-secondary))] text-xs mt-1">
-                {item.description}
+      {hasItems ? (
+        <div className="space-y-3">
+          {section.items!.map((item) => (
+            <div key={item.label} className="border-l-2 border-[rgb(var(--warn)/0.4)] pl-4">
+              <div className="text-[rgb(var(--text-color))] text-sm font-[var(--font-ibm)]">
+                {item.label}
               </div>
-            )}
-          </div>
-        ))}
-      </div>
+              {item.description ? (
+                <div className="text-[rgb(var(--text-secondary))] text-xs mt-1">
+                  {item.description}
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+      ) : (
+        <ul className="space-y-2">
+          {section.bullets!.map((bullet, i) => (
+            <li key={i} className="text-sm text-[rgb(var(--text-secondary))] flex gap-2">
+              <span className="text-[rgb(var(--warn))] shrink-0 mt-0.5">▸</span>
+              <span>{bullet}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+function DataFlowSection({ section }: { section: ProjectSection }) {
+  if (!section.content?.trim()) return null;
+  return (
+    <div className="surface-panel p-6">
+      <div className="text-label mb-3">{section.title.toUpperCase()}</div>
+      <pre className="overflow-x-auto rounded-sm border border-[rgb(var(--border)/0.25)] bg-[rgb(var(--window)/0.35)] p-4 font-[var(--font-ocr)] text-xs leading-relaxed text-[rgb(var(--text-secondary))]">
+        {section.content.trim()}
+      </pre>
     </div>
   );
 }
