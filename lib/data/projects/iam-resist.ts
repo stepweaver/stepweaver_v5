@@ -12,7 +12,7 @@ export const iamResist: Project = {
   slug: "iam-resist",
   title: "I AM [RESIST]",
   description:
-    "Content and commerce platform for independent reporting, curated media, and physical protest materials: Notion as headless CMS, a unified editorial pipeline (newswire, voices, protest music, video), Stripe + Printify merch, and a composable homepage. Rebuilt for domain-driven structure and full feature parity with the original—coherent boundaries, not a product pivot.",
+    "Content and commerce platform for independent reporting, curated media, and physical protest materials: Notion as headless CMS, a unified editorial pipeline (newswire, voices, protest music, video), Stripe + Printify merch, and a composable homepage. Rebuilt for domain-driven structure and full feature parity with the original, with coherent boundaries rather than a product pivot.",
   status: "live",
   tags: ["Next.js", "React", "Notion API", "Stripe", "Supabase", "Printify", "RSS"],
   keywords: ["notion", "stripe", "printify", "publishing", "commerce", "refactor"],
@@ -22,11 +22,11 @@ export const iamResist: Project = {
   builtFor:
     "A single system that surfaces reporting, curated feeds, and protest merch without splitting tools or stores",
   solved:
-    "Organic growth: content logic scattered across layers, UI coupled to fetching, duplicate hooks/utils, and hard-to-extend structure—without throwing away a proven product",
+    "Organic growth: content logic scattered across layers, UI coupled to fetching, duplicate hooks/utils, and hard-to-extend structure, without throwing away a proven product",
   delivered: [
     "Full structural refactor: domains own components, transforms, and route logic; data pipelines separated from rendering",
     "Normalized content model with shared rendering across types; modular homepage (shop promo, reading, newswire, voices, protest music)",
-    "Commerce kept simple: Stripe sessions + webhooks, Printify fulfillment, cart context—no over-engineered state layer",
+    "Commerce kept simple: Stripe sessions + webhooks, Printify fulfillment, cart context, and no over-engineered state layer",
   ],
   cardDescription:
     "Notion-backed publishing + feeds + Stripe/Printify shop, rebuilt domain-first: same capabilities, clearer pipelines and boundaries.",
@@ -42,7 +42,7 @@ export const iamResist: Project = {
       title: "Overview",
       type: "overview",
       content:
-        "iamresist is a content and commerce platform built to surface independent reporting, curated media, and physical protest materials in one system. The first version worked and proved the model; architecture had drifted. This rebuild restructures into a domain-driven, maintainable codebase without losing functionality—not a redesign, a coherence pass.",
+        "iamresist is a content and commerce platform built to surface independent reporting, curated media, and physical protest materials in one system. This rebuild restructures into a domain-driven, maintainable codebase without losing functionality: not a redesign, a coherence pass.",
       bullets: [
         "Notion as headless CMS",
         "Unified pipeline: newswire, voices, protest music, curated video",
@@ -87,12 +87,12 @@ export const iamResist: Project = {
       title: "Architecture",
       type: "architecture",
       bullets: [
-        "Domain structure — shop: catalog, cart, checkout | voices: aggregated reporting | newswire: headline feed | journal: long-form | book-club: reading pipeline | home: composition layer",
+        "Domain structure. Shop: catalog, cart, checkout | voices: aggregated reporting | newswire: headline feed | journal: long-form | book-club: reading pipeline | home: composition layer",
         "Each domain owns components, data transforms, and route logic",
-        "Data layer — Notion as primary CMS; fetch via lib/notion, normalize to internal models, enrich (e.g. video, curated, protest music), deliver through domain-specific loaders so types can share rendering with different sources",
-        "Homepage composition — independent sections (e.g. shop promo, currently reading, featured newswire, voices feed, protest music) each pull from their pipeline, then render into a unified feed; extend without coupling everything to one data blob",
-        "Commerce — Stripe (checkout + webhooks), Printify fulfillment; CartContext for client state, /api/checkout for sessions, /api/webhooks for orders; product config stays close to UI (e.g. lib/shopProducts) without extra abstraction layers",
-        "API surface — /api/checkout, /api/webhooks, /api/voices-feed, /api/voices-archive, /api/revalidate: each route maps to one system concern",
+        "Data layer: Notion as primary CMS; fetch via lib/notion, normalize to internal models, enrich (e.g. video, curated, protest music), deliver through domain-specific loaders so types can share rendering with different sources",
+        "Homepage composition: independent sections (e.g. shop promo, currently reading, featured newswire, voices feed, protest music) each pull from their pipeline, then render into a unified feed; extend without coupling everything to one data blob",
+        "Commerce: Stripe (checkout + webhooks), Printify fulfillment; CartContext for client state, /api/checkout for sessions, /api/webhooks for orders; product config stays close to UI (e.g. lib/shopProducts) without extra abstraction layers",
+        "API surface: /api/checkout, /api/webhooks, /api/voices-feed, /api/voices-archive, /api/revalidate; each route maps to one system concern",
       ],
     },
     {
@@ -123,7 +123,7 @@ export const iamResist: Project = {
       title: "Engineering decisions",
       type: "engineering",
       bullets: [
-        "Rebuild focused on extracting real structure from an organic codebase and reassembling it—control and stability over theoretical elegance",
+        "Rebuild focused on extracting real structure from an organic codebase and reassembling it, prioritizing control and stability over theoretical elegance",
         "Some duplication tolerated early to avoid breaking flows; clarity chosen over deep abstraction where it did not buy leverage",
         "Security and metadata handling brought back in line for production (OG/Twitter helpers, webhook verification patterns)",
       ],
@@ -143,7 +143,7 @@ export const iamResist: Project = {
       title: "Outcome",
       type: "outcome",
       content:
-        "Full feature parity with the original system. Clearer architecture, composable home, isolated shop layer, production-ready boundaries. The site behaves like a platform—a set of pipelines and surfaces—not a pile of one-off features.\n\nRebuilding without breaking a live product means naming the real structure, extracting it, and reassembling something durable. That is the gap between “works” and “can scale.”",
+        "Full feature parity with the original system. Clearer architecture, composable home, isolated shop layer, production-ready boundaries. The site behaves like a platform (a set of pipelines and surfaces), not a pile of one-off features.\n\nRebuilding without breaking a live product means naming the real structure, extracting it, and reassembling something durable. That is the gap between “works” and “can scale.”",
       bullets: [
         "Easier to add content types and homepage modules",
         "Predictable place for shop, feeds, and editorial code to live",

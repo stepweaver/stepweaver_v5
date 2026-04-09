@@ -1,4 +1,4 @@
-// Meshtastic Docs DB (NOTION_MESHTASTIC_DOCS_DB_ID) — schema matches v3 Notion database.
+// Meshtastic Docs DB (NOTION_MESHTASTIC_DOCS_DB_ID); schema matches v3 Notion database.
 import { unstable_cache } from "next/cache";
 import type { PageObjectResponse, PartialPageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { getNotion } from "./client";
@@ -21,7 +21,7 @@ export type MeshtasticPublishedDoc = {
 
 /**
  * Normalize Notion database ID (trim, strip wrapping quotes, re-hyphenate UUID).
- * Copy/paste from the dashboard often includes trailing newlines — those broke production
+ * Copy/paste from the dashboard often includes trailing newlines, which broke production
  * while dev `.env.local` stayed clean.
  */
 function getMeshtasticDbId(): string | null {
@@ -34,7 +34,7 @@ function getMeshtasticDbId(): string | null {
   return `${clean.slice(0, 8)}-${clean.slice(8, 12)}-${clean.slice(12, 16)}-${clean.slice(16, 20)}-${clean.slice(20)}`;
 }
 
-/** Why Meshtastic cannot talk to Notion (safe to show in UI — no secrets). */
+/** Why Meshtastic cannot talk to Notion (safe to show in UI; no secrets). */
 export type MeshtasticNotionConfigIssue =
   | "ok"
   | "missing_database_id"

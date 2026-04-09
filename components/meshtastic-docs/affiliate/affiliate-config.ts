@@ -1,5 +1,5 @@
 /**
- * Meshtastic affiliate URL configuration (Atlavox products) — v3 parity.
+ * Meshtastic affiliate URL configuration (Atlavox products), aligned with v3.
  */
 export const AFFILIATE_SOURCES = [
   { envKey: "NEXT_PUBLIC_ATLAVOX_M1_URL", label: "Atlavox M1 Meshtastic Radio" },
