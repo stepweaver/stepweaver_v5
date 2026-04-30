@@ -17,6 +17,14 @@ const EXTRA_ALIASES: Record<string, string[]> = {
   grating: ['grating', 'grate'],
   window: ['window', 'kitchen window'],
   'trap-door': ['trap door', 'door', 'trapdoor'],
+  debris: ['debris', 'heap', 'pile', 'heap of debris', 'rubble', 'junk'],
+  'signal-prism': [
+    'prism',
+    'signal prism',
+    'glass prism',
+    'glass signal prism',
+    'artifact',
+  ],
 };
 
 function normalizePhrase(s: string): string {

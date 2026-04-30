@@ -160,34 +160,47 @@ const defs: Record<string, Omit<RoomDef, 'id'> & { id?: string }> = {
     initialItems: [],
   },
   'reservoir-south': {
-    name: 'South Reservoir',
+    name: 'Mist Reservoir',
     description:
-      'South of a vast underground reservoir, the path continues. Mist clings to the stone. (More lies ahead: content stub.)',
+      'A cold mist hangs over a dark underground reservoir. Water laps softly against stone. A narrow ledge continues along the rim, and a smaller passage breaks away into the rock.',
     dark: true,
     exits: {
       southwest: 'chasm',
+      east: 'east-west-passage',
     },
     initialItems: [],
   },
   'east-west-passage': {
-    name: 'East-West Passage',
+    name: 'Echo Gallery',
     description:
-      'A carved passage runs east and west through the rock. Footprints in the dust suggest recent traffic. (Early dungeon; extend from here.)',
+      'A worked stone corridor that carries every footstep forward and back again. The air tastes of metal and wet limestone.',
     dark: true,
     exits: {
       northeast: 'chasm',
+      west: 'survey-niche',
+      east: 'reservoir-south',
     },
     initialItems: [],
   },
   crawlway: {
-    name: 'Crawlway',
+    name: 'Low Crawlway',
     description:
-      'A tight crawlway of damp stone. You can stand again to the north. (Dungeon extension point.)',
+      'A tight crawlway of damp stone, just wide enough to squeeze through without scraping yourself raw. You can stand again to the north.',
     dark: true,
     exits: {
       north: 'cellar',
     },
     initialItems: [],
+  },
+  'survey-niche': {
+    name: 'Survey Niche',
+    description:
+      'A small niche has been hacked into the wall, as if someone once worked here by lamplight. Old chalk marks crisscross the stone. A heap of debris slumps in one corner.',
+    dark: true,
+    exits: {
+      east: 'east-west-passage',
+    },
+    initialItems: ['debris'],
   },
 };
 

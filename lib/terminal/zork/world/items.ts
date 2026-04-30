@@ -107,6 +107,20 @@ const defs: Record<string, Omit<ItemDef, 'id'> & { id?: string }> = {
     takeable: false,
     openable: true,
   },
+  debris: {
+    name: 'heap of debris',
+    description:
+      'A slumped heap of damp boards, cracked stone, and rusted iron. Something about it feels deliberately piled.',
+    takeable: false,
+    moveable: true,
+    under: ['signal-prism'],
+  },
+  'signal-prism': {
+    name: 'glass signal prism',
+    description:
+      'A dense glass prism, edges clean despite the grime around it. Fine etching marks one face like a calibration scale.',
+    takeable: true,
+  },
 };
 
 export const ITEMS: Record<string, ItemDef> = Object.fromEntries(

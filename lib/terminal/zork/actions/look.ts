@@ -9,6 +9,7 @@ import {
 } from '../state';
 import { ITEMS } from '../world/items';
 import { describeRoom } from './movement';
+import { FLAG_ARTIFACT_PLACED } from '../world/flags';
 
 function mailboxDescription(state: GameState): string {
   const open = isItemOpen(state, 'mailbox');
@@ -72,6 +73,24 @@ export function tryExamine(
 
   if (itemId === 'mailbox') {
     return { state, lines: [line('text', mailboxDescription(state))] };
+  }
+
+  if (itemId === 'trophy-case') {
+    if (state.flags[FLAG_ARTIFACT_PLACED]) {
+      return {
+        state,
+        lines: [
+          line(
+            'text',
+            'The trophy case holds a single glass prism, catching and breaking the light into quiet angles.'
+          ),
+        ],
+      };
+    }
+    return {
+      state,
+      lines: [line('text', 'A handsome trophy case. It is empty.')],
+    };
   }
 
   const def = ITEMS[itemId];

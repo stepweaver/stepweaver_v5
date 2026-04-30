@@ -1,5 +1,5 @@
 import type { Direction } from '../direction';
-import { FLAG_FIRST_CELLAR } from '../world/flags';
+import { FLAG_ENTERED_HOUSE, FLAG_FIRST_CELLAR } from '../world/flags';
 import {
   type GameState,
   type OutputLine,
@@ -88,6 +88,14 @@ export function tryMove(
   const drained = drainLampOnMove(next);
   next = drained.state;
   const extra = drained.lines;
+
+  if (target === 'living-room' && !next.flags[FLAG_ENTERED_HOUSE]) {
+    next = {
+      ...next,
+      score: next.score + 10,
+      flags: { ...next.flags, [FLAG_ENTERED_HOUSE]: true },
+    };
+  }
 
   if (target === 'cellar' && !next.flags[FLAG_FIRST_CELLAR]) {
     next = {

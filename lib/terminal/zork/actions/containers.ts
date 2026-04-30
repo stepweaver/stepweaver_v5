@@ -15,9 +15,17 @@ import {
 } from '../state';
 import { ITEMS } from '../world/items';
 
+function reachableCandidates(state: GameState): Set<string> {
+  // Room-visible items already include contents of open room containers.
+  // Add inventory items so carried containers can be opened/closed naturally.
+  return new Set([
+    ...getVisibleItemIdsInRoom(state, state.currentRoom),
+    ...state.inventory,
+  ]);
+}
+
 function canReachItem(state: GameState, itemId: string): boolean {
-  const vis = new Set(getVisibleItemIdsInRoom(state, state.currentRoom));
-  return vis.has(itemId);
+  return reachableCandidates(state).has(itemId);
 }
 
 export function tryOpen(
@@ -39,7 +47,7 @@ export function tryOpen(
     };
   }
 
-  const candidates = new Set(getVisibleItemIdsInRoom(state, state.currentRoom));
+  const candidates = reachableCandidates(state);
   const itemId = resolveItemPhrase(objectPhrase, candidates);
   if (!itemId || !canReachItem(state, itemId)) {
     return {
@@ -145,7 +153,7 @@ export function tryClose(
     };
   }
 
-  const candidates = new Set(getVisibleItemIdsInRoom(state, state.currentRoom));
+  const candidates = reachableCandidates(state);
   const itemId = resolveItemPhrase(objectPhrase, candidates);
   if (!itemId || !canReachItem(state, itemId)) {
     return {
@@ -274,6 +282,9 @@ export function tryMoveObject(
       roomItems: { ...next.roomItems, [next.currentRoom]: room },
     };
     if (itemId === 'rug') {
+      if (!next.flags[FLAG_RUG_MOVED]) {
+        next = { ...next, score: next.score + 10 };
+      }
       next = { ...next, flags: { ...next.flags, [FLAG_RUG_MOVED]: true } };
     }
   } else {

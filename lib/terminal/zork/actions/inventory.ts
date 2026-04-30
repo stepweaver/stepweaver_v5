@@ -9,6 +9,11 @@ import {
   bumpMoves,
 } from '../state';
 import { ITEMS as ITEM_DEFS } from '../world/items';
+import {
+  FLAG_ARTIFACT_PLACED,
+  FLAG_ARTIFACT_TAKEN,
+  FLAG_VICTORY,
+} from '../world/flags';
 
 function findContainerHolding(state: GameState, itemId: string): string | null {
   for (const [cid, inner] of Object.entries(state.containerContents)) {
@@ -19,6 +24,14 @@ function findContainerHolding(state: GameState, itemId: string): string | null {
 
 function candidateSetForTake(state: GameState): Set<string> {
   const ids = new Set(getVisibleItemIdsInRoom(state, state.currentRoom));
+  for (const carriedId of state.inventory) {
+    const def = ITEM_DEFS[carriedId];
+    if (def?.container && isItemOpen(state, carriedId)) {
+      for (const inner of state.containerContents[carriedId] ?? []) {
+        ids.add(inner);
+      }
+    }
+  }
   return ids;
 }
 
@@ -108,6 +121,14 @@ export function tryTake(
       flags: { ...next.flags, tookLantern: true },
     };
   }
+  if (itemId === 'signal-prism' && !next.flags[FLAG_ARTIFACT_TAKEN]) {
+    scoreAdd = 25;
+    next = {
+      ...next,
+      score: next.score + scoreAdd,
+      flags: { ...next.flags, [FLAG_ARTIFACT_TAKEN]: true },
+    };
+  }
 
   const lines: OutputLine[] = [line('success', 'Taken.')];
   return { state: next, lines };
@@ -136,6 +157,41 @@ export function tryDrop(
     inventory: inv,
     roomItems: { ...state.roomItems, [state.currentRoom]: roomItems },
   };
+
+  if (
+    itemId === 'signal-prism' &&
+    state.currentRoom === 'living-room' &&
+    (state.roomItems['living-room'] ?? []).includes('trophy-case') &&
+    !state.flags[FLAG_VICTORY]
+  ) {
+    next = {
+      ...next,
+      score: next.score + 40,
+      flags: {
+        ...next.flags,
+        [FLAG_ARTIFACT_PLACED]: true,
+        [FLAG_VICTORY]: true,
+      },
+      gameOver: true,
+    };
+    next = bumpMoves(next, 1);
+    return {
+      state: next,
+      lines: [
+        line('success', 'Placed.'),
+        line('text', ''),
+        line(
+          'success',
+          'The prism settles into the trophy case as if it was made for it.'
+        ),
+        line(
+          'cyan',
+          'A quiet chime pulses through the house, and the air feels… finished.'
+        ),
+        line('success', 'You have completed the adventure.'),
+      ],
+    };
+  }
 
   if (itemId === 'lamp' && next.lampOn) {
     next = { ...next, lampOn: false };

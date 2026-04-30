@@ -2,6 +2,8 @@
 
 Headless interactive-fiction engine used by the portfolio terminal’s `adventure` command. It is **not** a Z-machine interpreter: logic is browser-native TypeScript with an explicit command pipeline.
 
+The bundled content is a compact, finishable mini-adventure (about 10–15 minutes): explore the house and cellar, recover a single original artifact from the underground, and return it to the trophy case to win.
+
 ## Layout
 
 ```text
@@ -35,10 +37,25 @@ Jest specs live in [`tests/`](./tests/) (`parser`, `validateWorld`, `movement`, 
 - **This is not** a full Zork clone or recreation.
 - **This is not** a Z-machine interpreter.
 
+## Mini-adventure win condition (high level)
+
+- Explore into the cellar and underground passages.
+- Use light to safely navigate the dark.
+- Find the **glass signal prism** (the single artifact).
+- Return to the living room and place it at the **trophy case** to complete the adventure.
+
+## Engine features
+
+- Parser directions + verb/noun phrases (`go`, `turn on/off`, etc.)
+- Rooms, exits, inventory, containers (including carried containers)
+- `move` reveal mechanics (`under`)
+- Lamp/darkness + fuel drain on movement
+- Score/moves + named story flags
+- Save/restore/restart (via adapter + localStorage)
+
 ## What’s intentionally thin
 
 - **NPCs / combat:** `NPCS` is empty; `attack`/`kill` return a generic line until enemies exist.
-- **Dungeon stubs:** `canyon-view`, `reservoir-south`, `east-west-passage`, and `crawlway` are minimal connectors so the graph validates; expand with real puzzles and prose.
 - **Score:** `SCORE_MAX` is a small cap for this port; tune events in movement/inventory/actions as you add goals.
 
 This project aims to capture the *feel* of classic cave-crawl adventures while remaining an original work.
