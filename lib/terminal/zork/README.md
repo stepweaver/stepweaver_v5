@@ -14,7 +14,7 @@ raw input → normalize → parse → resolve objects (in handlers) → dispatch
 - **State:** [`state.ts`](./state.ts): serializable `GameState` (rooms, items, inventory, flags, lamp, score)
 - **World data:** [`world/rooms.ts`](./world/rooms.ts), [`world/items.ts`](./world/items.ts), [`world/flags.ts`](./world/flags.ts)
 - **Parser:** [`parser.ts`](./parser.ts): directions, `go`/`move`, `turn on/off`, verb + noun phrase
-- **Actions:** [`actions/`](./actions/): movement, look, inventory, containers, combat stub, meta verbs
+- **Actions:** [`actions/`](./actions/): movement, look, inventory, containers, lightweight combat verbs, meta verbs
 - **Adapter:** [`adapters/terminalAdapter.ts`](./adapters/terminalAdapter.ts): maps semantic `OutputLine`s to terminal HTML; handles `save` / `restore` / `restart` via [`persistence/saveGame.ts`](./persistence/saveGame.ts) (`localStorage`)
 - **Integration:** the portfolio terminal uses a small adapter in [`../../zork-terminal.ts`](../zork-terminal.ts) to map engine output lines into terminal line variants and to handle `save` / `restore` / `restart`.
 

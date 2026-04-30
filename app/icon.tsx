@@ -7,7 +7,7 @@ export const size = { width: 32, height: 32 };
 
 export const contentType = "image/png";
 
-/** Default app icon; `next.config` redirects `/favicon.ico` here (middleware skips `*.ico`). */
+/** Default app icon. */
 export default function Icon() {
   return new ImageResponse(
     (

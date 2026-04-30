@@ -2,7 +2,7 @@ import { normalizeInput } from './utils/normalize';
 import { parseCommand } from './parser';
 import { createInitialState, line, type GameState, type OutputLine } from './state';
 import { tryMove, describeRoom } from './actions/movement';
-import { tryTake, tryDrop, showInventory } from './actions/inventory';
+import { tryTake, tryDrop, tryPut, showInventory } from './actions/inventory';
 import { tryLookRoom, tryExamine } from './actions/look';
 import { tryOpen, tryClose, tryMoveObject } from './actions/containers';
 import { tryAttack } from './actions/combat';
@@ -68,6 +68,10 @@ export function runCommand(state: GameState, rawInput: string): RunResult {
         return tryTake(state, obj);
       case 'drop':
         return tryDrop(state, obj);
+      case 'put':
+      case 'place':
+      case 'insert':
+        return tryPut(state, obj);
       case 'i':
       case 'inventory':
         return showInventory(state);

@@ -1,10 +1,13 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  eslint: {
+    // We run `npm run lint` in CI locally; Next's build-time lint currently
+    // trips over ESLint option differences across versions.
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
-      // Browsers request /favicon.ico; middleware skips *.ico, so use a config redirect to app icon.
-      { source: "/favicon.ico", destination: "/icon", permanent: false },
       { source: "/projects/cerebro", destination: "/projects/lcerebro", permanent: true },
       { source: "/projects/cashflow-ledger", destination: "/projects/bill-planner", permanent: true },
       { source: "/projects/dice-roller", destination: "/projects/rpg-dice-roller", permanent: true },

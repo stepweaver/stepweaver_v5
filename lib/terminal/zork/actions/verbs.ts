@@ -89,7 +89,7 @@ export function tryHelp(state: GameState): { state: GameState; lines: OutputLine
         'north, south, east, west, northeast, northwest, southeast, southwest, up, down, in, out (or n/s/e/w/u/d).'
       ),
       line('cyan', 'INVENTORY:'),
-      line('text', 'take / get, drop, inventory (i)'),
+      line('text', 'take / get, drop, put / place / insert (in/into), inventory (i)'),
       line('cyan', 'ACTIONS:'),
       line(
         'text',

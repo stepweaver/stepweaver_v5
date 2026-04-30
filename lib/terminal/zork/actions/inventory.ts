@@ -201,6 +201,99 @@ export function tryDrop(
   return { state: next, lines: [line('success', 'Dropped.')] };
 }
 
+function splitPutPhrase(
+  phrase: string
+): { objectPhrase: string; targetPhrase: string } | null {
+  const norm = phrase.trim().replace(/\s+/g, ' ');
+  if (!norm) return null;
+
+  // Minimal, intentionally non-general: handle the common "X in Y" / "X into Y".
+  const m = norm.match(/^(.*?)\s+(?:in|into|inside)\s+(.*?)$/i);
+  if (!m) return null;
+  const objectPhrase = (m[1] ?? '').trim();
+  const targetPhrase = (m[2] ?? '').trim();
+  if (!objectPhrase || !targetPhrase) return null;
+  return { objectPhrase, targetPhrase };
+}
+
+export function tryPut(
+  state: GameState,
+  objectPhrase: string
+): { state: GameState; lines: OutputLine[] } {
+  const split = splitPutPhrase(objectPhrase);
+  if (!split) {
+    if (!objectPhrase.trim()) {
+      return { state, lines: [line('error', 'Put what?')] };
+    }
+    return { state, lines: [line('error', 'Put it where?')] };
+  }
+
+  const invCandidates = new Set(state.inventory);
+  const itemId = resolveItemPhrase(split.objectPhrase, invCandidates);
+  if (!itemId) {
+    return { state, lines: [line('error', "You don't have that.")] };
+  }
+
+  // Only support a special-case placement for the trophy case; keep everything else simple.
+  const visTargets = new Set(getVisibleItemIdsInRoom(state, state.currentRoom));
+  const targetId = resolveItemPhrase(split.targetPhrase, visTargets);
+  if (!targetId) {
+    return { state, lines: [line('error', "I don't see that here.")] };
+  }
+
+  if (targetId !== 'trophy-case') {
+    return { state, lines: [line('error', "That doesn't seem like something you can put things into.")] };
+  }
+
+  if (state.currentRoom !== 'living-room') {
+    return { state, lines: [line('error', "That doesn't seem useful here.")] };
+  }
+
+  // Victory: placing the prism in the trophy case.
+  if (
+    itemId === 'signal-prism' &&
+    (state.roomItems['living-room'] ?? []).includes('trophy-case') &&
+    !state.flags[FLAG_VICTORY]
+  ) {
+    const inv = state.inventory.filter((x) => x !== itemId);
+    let next: GameState = {
+      ...state,
+      inventory: inv,
+      score: state.score + 40,
+      flags: {
+        ...state.flags,
+        [FLAG_ARTIFACT_PLACED]: true,
+        [FLAG_VICTORY]: true,
+      },
+      gameOver: true,
+    };
+    next = bumpMoves(next, 1);
+    return {
+      state: next,
+      lines: [
+        line('success', 'Placed.'),
+        line('text', ''),
+        line(
+          'success',
+          'The prism settles into the trophy case as if it was made for it.'
+        ),
+        line(
+          'cyan',
+          'A quiet chime pulses through the house, and the air feels… finished.'
+        ),
+        line('success', 'You have completed the adventure.'),
+      ],
+    };
+  }
+
+  // Reject near-misses explicitly so players understand the intended completion.
+  if (itemId === 'signal-prism') {
+    return { state: bumpMoves(state, 1), lines: [line('error', 'It won’t sit properly there.')] };
+  }
+
+  return { state: bumpMoves(state, 1), lines: [line('error', "That doesn't seem to fit.")] };
+}
+
 export function showInventory(state: GameState): { state: GameState; lines: OutputLine[] } {
   if (state.inventory.length === 0) {
     return {
