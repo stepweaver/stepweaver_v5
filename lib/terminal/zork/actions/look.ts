@@ -2,12 +2,12 @@ import { resolveItemPhrase } from '../content/synonyms';
 import {
   type GameState,
   type OutputLine,
-  getVisibleItemIdsInRoom,
   isItemOpen,
   isPitchBlack,
   line,
 } from '../state';
 import { ITEMS } from '../world/items';
+import { itemIdsVisibleForExamineOrRead } from './item-visibility';
 import { describeRoom } from './movement';
 import { FLAG_ARTIFACT_PLACED } from '../world/flags';
 
@@ -50,18 +50,7 @@ export function tryExamine(
     };
   }
 
-  const vis = new Set([
-    ...getVisibleItemIdsInRoom(state, state.currentRoom),
-    ...state.inventory,
-  ]);
-  for (const carried of state.inventory) {
-    const def = ITEMS[carried];
-    if (def?.container && isItemOpen(state, carried)) {
-      for (const inner of state.containerContents[carried] ?? []) {
-        vis.add(inner);
-      }
-    }
-  }
+  const vis = itemIdsVisibleForExamineOrRead(state);
 
   const itemId = resolveItemPhrase(objectPhrase, vis);
   if (!itemId) {

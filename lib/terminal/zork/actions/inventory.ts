@@ -15,6 +15,22 @@ import {
   FLAG_VICTORY,
 } from '../world/flags';
 
+function linesSignalPrismVictory(): OutputLine[] {
+  return [
+    line('success', 'Placed.'),
+    line('text', ''),
+    line(
+      'success',
+      'The prism settles into the trophy case as if it was made for it.'
+    ),
+    line(
+      'cyan',
+      'A quiet chime pulses through the house, and the air feels… finished.'
+    ),
+    line('success', 'You have completed the adventure.'),
+  ];
+}
+
 function findContainerHolding(state: GameState, itemId: string): string | null {
   for (const [cid, inner] of Object.entries(state.containerContents)) {
     if (inner.includes(itemId)) return cid;
@@ -177,19 +193,7 @@ export function tryDrop(
     next = bumpMoves(next, 1);
     return {
       state: next,
-      lines: [
-        line('success', 'Placed.'),
-        line('text', ''),
-        line(
-          'success',
-          'The prism settles into the trophy case as if it was made for it.'
-        ),
-        line(
-          'cyan',
-          'A quiet chime pulses through the house, and the air feels… finished.'
-        ),
-        line('success', 'You have completed the adventure.'),
-      ],
+      lines: linesSignalPrismVictory(),
     };
   }
 
@@ -270,19 +274,7 @@ export function tryPut(
     next = bumpMoves(next, 1);
     return {
       state: next,
-      lines: [
-        line('success', 'Placed.'),
-        line('text', ''),
-        line(
-          'success',
-          'The prism settles into the trophy case as if it was made for it.'
-        ),
-        line(
-          'cyan',
-          'A quiet chime pulses through the house, and the air feels… finished.'
-        ),
-        line('success', 'You have completed the adventure.'),
-      ],
+      lines: linesSignalPrismVictory(),
     };
   }
 

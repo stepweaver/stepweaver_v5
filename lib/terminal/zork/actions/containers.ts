@@ -28,16 +28,20 @@ function canReachItem(state: GameState, itemId: string): boolean {
   return reachableCandidates(state).has(itemId);
 }
 
-export function tryOpen(
+function resolveOpenableTarget(
   state: GameState,
-  objectPhrase: string
-): { state: GameState; lines: OutputLine[] } {
+  objectPhrase: string,
+  emptyPrompt: string,
+  notOpenableVerb: 'open' | 'close'
+):
+  | { ok: true; itemId: string; def: (typeof ITEMS)[string] }
+  | { ok: false; lines: OutputLine[] } {
   if (!objectPhrase.trim()) {
-    return { state, lines: [line('error', 'Open what?')] };
+    return { ok: false, lines: [line('error', emptyPrompt)] };
   }
   if (isPitchBlack(state)) {
     return {
-      state,
+      ok: false,
       lines: [
         line(
           'error',
@@ -51,7 +55,7 @@ export function tryOpen(
   const itemId = resolveItemPhrase(objectPhrase, candidates);
   if (!itemId || !canReachItem(state, itemId)) {
     return {
-      state,
+      ok: false,
       lines: [line('error', "I don't see that here.")],
     };
   }
@@ -59,10 +63,23 @@ export function tryOpen(
   const def = ITEMS[itemId];
   if (!def?.openable) {
     return {
-      state,
-      lines: [line('error', `You can't open the ${def.name}.`)],
+      ok: false,
+      lines: [line('error', `You can't ${notOpenableVerb} the ${def.name}.`)],
     };
   }
+
+  return { ok: true, itemId, def };
+}
+
+export function tryOpen(
+  state: GameState,
+  objectPhrase: string
+): { state: GameState; lines: OutputLine[] } {
+  const resolved = resolveOpenableTarget(state, objectPhrase, 'Open what?', 'open');
+  if (!resolved.ok) {
+    return { state, lines: resolved.lines };
+  }
+  const { itemId, def } = resolved;
 
   if (isItemOpen(state, itemId)) {
     return {
@@ -138,37 +155,11 @@ export function tryClose(
   state: GameState,
   objectPhrase: string
 ): { state: GameState; lines: OutputLine[] } {
-  if (!objectPhrase.trim()) {
-    return { state, lines: [line('error', 'Close what?')] };
+  const resolved = resolveOpenableTarget(state, objectPhrase, 'Close what?', 'close');
+  if (!resolved.ok) {
+    return { state, lines: resolved.lines };
   }
-  if (isPitchBlack(state)) {
-    return {
-      state,
-      lines: [
-        line(
-          'error',
-          "It is pitch black. You can't see a thing."
-        ),
-      ],
-    };
-  }
-
-  const candidates = reachableCandidates(state);
-  const itemId = resolveItemPhrase(objectPhrase, candidates);
-  if (!itemId || !canReachItem(state, itemId)) {
-    return {
-      state,
-      lines: [line('error', "I don't see that here.")],
-    };
-  }
-
-  const def = ITEMS[itemId];
-  if (!def?.openable) {
-    return {
-      state,
-      lines: [line('error', `You can't close the ${def.name}.`)],
-    };
-  }
+  const { itemId, def } = resolved;
 
   if (!isItemOpen(state, itemId)) {
     return {

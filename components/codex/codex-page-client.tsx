@@ -13,6 +13,69 @@ import {
   type CodexPost,
 } from "@/lib/codex/selectors";
 
+function CodexHashtagFilterBlock({
+  layout,
+  filteredHashtags,
+  allPosts,
+  activeHashtags,
+  onHashtagClick,
+  tagButtonClass,
+  onClearFilters,
+}: {
+  layout: "mobile" | "desktop";
+  filteredHashtags: string[];
+  allPosts: CodexPost[];
+  activeHashtags: string[];
+  onHashtagClick: (_tag: string) => void;
+  tagButtonClass: (_isActive: boolean) => string;
+  onClearFilters: () => void;
+}) {
+  if (filteredHashtags.length === 0) return null;
+
+  const filterHeadingMb = layout === "mobile" ? "mb-3" : "mb-4";
+  const clearMt = layout === "mobile" ? "mt-3" : "mt-4";
+  const clearBtnClass =
+    "text-[10px] tracking-[0.15em] text-[rgb(var(--neon)/0.5)] hover:text-[rgb(var(--neon))] font-[var(--font-ocr)] cursor-pointer transition-colors uppercase";
+
+  const inner = (
+    <>
+      <p
+        className={`text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.5)] font-[var(--font-ocr)] uppercase ${filterHeadingMb}`}
+      >
+        FILTER BY TAG
+      </p>
+      <div className="flex flex-wrap gap-2">
+        {filteredHashtags.map((tag) => {
+          const count = allPosts.filter((p) => p.hashtags?.includes(tag)).length;
+          const isActive = activeHashtags.includes(tag);
+          return (
+            <button
+              key={tag}
+              type="button"
+              onClick={() => onHashtagClick(tag)}
+              className={tagButtonClass(isActive)}
+            >
+              #{tag}{" "}
+              <span className="text-[rgb(var(--text-meta))] ml-1">{count}</span>
+            </button>
+          );
+        })}
+      </div>
+      {activeHashtags.length > 0 && (
+        <button type="button" onClick={onClearFilters} className={`${clearMt} ${clearBtnClass}`}>
+          [ CLEAR FILTERS ]
+        </button>
+      )}
+    </>
+  );
+
+  if (layout === "mobile") {
+    return <div className="mb-6">{inner}</div>;
+  }
+
+  return <div>{inner}</div>;
+}
+
 function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
   const searchParams = useSearchParams();
   const [posts, setPosts] = useState<CodexPost[]>(initialPosts);
@@ -97,39 +160,15 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
             <div className="flex flex-col lg:flex-row gap-10">
               <div className="flex-1 max-w-4xl">
                 <div className="mb-8 lg:hidden">
-                  {filteredHashtags.length > 0 && (
-                    <div className="mb-6">
-                      <p className="text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.5)] font-[var(--font-ocr)] uppercase mb-3">
-                        FILTER BY TAG
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {filteredHashtags.map((tag) => {
-                          const count = allPosts.filter((p) => p.hashtags?.includes(tag)).length;
-                          const isActive = activeHashtags.includes(tag);
-                          return (
-                            <button
-                              key={tag}
-                              type="button"
-                              onClick={() => handleHashtagClick(tag)}
-                              className={tagButtonClass(isActive)}
-                            >
-                              #{tag}{" "}
-                              <span className="text-[rgb(var(--text-meta))] ml-1">{count}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {activeHashtags.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setActiveHashtags([])}
-                          className="mt-3 text-[10px] tracking-[0.15em] text-[rgb(var(--neon)/0.5)] hover:text-[rgb(var(--neon))] font-[var(--font-ocr)] cursor-pointer transition-colors uppercase"
-                        >
-                          [ CLEAR FILTERS ]
-                        </button>
-                      )}
-                    </div>
-                  )}
+                  <CodexHashtagFilterBlock
+                    layout="mobile"
+                    filteredHashtags={filteredHashtags}
+                    allPosts={allPosts}
+                    activeHashtags={activeHashtags}
+                    onHashtagClick={handleHashtagClick}
+                    tagButtonClass={tagButtonClass}
+                    onClearFilters={() => setActiveHashtags([])}
+                  />
                   <p className="text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.5)] font-[var(--font-ocr)] uppercase mb-3">
                     PROJECTS
                   </p>
@@ -185,39 +224,15 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
 
               <div className="w-72 flex-shrink-0 hidden lg:block">
                 <div className="sticky top-28 space-y-8">
-                  {filteredHashtags.length > 0 && (
-                    <div>
-                      <p className="text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.5)] font-[var(--font-ocr)] uppercase mb-4">
-                        FILTER BY TAG
-                      </p>
-                      <div className="flex flex-wrap gap-2">
-                        {filteredHashtags.map((tag) => {
-                          const count = allPosts.filter((p) => p.hashtags?.includes(tag)).length;
-                          const isActive = activeHashtags.includes(tag);
-                          return (
-                            <button
-                              key={tag}
-                              type="button"
-                              onClick={() => handleHashtagClick(tag)}
-                              className={tagButtonClass(isActive)}
-                            >
-                              #{tag}{" "}
-                              <span className="text-[rgb(var(--text-meta))] ml-1">{count}</span>
-                            </button>
-                          );
-                        })}
-                      </div>
-                      {activeHashtags.length > 0 && (
-                        <button
-                          type="button"
-                          onClick={() => setActiveHashtags([])}
-                          className="mt-4 text-[10px] tracking-[0.15em] text-[rgb(var(--neon)/0.5)] hover:text-[rgb(var(--neon))] font-[var(--font-ocr)] cursor-pointer transition-colors uppercase"
-                        >
-                          [ CLEAR FILTERS ]
-                        </button>
-                      )}
-                    </div>
-                  )}
+                  <CodexHashtagFilterBlock
+                    layout="desktop"
+                    filteredHashtags={filteredHashtags}
+                    allPosts={allPosts}
+                    activeHashtags={activeHashtags}
+                    onHashtagClick={handleHashtagClick}
+                    tagButtonClass={tagButtonClass}
+                    onClearFilters={() => setActiveHashtags([])}
+                  />
 
                   <div>
                     <p className="text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.5)] font-[var(--font-ocr)] uppercase mb-4">

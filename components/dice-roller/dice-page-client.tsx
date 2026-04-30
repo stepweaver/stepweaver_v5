@@ -1,8 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { Dices, History, Zap, Keyboard, Target, ChevronRight } from "lucide-react";
+import { Dices, History, Zap, Keyboard, Target } from "lucide-react";
 import { DiceRoller } from "@/components/dice-roller/dice-roller";
+import {
+  HudFeatureModuleCard,
+  HudMobileCollapsible,
+  HudSidebarPanel,
+} from "@/components/shared/hud-chrome";
 
 const FEATURE_MODULES = [
   {
@@ -32,66 +36,6 @@ const KEYBOARD_GUIDE = [
   { key: "ESC", action: "Clear results" },
 ];
 
-function SidebarPanel({
-  children,
-  label,
-  className = "",
-}: {
-  children: React.ReactNode;
-  label?: string;
-  className?: string;
-}) {
-  return (
-    <div className={`hud-panel p-3 ${className}`}>
-      {label ? (
-        <p className="font-[var(--font-ocr)] text-xs tracking-[0.25em] text-[rgb(var(--neon)/0.45)] uppercase mb-2">
-          {label}
-        </p>
-      ) : null}
-      {children}
-    </div>
-  );
-}
-
-function MobileBriefBar() {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="lg:hidden shrink-0 border-b border-[rgb(var(--neon)/0.15)]">
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-[rgb(var(--panel)/0.3)] transition-colors cursor-pointer"
-      >
-        <div className="flex items-center gap-2">
-          <Zap className="w-3 h-3 text-[rgb(var(--neon)/0.5)]" />
-          <span className="font-[var(--font-ocr)] text-xs tracking-[0.2em] text-[rgb(var(--neon)/0.5)] uppercase">
-            Quick reference
-          </span>
-        </div>
-        <ChevronRight
-          className={`w-3 h-3 text-[rgb(var(--neon)/0.4)] transition-transform duration-200 ${
-            expanded ? "rotate-90" : ""
-          }`}
-        />
-      </button>
-
-      {expanded ? (
-        <div className="px-3 pb-3 space-y-3 animate-fade-in">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-1">
-            {KEYBOARD_GUIDE.map((item) => (
-              <span key={item.key} className="font-[var(--font-ocr)] text-sm">
-                <span className="text-[rgb(var(--neon)/0.6)] font-[var(--font-ibm)]">{item.key}</span>
-                <span className="text-[rgb(var(--muted-color)/0.45)]"> - {item.action}</span>
-              </span>
-            ))}
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 export function DicePageClient() {
   return (
     <div className="relative flex flex-col flex-1 min-h-0 h-[calc(100dvh-3.5rem)] overflow-hidden">
@@ -120,12 +64,21 @@ export function DicePageClient() {
           </div>
         </header>
 
-        <MobileBriefBar />
+        <HudMobileCollapsible icon={Zap} title="Quick reference" expandedContentClassName="space-y-3">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-1">
+            {KEYBOARD_GUIDE.map((item) => (
+              <span key={item.key} className="font-[var(--font-ocr)] text-sm">
+                <span className="text-[rgb(var(--neon)/0.6)] font-[var(--font-ibm)]">{item.key}</span>
+                <span className="text-[rgb(var(--muted-color)/0.45)]"> - {item.action}</span>
+              </span>
+            ))}
+          </div>
+        </HudMobileCollapsible>
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0">
           <aside className="hidden lg:flex lg:flex-col lg:w-72 2xl:w-80 shrink-0 border-r border-[rgb(var(--neon)/0.15)] overflow-y-auto">
             <div className="p-3 space-y-3 flex-1">
-              <SidebarPanel label="SYS.BRIEF">
+              <HudSidebarPanel label="SYS.BRIEF">
                 <p className="font-[var(--font-ibm)] text-lg text-[rgb(var(--text-color))] leading-snug">RPG Dice Roller.</p>
                 <p className="font-[var(--font-ocr)] text-sm text-[rgb(var(--muted-color)/0.9)] leading-relaxed mt-2">
                   Roll complex dice pools, hold dice for rerolls, and track history. Built with keyboard shortcuts for speed.
@@ -134,47 +87,35 @@ export function DicePageClient() {
                 <p className="font-[var(--font-ocr)] text-xs text-[rgb(var(--neon)/0.4)] mt-2">
                   Fully client-side. All rolls saved to your browser.
                 </p>
-              </SidebarPanel>
+              </HudSidebarPanel>
 
-              <SidebarPanel label="QUICK.START">
+              <HudSidebarPanel label="QUICK.START">
                 <ul className="space-y-1.5 font-[var(--font-ocr)] text-sm text-[rgb(var(--muted-color)/0.85)]">
                   <li>1. Click dice to add to pool. Adjust with +/−.</li>
                   <li>2. Add modifiers or notes. Hit ENTER or ROLL.</li>
                   <li>3. Click dice to hold, then REROLL to keep values.</li>
                 </ul>
-              </SidebarPanel>
+              </HudSidebarPanel>
 
               <div>
                 <p className="font-[var(--font-ocr)] text-xs tracking-[0.25em] text-[rgb(var(--neon)/0.4)] uppercase px-1 mb-2">
                   Modules
                 </p>
                 <div className="space-y-1.5">
-                  {FEATURE_MODULES.map((mod) => {
-                    const Icon = mod.icon;
-                    return (
-                      <div
-                        key={mod.tag}
-                        className="group flex items-start gap-2.5 px-3 py-2.5 rounded-sm bg-[rgb(var(--panel)/0.3)] border border-[rgb(var(--neon)/0.08)] hover:border-[rgb(var(--neon)/0.2)] hover:bg-[rgb(var(--panel)/0.5)] transition-all duration-200"
-                      >
-                        <Icon className="w-3.5 h-3.5 text-[rgb(var(--neon)/0.55)] mt-0.5 shrink-0 group-hover:text-[rgb(var(--neon)/0.8)] transition-colors" />
-                        <div className="min-w-0">
-                          <div className="flex items-baseline gap-2">
-                            <p className="font-[var(--font-ibm)] text-xs text-[rgb(var(--neon)/0.8)] group-hover:text-neon transition-colors">
-                              {mod.title}
-                            </p>
-                            <span className="font-[var(--font-ocr)] text-[8px] text-[rgb(var(--neon)/0.25)]">{mod.tag}</span>
-                          </div>
-                          <p className="font-[var(--font-ocr)] text-sm text-[rgb(var(--muted-color)/0.6)] leading-snug mt-0.5">
-                            {mod.body}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {FEATURE_MODULES.map((mod) => (
+                    <HudFeatureModuleCard
+                      key={mod.tag}
+                      title={mod.title}
+                      tag={mod.tag}
+                      body={mod.body}
+                      icon={mod.icon}
+                      bodyMutedClassName="text-[rgb(var(--muted-color)/0.6)]"
+                    />
+                  ))}
                 </div>
               </div>
 
-              <SidebarPanel label="KEYBIND">
+              <HudSidebarPanel label="KEYBIND">
                 <div className="space-y-1.5">
                   {KEYBOARD_GUIDE.map((item) => (
                     <div key={item.key} className="flex items-baseline gap-2 font-[var(--font-ocr)] text-xs">
@@ -185,7 +126,7 @@ export function DicePageClient() {
                     </div>
                   ))}
                 </div>
-              </SidebarPanel>
+              </HudSidebarPanel>
 
               <div className="px-1 space-y-1">
                 <div className="flex items-center gap-2 font-[var(--font-ocr)] text-xs text-[rgb(var(--muted-color)/0.4)]">

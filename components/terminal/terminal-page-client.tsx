@@ -5,11 +5,14 @@ import {
   BookOpen,
   Sparkles,
   Terminal as TerminalIcon,
-  ChevronRight,
   Map,
 } from "lucide-react";
-import { useState } from "react";
 import { Terminal } from "@/components/terminal/terminal";
+import {
+  HudFeatureModuleCard,
+  HudMobileCollapsible,
+  HudSidebarPanel,
+} from "@/components/shared/hud-chrome";
 
 const FEATURE_MODULES = [
   {
@@ -50,58 +53,6 @@ const COMMAND_GUIDE = [
   { command: "clear", summary: "Clear screen" },
 ];
 
-function SidebarPanel({ children, label, className = "" }: { children: React.ReactNode; label?: string; className?: string }) {
-  return (
-    <div className={`hud-panel p-3 ${className}`}>
-      {label ? (
-        <p className="font-[var(--font-ocr)] text-xs tracking-[0.25em] text-[rgb(var(--neon)/0.45)] uppercase mb-2">
-          {label}
-        </p>
-      ) : null}
-      {children}
-    </div>
-  );
-}
-
-function MobileBriefBar() {
-  const [expanded, setExpanded] = useState(false);
-
-  return (
-    <div className="lg:hidden shrink-0 border-b border-[rgb(var(--neon)/0.15)]">
-      <button
-        type="button"
-        onClick={() => setExpanded(!expanded)}
-        className="w-full px-3 py-2 flex items-center justify-between text-left hover:bg-[rgb(var(--panel)/0.3)] transition-colors"
-      >
-        <div className="flex items-center gap-2">
-          <Command className="w-3 h-3 text-[rgb(var(--neon)/0.5)]" />
-          <span className="font-[var(--font-ocr)] text-xs tracking-[0.2em] text-[rgb(var(--neon)/0.5)] uppercase">
-            System modules
-          </span>
-        </div>
-        <ChevronRight
-          className={`w-3 h-3 text-[rgb(var(--neon)/0.4)] transition-transform duration-200 ${
-            expanded ? "rotate-90" : ""
-          }`}
-        />
-      </button>
-
-      {expanded ? (
-        <div className="px-3 pb-3 animate-fade-in">
-          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
-            {COMMAND_GUIDE.map((item) => (
-              <div key={item.command} className="font-[var(--font-ocr)] text-xs text-[rgb(var(--neon)/0.5)]">
-                <span className="text-[rgb(var(--neon)/0.7)]">{item.command}</span>
-                <span className="text-[rgb(var(--muted-color)/0.7)]">: {item.summary}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 export function TerminalPageClient() {
   return (
     <div className="relative flex flex-col flex-1 min-h-0 h-[calc(100dvh-3.5rem)] overflow-hidden">
@@ -133,12 +84,21 @@ export function TerminalPageClient() {
           </div>
         </header>
 
-        <MobileBriefBar />
+        <HudMobileCollapsible icon={Command} title="System modules">
+          <div className="grid grid-cols-2 gap-x-4 gap-y-2">
+            {COMMAND_GUIDE.map((item) => (
+              <div key={item.command} className="font-[var(--font-ocr)] text-xs text-[rgb(var(--neon)/0.5)]">
+                <span className="text-[rgb(var(--neon)/0.7)]">{item.command}</span>
+                <span className="text-[rgb(var(--muted-color)/0.7)]">: {item.summary}</span>
+              </div>
+            ))}
+          </div>
+        </HudMobileCollapsible>
 
         <div className="flex-1 flex flex-col lg:flex-row min-h-0 bg-[rgb(var(--panel)/0.22)]">
           <aside className="hidden lg:flex lg:flex-col lg:w-72 2xl:w-80 shrink-0 border-r border-[rgb(var(--neon)/0.15)] overflow-y-auto">
             <div className="p-3 space-y-3 flex-1">
-              <SidebarPanel label="SYS.BRIEF">
+              <HudSidebarPanel label="SYS.BRIEF">
                 <p className="font-[var(--font-ibm)] text-lg text-[rgb(var(--text-color))] leading-snug">
                   Interactive terminal.
                 </p>
@@ -149,44 +109,32 @@ export function TerminalPageClient() {
                 <p className="font-[var(--font-ocr)] text-xs text-[rgb(var(--neon)/0.4)] mt-2">
                   Type <span className="text-[rgb(var(--neon)/0.65)]">help</span> to get started.
                 </p>
-              </SidebarPanel>
+              </HudSidebarPanel>
 
               <div>
                 <p className="font-[var(--font-ocr)] text-xs tracking-[0.25em] text-[rgb(var(--neon)/0.4)] uppercase px-1 mb-2">
                   Modules
                 </p>
                 <div className="space-y-1.5">
-                  {FEATURE_MODULES.map((mod) => {
-                    const Icon = mod.icon;
-                    return (
-                      <div
-                        key={mod.tag}
-                        className="group flex items-start gap-2.5 px-3 py-2.5 rounded-sm bg-[rgb(var(--panel)/0.3)] border border-[rgb(var(--neon)/0.08)] hover:border-[rgb(var(--neon)/0.2)] hover:bg-[rgb(var(--panel)/0.5)] transition-all duration-200"
-                      >
-                        <Icon className="w-3.5 h-3.5 text-[rgb(var(--neon)/0.55)] mt-0.5 shrink-0 group-hover:text-[rgb(var(--neon)/0.8)] transition-colors" />
-                        <div className="min-w-0">
-                          <div className="flex items-baseline gap-2">
-                            <p className="font-[var(--font-ibm)] text-xs text-[rgb(var(--neon)/0.8)] group-hover:text-neon transition-colors">
-                              {mod.title}
-                            </p>
-                            <span className="font-[var(--font-ocr)] text-[8px] text-[rgb(var(--neon)/0.25)]">
-                              {mod.tag}
-                            </span>
-                          </div>
-                          <p className="font-[var(--font-ocr)] text-sm text-[rgb(var(--muted-color)/0.75)] leading-snug mt-0.5">
-                            {mod.body}
-                          </p>
-                          <p className="font-mono text-xs text-[rgb(var(--accent)/0.45)] mt-1">
-                            &gt; {mod.cmd}
-                          </p>
-                        </div>
-                      </div>
-                    );
-                  })}
+                  {FEATURE_MODULES.map((mod) => (
+                    <HudFeatureModuleCard
+                      key={mod.tag}
+                      title={mod.title}
+                      tag={mod.tag}
+                      body={mod.body}
+                      icon={mod.icon}
+                      bodyMutedClassName="text-[rgb(var(--muted-color)/0.75)]"
+                      footer={
+                        <p className="font-mono text-xs text-[rgb(var(--accent)/0.45)] mt-1">
+                          &gt; {mod.cmd}
+                        </p>
+                      }
+                    />
+                  ))}
                 </div>
               </div>
 
-              <SidebarPanel label="CMD.REF">
+              <HudSidebarPanel label="CMD.REF">
                 <div className="space-y-1.5">
                   {COMMAND_GUIDE.map((item) => (
                     <div key={item.command} className="flex items-baseline gap-2 font-[var(--font-ocr)] text-xs">
@@ -197,7 +145,7 @@ export function TerminalPageClient() {
                     </div>
                   ))}
                 </div>
-              </SidebarPanel>
+              </HudSidebarPanel>
 
               <div className="px-1 space-y-1">
                 <div className="flex items-center gap-2 font-[var(--font-ocr)] text-xs text-[rgb(var(--muted-color)/0.45)]">

@@ -18,6 +18,19 @@ function json(body: unknown, status = 200) {
   return NextResponse.json(body, { status, headers: jsonSecurityHeaders() });
 }
 
+async function readGoogleAppsScriptJson(response: Response): Promise<unknown> {
+  const contentType = response.headers.get("content-type");
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+  const text = await response.text();
+  try {
+    return JSON.parse(text);
+  } catch {
+    return { raw: text };
+  }
+}
+
 export async function GET(request: NextRequest) {
   try {
     if (!isAllowedRequestOrigin(request)) {
@@ -46,19 +59,7 @@ export async function GET(request: NextRequest) {
       throw new Error(`Failed to fetch from script: ${response.status}`);
     }
 
-    const contentType = response.headers.get("content-type");
-    let data: unknown;
-
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      const text = await response.text();
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = { raw: text };
-      }
-    }
+    const data = await readGoogleAppsScriptJson(response);
 
     return NextResponse.json(data, { headers: jsonSecurityHeaders() });
   } catch (error) {
@@ -94,19 +95,7 @@ export async function POST(request: NextRequest) {
       throw new Error(`Failed to fetch from script: ${response.status}`);
     }
 
-    const contentType = response.headers.get("content-type");
-    let data: unknown;
-
-    if (contentType && contentType.includes("application/json")) {
-      data = await response.json();
-    } else {
-      const text = await response.text();
-      try {
-        data = JSON.parse(text);
-      } catch {
-        data = { raw: text };
-      }
-    }
+    const data = await readGoogleAppsScriptJson(response);
 
     return NextResponse.json(data, { headers: jsonSecurityHeaders() });
   } catch (error) {

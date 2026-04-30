@@ -3,14 +3,13 @@ import {
   type GameState,
   type OutputLine,
   SCORE_MAX,
-  getVisibleItemIdsInRoom,
-  isItemOpen,
   isPitchBlack,
   line,
   bumpMoves,
   LAMP_ITEM_ID,
 } from '../state';
 import { ITEMS } from '../world/items';
+import { itemIdsVisibleForExamineOrRead } from './item-visibility';
 
 export function tryRead(
   state: GameState,
@@ -31,18 +30,7 @@ export function tryRead(
     };
   }
 
-  const vis = new Set([
-    ...getVisibleItemIdsInRoom(state, state.currentRoom),
-    ...state.inventory,
-  ]);
-  for (const carried of state.inventory) {
-    const def = ITEMS[carried];
-    if (def?.container && isItemOpen(state, carried)) {
-      for (const inner of state.containerContents[carried] ?? []) {
-        vis.add(inner);
-      }
-    }
-  }
+  const vis = itemIdsVisibleForExamineOrRead(state);
 
   const itemId = resolveItemPhrase(objectPhrase, vis);
   if (!itemId) {
