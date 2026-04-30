@@ -133,3 +133,9 @@ export function handleZorkInput(
 
   return { lines };
 }
+
+// Neutral/public naming. `zork` is an internal/legacy filename only.
+export const startAdventureGame = startZorkGame;
+export const isAdventureGameActive = isZorkGameActive;
+export const resetAdventureGame = resetZorkGame;
+export const handleAdventureInput = handleZorkInput;

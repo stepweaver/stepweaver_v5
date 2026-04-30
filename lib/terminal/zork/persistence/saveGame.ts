@@ -1,6 +1,6 @@
 import type { GameState } from '../state';
 
-const SAVE_STORAGE_KEY = 'stepweaver-zork-save-v1';
+const SAVE_STORAGE_KEY = 'stepweaver-adventure-save-v1';
 const SCHEMA_VERSION = 1;
 
 interface SaveEnvelope {

@@ -4,7 +4,7 @@ export type TerminalMode =
   | "selection"
   | "codex"
   | "resume"
-  | "zork"
+  | "adventure"
   | "blackjack";
 
 export type LineVariant =

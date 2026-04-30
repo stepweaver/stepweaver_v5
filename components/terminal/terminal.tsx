@@ -8,9 +8,9 @@ import { handleResumeCommand } from "@/lib/terminal/resume-content";
 import { handleCodexCommand, resetCodexSession } from "@/lib/terminal/codex-terminal";
 import { handleBlackjackInput, isBlackjackActive } from "@/lib/terminal/blackjack-engine";
 import {
-  handleZorkInput,
-  isZorkGameActive,
-  resetZorkGame,
+  handleAdventureInput,
+  isAdventureGameActive,
+  resetAdventureGame,
 } from "@/lib/terminal/zork-terminal";
 import { formatWeatherApiLines } from "@/lib/terminal/format-weather-lines";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
@@ -245,11 +245,11 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
         return;
       }
 
-      if (mode === "zork" || isZorkGameActive()) {
-        const r = handleZorkInput(rawInput);
+      if (mode === "adventure" || isAdventureGameActive()) {
+        const r = handleAdventureInput(rawInput);
         if (r.lines.length) addLines(r.lines);
         if (r.exit) {
-          resetZorkGame();
+          resetAdventureGame();
           setMode("normal");
         }
         return;
@@ -297,7 +297,7 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
           addLines([{ content: "Selection cancelled.", variant: "dimmed" }]);
         } else if (mode !== "normal") {
           if (mode === "codex") resetCodexSession();
-          if (mode === "zork" || isZorkGameActive()) resetZorkGame();
+          if (mode === "adventure" || isAdventureGameActive()) resetAdventureGame();
           setMode("normal");
           addLines([{ content: "Returned to normal shell.", variant: "dimmed" }]);
         }

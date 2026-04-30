@@ -43,7 +43,7 @@ const COMMAND_GUIDE = [
   { command: "weather [city]", summary: "Geolocate or pick city; --forecast" },
   { command: "roll <notation>", summary: "Dice, advantage, disadvantage" },
   { command: "cd <dest>", summary: "Jump to sections/pages" },
-  { command: "zork", summary: "Text adventure" },
+  { command: "adventure", summary: "Text adventure" },
   { command: "blackjack", summary: "Play Blackjack" },
   { command: "contact", summary: "Send message" },
   { command: "clear", summary: "Clear screen" },

@@ -32,7 +32,7 @@ export function describeRoom(state: GameState, roomId: string): OutputLine[] {
     return [
       line(
         'error',
-        'It is pitch black. You are likely to be eaten by a grue.'
+        "It is pitch black. You can't see a thing."
       ),
     ];
   }
@@ -64,7 +64,7 @@ export function tryMove(
       lines: [
         line(
           'error',
-          'It is pitch black. You are likely to be eaten by a grue.'
+          "It is pitch black. You can't see a thing."
         ),
       ],
     };

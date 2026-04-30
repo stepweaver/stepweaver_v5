@@ -57,6 +57,7 @@ describe("projects registry", () => {
       "overview", "problem", "solution", "architecture", "features",
       "engineering", "outcome", "tradeoffs", "tech-stack", "evidence-bar",
       "terminal-integration", "key-features", "project-structure", "keyboard-shortcuts",
+      "data-flow",
     ];
     const projects = getAllProjects();
     for (const p of projects) {

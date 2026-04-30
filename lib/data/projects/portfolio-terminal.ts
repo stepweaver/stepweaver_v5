@@ -8,7 +8,7 @@ export const portfolioTerminal: Project = {
     "A browser terminal for navigating the portfolio through actual commands instead of static navigation.",
   status: "live",
   tags: ["Next.js", "Terminal UI", "Interactive UX", "AI Integration", "Command Router", "JavaScript"],
-  keywords: ["terminal", "cli", "commands", "zork", "interactive"],
+  keywords: ["terminal", "cli", "commands", "interactive-fiction", "text-adventure", "parser", "terminal-game"],
   imageUrl: "/images/terminal_ui.png",
   link: "/terminal",
   githubRepo: "https://github.com/stepweaver/stepweaver_v5",
@@ -57,7 +57,7 @@ export const portfolioTerminal: Project = {
       type: "architecture",
       bullets: [
         "Sits on Next.js as a client-rendered interaction layer; heavy pieces dynamically imported",
-        "Stateful modes: Resume, Codex, Zork, Blackjack, contact, weather selection",
+        "Stateful modes: Resume, Codex, Adventure, Blackjack, contact, weather selection",
         "Server-backed features use protected API routes: validation, rate limiting, sanitization, bot checks",
       ],
     },

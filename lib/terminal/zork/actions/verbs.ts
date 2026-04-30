@@ -25,7 +25,7 @@ export function tryRead(
       lines: [
         line(
           'error',
-          'It is pitch black. You are likely to be eaten by a grue.'
+          "It is pitch black. You can't see a thing."
         ),
       ],
     };

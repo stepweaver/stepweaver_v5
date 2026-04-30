@@ -2,7 +2,7 @@ import type { CommandContext, CommandResult, WeatherPickOption } from '../types'
 import { buildChatRequestPayload } from '@/lib/chat/request-builder';
 import { resumeMenuLines } from '@/lib/terminal/resume-content';
 import { codexHelpLines, ensureCodexPosts } from '@/lib/terminal/codex-terminal';
-import { startZorkGame } from '@/lib/terminal/zork-terminal';
+import { startAdventureGame, startZorkGame } from '@/lib/terminal/zork-terminal';
 import { startBlackjack } from '@/lib/terminal/blackjack-engine';
 import {
   roll as executeRoll,
@@ -36,7 +36,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: '', variant: 'default' },
       { content: 'Games:', variant: 'lambda' },
       { content: '  blackjack | bj: hit, stand, deal, exit', variant: 'default' },
-      { content: '  zork: Classic-style text adventure (save / restore / restart)', variant: 'default' },
+      { content: '  adventure: Original terminal text adventure (save / restore / restart)', variant: 'default' },
     ],
   }),
 
@@ -164,10 +164,27 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     };
   },
 
+  adventure: (_args, ctx) => {
+    ctx.setMode('adventure');
+    const { lines } = startAdventureGame();
+    return { mode: 'adventure', lines };
+  },
+
+  // Legacy/hidden alias. Intentionally not shown in help output.
   zork: (_args, ctx) => {
-    ctx.setMode('zork');
+    ctx.setMode('adventure');
     const { lines } = startZorkGame();
-    return { mode: 'zork', lines };
+    return {
+      mode: 'adventure',
+      lines: [
+        {
+          content: 'Launching original text adventure. "zork" is a legacy alias.',
+          variant: 'dimmed',
+        },
+        { content: '', variant: 'default' },
+        ...lines,
+      ],
+    };
   },
 
   blackjack: (_args, ctx) => {

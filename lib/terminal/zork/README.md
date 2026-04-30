@@ -1,6 +1,6 @@
 # Terminal text adventure engine
 
-Headless interactive-fiction engine used by the portfolio terminal’s `zork` command. It is **not** a Z-machine interpreter: logic is data-driven TypeScript with an explicit command pipeline.
+Headless interactive-fiction engine used by the portfolio terminal’s `adventure` command. It is **not** a Z-machine interpreter: logic is browser-native TypeScript with an explicit command pipeline.
 
 ## Layout
 
@@ -14,7 +14,7 @@ raw input → normalize → parse → resolve objects (in handlers) → dispatch
 - **Parser:** [`parser.ts`](./parser.ts): directions, `go`/`move`, `turn on/off`, verb + noun phrase
 - **Actions:** [`actions/`](./actions/): movement, look, inventory, containers, combat stub, meta verbs
 - **Adapter:** [`adapters/terminalAdapter.ts`](./adapters/terminalAdapter.ts): maps semantic `OutputLine`s to terminal HTML; handles `save` / `restore` / `restart` via [`persistence/saveGame.ts`](./persistence/saveGame.ts) (`localStorage`)
-- **Integration:** [`../../data/zork.js`](../../data/zork.js) lazy-loads the adapter; session flag lives in [`../../data/zorkBridge.js`](../../data/zorkBridge.js)
+- **Integration:** the portfolio terminal uses a small adapter in [`../../zork-terminal.ts`](../zork-terminal.ts) to map engine output lines into terminal line variants and to handle `save` / `restore` / `restart`.
 
 ## Extending content
 
@@ -28,10 +28,17 @@ raw input → normalize → parse → resolve objects (in handlers) → dispatch
 
 Jest specs live in [`tests/`](./tests/) (`parser`, `validateWorld`, `movement`, transcript-style early game).
 
+## What this is / isn’t
+
+- **This is** an original, browser-native text adventure engine (parser-driven interactive fiction).
+- **This is** inspired by classic command-line parser games.
+- **This is not** a full Zork clone or recreation.
+- **This is not** a Z-machine interpreter.
+
 ## What’s intentionally thin
 
 - **NPCs / combat:** `NPCS` is empty; `attack`/`kill` return a generic line until enemies exist.
 - **Dungeon stubs:** `canyon-view`, `reservoir-south`, `east-west-passage`, and `crawlway` are minimal connectors so the graph validates; expand with real puzzles and prose.
 - **Score:** `SCORE_MAX` is a small cap for this port; tune events in movement/inventory/actions as you add goals.
 
-Prose and puzzles are an **homage** to classic cave-crawl games; this implementation uses original code and paraphrased descriptions to avoid trademark-heavy presentation.
+This project aims to capture the *feel* of classic cave-crawl adventures while remaining an original work.
