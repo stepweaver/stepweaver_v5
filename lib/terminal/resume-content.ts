@@ -30,9 +30,9 @@ export function handleResumeCommand(raw: string): { lines: { content: string; va
         lines: [
           line("SUMMARY", "lambda"),
           line("", "default"),
-          line("Full-stack developer · AI-native workflows · business analysis", "default"),
-          line("JavaScript, TypeScript, Python, SQL · React, Next.js, Node.js", "dimmed"),
-          line("PostgreSQL, MongoDB · AWS, Vercel · n8n, automation", "dimmed"),
+          line("Business-facing developer · systems builder · automation & AI integration", "default"),
+          line("Messy workflows → working software, dashboards, and operational systems", "dimmed"),
+          line("JavaScript/TypeScript/Python/SQL · Next.js/React/Node.js · Postgres/Supabase", "dimmed"),
           line("", "default"),
           line("Type another section or exit.", "dimmed"),
         ],
