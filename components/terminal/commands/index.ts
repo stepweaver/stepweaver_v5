@@ -36,7 +36,8 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: '', variant: 'default' },
       { content: 'Games:', variant: 'lambda' },
       { content: '  blackjack | bj: hit, stand, deal, exit', variant: 'default' },
-      { content: '  adventure: Original terminal text adventure (save / restore / restart)', variant: 'default' },
+      { content: '  zork: Play terminal adventure (save / restore / restart)', variant: 'default' },
+      { content: '  adventure: Alias for zork', variant: 'default' },
     ],
   }),
 
@@ -170,7 +171,6 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     return { mode: 'adventure', lines };
   },
 
-  // Legacy/hidden alias. Intentionally not shown in help output.
   zork: (_args, ctx) => {
     ctx.setMode('adventure');
     const { lines } = startZorkGame();
@@ -178,7 +178,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       mode: 'adventure',
       lines: [
         {
-          content: 'Launching original text adventure. "zork" is a legacy alias.',
+          content: 'Launching terminal adventure.',
           variant: 'dimmed',
         },
         { content: '', variant: 'default' },
