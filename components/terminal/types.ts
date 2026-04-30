@@ -49,7 +49,7 @@ export interface ContactState {
   timestamp: number | null;
 }
 
-export interface SelectionState {
+interface SelectionState {
   isActive: boolean;
   options: string[];
   callback: (_index: number) => void;

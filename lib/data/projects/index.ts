@@ -21,7 +21,7 @@ import { stepweaverDev } from "./stepweaver-dev";
 import { websiteRefreshes } from "./website-refreshes";
 
 /** Homepage featured dossiers: v3 `carouselProjects.js` FEATURED_ORDER parity (8 entries). */
-export const FEATURED_SLUGS = [
+const FEATURED_SLUGS = [
   "stepweaver-dev",
   "silent-auction",
   "bill-planner",
@@ -98,7 +98,7 @@ export function getProjectBySlug(slug: string): Project | undefined {
 }
 
 /** Curated homepage carousel: exactly the 8 featured slugs when all exist. */
-export function getFeaturedProjects(): Project[] {
+function getFeaturedProjects(): Project[] {
   return getHomepageCarouselProjects();
 }
 

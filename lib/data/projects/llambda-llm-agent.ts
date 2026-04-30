@@ -116,5 +116,3 @@ export const llambdaLlmAgent: Project = {
   ],
   liveUrl: "/terminal",
 };
-
-export default llambdaLlmAgent;

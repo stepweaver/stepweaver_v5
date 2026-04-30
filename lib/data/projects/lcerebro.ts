@@ -113,5 +113,3 @@ export const lcerebro: Project = {
     },
   ],
 };
-
-export default lcerebro;

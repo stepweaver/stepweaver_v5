@@ -15,7 +15,7 @@ const SLUG_TO_SECTION: Record<string, string> = {
 };
 
 /** Static docs as the same shape as Notion entries for shared sidebar / prev-next. */
-export function staticDocsAsPublished(): MeshtasticPublishedDoc[] {
+function staticDocsAsPublished(): MeshtasticPublishedDoc[] {
   return MESHTASTIC_DOCS.map((d, i) => ({
     id: `static-${d.slug}`,
     title: d.title,
@@ -26,7 +26,7 @@ export function staticDocsAsPublished(): MeshtasticPublishedDoc[] {
   }));
 }
 
-export function getStaticGroupedDocs(): GroupedMeshtasticSection[] {
+function getStaticGroupedDocs(): GroupedMeshtasticSection[] {
   return groupDocsBySection(staticDocsAsPublished());
 }
 

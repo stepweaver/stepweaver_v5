@@ -117,5 +117,3 @@ export const silentAuction: Project = {
   ],
   liveUrl: "https://tinyurl.com/mary-frank-silent-auction",
 };
-
-export default silentAuction;

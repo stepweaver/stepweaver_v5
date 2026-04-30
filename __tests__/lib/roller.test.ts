@@ -1,7 +1,6 @@
 import {
   randomIntInclusive,
   rollSingleDie,
-  rollDice,
   parseDiceNotation,
   roll,
   formatRollResult,

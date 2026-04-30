@@ -125,5 +125,3 @@ export const lsigilSetup: Project = {
     },
   ],
 };
-
-export default lsigilSetup;

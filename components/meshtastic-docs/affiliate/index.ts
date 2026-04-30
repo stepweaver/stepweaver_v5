@@ -5,5 +5,4 @@ export { AffiliateHardwareBlock } from "./affiliate-hardware-block";
 export {
   getConfiguredAffiliateLinks,
   getPrimaryAffiliateUrl,
-  AFFILIATE_SOURCES,
 } from "./affiliate-config";

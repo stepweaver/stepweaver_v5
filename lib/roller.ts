@@ -38,7 +38,7 @@ export function rollSingleDie(sides: number): number {
   return randomIntInclusive(1, sides);
 }
 
-export function rollDice(sides: number, count: number): number[] {
+function rollDice(sides: number, count: number): number[] {
   if (!Number.isInteger(count) || count < 1) {
     return [];
   }

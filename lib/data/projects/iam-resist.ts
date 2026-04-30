@@ -164,5 +164,3 @@ export const iamResist: Project = {
   ],
   liveUrl: "https://iamresist.org",
 };
-
-export default iamResist;

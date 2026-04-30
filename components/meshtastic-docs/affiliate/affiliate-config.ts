@@ -1,7 +1,7 @@
 /**
  * Meshtastic affiliate URL configuration (Atlavox products), aligned with v3.
  */
-export const AFFILIATE_SOURCES = [
+const AFFILIATE_SOURCES = [
   { envKey: "NEXT_PUBLIC_ATLAVOX_M1_URL", label: "Atlavox M1 Meshtastic Radio" },
   { envKey: "NEXT_PUBLIC_ATLAVOX_BEACON_URL", label: "Atlavox Beacon Solar Meshtastic Node" },
   { envKey: "NEXT_PUBLIC_ATLAVOX_BEACON_OUTPOST_URL", label: "Atlavox Beacon Solar – Preconfigured (Outpost)" },

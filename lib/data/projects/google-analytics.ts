@@ -98,5 +98,3 @@ export const googleAnalytics: Project = {
     },
   ],
 };
-
-export default googleAnalytics;

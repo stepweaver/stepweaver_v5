@@ -104,5 +104,3 @@ export const websiteRefreshes: Project = {
     },
   ],
 };
-
-export default websiteRefreshes;

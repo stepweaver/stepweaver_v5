@@ -107,5 +107,3 @@ export const n8nAutomations: Project = {
     },
   ],
 };
-
-export default n8nAutomations;

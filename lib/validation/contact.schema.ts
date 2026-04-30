@@ -9,4 +9,4 @@ export const contactSchema = z.object({
   _d: z.number().optional(),
 });
 
-export type ContactForm = z.infer<typeof contactSchema>;
+type ContactForm = z.infer<typeof contactSchema>;

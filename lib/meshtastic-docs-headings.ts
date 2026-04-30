@@ -6,7 +6,7 @@ export function headingIndentClass(level: 1 | 2 | 3, isFirst: boolean): string {
   return level === 2 ? "pl-4" : "pl-6";
 }
 
-export function slugifyHeading(text: string): string {
+function slugifyHeading(text: string): string {
   if (!text || typeof text !== "string") return "section";
   return (
     text

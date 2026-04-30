@@ -117,5 +117,3 @@ export const mishawakaShowerBooking: Project = {
     },
   ],
 };
-
-export default mishawakaShowerBooking;

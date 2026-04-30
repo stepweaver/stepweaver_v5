@@ -125,5 +125,3 @@ export const billPlanner: Project = {
     },
   ],
 };
-
-export default billPlanner;

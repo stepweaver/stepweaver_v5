@@ -110,5 +110,3 @@ export const rpgDiceRoller: Project = {
   ],
   liveUrl: "/dice-roller",
 };
-
-export default rpgDiceRoller;

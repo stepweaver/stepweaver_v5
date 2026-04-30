@@ -7,7 +7,7 @@ export type CodexPost = {
   hashtags: string[];
 };
 
-export function safeParseCodexDate(dateStr: string): Date {
+function safeParseCodexDate(dateStr: string): Date {
   if (!dateStr) return new Date(0);
   try {
     const parts = String(dateStr).split("-").map(Number);

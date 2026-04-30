@@ -108,5 +108,3 @@ export const neonProfileCard: Project = {
     },
   ],
 };
-
-export default neonProfileCard;

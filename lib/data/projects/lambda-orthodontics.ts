@@ -113,5 +113,3 @@ export const lambdaOrthodontics: Project = {
   ],
   liveUrl: "https://lambdaortho.vercel.app/",
 };
-
-export default lambdaOrthodontics;

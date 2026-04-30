@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 
-export type NavigationIntent = { pathKey: string; startedAt: number };
+type NavigationIntent = { pathKey: string; startedAt: number };
 
 type Ctx = {
   intent: NavigationIntent | null;

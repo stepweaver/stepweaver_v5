@@ -307,6 +307,6 @@ export function processCommand(
   return handler(args, ctx);
 }
 
-export function getCommandList(): string[] {
+function getCommandList(): string[] {
   return Object.keys(COMMANDS);
 }

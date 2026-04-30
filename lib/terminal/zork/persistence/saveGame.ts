@@ -1,19 +1,19 @@
 import type { GameState } from '../state';
 
-export const SAVE_STORAGE_KEY = 'stepweaver-zork-save-v1';
+const SAVE_STORAGE_KEY = 'stepweaver-zork-save-v1';
 const SCHEMA_VERSION = 1;
 
-export interface SaveEnvelope {
+interface SaveEnvelope {
   v: number;
   state: GameState;
 }
 
-export function serializeGameState(state: GameState): string {
+function serializeGameState(state: GameState): string {
   const envelope: SaveEnvelope = { v: SCHEMA_VERSION, state };
   return JSON.stringify(envelope);
 }
 
-export function parseGameState(json: string): GameState | null {
+function parseGameState(json: string): GameState | null {
   try {
     const o = JSON.parse(json) as SaveEnvelope;
     if (o?.v !== SCHEMA_VERSION || !o.state || typeof o.state !== 'object') {

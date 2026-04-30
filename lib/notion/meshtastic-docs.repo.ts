@@ -189,7 +189,7 @@ export async function getDocBySlug(slug: string): Promise<MeshtasticPublishedDoc
 }
 
 /** Stable section order for sidebar display (v3 parity). */
-export const SECTION_ORDER = ["About", "Overview", "Getting Started", "Hardware", "Field Notes"];
+const SECTION_ORDER = ["About", "Overview", "Getting Started", "Hardware", "Field Notes"];
 
 export type GroupedMeshtasticSection = { section: string; pages: MeshtasticPublishedDoc[] };
 

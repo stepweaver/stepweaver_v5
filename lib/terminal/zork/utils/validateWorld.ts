@@ -53,7 +53,7 @@ export function validateWorld(): WorldValidationIssue[] {
   return issues;
 }
 
-export function assertValidWorld(): void {
+function assertValidWorld(): void {
   const issues = validateWorld();
   if (issues.length > 0) {
     const msg = issues.map((i) => i.message).join('\n');
@@ -62,7 +62,7 @@ export function assertValidWorld(): void {
 }
 
 /** All direction strings used in room defs (for scripted overrides). */
-export const ALL_DIRECTIONS: Direction[] = [
+const ALL_DIRECTIONS: Direction[] = [
   'north',
   'south',
   'east',

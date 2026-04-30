@@ -112,5 +112,3 @@ export const orthodonticTracker: Project = {
     },
   ],
 };
-
-export default orthodonticTracker;

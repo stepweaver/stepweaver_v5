@@ -13,7 +13,7 @@ function isLoopbackOrigin(origin: string): boolean {
   }
 }
 
-export function checkOrigin(request: NextRequest): string | null {
+function checkOrigin(request: NextRequest): string | null {
   const origin = request.headers.get("origin");
   const host = request.headers.get("host") || request.headers.get("x-forwarded-host");
 
@@ -43,7 +43,7 @@ export function checkOrigin(request: NextRequest): string | null {
 const MIN_PAGE_AGE_MS = 400;
 const MIN_FLOW_DURATION_MS = 500;
 
-export function checkBotProtection(body: Record<string, unknown>): string | null {
+function checkBotProtection(body: Record<string, unknown>): string | null {
   const honeypot = body._hp_website as string | undefined;
   if (honeypot && String(honeypot).trim().length > 0) {
     return "honeypot-filled";

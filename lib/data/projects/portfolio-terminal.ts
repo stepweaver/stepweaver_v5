@@ -118,5 +118,3 @@ export const portfolioTerminal: Project = {
   ],
   liveUrl: "/terminal",
 };
-
-export default portfolioTerminal;

@@ -14,7 +14,7 @@ const contentPartSchema = z
   })
   .strict();
 
-export const chatMessageSchema = z.object({
+const chatMessageSchema = z.object({
   role: z.enum(["user", "assistant"]),
   content: z.union([z.string().max(20_000), z.array(contentPartSchema).max(10)]).optional(),
   attachments: z.array(attachmentSchema).max(5).optional(),
@@ -36,5 +36,5 @@ export const chatBodySchema = z.object({
   _d: z.number().optional(),
 });
 
-export type ChatMessage = z.infer<typeof chatMessageSchema>;
-export type ChatBody = z.infer<typeof chatBodySchema>;
+type ChatMessage = z.infer<typeof chatMessageSchema>;
+type ChatBody = z.infer<typeof chatBodySchema>;

@@ -115,5 +115,3 @@ export const serviceBusinessDemo: Project = {
   ],
   liveUrl: "https://lambda-heating-air.vercel.app/",
 };
-
-export default serviceBusinessDemo;

@@ -19,7 +19,7 @@ const EXTRA_ALIASES: Record<string, string[]> = {
   'trap-door': ['trap door', 'door', 'trapdoor'],
 };
 
-export function normalizePhrase(s: string): string {
+function normalizePhrase(s: string): string {
   return s
     .trim()
     .toLowerCase()

@@ -119,5 +119,3 @@ export const soapStache: Project = {
   ],
   liveUrl: "https://app-soap-stache.vercel.app/",
 };
-
-export default soapStache;

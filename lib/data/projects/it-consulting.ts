@@ -100,5 +100,3 @@ export const itConsulting: Project = {
     },
   ],
 };
-
-export default itConsulting;

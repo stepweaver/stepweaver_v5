@@ -123,5 +123,3 @@ export const stepweaverDev: Project = {
     },
   ],
 };
-
-export default stepweaverDev;

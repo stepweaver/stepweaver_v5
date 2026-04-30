@@ -42,7 +42,7 @@ export interface GameState {
 export const LAMP_ITEM_ID = 'lamp';
 export const SCORE_MAX = 100;
 
-export function emptyOutput(): OutputLine[] {
+function emptyOutput(): OutputLine[] {
   return [];
 }
 
@@ -50,7 +50,7 @@ export function line(kind: OutputKind, text: string): OutputLine {
   return { kind, text };
 }
 
-export function textLines(text: string, kind: OutputKind = 'text'): OutputLine[] {
+function textLines(text: string, kind: OutputKind = 'text'): OutputLine[] {
   return text.split('\n').map((t) => line(kind, t));
 }
 
@@ -58,7 +58,7 @@ export function getRoomDef(roomId: string): RoomDef | undefined {
   return ROOMS[roomId];
 }
 
-export function getItemDef(itemId: string): ItemDef | undefined {
+function getItemDef(itemId: string): ItemDef | undefined {
   return ITEMS[itemId];
 }
 
@@ -72,7 +72,7 @@ export function getEffectiveExits(
   return { ...base, ...over };
 }
 
-export function hasLight(state: GameState): boolean {
+function hasLight(state: GameState): boolean {
   if (!state.lampOn) return false;
   return state.inventory.includes(LAMP_ITEM_ID);
 }
@@ -99,7 +99,7 @@ export function getVisibleItemIdsInRoom(state: GameState, roomId: string): strin
   return inRoom;
 }
 
-export function canSeeItemInContext(
+function canSeeItemInContext(
   state: GameState,
   itemId: string,
   scope: 'room' | 'inventory' | 'anywhere'

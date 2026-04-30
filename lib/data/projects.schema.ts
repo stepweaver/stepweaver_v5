@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-export const ProjectSectionSchema = z.object({
+const ProjectSectionSchema = z.object({
   id: z.string(),
   title: z.string(),
   type: z.enum([
@@ -37,7 +37,7 @@ export const ProjectSectionSchema = z.object({
   })).optional(),
 }).strict();
 
-export const ProjectSchema = z.object({
+const ProjectSchema = z.object({
   slug: z.string(),
   title: z.string(),
   description: z.string(),

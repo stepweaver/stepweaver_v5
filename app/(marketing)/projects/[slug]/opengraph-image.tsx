@@ -3,6 +3,7 @@ import { ImageResponse } from "next/og";
 import { getProjectBySlug } from "@/lib/data/projects";
 import { chooseProjectSharePath } from "@/lib/og/project-share-path";
 
+// fallow-ignore-next-line unused-export
 export const runtime = "edge";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";

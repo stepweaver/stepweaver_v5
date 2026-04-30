@@ -2,7 +2,7 @@ import { getBlogEntries, type BlogEntry } from "./notion/blog.repo";
 
 export type { BlogEntry };
 
-export async function getAllBlogEntries(): Promise<BlogEntry[]> {
+async function getAllBlogEntries(): Promise<BlogEntry[]> {
   const entries = await getBlogEntries();
   return Array.isArray(entries) ? entries : [];
 }

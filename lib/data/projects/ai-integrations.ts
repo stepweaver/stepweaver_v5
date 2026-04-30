@@ -123,5 +123,3 @@ export const aiIntegrations: Project = {
   ],
   liveUrl: "/terminal",
 };
-
-export default aiIntegrations;

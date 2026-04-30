@@ -8,6 +8,9 @@ node_modules/
 out/
 build/
 
+# Tool caches
+.fallow/
+
 # Production
 dist/
 

@@ -11,7 +11,7 @@ import {
 } from "@/lib/terminal/zork/persistence/saveGame";
 import type { LineVariant } from "@/components/terminal/types";
 
-export const zorkSession = { isActive: false };
+const zorkSession = { isActive: false };
 
 let gameState: GameState | null = null;
 

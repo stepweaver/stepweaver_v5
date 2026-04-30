@@ -2,7 +2,7 @@
  * Editorial / long-read surfaces get the full terminal scan sequence.
  * Ported from v3 `components/transition/transitionConfig.js`.
  */
-export const CONTENT_PATH_PREFIXES = ["/codex", "/meshtastic", "/resume"];
+const CONTENT_PATH_PREFIXES = ["/codex", "/meshtastic", "/resume"];
 
 export function isContentRoute(path: string): boolean {
   if (!path) return false;

@@ -99,7 +99,7 @@ function formatProjectDetail(project: Project): string {
   return lines.join("\n");
 }
 
-export function buildProjectIndexBlock(): string {
+function buildProjectIndexBlock(): string {
   return getAllProjects()
     .map((project) => {
       const preview = cleanText(project.cardDescription || project.description);
@@ -108,7 +108,7 @@ export function buildProjectIndexBlock(): string {
     .join("\n");
 }
 
-export function buildProjectKnowledgeBlock(): string {
+function buildProjectKnowledgeBlock(): string {
   const parts = getAllProjects().map((project) => {
     const body = formatProjectDetail(project);
     return [`=== ${project.title} ===`, body].join("\n");
