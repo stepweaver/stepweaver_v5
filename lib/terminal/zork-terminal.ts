@@ -41,16 +41,16 @@ export function startZorkGame(): { lines: { content: string; variant: LineVarian
   return { lines: mapLines(getOpeningLines()) };
 }
 
-export function isZorkGameActive(): boolean {
+function isZorkGameActive(): boolean {
   return zorkSession.isActive;
 }
 
-export function resetZorkGame(): void {
+function resetZorkGame(): void {
   gameState = null;
   zorkSession.isActive = false;
 }
 
-export function handleZorkInput(
+function handleZorkInput(
   raw: string
 ): { lines: { content: string; variant: LineVariant }[]; exit?: boolean } {
   const trimmed = raw.trim().toLowerCase();
