@@ -38,8 +38,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!entry) return { title: "Not Found", description: "The page you requested was not found" };
   const title = entry.title || "Blog Post";
   const description = entry.description || `${title} · stepweaver.dev`;
-  const canonicalPath = `/codex/${slug}`;
-  const canonicalUrl = `${siteBaseUrl()}${canonicalPath}`;
+  const canonicalUrl = `${siteBaseUrl()}/codex/${slug}`;
+  const shareImage = `${siteBaseUrl()}/images/stepweaver-dev.png`;
   return {
     title,
     description,
@@ -49,11 +49,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       type: "article",
       url: canonicalUrl,
+      images: [{ url: shareImage, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [shareImage],
     },
   };
 }

@@ -44,8 +44,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   const title = entry.title || SYSTEMS_LOG_SERIES_TITLE;
   const description = entry.description || `${title} · ${SYSTEMS_LOG_SERIES_TITLE}`;
-  const canonicalPath = `/systems-log/${slug}`;
-  const canonicalUrl = `${siteBaseUrl()}${canonicalPath}`;
+  const canonicalUrl = `${siteBaseUrl()}/systems-log/${slug}`;
+  const shareImage = `${siteBaseUrl()}/images/stepweaver-dev.png`;
   return {
     title,
     description,
@@ -55,11 +55,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       description,
       type: "article",
       url: canonicalUrl,
+      images: [{ url: shareImage, width: 1200, height: 630, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
       title,
       description,
+      images: [shareImage],
     },
   };
 }
