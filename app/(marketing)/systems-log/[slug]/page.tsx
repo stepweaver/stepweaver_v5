@@ -4,6 +4,7 @@ import { getBlogEntryBySlug, getInitialBlogEntries } from "@/lib/blog";
 import { getPageBlocks, type NotionBlock } from "@/lib/notion-blocks";
 import { NotionBlockBody } from "@/components/codex/notion-block-body";
 import { isSystemsLogEntry, SYSTEMS_LOG_SERIES_TITLE } from "@/lib/systems-log/selectors";
+import { siteBaseUrl } from "@/lib/structured-data";
 
 export const revalidate = 60;
 export const dynamicParams = true;
@@ -43,15 +44,17 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   }
   const title = entry.title || SYSTEMS_LOG_SERIES_TITLE;
   const description = entry.description || `${title} · ${SYSTEMS_LOG_SERIES_TITLE}`;
+  const canonicalPath = `/systems-log/${slug}`;
+  const canonicalUrl = `${siteBaseUrl()}${canonicalPath}`;
   return {
     title,
     description,
-    alternates: { canonical: `/systems-log/${slug}` },
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title,
       description,
       type: "article",
-      url: `/systems-log/${slug}`,
+      url: canonicalUrl,
     },
   };
 }
