@@ -1,4 +1,3 @@
-import { buildKaizenAppendix } from "@/lib/chat/kaizen-knowledge";
 import { buildProjectAppendix } from "@/lib/chat/project-knowledge";
 
 let cachedAppendix: string | null = null;
@@ -83,14 +82,13 @@ Link rules for web chat:
 Source citation rules:
 - When you reference a specific project, page, or document, append a citation marker at the end of the sentence.
 - Citation format: [[CITE:type|label|href]] or [[CITE:type|label|href|section]]
-- Types: project, resume, codex, page, systems-log
+- Types: project, resume, codex, page
 - Only cite things that are real and verifiable from the project records or site.
 - Keep citations sparse: at most 1-3 per response. Only cite when it genuinely helps the user find the source.
 - Examples:
   [[CITE:project|λsigil Lead Ops Runtime|/projects/lsigil-setup]]
   [[CITE:project|Silent Auction Platform|/projects/silent-auction|Architecture]]
   [[CITE:resume|Resume|/resume]]
-  [[CITE:systems-log|Systems Log|/systems-log|Positioning]]
   [[CITE:page|Services|/services]]
   [[CITE:page|Capabilities|/capabilities]]
 
@@ -105,7 +103,6 @@ export function buildSystemPrompt(
   channel: "widget" | "terminal",
   projectCaseStudy?: { slug: string; title: string; summary: string }
 ): string {
-  const kaizenAppendix = buildKaizenAppendix();
   const appendix = getProjectAppendix();
 
   let dossier = "";
@@ -121,8 +118,6 @@ Ground answers in this excerpt and the portfolio records. If something is not st
   }
 
   const core = `${BASE_SYSTEM_PROMPT}
-
-${kaizenAppendix}
 
 ${appendix}${dossier}`;
 

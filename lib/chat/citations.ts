@@ -16,7 +16,7 @@ export function extractCitations(text: string): { cleanText: string; citations: 
   const citations: ChatCitation[] = [];
   const cleanText = text
     .replace(CITE_PATTERN, (_, type: string, label: string, href: string, section?: string) => {
-      const allowedTypes = new Set(["project", "resume", "codex", "page", "systems-log"]);
+      const allowedTypes = new Set(["project", "resume", "codex", "page"]);
       const safeType = allowedTypes.has(type.trim()) ? type.trim() : "page";
       const safeLabel = label.trim().slice(0, 80);
       const safeHref = href.trim().slice(0, 200);
