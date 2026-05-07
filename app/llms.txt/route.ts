@@ -15,7 +15,6 @@ He is strongest in end-to-end thinking, implementation, debugging, integration, 
 - Operator profile JSON: ${base}/operator-profile.json
 - Projects: ${base}/projects
 - Resume: ${base}/resume
-- Systems Log: ${base}/systems-log — A public series documenting Stephen’s Kaizen-driven professional positioning, business-systems developer path, proof artifacts, and AI-assisted development workflow.
 - Terminal: ${base}/terminal
 - Contact: ${base}/contact
 
