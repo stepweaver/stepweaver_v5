@@ -38,6 +38,17 @@ export default function ResumePage() {
             <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed max-w-3xl">
               {resumeData.identity.statement}
             </p>
+            <div className="mt-5 border border-[rgb(var(--border)/0.25)] p-4 bg-[rgb(var(--panel)/0.15)] max-w-3xl">
+              <div className="flex flex-wrap items-baseline gap-3 mb-1">
+                <span className="text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-sm">Systems Log →</span>
+                <Link href="/systems-log" className="text-xs text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))]">
+                  Open
+                </Link>
+              </div>
+              <p className="text-[rgb(var(--text-secondary))] text-xs leading-relaxed">
+                A working record of my professional positioning, proof artifacts, and business-systems development path.
+              </p>
+            </div>
           </section>
 
           <section>

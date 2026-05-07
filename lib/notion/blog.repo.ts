@@ -33,6 +33,13 @@ function slugify(title: string): string {
     .substring(0, 100);
 }
 
+function readOptionalSlug(properties: Record<string, unknown>): string | null {
+  const prop = (properties.Slug || properties.slug) as Record<string, unknown> | undefined;
+  const raw = (getPropertyValue(prop, "rich_text") as string) || "";
+  const trimmed = raw.trim();
+  return trimmed ? trimmed : null;
+}
+
 function getPropertyValue(
   property: Record<string, unknown> | undefined,
   type: string
@@ -86,6 +93,7 @@ function formatBlogEntry(page: PageObjectResponse): BlogEntry {
   const p = page.properties as Record<string, unknown>;
   const titleProp = (p.Title || p.Name) as Record<string, unknown> | undefined;
   const title = (getPropertyValue(titleProp, "title") as string) || "";
+  const explicitSlug = readOptionalSlug(p);
   const dateProp = getPropertyByType(p, "date") || (p.Date as Record<string, unknown>) || (p.date as Record<string, unknown>);
   const dateValue = dateProp ? (getPropertyValue(dateProp, "date") as string | null) : null;
   const dateOnly = toCalendarDateOnly(dateValue);
@@ -103,7 +111,7 @@ function formatBlogEntry(page: PageObjectResponse): BlogEntry {
   return {
     id: page.id,
     title,
-    slug: slugify(title),
+    slug: explicitSlug ?? slugify(title),
     date: dateOnly ?? fallbackDate ?? dateValue,
     updated: lastEdited || dateOnly || fallbackDate || dateValue,
     description: description || "",
