@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FileText, FolderOpen, BookOpen, FileCode } from "lucide-react";
+import { FileText, FolderOpen, BookOpen, FileCode, NotebookText } from "lucide-react";
 
 export type Citation = {
   type: string;
@@ -15,6 +15,7 @@ const TYPE_ICONS: Record<string, typeof FileText> = {
   resume: FileText,
   codex: BookOpen,
   page: FileCode,
+  "systems-log": NotebookText,
 };
 
 export function SourceCitations({ citations }: { citations: Citation[] }) {

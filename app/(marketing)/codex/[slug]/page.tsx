@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getBlogEntryBySlug, getInitialBlogEntries } from "@/lib/blog";
 import { getPageBlocks, type NotionBlock } from "@/lib/notion-blocks";
 import { NotionBlockBody } from "@/components/codex/notion-block-body";
+import { siteBaseUrl } from "@/lib/structured-data";
 export const revalidate = 60;
 export const dynamicParams = true;
 
@@ -37,13 +38,25 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!entry) return { title: "Not Found", description: "The page you requested was not found" };
   const title = entry.title || "Blog Post";
   const description = entry.description || `${title} · stepweaver.dev`;
+  const canonicalPath = `/codex/${slug}`;
+  const canonicalUrl = `${siteBaseUrl()}${canonicalPath}`;
+  const ogImageUrl = `${siteBaseUrl()}/codex/${slug}/opengraph-image`;
   return {
     title,
     description,
+    alternates: { canonical: canonicalUrl },
     openGraph: {
       title,
       description,
       type: "article",
+      url: canonicalUrl,
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImageUrl],
     },
   };
 }
