@@ -40,7 +40,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   const description = entry.description || `${title} · stepweaver.dev`;
   const canonicalPath = `/codex/${slug}`;
   const canonicalUrl = `${siteBaseUrl()}${canonicalPath}`;
-  const ogImageUrl = `${siteBaseUrl()}/codex/${slug}/opengraph-image`;
+  const ogImageUrl = `${siteBaseUrl()}/codex/${slug}/opengraph-image.png`;
   return {
     title,
     description,
