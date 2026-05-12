@@ -43,7 +43,6 @@ export async function GET() {
       llms_txt: `${base}/llms.txt`,
     },
     proof: {
-      systems_log: `${base}/systems-log`,
       projects: `${base}/projects`,
       resume: `${base}/resume`,
       terminal: `${base}/terminal`,

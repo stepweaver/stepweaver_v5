@@ -3,7 +3,6 @@ import { getInitialBlogEntries } from "@/lib/blog";
 import { getProjectSlugs } from "@/lib/data/projects";
 import { getMeshtasticNotionConfigIssue, listPublishedDocs } from "@/lib/notion/meshtastic-docs.repo";
 import { MESHTASTIC_DOCS } from "@/lib/data/meshtastic-content";
-import { isSystemsLogEntry } from "@/lib/systems-log/selectors";
 
 const STATIC_ROUTES = [
   "/",
@@ -12,7 +11,6 @@ const STATIC_ROUTES = [
   "/contact",
   "/codex",
   "/for-agents",
-  "/systems-log",
   "/meshtastic",
   "/meshtastic/field-notes",
   "/projects",
@@ -84,17 +82,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         if (!entry.slug) continue;
         entries.push({
           url: `${baseUrl}/codex/${entry.slug}`,
-          lastModified: now,
-          changeFrequency: "weekly",
-          priority: 0.7,
-        });
-      }
-
-      for (const entry of blogEntries) {
-        if (!entry.slug) continue;
-        if (!isSystemsLogEntry(entry)) continue;
-        entries.push({
-          url: `${baseUrl}/systems-log/${entry.slug}`,
           lastModified: now,
           changeFrequency: "weekly",
           priority: 0.7,

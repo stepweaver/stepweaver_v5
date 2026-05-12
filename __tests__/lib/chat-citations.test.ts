@@ -19,18 +19,6 @@ describe("extractCitations", () => {
     const { citations } = extractCitations("[[CITE:weird|Label|/path]]");
     expect(citations[0]?.type).toBe("page");
   });
-
-  it("preserves Systems Log citations", () => {
-    const { citations } = extractCitations(
-      "See the positioning notes [[CITE:systems-log|Systems Log|/systems-log|Positioning]]."
-    );
-    expect(citations[0]).toMatchObject({
-      type: "systems-log",
-      label: "Systems Log",
-      href: "/systems-log",
-      section: "Positioning",
-    });
-  });
 });
 
 describe("redactIfPromptLeak", () => {

@@ -12,7 +12,6 @@ const NAV_LINKS = [
   { label: "Services", href: "/services" },
   { label: "Projects", href: "/projects" },
   { label: "Codex", href: "/codex" },
-  { label: "Systems Log", href: "/systems-log" },
   { label: "Terminal", href: "/terminal" },
   { label: "Contact", href: "/contact" },
 ];

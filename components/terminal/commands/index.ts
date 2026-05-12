@@ -24,13 +24,10 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: 'Content:', variant: 'lambda' },
       { content: '  resume: View resume (sections: summary, experience, …)', variant: 'default' },
       { content: '  codex: Browse blog (ls, cat, grep, exit)', variant: 'default' },
-      { content: '  systems-log: Professional reflection series (open /systems-log)', variant: 'default' },
-      { content: '  kaizen: Print Kaizen definition', variant: 'default' },
-      { content: '  positioning: Print positioning statement', variant: 'default' },
       { content: '  chat <message>: Ask Lambda about experience', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Navigation:', variant: 'lambda' },
-      { content: '  cd contact | codex | systems-log | dice-roller | github', variant: 'default' },
+      { content: '  cd contact | codex | dice-roller | github', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Features:', variant: 'lambda' },
       { content: '  weather [location] [--forecast] - no location: browser location, else New York', variant: 'default' },
@@ -61,7 +58,6 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     const routes: Record<string, string> = {
       contact: '/contact',
       codex: '/codex',
-      'systems-log': '/systems-log',
       'dice-roller': '/dice-roller',
       github: 'https://github.com/stephen',
     };
@@ -69,7 +65,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       return {
         lines: [
           { content: 'Usage: cd <destination>', variant: 'warning' },
-          { content: 'Available: contact, codex, systems-log, dice-roller, github', variant: 'dimmed' },
+          { content: 'Available: contact, codex, dice-roller, github', variant: 'dimmed' },
         ],
       };
     }
@@ -83,39 +79,6 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     setTimeout(() => ctx.navigate(target), 300);
     return { lines: [{ content: 'Navigating to ' + dest + '...', variant: 'success' }, { content: '', variant: 'default' }] };
   },
-
-  'systems-log': (_args, _ctx) => ({
-    lines: [
-      { content: 'SYSTEMS LOG', variant: 'success' },
-      { content: '----------', variant: 'dimmed' },
-      {
-        content:
-          'A professional reflection / proof-of-thinking series on positioning, business systems, and AI-assisted workflows.',
-        variant: 'default',
-      },
-      { content: 'Open: /systems-log', variant: 'lambda' },
-      { content: '', variant: 'default' },
-    ],
-  }),
-
-  kaizen: (_args, _ctx) => ({
-    lines: [
-      {
-        content: 'Kaizen is the process I’m using to identify my actual professional pattern, name it clearly, and turn it into proof.',
-        variant: 'default',
-      },
-    ],
-  }),
-
-  positioning: (_args, _ctx) => ({
-    lines: [
-      {
-        content:
-          'Stephen is a business-systems developer and technical generalist. He builds practical business systems that turn messy operations into clearer decisions and smoother customer flows.',
-        variant: 'default',
-      },
-    ],
-  }),
 
   contact: (_args, ctx) => {
     ctx.setMode('contact');
