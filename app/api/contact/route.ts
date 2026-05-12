@@ -5,6 +5,22 @@ import { withProtectedRoute } from "@/lib/security/with-protected-route";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { renderContactEmail, renderConfirmationEmail } from "@/lib/email/contact-mail";
 
+async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY;
+  if (!secret) return true; // skip if not configured (dev without key)
+  try {
+    const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ secret, response: token, remoteip: ip }),
+    });
+    const data = (await res.json()) as { success: boolean };
+    return data.success === true;
+  } catch {
+    return false;
+  }
+}
+
 let transporter: nodemailer.Transporter | null = null;
 
 function getTransporter(): nodemailer.Transporter {
@@ -29,10 +45,22 @@ const EMAIL_UNCONFIGURED_DEV =
 
 export async function POST(request: NextRequest) {
   return withProtectedRoute(request, async (_req, body) => {
-    const rlKey = "contact:" + (request.headers.get("x-forwarded-for") || "unknown");
+    const clientIp = (request.headers.get("x-forwarded-for") ?? "unknown").split(",")[0].trim();
+    const rlKey = "contact:" + clientIp;
     const rl = await rateLimit(rlKey, 5, 60_000);
     if (!rl.allowed) {
       return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
+    }
+
+    if (process.env.TURNSTILE_SECRET_KEY) {
+      const token = typeof body.cf_turnstile_response === "string" ? body.cf_turnstile_response : "";
+      if (!token) {
+        return NextResponse.json({ error: "Bot check required" }, { status: 403 });
+      }
+      const valid = await verifyTurnstile(token, clientIp);
+      if (!valid) {
+        return NextResponse.json({ error: "Bot check failed" }, { status: 403 });
+      }
     }
 
     const parsed = contactSchema.safeParse(body);

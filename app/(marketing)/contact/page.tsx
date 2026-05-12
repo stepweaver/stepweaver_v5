@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
 export default function ContactPage() {
   const [name, setName] = useState("");
@@ -8,7 +11,11 @@ export default function ContactPage() {
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
+  const [turnstileReady, setTurnstileReady] = useState(!TURNSTILE_SITE_KEY);
   const pageOpenedAt = useRef<number | null>(null);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+  const turnstileToken = useRef<string | null>(null);
+
   useEffect(() => {
     pageOpenedAt.current = Date.now();
   }, []);
@@ -28,6 +35,7 @@ export default function ContactPage() {
           _hp_website: "",
           _t: pageOpenedAt.current ?? Date.now(),
           _d: Math.max(0, Date.now() - (pageOpenedAt.current ?? Date.now())),
+          ...(turnstileToken.current ? { cf_turnstile_response: turnstileToken.current } : {}),
         }),
       });
       if (!res.ok) {
@@ -38,9 +46,15 @@ export default function ContactPage() {
       setName("");
       setEmail("");
       setMessage("");
+      turnstileRef.current?.reset();
+      turnstileToken.current = null;
+      setTurnstileReady(false);
     } catch (err) {
       setStatus("error");
       setErrorMsg(err instanceof Error ? err.message : "Failed to send message");
+      turnstileRef.current?.reset();
+      turnstileToken.current = null;
+      setTurnstileReady(false);
     }
   }, [name, email, message]);
 
@@ -122,9 +136,29 @@ export default function ContactPage() {
             <div className="text-[rgb(var(--red))] text-sm">{errorMsg}</div>
           )}
 
+          {TURNSTILE_SITE_KEY && (
+            <Turnstile
+              ref={turnstileRef}
+              siteKey={TURNSTILE_SITE_KEY}
+              options={{ size: "invisible" }}
+              onSuccess={(token) => {
+                turnstileToken.current = token;
+                setTurnstileReady(true);
+              }}
+              onExpire={() => {
+                turnstileToken.current = null;
+                setTurnstileReady(false);
+              }}
+              onError={() => {
+                turnstileToken.current = null;
+                setTurnstileReady(false);
+              }}
+            />
+          )}
+
           <button
             type="submit"
-            disabled={status === "sending"}
+            disabled={status === "sending" || !turnstileReady}
             className="glitch-button glitch-button--primary w-full sm:w-auto"
           >
             {status === "sending" ? "Sending..." : "Send Message"}

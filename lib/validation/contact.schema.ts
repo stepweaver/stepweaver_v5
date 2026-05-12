@@ -7,6 +7,7 @@ export const contactSchema = z.object({
   _hp_website: z.string().optional(),
   _t: z.number().optional(),
   _d: z.number().optional(),
+  cf_turnstile_response: z.string().optional(),
 });
 
 type ContactForm = z.infer<typeof contactSchema>;

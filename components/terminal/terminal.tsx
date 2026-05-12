@@ -14,6 +14,9 @@ import {
 } from "@/lib/terminal/zork-terminal";
 import { formatWeatherApiLines } from "@/lib/terminal/format-weather-lines";
 import { BrandWordmark } from "@/components/ui/brand-wordmark";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
+
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY ?? "";
 
 let lineCounter = 0;
 function makeId(): string {
@@ -48,6 +51,8 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const previousLinesLength = useRef(lines.length);
+  const turnstileRef = useRef<TurnstileInstance>(null);
+  const turnstileToken = useRef<string | null>(null);
 
   // Only scroll when new output is appended (v3 parity: avoid fighting user scroll / smooth re-attachments).
   useEffect(() => {
@@ -94,7 +99,7 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
       } else if (contact.step === 3) {
         if (trimmed === "send") {
           const flowStart = contact.timestamp ?? Date.now();
-          const payload = {
+          const payload: Record<string, unknown> = {
             name: contact.data.name,
             email: contact.data.email,
             message: contact.data.message,
@@ -102,6 +107,9 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
             _t: flowStart,
             _d: Math.max(0, Date.now() - flowStart),
           };
+          if (turnstileToken.current) {
+            payload.cf_turnstile_response = turnstileToken.current;
+          }
           try {
             const res = await fetch("/api/contact", {
               method: "POST",
@@ -121,6 +129,8 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
               },
             ]);
           }
+          turnstileToken.current = null;
+          turnstileRef.current?.reset();
           setContact({ isActive: false, step: 0, data: { name: "", email: "", message: "" }, timestamp: null });
           setMode("normal");
         } else if (trimmed === "edit") {
@@ -274,6 +284,7 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
             data: { name: "", email: "", message: "" },
             timestamp: Date.now(),
           });
+          turnstileRef.current?.execute();
         }
         if (result.mode && !result.weatherSelection) setMode(result.mode);
         if (result.lines.length > 0) addLines(result.lines);
@@ -367,6 +378,16 @@ export function Terminal({ embedded = false }: { embedded?: boolean } = {}) {
         </div>
         <div ref={bottomRef} />
       </div>
+      {TURNSTILE_SITE_KEY && (
+        <Turnstile
+          ref={turnstileRef}
+          siteKey={TURNSTILE_SITE_KEY}
+          options={{ size: "invisible", execution: "execute" }}
+          onSuccess={(token) => { turnstileToken.current = token; }}
+          onExpire={() => { turnstileToken.current = null; }}
+          onError={() => { turnstileToken.current = null; }}
+        />
+      )}
     </div>
   );
 
