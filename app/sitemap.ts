@@ -7,6 +7,7 @@ import { MESHTASTIC_DOCS } from "@/lib/data/meshtastic-content";
 const STATIC_ROUTES = [
   "/",
   "/brief",
+  "/carrier-journal",
   "/capabilities",
   "/contact",
   "/codex",

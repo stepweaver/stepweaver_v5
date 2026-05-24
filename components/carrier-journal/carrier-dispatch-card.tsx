@@ -1,4 +1,4 @@
-import type { CarrierDispatch, MailLoad } from "@/lib/data/carrier-journal";
+import type { CarrierDispatch, CarrierPhase, MailLoad } from "@/lib/data/carrier-journal";
 
 const MAIL_LOAD_LABEL: Record<MailLoad, string> = {
   light: "LIGHT",
@@ -14,6 +14,13 @@ const MAIL_LOAD_COLOR: Record<MailLoad, string> = {
   brutal: "rgb(var(--danger))",
 };
 
+const PHASE_LABEL: Record<CarrierPhase, string> = {
+  "break-in": "BREAK-IN",
+  adapting: "ADAPTING",
+  building: "BUILDING",
+  regular: "REGULAR",
+};
+
 type Props = {
   dispatch: CarrierDispatch;
 };
@@ -25,9 +32,18 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
   if (d.storm) weatherFlags.push("STORM");
   if (d.snow) weatherFlags.push("SNOW");
 
+  const chips: { label: string; color?: string }[] = [];
+  if (d.phase) chips.push({ label: PHASE_LABEL[d.phase] });
+  if (d.waterOz !== undefined) {
+    const goal = d.hydrationGoalOz;
+    chips.push({
+      label: goal ? `${d.waterOz}/${goal} OZ` : `${d.waterOz} OZ`,
+      color: goal && d.waterOz >= goal ? "rgb(var(--green))" : "rgb(var(--neon))",
+    });
+  }
+
   return (
     <div className="surface-panel p-5 sm:p-6 space-y-3">
-      {/* Header row */}
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-1">
@@ -48,7 +64,6 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
         </div>
       </div>
 
-      {/* Metrics strip */}
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-px bg-[rgb(var(--border)/0.12)]">
         {[
           { label: "MILES", value: `${d.milesWalked}` },
@@ -57,13 +72,8 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
           { label: "ENERGY", value: `${d.energy}/10` },
           { label: "MOOD", value: `${d.mood}/10` },
         ].map((m) => (
-          <div
-            key={m.label}
-            className="bg-[rgb(var(--panel))] px-3 py-2 text-center"
-          >
-            <div className="font-[var(--font-ibm)] text-sm text-[rgb(var(--neon))]">
-              {m.value}
-            </div>
+          <div key={m.label} className="bg-[rgb(var(--panel))] px-3 py-2 text-center">
+            <div className="font-[var(--font-ibm)] text-sm text-[rgb(var(--neon))]">{m.value}</div>
             <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mt-0.5">
               {m.label}
             </div>
@@ -71,7 +81,23 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
         ))}
       </div>
 
-      {/* Weather + flags */}
+      {chips.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {chips.map((chip) => (
+            <span
+              key={chip.label}
+              className="font-[var(--font-ocr)] text-[9px] tracking-widest border px-1.5 py-0.5"
+              style={{
+                color: chip.color ?? "rgb(var(--text-secondary))",
+                borderColor: chip.color ?? "rgb(var(--border)/0.4)",
+              }}
+            >
+              {chip.label}
+            </span>
+          ))}
+        </div>
+      )}
+
       <div className="flex flex-wrap items-center gap-3 text-xs text-[rgb(var(--text-secondary))]">
         <span className="font-[var(--font-ocr)] tracking-wide">
           {d.weather}
@@ -93,10 +119,32 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
         )}
       </div>
 
-      {/* Public note */}
-      <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed border-l-2 border-[rgb(var(--neon)/0.3)] pl-3">
-        {d.publicNote}
-      </p>
+      {(d.bodyNote || d.recoveryNote) && (
+        <div className="flex flex-col sm:flex-row gap-2 text-xs">
+          {d.bodyNote && (
+            <span className="text-[rgb(var(--text-secondary))] border-l border-[rgb(var(--border)/0.3)] pl-2">
+              <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mr-2">
+                BODY
+              </span>
+              {d.bodyNote}
+            </span>
+          )}
+          {d.recoveryNote && (
+            <span className="text-[rgb(var(--text-secondary))] border-l border-[rgb(var(--border)/0.3)] pl-2">
+              <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mr-2">
+                RECOVERY
+              </span>
+              {d.recoveryNote}
+            </span>
+          )}
+        </div>
+      )}
+
+      {d.publicNote.trim() && (
+        <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed border-l-2 border-[rgb(var(--neon)/0.3)] pl-3">
+          {d.publicNote}
+        </p>
+      )}
     </div>
   );
 }

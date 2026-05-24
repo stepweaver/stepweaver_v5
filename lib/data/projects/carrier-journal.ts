@@ -38,7 +38,7 @@ export const carrierJournal: Project = {
       type: "problem",
       bullets: [
         "Mail carrying is physically intense: miles, heat, load, and recovery all compound across a week",
-        "There was no structured way to understand my own physical trajectory — just feeling it",
+        "There was no structured way to understand my own physical trajectory, just feeling it",
         "Generic fitness apps do not model mail load, heat index, or dog encounters",
         "Any logging tool that is too slow or complex gets abandoned by shift three",
       ],
@@ -73,10 +73,10 @@ export const carrierJournal: Project = {
       type: "engineering",
       bullets: [
         "Static TypeScript data model first: zero runtime cost, fully typed, immediately deployable",
-        "Helper functions compute all KPIs from raw dispatch array — no denormalized aggregates to maintain",
+        "Helper functions compute all KPIs from raw dispatch array, with no denormalized aggregates to maintain",
         "Public/private separation is a data-layer concern, not a UI concern: only public-safe entries exist in this file",
         "Component design mirrors existing stepweaver.dev panel/surface system: OCR labels, IBM body, neon tokens",
-        "No auth, no database, no API surface in Phase 1 — reduces attack surface and deployment complexity",
+        "No auth, no database, no API surface in Phase 1, which reduces attack surface and deployment complexity",
       ],
     },
     {
@@ -84,9 +84,9 @@ export const carrierJournal: Project = {
       title: "Tradeoffs",
       type: "tradeoffs",
       bullets: [
-        "Static data means entries require a deploy to appear — acceptable for a personal log at this scale",
+        "Static data means entries require a deploy to appear, which is acceptable for a personal log at this scale",
         "Phase 2 Notion integration adds a network dependency; fallback to static stays in place",
-        "KPIs are self-reported and subjective — soreness and energy are operator perception, not biometric measurement",
+        "KPIs are self-reported and subjective: soreness and energy are operator perception, not biometric measurement",
         "No historical charting yet: the data model supports it but the UI is not wired",
       ],
     },

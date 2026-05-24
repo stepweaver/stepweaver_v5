@@ -1,7 +1,7 @@
 export const metadata = {
   title: "Services",
   description:
-    "Precise systems that fit how you work—not bloated platforms. Custom solutions for small businesses; pay for what you use.",
+    "Precise systems that fit how you work, not bloated platforms. Custom solutions for small businesses; pay for what you use.",
 };
 
 const SIGNALS = [
@@ -73,7 +73,7 @@ export default function ServicesPage() {
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
           {[
             { label: "Build for scale", value: "Segments left behind", detail: "Broad platforms often skip what is specific to you." },
-            { label: "Barely used", value: "One thing right", detail: "Review request, intake, follow-up—whatever actually fits." },
+            { label: "Barely used", value: "One thing right", detail: "Review request, intake, follow-up, whatever actually fits." },
             { label: "Small business too", value: "Pay for what you use", detail: "Custom around your workflow, not shelf-ware." },
           ].map((s) => (
             <div key={s.label} className="bg-[rgb(var(--panel))] p-6">
@@ -119,7 +119,7 @@ export default function ServicesPage() {
             </p>
             <p>
               The goal is not a bigger stack. It is one problem that stops happening: reviews go out reliably, leads do not disappear, handoffs do not
-              break, and the numbers get readable—without paying for a shelf of features you will never touch.
+              break, and the numbers get readable, without paying for a shelf of features you will never touch.
             </p>
           </div>
 

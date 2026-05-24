@@ -1,4 +1,4 @@
-// Temporary diagnostic route — remove after confirming Notion integration works.
+// Temporary diagnostic route; remove after confirming Notion integration works.
 // Only active in development (returns 404 in production).
 import { NextResponse } from "next/server";
 import { getNotion } from "@/lib/notion/client";
@@ -34,7 +34,7 @@ export async function GET() {
   }
 
   try {
-    // Query with NO filter — shows all pages including unpublished ones
+    // Query with NO filter, which shows all pages including unpublished ones
     const res = await getNotion().databases.query({
       database_id: dbId,
       page_size: 5,

@@ -1,10 +1,16 @@
 // Carrier Journal DB (NOTION_CARRIER_JOURNAL_DB_ID).
-// Only pages with Publish Public = true are ever returned — Private Note is never read.
+// Only pages with Publish Public = true are ever returned; Private Note is never read.
 import { unstable_cache } from "next/cache";
 import type { PageObjectResponse, PartialPageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { getNotion } from "./client";
 import { paginate } from "./paginate";
-import type { CarrierDispatch, MailLoad } from "@/lib/data/carrier-journal";
+import {
+  dispatchHasPublicKpiData,
+  type CarrierDispatch,
+  type CarrierPhase,
+  type MailLoad,
+  type WeightPublicMode,
+} from "@/lib/data/carrier-journal";
 
 const CACHE_REVALIDATE = 300; // 5 minutes
 
@@ -57,6 +63,28 @@ function dateStr(prop: Props | undefined): string {
   return start.slice(0, 10);
 }
 
+function parseWeightPublicMode(raw: string): WeightPublicMode | undefined {
+  const normalized = raw.toLowerCase().trim();
+  if (normalized === "hidden") return "hidden";
+  if (normalized === "change-only" || normalized === "change only") return "change-only";
+  if (
+    normalized === "current-and-change" ||
+    normalized === "current and change"
+  ) {
+    return "current-and-change";
+  }
+  return undefined;
+}
+
+function parsePhase(raw: string): CarrierPhase | undefined {
+  const normalized = raw.toLowerCase().trim();
+  if (normalized === "break-in" || normalized === "break in") return "break-in";
+  if (normalized === "adapting") return "adapting";
+  if (normalized === "building") return "building";
+  if (normalized === "regular") return "regular";
+  return undefined;
+}
+
 function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const p = page.properties as Record<string, unknown>;
 
@@ -84,6 +112,14 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const dogEncounter = check(p["Dog Encounter"] as Props);
   const publicNote = str(p["Public Note"] as Props, "rich_text");
 
+  const waterOz = num(p["Water Oz"] as Props);
+  const hydrationGoalOz = num(p["Hydration Goal Oz"] as Props);
+  const weightLbs = num(p["Weight Lbs"] as Props);
+  const weightPublicMode = parseWeightPublicMode(sel(p["Weight Public Mode"] as Props));
+  const bodyNote = str(p["Body Note"] as Props, "rich_text");
+  const recoveryNote = str(p["Recovery Note"] as Props, "rich_text");
+  const phase = parsePhase(sel(p.Phase as Props));
+
   return {
     id: `cj-${page.id.replace(/-/g, "").slice(0, 8)}`,
     date,
@@ -103,6 +139,13 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(snow && { snow }),
     ...(dogEncounter && { dogEncounter }),
     publicNote,
+    ...(waterOz !== undefined && { waterOz }),
+    ...(hydrationGoalOz !== undefined && { hydrationGoalOz }),
+    ...(weightLbs !== undefined && { weightLbs }),
+    ...(weightPublicMode && { weightPublicMode }),
+    ...(bodyNote && { bodyNote }),
+    ...(recoveryNote && { recoveryNote }),
+    ...(phase && { phase }),
   };
 }
 
@@ -129,7 +172,8 @@ async function fetchDispatchesUncached(): Promise<CarrierDispatch[]> {
     return (pages as PageObjectResponse[])
       .filter((page) => page && typeof page === "object" && "properties" in page)
       .map(formatPage)
-      .filter((d): d is CarrierDispatch => d !== null);
+      .filter((d): d is CarrierDispatch => d !== null)
+      .filter((d) => d.publicNote.trim() || dispatchHasPublicKpiData(d));
   } catch (err) {
     logError("fetchDispatches", err);
     return [];
