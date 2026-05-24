@@ -1,5 +1,6 @@
 import type { Project } from "../projects.schema";
 import { aiIntegrations } from "./ai-integrations";
+import { carrierJournal } from "./carrier-journal";
 import { billPlanner } from "./bill-planner";
 import { googleAnalytics } from "./google-analytics";
 import { iamResist } from "./iam-resist";
@@ -35,6 +36,7 @@ const FEATURED_SLUGS = [
 /** Full catalog sort: featured block first, then v3 REMAINING_ORDER. */
 const CATALOG_ORDER = [
   ...FEATURED_SLUGS,
+  "carrier-journal",
   "ai-integrations",
   "lambda-orthodontics",
   "service-business-demo",
@@ -53,6 +55,7 @@ const CATALOG_SLUG_SET = new Set<string>(CATALOG_ORDER);
 
 const RAW_PROJECTS: Project[] = [
   aiIntegrations,
+  carrierJournal,
   billPlanner,
   googleAnalytics,
   iamResist,
