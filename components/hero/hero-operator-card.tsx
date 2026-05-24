@@ -57,7 +57,7 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
 
       <div className="relative z-10 flex flex-col gap-4">
         <div className="grid grid-cols-[144px_1fr] gap-4 items-start">
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-3">
             <div
               className={[
                 "hero-operator-portrait-bay relative w-36 h-36 overflow-hidden border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)]",
@@ -101,6 +101,13 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
                 aria-hidden={!isSkynet}
               />
             </div>
+
+            <div>
+              <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Current chapter</p>
+              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
+                Mail carrier fieldwork + systems building
+              </p>
+            </div>
           </div>
 
           <div className="min-w-0 space-y-3">
@@ -111,33 +118,20 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
               </p>
             </div>
 
-            <div className="space-y-2">
-              <Link href="/resume" className="group block" aria-label="Open to work (view resume)">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                      Availability
-                    </p>
-                    <div className="mt-1 flex items-center gap-2">
-                      <p className="text-sm text-[rgb(var(--green))] font-[var(--font-ibm)] whitespace-normal leading-snug">
-                        Open to work
-                      </p>
-                      <span className="relative flex h-4 w-4 flex-shrink-0 items-center justify-center" aria-hidden>
-                        <span className="absolute inline-flex h-full w-full rounded-full bg-[rgb(var(--green)/0.35)] motion-safe:animate-ping" />
-                        <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[rgb(var(--green))] shadow-[0_0_14px_rgb(var(--green)/0.55)]" />
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </Link>
-
-              <div>
-                <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Current chapter</p>
-                <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] whitespace-normal leading-snug">
-                  Mail carrier fieldwork + systems building
+            <Link href="/resume" className="group block" aria-label="Open to work (view resume)">
+              <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
+                Availability
+              </p>
+              <div className="mt-1 flex items-center gap-2">
+                <p className="text-sm text-[rgb(var(--green))] font-[var(--font-ibm)] whitespace-normal leading-snug">
+                  Open to work
                 </p>
+                <span className="relative flex h-4 w-4 flex-shrink-0 items-center justify-center" aria-hidden>
+                  <span className="absolute inline-flex h-full w-full rounded-full bg-[rgb(var(--green)/0.35)] motion-safe:animate-ping" />
+                  <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-[rgb(var(--green))] shadow-[0_0_14px_rgb(var(--green)/0.55)]" />
+                </span>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
 
