@@ -1,4 +1,4 @@
-/** Public-safe carrier field journal data. No addresses, route numbers, coworker/customer names, scanner data, or official mail volume. */
+/** Public-safe letter carrier field log data. No addresses, route numbers, coworker/customer names, scanner data, or official mail volume. */
 
 export const CARRIER_KPI_EMPTY = "n/a";
 

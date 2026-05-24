@@ -14,6 +14,10 @@ export function TerminalLinkStrip() {
         <span className="font-bold whitespace-nowrap">Explore my terminal</span>
         <span className="text-[rgb(var(--green))] text-lg sm:text-2xl md:text-3xl motion-safe:animate-pulse">→</span>
       </Link>
+      <Link href="/carrier-journal" className={linkClass}>
+        <span className="font-bold whitespace-nowrap">Mailwalker</span>
+        <span className="text-[rgb(var(--green))] text-lg sm:text-2xl md:text-3xl motion-safe:animate-pulse">→</span>
+      </Link>
       <Link href="/meshtastic" className={linkClass}>
         <span className="font-bold whitespace-nowrap">{"//\\ Meshtastic"}</span>
         <span className="text-[rgb(var(--green))] text-lg sm:text-2xl md:text-3xl motion-safe:animate-pulse">→</span>

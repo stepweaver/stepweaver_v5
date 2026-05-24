@@ -24,10 +24,11 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: 'Content:', variant: 'lambda' },
       { content: '  resume: View resume (sections: summary, experience, …)', variant: 'default' },
       { content: '  codex: Browse blog (ls, cat, grep, exit)', variant: 'default' },
+      { content: '  carrier | mailwalker | fieldlog: Open Carrier\'s Log', variant: 'default' },
       { content: '  chat <message>: Ask Lambda about experience', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Navigation:', variant: 'lambda' },
-      { content: '  cd contact | codex | dice-roller | github', variant: 'default' },
+      { content: '  cd contact | codex | dice-roller | carrier-journal | github', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Features:', variant: 'lambda' },
       { content: '  weather [location] [--forecast] - no location: browser location, else New York', variant: 'default' },
@@ -59,13 +60,16 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       contact: '/contact',
       codex: '/codex',
       'dice-roller': '/dice-roller',
+      'carrier-journal': '/carrier-journal',
+      fieldlog: '/carrier-journal',
+      mailwalker: '/carrier-journal',
       github: 'https://github.com/stephen',
     };
     if (!dest) {
       return {
         lines: [
           { content: 'Usage: cd <destination>', variant: 'warning' },
-          { content: 'Available: contact, codex, dice-roller, github', variant: 'dimmed' },
+          { content: 'Available: contact, codex, dice-roller, carrier-journal, github', variant: 'dimmed' },
         ],
       };
     }
@@ -183,6 +187,42 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
         },
         { content: '', variant: 'default' },
         ...lines,
+      ],
+    };
+  },
+
+  carrier: (_args, ctx) => {
+    setTimeout(() => ctx.navigate('/carrier-journal'), 400);
+    return {
+      lines: [
+        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier —', variant: 'success' },
+        { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
+        { content: '', variant: 'default' },
+        { content: 'Opening /carrier-journal...', variant: 'dimmed' },
+      ],
+    };
+  },
+
+  mailwalker: (_args, ctx) => {
+    setTimeout(() => ctx.navigate('/carrier-journal'), 400);
+    return {
+      lines: [
+        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier —', variant: 'success' },
+        { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
+        { content: '', variant: 'default' },
+        { content: 'Opening /carrier-journal...', variant: 'dimmed' },
+      ],
+    };
+  },
+
+  fieldlog: (_args, ctx) => {
+    setTimeout(() => ctx.navigate('/carrier-journal'), 400);
+    return {
+      lines: [
+        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier —', variant: 'success' },
+        { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
+        { content: '', variant: 'default' },
+        { content: 'Opening /carrier-journal...', variant: 'dimmed' },
       ],
     };
   },

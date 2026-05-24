@@ -5,9 +5,9 @@ import { CarrierJournalPage } from "@/components/carrier-journal/carrier-journal
 export const revalidate = 300; // 5 minutes, matches Notion cache TTL
 
 export const metadata: Metadata = {
-  title: "Carrier Journal | Stephen Weaver",
+  title: "Carrier's Log | Stephen Weaver",
   description:
-    "A public-safe transformation journal from adapting to city mail delivery: miles, hydration, recovery, and field KPIs.",
+    "A public-safe letter carrier field log: miles, hydration, recovery, phase progression, and field KPIs from city mail routes.",
 };
 
 export default async function Page() {

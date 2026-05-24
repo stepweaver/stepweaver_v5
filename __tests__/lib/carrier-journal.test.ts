@@ -19,7 +19,7 @@ function dispatch(overrides: Partial<CarrierDispatch> & Pick<CarrierDispatch, "i
   };
 }
 
-describe("carrier journal totals", () => {
+describe("carrier's log totals", () => {
   it("returns empty totals for no dispatches", () => {
     const totals = computeTotalsFromDispatches([]);
     expect(totals.daysLogged).toBe(0);

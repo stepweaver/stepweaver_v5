@@ -8,10 +8,9 @@ import { BrandWordmark } from "@/components/ui/brand-wordmark";
 
 const NAV_LINKS = [
   { label: "Brief", href: "/brief" },
-  { label: "Capabilities", href: "/capabilities" },
-  { label: "Services", href: "/services" },
   { label: "Projects", href: "/projects" },
   { label: "Codex", href: "/codex" },
+  { label: "Carrier's Log", href: "/carrier-journal" },
   { label: "Terminal", href: "/terminal" },
   { label: "Contact", href: "/contact" },
 ];

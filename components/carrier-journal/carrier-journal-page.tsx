@@ -92,13 +92,13 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
         {/* Hero */}
         <div>
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
-            FIELD LOG // MAILWALKER
+            CARRIER&apos;S LOG // MAILWALKER
           </div>
           <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))] mb-4">
-            Carrier Journal
+            Carrier&apos;s Log
           </h1>
           <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
-            A public-safe transformation journal from starting overweight and learning city mail delivery:
+            A public-safe field log from starting overweight and learning life as a city letter carrier:
             miles, hydration, recovery, phase progression, and the operational lessons hiding inside a walking route.
           </p>
         </div>
@@ -106,10 +106,10 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
         {/* Disclaimer */}
         <div className="surface-panel p-5 sm:p-6 border-[rgb(var(--border)/0.3)]">
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-2">
-            NOTICE // UNOFFICIAL PERSONAL JOURNAL
+            NOTICE // UNOFFICIAL PERSONAL LOG
           </div>
           <p className="text-xs text-[rgb(var(--text-meta))] leading-relaxed">
-            Carrier Journal is an unofficial personal field log. It is not affiliated with, endorsed by, or
+            Carrier&apos;s Log is an unofficial personal field log. It is not affiliated with, endorsed by, or
             representative of the United States Postal Service or any other organization. Entries deliberately omit
             addresses, route numbers, customer names, coworker names, scanner data, and official mail volume figures.
             Weight and body data follow explicit public-sharing modes, and raw numbers are never shown unless configured.
@@ -233,7 +233,7 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             Why this belongs on a developer portfolio
           </h2>
           <p className="text-[rgb(var(--text-secondary))] text-sm mb-5 max-w-3xl leading-relaxed">
-            This is not just a journal. It is a live business-systems artifact: a data pipeline from physical experience
+            This is not just route notes. It is a live business-systems artifact: a data pipeline from physical experience
             to public KPIs, constrained by real-world conditions and a strict public/private boundary.
           </p>
           <div className="space-y-3">
@@ -272,7 +272,7 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             More systems. More artifacts.
           </h2>
           <p className="text-[rgb(var(--text-secondary))] text-sm mb-6 max-w-xl mx-auto">
-            Carrier Journal is one proof of the approach. The project catalog and codex have the rest.
+            Carrier&apos;s Log is one proof of the approach. The project catalog and codex have the rest.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/projects" className="glitch-button glitch-button--primary">

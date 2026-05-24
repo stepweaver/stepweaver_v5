@@ -2,12 +2,12 @@ import type { Project } from "../projects.schema";
 
 export const carrierJournal: Project = {
   slug: "carrier-journal",
-  title: "Carrier Journal",
+  title: "Carrier's Log",
   description:
-    "A public-safe carrier field journal that turns daily route experience into KPIs, dispatches, and operational reflection. Built as a portfolio artifact demonstrating mobile-first field UX, public/private data separation, personal KPI design, and narrative reporting from operational data.",
+    "A public-safe letter carrier field log that turns daily route experience into KPIs, dispatches, and operational reflection. Built as a portfolio artifact demonstrating mobile-first field UX, public/private data separation, personal KPI design, and narrative reporting from operational data.",
   status: "live",
   tags: ["Next.js", "Field Notes", "KPI Design", "Personal Systems", "Mobile UX"],
-  keywords: ["carrier", "mail carrier", "field journal", "kpi", "personal systems", "portfolio"],
+  keywords: ["carrier", "letter carrier", "field log", "kpi", "personal systems", "portfolio"],
   builtFor: "personal operational tracking and portfolio storytelling",
   solved: "turning a physically demanding job into structured, shareable field data",
   delivered: [
@@ -16,7 +16,7 @@ export const carrierJournal: Project = {
     "Operator reflection framing why the system belongs on a developer portfolio",
   ],
   cardDescription:
-    "A public-safe field journal and KPI dashboard from life as a city mail carrier: miles, steps, weather, soreness, and operational lessons.",
+    "A public-safe field log and KPI dashboard from life as a city letter carrier: miles, steps, weather, soreness, and operational lessons.",
   cardBuiltFor: "personal operational tracking",
   cardSolved: "turning physical field experience into structured portfolio data",
   cardDelivered: [
@@ -30,7 +30,7 @@ export const carrierJournal: Project = {
       title: "Overview",
       type: "overview",
       content:
-        "Carrier Journal is not a USPS project. It is a personal systems project: I became a city mail carrier and immediately started treating the experience as a field data problem. What physical load am I accumulating? How does weather affect output? How do I design a logging tool I will actually use mid-route?",
+        "Carrier's Log is not a USPS project. It is a personal systems project: I became a city letter carrier and immediately started treating the experience as a field data problem. What physical load am I accumulating? How does weather affect output? How do I design a logging tool I will actually use mid-route?",
     },
     {
       id: "problem",

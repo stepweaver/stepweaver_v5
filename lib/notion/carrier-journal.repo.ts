@@ -1,4 +1,4 @@
-// Carrier Journal DB (NOTION_CARRIER_JOURNAL_DB_ID).
+// Carrier's Log DB (NOTION_CARRIER_JOURNAL_DB_ID).
 // Only pages with Publish Public = true are ever returned; Private Note is never read.
 import { unstable_cache } from "next/cache";
 import type { PageObjectResponse, PartialPageObjectResponse } from "@notionhq/client/build/src/api-endpoints";

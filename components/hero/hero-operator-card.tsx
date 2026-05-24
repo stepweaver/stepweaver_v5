@@ -132,9 +132,9 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
               </Link>
 
               <div>
-                <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Current focus</p>
+                <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Current chapter</p>
                 <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] whitespace-normal leading-snug">
-                  DevOps engineering and infrastructure
+                  Mail carrier fieldwork + systems building
                 </p>
               </div>
             </div>
@@ -166,6 +166,12 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
             className="inline-flex cursor-pointer items-center justify-center border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--window)/0.2)] px-3 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.08em] text-[rgb(var(--text-meta))] transition-colors hover:border-[rgb(var(--neon)/0.4)] hover:bg-[rgb(var(--neon)/0.1)] hover:text-[rgb(var(--neon))]"
           >
             Terminal
+          </Link>
+          <Link
+            href="/carrier-journal"
+            className="inline-flex cursor-pointer items-center justify-center border border-[rgb(var(--cyan)/0.25)] bg-[rgb(var(--window)/0.2)] px-3 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.08em] text-[rgb(var(--cyan))] transition-colors hover:border-[rgb(var(--cyan)/0.55)] hover:bg-[rgb(var(--cyan)/0.1)]"
+          >
+            Carrier&apos;s Log
           </Link>
         </div>
 

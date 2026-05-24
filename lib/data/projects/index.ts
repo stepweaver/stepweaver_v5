@@ -21,22 +21,22 @@ import { soapStache } from "./soap-stache";
 import { stepweaverDev } from "./stepweaver-dev";
 import { websiteRefreshes } from "./website-refreshes";
 
-/** Homepage featured dossiers: v3 `carouselProjects.js` FEATURED_ORDER parity (8 entries). */
+/** Homepage featured dossiers: carrier-journal leads as the active living project. */
 const FEATURED_SLUGS = [
+  "carrier-journal",
   "stepweaver-dev",
-  "silent-auction",
-  "bill-planner",
-  "llambda-llm-agent",
   "portfolio-terminal",
   "iam-resist",
   "lcerebro",
   "lsigil-setup",
+  "bill-planner",
+  "silent-auction",
 ] as const;
 
-/** Full catalog sort: featured block first, then v3 REMAINING_ORDER. */
+/** Full catalog sort: featured block first, then remaining order. */
 const CATALOG_ORDER = [
   ...FEATURED_SLUGS,
-  "carrier-journal",
+  "llambda-llm-agent",
   "ai-integrations",
   "lambda-orthodontics",
   "service-business-demo",

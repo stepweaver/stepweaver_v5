@@ -19,6 +19,9 @@ export function Footer() {
           >
             GitHub
           </a>
+          <Link href="/carrier-journal" className="hover:text-[rgb(var(--neon))] transition-colors">
+            Carrier&apos;s Log
+          </Link>
           <Link href="/privacy" className="hover:text-[rgb(var(--neon))] transition-colors">
             Privacy
           </Link>

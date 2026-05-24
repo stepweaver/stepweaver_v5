@@ -148,6 +148,24 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
               </p>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-[rgb(var(--neon)/0.4)] via-[rgb(var(--neon)/0.1)] to-transparent" />
+            <div className="flex items-start gap-3 border-l-2 border-[rgb(var(--cyan)/0.5)] bg-[rgb(var(--panel)/0.2)] px-4 py-3 max-w-2xl">
+              <p className="font-[var(--font-ibm)] text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
+                Looking for the current field notes?{" "}
+                <Link
+                  href="/carrier-journal"
+                  className="text-[rgb(var(--cyan))] hover:text-[rgb(var(--neon))] transition-colors underline-offset-2 hover:underline"
+                >
+                  Carrier&apos;s Log
+                </Link>{" "}
+                is where I&apos;m documenting the physical and operational reality of becoming a letter carrier.{" "}
+                <Link
+                  href="/carrier-journal"
+                  className="inline-flex items-center gap-1 text-[rgb(var(--cyan))] hover:text-[rgb(var(--neon))] transition-colors font-medium whitespace-nowrap"
+                >
+                  Open Carrier&apos;s Log →
+                </Link>
+              </p>
+            </div>
           </div>
 
           {loading ? (

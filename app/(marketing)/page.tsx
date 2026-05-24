@@ -68,6 +68,7 @@ export default async function HomePage() {
             <TerminalLinkStrip />
           </div>
           <InkDivider />
+          <CurrentChapter />
           <QuickEntry />
         </div>
       </div>
@@ -75,12 +76,43 @@ export default async function HomePage() {
   );
 }
 
+function CurrentChapter() {
+  return (
+    <section className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 xl:px-14 pb-8">
+      <div className="relative border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)] p-5 sm:p-7">
+        <div className="pointer-events-none absolute left-0 top-0 h-5 w-5 border-l-2 border-t-2 border-[rgb(var(--cyan)/0.5)]" />
+        <div className="pointer-events-none absolute bottom-0 right-0 h-5 w-5 border-b-2 border-r-2 border-[rgb(var(--cyan)/0.5)]" />
+        <p className="font-[var(--font-ocr)] text-xs uppercase tracking-[0.28em] text-[rgb(var(--cyan)/0.7)] mb-2">
+          Current chapter
+        </p>
+        <h2 className="font-[var(--font-ibm)] text-xl sm:text-2xl font-semibold text-[rgb(var(--text-color))] mb-3 leading-snug">
+          Mail routes, miles, and systems thinking in the field.
+        </h2>
+        <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-3 max-w-3xl">
+          I&apos;m currently working as a mail carrier and documenting the adaptation: walking distance, hydration,
+          soreness, weather, weight trend, recovery, and the daily reality of learning a physical route job.
+        </p>
+        <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-5 max-w-3xl">
+          Carrier&apos;s Log is part field log, part transformation record, and part public proof that systems thinking
+          does not only happen behind a desk.
+        </p>
+        <a
+          href="/carrier-journal"
+          className="inline-flex items-center gap-2 border border-[rgb(var(--cyan)/0.35)] bg-[rgb(var(--window)/0.2)] px-4 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.1em] text-[rgb(var(--cyan))] transition-colors hover:border-[rgb(var(--cyan)/0.65)] hover:bg-[rgb(var(--cyan)/0.1)]"
+        >
+          Read Carrier&apos;s Log →
+        </a>
+      </div>
+    </section>
+  );
+}
+
 function QuickEntry() {
   const links = [
-    { label: "Services", href: "/services", desc: "What I build" },
-    { label: "Start Here", href: "/start-here", desc: "Find your path" },
+    { label: "Projects", href: "/projects", desc: "Proof of work" },
+    { label: "Carrier's Log", href: "/carrier-journal", desc: "Letter carrier field log" },
+    { label: "Codex", href: "/codex", desc: "Essays and notes" },
     { label: "Brief", href: "/brief", desc: "One-page dossier" },
-    { label: "Capabilities", href: "/capabilities", desc: "Proof of skill" },
   ];
 
   return (
