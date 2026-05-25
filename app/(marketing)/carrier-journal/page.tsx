@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { fetchCarrierDispatches } from "@/lib/notion/carrier-journal.repo";
-import { fetchAchievementUnlocks } from "@/lib/notion/carrier-achievement-unlocks.repo";
 import { CarrierJournalPage } from "@/components/carrier-journal/carrier-journal-page";
 
 export const revalidate = 300; // 5 minutes, matches Notion cache TTL
@@ -30,14 +29,10 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const [notionDispatches, notionUnlockedIds] = await Promise.all([
-    fetchCarrierDispatches(),
-    fetchAchievementUnlocks(),
-  ]);
+  const notionDispatches = await fetchCarrierDispatches();
   return (
     <CarrierJournalPage
       dispatches={notionDispatches.length > 0 ? notionDispatches : undefined}
-      notionUnlockedIds={notionUnlockedIds.length > 0 ? notionUnlockedIds : undefined}
     />
   );
 }

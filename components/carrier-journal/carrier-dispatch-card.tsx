@@ -44,10 +44,12 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
 
   return (
     <div className="surface-panel p-5 sm:p-6 space-y-3">
+      {/* Header: date, title, mail load */}
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-1">
-            {`${d.date} // DISPATCH ${d.id.toUpperCase()}`}
+            {d.date}
+            {d.phase ? ` // ${PHASE_LABEL[d.phase]}` : ""}
           </div>
           <h3 className="font-[var(--font-ibm)] text-lg text-[rgb(var(--text-color))] leading-snug">
             {d.title}
@@ -64,6 +66,14 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
         </div>
       </div>
 
+      {/* Authored narrative — primary content */}
+      {d.publicNote.trim() && (
+        <p className="text-sm text-[rgb(var(--text-color))] leading-relaxed border-l-2 border-[rgb(var(--neon)/0.4)] pl-3">
+          {d.publicNote}
+        </p>
+      )}
+
+      {/* KPI telemetry row — secondary */}
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-px bg-[rgb(var(--border)/0.12)]">
         {[
           { label: "MILES", value: `${d.milesWalked}` },
@@ -81,25 +91,9 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
         ))}
       </div>
 
-      {chips.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {chips.map((chip) => (
-            <span
-              key={chip.label}
-              className="font-[var(--font-ocr)] text-[9px] tracking-widest border px-1.5 py-0.5"
-              style={{
-                color: chip.color ?? "rgb(var(--text-secondary))",
-                borderColor: chip.color ?? "rgb(var(--border)/0.4)",
-              }}
-            >
-              {chip.label}
-            </span>
-          ))}
-        </div>
-      )}
-
-      <div className="flex flex-wrap items-center gap-3 text-xs text-[rgb(var(--text-secondary))]">
-        <span className="font-[var(--font-ocr)] tracking-wide">
+      {/* Meta row: weather, flags, hydration */}
+      <div className="flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--text-secondary))]">
+        <span className="font-[var(--font-ocr)] tracking-wide text-[rgb(var(--text-meta))]">
           {d.weather}
           {d.temperatureF ? ` · ${d.temperatureF}°F` : ""}
           {d.heatIndexF ? ` (feels ${d.heatIndexF}°F)` : ""}
@@ -117,8 +111,21 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
             DOG
           </span>
         )}
+        {chips.map((chip) => (
+          <span
+            key={chip.label}
+            className="font-[var(--font-ocr)] text-[9px] tracking-widest border px-1.5 py-0.5"
+            style={{
+              color: chip.color ?? "rgb(var(--text-secondary))",
+              borderColor: chip.color ?? "rgb(var(--border)/0.4)",
+            }}
+          >
+            {chip.label}
+          </span>
+        ))}
       </div>
 
+      {/* Body / recovery notes */}
       {(d.bodyNote || d.recoveryNote) && (
         <div className="flex flex-col sm:flex-row gap-2 text-xs">
           {d.bodyNote && (
@@ -138,12 +145,6 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
             </span>
           )}
         </div>
-      )}
-
-      {d.publicNote.trim() && (
-        <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed border-l-2 border-[rgb(var(--neon)/0.3)] pl-3">
-          {d.publicNote}
-        </p>
       )}
     </div>
   );
