@@ -6,6 +6,7 @@ export const carrierJournal: Project = {
   description:
     "A public-safe letter carrier field log that turns daily route experience into KPIs, dispatches, and operational reflection. Built as a portfolio artifact demonstrating mobile-first field UX, public/private data separation, personal KPI design, and narrative reporting from operational data.",
   status: "live",
+  imageUrl: "/images/carrier_log.png",
   tags: ["Next.js", "Field Notes", "KPI Design", "Personal Systems", "Mobile UX"],
   keywords: ["carrier", "letter carrier", "field log", "kpi", "personal systems", "portfolio"],
   builtFor: "personal operational tracking and portfolio storytelling",

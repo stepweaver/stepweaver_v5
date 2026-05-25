@@ -119,6 +119,8 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const bodyNote = str(p["Body Note"] as Props, "rich_text");
   const recoveryNote = str(p["Recovery Note"] as Props, "rich_text");
   const phase = parsePhase(sel(p.Phase as Props));
+  const rawTags = (p.Tags as Props)?.multi_select as { name?: string }[] | undefined;
+  const tags = rawTags?.map((t) => t.name ?? "").filter(Boolean);
 
   return {
     id: `cj-${page.id.replace(/-/g, "").slice(0, 8)}`,
@@ -146,6 +148,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(bodyNote && { bodyNote }),
     ...(recoveryNote && { recoveryNote }),
     ...(phase && { phase }),
+    ...(tags && tags.length > 0 && { tags }),
   };
 }
 

@@ -27,6 +27,7 @@ describe("carrier's log totals", () => {
     expect(totals.totalSteps).toBe(0);
     expect(totals.avgWaterOz).toBe(0);
     expect(totals.hydrationGoalHitRate).toBe(0);
+    expect(totals.dogEncounterDays).toBe(0);
     expect(totals.startingWeightLbs).toBeUndefined();
     expect(totals.latestWeightLbs).toBeUndefined();
     expect(totals.weightChangeLbs).toBeUndefined();
@@ -36,6 +37,16 @@ describe("carrier's log totals", () => {
       building: 0,
       regular: 0,
     });
+  });
+
+  it("counts dog encounter days correctly", () => {
+    const dispatches = [
+      dispatch({ id: "a", date: "2026-05-01", title: "A", dogEncounter: true }),
+      dispatch({ id: "b", date: "2026-05-02", title: "B" }),
+      dispatch({ id: "c", date: "2026-05-03", title: "C", dogEncounter: true }),
+    ];
+    const totals = computeTotalsFromDispatches(dispatches);
+    expect(totals.dogEncounterDays).toBe(2);
   });
 
   it("computes total miles and steps", () => {

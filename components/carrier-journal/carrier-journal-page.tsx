@@ -7,8 +7,13 @@ import {
   totalsToKpis,
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
+import {
+  evaluateCarrierAchievements,
+  STATIC_MANUAL_UNLOCK_IDS,
+} from "@/lib/data/carrier-achievements";
 import { CarrierKpiCard } from "./carrier-kpi-card";
 import { CarrierDispatchCard } from "./carrier-dispatch-card";
+import { CarrierAchievementsPanel } from "./carrier-achievements-panel";
 
 const TRACKING_ITEMS = [
   { category: "Physical load", detail: "Miles walked, steps, soreness, recovery signals, body notes" },
@@ -84,6 +89,12 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
     notionDispatches && notionDispatches.length > 0
       ? totalsToKpis(totals, dispatches)
       : getCarrierKpis();
+
+  const unlockedIds = evaluateCarrierAchievements(
+    dispatches,
+    totals,
+    new Set(STATIC_MANUAL_UNLOCK_IDS)
+  );
 
   return (
     <div className="min-h-screen pt-20 pb-16">
@@ -222,6 +233,11 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
               <CarrierDispatchCard key={d.id} dispatch={d} />
             ))}
           </div>
+        </div>
+
+        {/* Field Achievements */}
+        <div className="surface-panel p-6 sm:p-8">
+          <CarrierAchievementsPanel unlockedIds={unlockedIds} />
         </div>
 
         {/* Why This Belongs Here */}

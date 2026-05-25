@@ -34,6 +34,8 @@ export type CarrierDispatch = {
   bodyNote?: string;
   recoveryNote?: string;
   phase?: CarrierPhase;
+  /** Public-safe semantic tags for achievement evaluation and reflection filtering. */
+  tags?: string[];
 };
 
 export type CarrierKpi = {
@@ -50,6 +52,7 @@ export type CarrierTotals = {
   heatDays: number;
   weatherDays: number;
   heavyBrutalDays: number;
+  dogEncounterDays: number;
   avgSoreness: number;
   avgEnergy: number;
   avgMood: number;
@@ -209,6 +212,7 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
       heatDays: 0,
       weatherDays: 0,
       heavyBrutalDays: 0,
+      dogEncounterDays: 0,
       avgSoreness: 0,
       avgEnergy: 0,
       avgMood: 0,
@@ -227,6 +231,7 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
   const heavyBrutalDays = dispatches.filter(
     (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal"
   ).length;
+  const dogEncounterDays = dispatches.filter((d) => d.dogEncounter).length;
   const avgSoreness = dispatches.reduce((s, d) => s + d.soreness, 0) / count;
   const avgEnergy = dispatches.reduce((s, d) => s + d.energy, 0) / count;
   const avgMood = dispatches.reduce((s, d) => s + d.mood, 0) / count;
@@ -281,6 +286,7 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
     heatDays,
     weatherDays,
     heavyBrutalDays,
+    dogEncounterDays,
     avgSoreness: Math.round(avgSoreness * 10) / 10,
     avgEnergy: Math.round(avgEnergy * 10) / 10,
     avgMood: Math.round(avgMood * 10) / 10,
