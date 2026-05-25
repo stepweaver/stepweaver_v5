@@ -48,9 +48,9 @@ function titleStr(prop: Props | undefined): string {
 
 type QueryPage = PageObjectResponse | PartialPageObjectResponse;
 
-async function fetchUnlocksUncached(): Promise<Set<string>> {
+async function fetchUnlocksUncached(): Promise<string[]> {
   const dbId = getDbId();
-  if (!dbId || !(process.env.NOTION_API_KEY ?? "").trim()) return new Set();
+  if (!dbId || !(process.env.NOTION_API_KEY ?? "").trim()) return [];
 
   try {
     const pages = await paginate<QueryPage>((cursor) =>
@@ -61,24 +61,26 @@ async function fetchUnlocksUncached(): Promise<Set<string>> {
       })
     );
 
-    const ids = new Set<string>();
+    const ids: string[] = [];
+    const seen = new Set<string>();
     for (const page of pages as PageObjectResponse[]) {
       if (!page || !("properties" in page)) continue;
       const p = page.properties as Record<string, unknown>;
       const achievementId = titleStr(p["Achievement ID"] as Props);
-      if (achievementId && VALID_IDS.has(achievementId)) {
-        ids.add(achievementId);
+      if (achievementId && VALID_IDS.has(achievementId) && !seen.has(achievementId)) {
+        seen.add(achievementId);
+        ids.push(achievementId);
       }
     }
     return ids;
   } catch (err) {
     logError("fetchUnlocks", err);
-    return new Set();
+    return [];
   }
 }
 
-export async function fetchAchievementUnlocks(): Promise<Set<string>> {
-  if (!isConfigured()) return new Set();
+export async function fetchAchievementUnlocks(): Promise<string[]> {
+  if (!isConfigured()) return [];
   return unstable_cache(
     async () => fetchUnlocksUncached(),
     ["notion-carrier-achievement-unlocks"],

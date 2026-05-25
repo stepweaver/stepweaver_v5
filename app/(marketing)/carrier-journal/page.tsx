@@ -37,7 +37,7 @@ export default async function Page() {
   return (
     <CarrierJournalPage
       dispatches={notionDispatches.length > 0 ? notionDispatches : undefined}
-      notionUnlockedIds={notionUnlockedIds}
+      notionUnlockedIds={notionUnlockedIds.length > 0 ? notionUnlockedIds : undefined}
     />
   );
 }

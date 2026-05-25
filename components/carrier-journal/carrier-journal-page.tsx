@@ -82,7 +82,7 @@ const WHY_THIS_BELONGS = [
 type Props = {
   dispatches?: CarrierDispatch[];
   /** Achievement IDs already stored in the Notion Achievement Unlocks DB. */
-  notionUnlockedIds?: Set<string>;
+  notionUnlockedIds?: string[];
 };
 
 export function CarrierJournalPage({
@@ -103,14 +103,17 @@ export function CarrierJournalPage({
     new Set(STATIC_MANUAL_UNLOCK_IDS)
   );
 
+  // Reconstruct a Set from the serializable string[] prop.
+  const notionUnlockedSet = notionUnlockedIds ? new Set(notionUnlockedIds) : undefined;
+
   // Merge computed IDs with any manually-added Notion rows (manual field unlocks).
-  const allUnlockedIds = notionUnlockedIds
-    ? new Set([...evaluatedIds, ...notionUnlockedIds])
+  const allUnlockedIds = notionUnlockedSet
+    ? new Set([...evaluatedIds, ...notionUnlockedSet])
     : evaluatedIds;
 
   // IDs that are newly computed but not yet in Notion → trigger write-back.
-  const newlyUnlockedIds = notionUnlockedIds
-    ? [...evaluatedIds].filter((id) => !notionUnlockedIds.has(id))
+  const newlyUnlockedIds = notionUnlockedSet
+    ? [...evaluatedIds].filter((id) => !notionUnlockedSet.has(id))
     : [];
 
   return (
