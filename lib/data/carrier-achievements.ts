@@ -1220,13 +1220,15 @@ export const ACHIEVEMENTS: CarrierAchievement[] = [
 ];
 
 /**
- * Achievements the system cannot infer from dispatch data alone.
- * Update this list as milestones are manually confirmed.
+ * System-level bootstraps that unlock by virtue of the app existing.
+ * These have no corresponding field entry and are never written to Notion.
+ *
+ * All other manual achievements (shadow_day, first_satchel, first_blue_day,
+ * scanner_basics, met_steward, etc.) should be rows in the
+ * NOTION_ACHIEVEMENT_UNLOCKS_DB_ID database. Add a row with the achievement's
+ * id as "Achievement ID" and today's date as "Unlocked At" to mark it off.
  */
 export const STATIC_MANUAL_UNLOCK_IDS: string[] = [
-  "shadow_day",
-  "first_blue_day",
-  "scanner_basics",
   "notion_wired",
   "kpi_dashboard",
   "portfolio_artifact",
@@ -1575,6 +1577,16 @@ export function evaluateCarrierAchievements(
     "came_back_anyway",
     sorted.some((_, i) => i > 0 && sorted[i - 1].mailLoad === "brutal")
   );
+
+  // ── Tag-based override ────────────────────────────────────────────────────
+  // Any dispatch entry tagged with an achievement's id unlocks it.
+  // This is the primary field workflow: add the achievement ID to a dispatch
+  // entry's Tags multi-select in Notion to mark it as earned.
+  for (const achievement of ACHIEVEMENTS) {
+    if (!unlocked.has(achievement.id)) {
+      unlock(achievement.id, hasTag(achievement.id));
+    }
+  }
 
   return unlocked;
 }

@@ -14,6 +14,7 @@ import {
 import { CarrierKpiCard } from "./carrier-kpi-card";
 import { CarrierDispatchCard } from "./carrier-dispatch-card";
 import { CarrierAchievementsPanel } from "./carrier-achievements-panel";
+import { CarrierAchievementSync } from "./carrier-achievement-sync";
 
 const TRACKING_ITEMS = [
   { category: "Physical load", detail: "Miles walked, steps, soreness, recovery signals, body notes" },
@@ -80,9 +81,14 @@ const WHY_THIS_BELONGS = [
 
 type Props = {
   dispatches?: CarrierDispatch[];
+  /** Achievement IDs already stored in the Notion Achievement Unlocks DB. */
+  notionUnlockedIds?: Set<string>;
 };
 
-export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {}) {
+export function CarrierJournalPage({
+  dispatches: notionDispatches,
+  notionUnlockedIds,
+}: Props = {}) {
   const dispatches = notionDispatches ?? getCarrierDispatches();
   const totals = computeTotalsFromDispatches(dispatches);
   const kpis =
@@ -90,11 +96,22 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
       ? totalsToKpis(totals, dispatches)
       : getCarrierKpis();
 
-  const unlockedIds = evaluateCarrierAchievements(
+  // Achievements computed fresh from dispatch data + static bootstraps.
+  const evaluatedIds = evaluateCarrierAchievements(
     dispatches,
     totals,
     new Set(STATIC_MANUAL_UNLOCK_IDS)
   );
+
+  // Merge computed IDs with any manually-added Notion rows (manual field unlocks).
+  const allUnlockedIds = notionUnlockedIds
+    ? new Set([...evaluatedIds, ...notionUnlockedIds])
+    : evaluatedIds;
+
+  // IDs that are newly computed but not yet in Notion → trigger write-back.
+  const newlyUnlockedIds = notionUnlockedIds
+    ? [...evaluatedIds].filter((id) => !notionUnlockedIds.has(id))
+    : [];
 
   return (
     <div className="min-h-screen pt-20 pb-16">
@@ -237,8 +254,11 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
 
         {/* Field Achievements */}
         <div className="surface-panel p-6 sm:p-8">
-          <CarrierAchievementsPanel unlockedIds={unlockedIds} />
+          <CarrierAchievementsPanel unlockedIds={allUnlockedIds} />
         </div>
+
+        {/* Write newly-computed achievements back to Notion (client, fire-and-forget) */}
+        <CarrierAchievementSync newlyUnlockedIds={newlyUnlockedIds} />
 
         {/* Why This Belongs Here */}
         <div className="surface-panel p-6 sm:p-8">
