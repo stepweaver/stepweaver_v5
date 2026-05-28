@@ -44,7 +44,7 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
   }
 
   return (
-    <div className="surface-panel p-5 sm:p-6 space-y-3">
+    <div id={d.id} className="surface-panel p-5 sm:p-6 space-y-3">
       {/* Header: date, title, mail load */}
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>

@@ -66,7 +66,8 @@ const ACCOUNTABLE_SERVICES = new Set([
   "cod",
   "insured_signature",
   "signature_confirmation",
-  "arrow_key",
+  "postage_due",
+  "customs_due",
 ]);
 
 function isCriticalMistake(
@@ -82,11 +83,7 @@ function isCriticalMistake(
     if (NEVER_UBBM_CLASSES.has(card.class)) return true;
     if (card.isAccountable) return true;
     if (ACCOUNTABLE_SERVICES.has(card.extraService)) return true;
-    if (
-      card.mailerEndorsement === "return_service_requested" ||
-      card.mailerEndorsement === "address_service_requested"
-    )
-      return true;
+    if (card.mailerEndorsement !== "none") return true;
   }
 
   if (

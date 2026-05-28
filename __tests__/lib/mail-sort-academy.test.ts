@@ -37,10 +37,157 @@ describe("UBBM rules", () => {
     expect(c.isUBBM).toBe(false);
   });
 
-  test("Marketing Mail ESR undeliverable (MSA-020) IS UBBM", () => {
+  test("Marketing Mail ESR undeliverable (MSA-020) is NOT UBBM – goes to CFS", () => {
     const c = card("MSA-020");
     expect(c.mailerEndorsement).toBe("electronic_service_requested");
+    expect(c.isUBBM).toBe(false);
+    expect(c.correctBin).toBe("forward_cfs");
+  });
+});
+
+// ─── Endorsed Marketing Mail routing ─────────────────────────────────────────
+
+describe("Endorsed Marketing Mail routing", () => {
+  test("ASR Marketing Mail with active COA (MSA-012) goes to forward_cfs", () => {
+    const c = card("MSA-012");
+    expect(c.mailerEndorsement).toBe("address_service_requested");
+    expect(c.isUBBM).toBe(false);
+    expect(c.correctBin).toBe("forward_cfs");
+  });
+
+  test("CSR Marketing Mail (MSA-041) goes to forward_cfs, not return_to_sender", () => {
+    const c = card("MSA-041");
+    expect(c.mailerEndorsement).toBe("change_service_requested");
+    expect(c.isUBBM).toBe(false);
+    expect(c.correctBin).toBe("forward_cfs");
+  });
+
+  test("ESR Marketing Mail (MSA-020) goes to forward_cfs, not UBBM", () => {
+    const c = card("MSA-020");
+    expect(c.mailerEndorsement).toBe("electronic_service_requested");
+    expect(c.isUBBM).toBe(false);
+    expect(c.correctBin).toBe("forward_cfs");
+  });
+
+  test("routing ESR Marketing Mail to UBBM is a CRITICAL MISTAKE", () => {
+    const c = card("MSA-020");
+    const result = evaluateAnswer(c, "ubbm_or_not", "ubbm");
+    expect(result.criticalMistake).toBe(true);
+    expect(result.points).toBe(-100);
+  });
+
+  test("routing ASR Marketing Mail to UBBM is a CRITICAL MISTAKE", () => {
+    const c = card("MSA-012");
+    const result = evaluateAnswer(c, "ubbm_or_not", "ubbm");
+    expect(result.criticalMistake).toBe(true);
+    expect(result.points).toBe(-100);
+  });
+
+  test("routing CSR Marketing Mail to UBBM is a CRITICAL MISTAKE", () => {
+    const c = card("MSA-041");
+    const result = evaluateAnswer(c, "ubbm_or_not", "ubbm");
+    expect(result.criticalMistake).toBe(true);
+    expect(result.points).toBe(-100);
+  });
+});
+
+// ─── Periodicals routing ──────────────────────────────────────────────────────
+
+describe("Periodicals routing", () => {
+  test("Periodical for moved addressee (MSA-014) goes to forward_cfs", () => {
+    const c = card("MSA-014");
+    expect(c.class).toBe("periodicals");
+    expect(c.isUBBM).toBe(false);
+    expect(c.correctBin).toBe("forward_cfs");
+  });
+
+  test("routing Periodicals to UBBM in route_case_sim is CRITICAL", () => {
+    const c = card("MSA-014");
+    const result = evaluateAnswer(c, "route_case_sim", "ubbm");
+    expect(result.criticalMistake).toBe(true);
+    expect(result.points).toBe(-100);
+  });
+});
+
+// ─── VAC endorsement scope ────────────────────────────────────────────────────
+
+describe("VAC endorsement scope", () => {
+  test("MSA-028 is now Occupant Marketing Mail at a vacant address", () => {
+    const c = card("MSA-028");
+    expect(c.class).toBe("usps_marketing_mail");
+    expect(c.correctCarrierEndorsement).toBe("vac");
     expect(c.isUBBM).toBe(true);
+    expect(c.correctBin).toBe("ubbm");
+  });
+});
+
+// ─── Postage Due accountable ──────────────────────────────────────────────────
+
+describe("Postage Due accountable handling", () => {
+  test("Postage Due (MSA-038) is accountable", () => {
+    const c = card("MSA-038");
+    expect(c.extraService).toBe("postage_due");
+    expect(c.isAccountable).toBe(true);
+    expect(c.isUBBM).toBe(false);
+  });
+
+  test("Postage Due refused (MSA-045) is accountable", () => {
+    const c = card("MSA-045");
+    expect(c.extraService).toBe("postage_due");
+    expect(c.isAccountable).toBe(true);
+    expect(c.isUBBM).toBe(false);
+  });
+
+  test("routing Postage Due to UBBM bin is CRITICAL", () => {
+    const c = card("MSA-038");
+    const result = evaluateAnswer(c, "accountable_chain", "ubbm");
+    expect(result.criticalMistake).toBe(true);
+    expect(result.points).toBe(-100);
+  });
+});
+
+// ─── Priority Mail Express accountable ───────────────────────────────────────
+
+describe("Priority Mail Express special handling (MSA-037)", () => {
+  test("PME Notice Required card is accountable and never UBBM", () => {
+    const c = card("MSA-037");
+    expect(c.class).toBe("priority_mail_express");
+    expect(c.isAccountable).toBe(true);
+    expect(c.isUBBM).toBe(false);
+    expect(c.correctBin).toBe("leave_notice");
+  });
+
+  test("routing PME to UBBM in accountable_chain is CRITICAL", () => {
+    const c = card("MSA-037");
+    const result = evaluateAnswer(c, "accountable_chain", "ubbm");
+    expect(result.criticalMistake).toBe(true);
+    expect(result.points).toBe(-100);
+  });
+});
+
+// ─── Unendorsed Marketing Mail still UBBM ────────────────────────────────────
+
+describe("Unendorsed Marketing Mail remains UBBM when undeliverable", () => {
+  test("Unendorsed Marketing Mail at vacant address (MSA-011) IS UBBM", () => {
+    const c = card("MSA-011");
+    expect(c.class).toBe("usps_marketing_mail");
+    expect(c.mailerEndorsement).toBe("none");
+    expect(c.isUBBM).toBe(true);
+    expect(c.correctBin).toBe("ubbm");
+  });
+
+  test("Unendorsed Marketing Mail to unknown addressee (MSA-018) IS UBBM", () => {
+    const c = card("MSA-018");
+    expect(c.class).toBe("usps_marketing_mail");
+    expect(c.mailerEndorsement).toBe("none");
+    expect(c.isUBBM).toBe(true);
+  });
+
+  test("Occupant Marketing Mail at vacant unit (MSA-028) IS UBBM", () => {
+    const c = card("MSA-028");
+    expect(c.mailerEndorsement).toBe("none");
+    expect(c.isUBBM).toBe(true);
+    expect(c.correctBin).toBe("ubbm");
   });
 });
 

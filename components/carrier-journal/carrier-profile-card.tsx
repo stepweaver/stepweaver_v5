@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const CARRIER_TAGS = ["City Carrier Assistant", "Mailwalker", "Transformation Arc"];
+const CARRIER_TAGS = ["City Carrier", "Mailwalker", "Transformation Arc"];
 
 export function CarrierProfileCard() {
   return (
@@ -68,7 +68,7 @@ export function CarrierProfileCard() {
                 Role
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                City Carrier Assistant · USPS · Mailwalker in Progress
+                City Carrier · USPS · Mailwalker in Progress
               </p>
             </div>
 

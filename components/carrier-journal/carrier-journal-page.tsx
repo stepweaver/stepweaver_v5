@@ -9,6 +9,7 @@ import {
 } from "@/lib/data/carrier-journal";
 import { CarrierKpiCard } from "./carrier-kpi-card";
 import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
+import { CarrierFieldCalendar } from "./carrier-field-calendar";
 import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 import { CarrierProfileCard } from "./carrier-profile-card";
 
@@ -135,6 +136,9 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             ))}
           </div>
         </div>
+
+        {/* Field Calendar — logged days derived from dispatch data, no schedule claims */}
+        <CarrierFieldCalendar dispatches={dispatches} />
 
         {/* Field Badges — cumulative milestones computed from dispatch data */}
         <CarrierMilestonePanel dispatches={dispatches} />
