@@ -220,6 +220,83 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
           </div>
         </div>
 
+        {/* Mail Sort Academy Promo */}
+        <div className="relative border border-[rgb(var(--neon)/0.35)] bg-[rgb(var(--panel))] overflow-hidden">
+          {/* Corner accent */}
+          <div className="absolute top-0 right-0 w-16 h-16 border-b border-l border-[rgb(var(--neon)/0.25)]" />
+
+          <div className="p-6 sm:p-8">
+            <div className="flex flex-col sm:flex-row sm:items-start gap-6">
+              <div className="flex-1 space-y-4">
+                <div>
+                  <div className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))] mb-2">
+                    TRAINING MODULE // ACTIVE
+                  </div>
+                  <h2 className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--neon))] mb-2">
+                    Mail Sort Academy
+                  </h2>
+                  <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed max-w-lg">
+                    An unofficial study game built from inside the job. Practice mail classification, UBBM
+                    decisions, carrier endorsements, and accountable handling. The real decisions you face
+                    every dispatch, turned into a scored drill.
+                  </p>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+                  {[
+                    { tag: "MODE-01", label: "Class Sort", note: "Rookie friendly" },
+                    { tag: "MODE-02", label: "UBBM or Not", note: "Regular carrier" },
+                    { tag: "MODE-03", label: "Endorsement Drill", note: "Regular carrier" },
+                    { tag: "MODE-04", label: "Accountable Chain", note: "Inspection level" },
+                    { tag: "MODE-05", label: "Route Case Simulation", note: "Mixed difficulty" },
+                  ].map((m) => (
+                    <div key={m.tag} className="flex items-baseline gap-2">
+                      <span className="font-[var(--font-ocr)] text-[9px] text-[rgb(var(--neon)/0.4)] shrink-0">
+                        {m.tag}
+                      </span>
+                      <span className="text-xs text-[rgb(var(--text-color))]">{m.label}</span>
+                      <span className="text-[10px] text-[rgb(var(--text-meta))] ml-auto hidden sm:block">
+                        {m.note}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="pt-2">
+                  <Link
+                    href="/mail-sort-academy"
+                    className="glitch-button glitch-button--primary inline-flex items-center gap-2"
+                  >
+                    Launch Training
+                    <span className="font-[var(--font-ocr)] text-[10px] tracking-widest opacity-70">▶</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Right badge column */}
+              <div className="sm:shrink-0 flex sm:flex-col gap-3 sm:gap-2 flex-wrap">
+                {[
+                  { value: "5", label: "TRAINING MODES" },
+                  { value: "7", label: "STUDY RULES" },
+                  { value: "∞", label: "SCORED DRILLS" },
+                ].map((stat) => (
+                  <div
+                    key={stat.label}
+                    className="border border-[rgb(var(--neon)/0.2)] px-4 py-3 text-center min-w-[90px]"
+                  >
+                    <div className="font-[var(--font-ibm)] text-2xl text-[rgb(var(--neon))]">
+                      {stat.value}
+                    </div>
+                    <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] mt-0.5">
+                      {stat.label}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Why This Belongs Here */}
         <div className="surface-panel p-6 sm:p-8">
           <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--neon))] mb-2">
@@ -271,7 +348,10 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             Carrier&apos;s Log is one proof of the approach. The project catalog and codex have the rest.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/projects" className="glitch-button glitch-button--primary">
+            <Link href="/mail-sort-academy" className="glitch-button glitch-button--primary">
+              Mail Sort Academy
+            </Link>
+            <Link href="/projects" className="glitch-button">
               View Projects
             </Link>
             <Link href="/codex" className="glitch-button">
