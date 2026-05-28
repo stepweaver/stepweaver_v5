@@ -27,7 +27,7 @@ export function CarrierProfileCard() {
           <div className="tracking-[0.18em] text-[rgb(var(--text-meta))] uppercase font-[var(--font-ocr)] text-xs">
             Carrier ID
           </div>
-          <div className="font-mono text-[rgb(var(--cyan))] whitespace-nowrap">CCA-01</div>
+          <div className="font-mono text-[rgb(var(--cyan))] whitespace-nowrap">PTF-01</div>
         </div>
       </header>
 
