@@ -1,4 +1,5 @@
 import type { CarrierDispatch, CarrierPhase, MailLoad } from "@/lib/data/carrier-journal";
+import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
 
 const MAIL_LOAD_LABEL: Record<MailLoad, string> = {
   light: "LIGHT",
@@ -68,9 +69,16 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
 
       {/* Authored narrative — primary content */}
       {d.publicNote.trim() && (
-        <p className="text-sm text-[rgb(var(--text-color))] leading-relaxed border-l-2 border-[rgb(var(--neon)/0.4)] pl-3">
-          {d.publicNote}
-        </p>
+        <div className="border-l-2 border-[rgb(var(--neon)/0.4)] pl-3 space-y-3">
+          {splitPublicNoteParagraphs(d.publicNote).map((paragraph, index) => (
+            <p
+              key={index}
+              className="text-sm text-[rgb(var(--text-color))] leading-relaxed whitespace-pre-line"
+            >
+              {paragraph}
+            </p>
+          ))}
+        </div>
       )}
 
       {/* KPI telemetry row — secondary */}

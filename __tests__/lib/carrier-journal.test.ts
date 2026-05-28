@@ -4,6 +4,8 @@ import {
   formatPublicWeightTrend,
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
+import { getCarrierLevel, getCarrierMilestones } from "@/lib/data/carrier-milestones";
+import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
 
 function dispatch(overrides: Partial<CarrierDispatch> & Pick<CarrierDispatch, "id" | "date" | "title">): CarrierDispatch {
   return {
@@ -102,6 +104,173 @@ describe("carrier's log totals", () => {
     expect(totals.startingWeightLbs).toBe(248);
     expect(totals.latestWeightLbs).toBe(243.8);
     expect(totals.weightChangeLbs).toBe(-4.2);
+  });
+});
+
+describe("getCarrierLevel", () => {
+  it("returns Academy Walker at 0 miles", () => {
+    const level = getCarrierLevel([]);
+    expect(level.title).toBe("Academy Walker");
+    expect(level.level).toBe(1);
+    expect(level.xp).toBe(0);
+  });
+
+  it("returns Block Rookie between 10 and 24 miles", () => {
+    const level = getCarrierLevel([
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 15 }),
+    ]);
+    expect(level.title).toBe("Block Rookie");
+    expect(level.level).toBe(2);
+  });
+
+  it("returns Pavement Regular at exactly 100 miles", () => {
+    const level = getCarrierLevel([
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 100 }),
+    ]);
+    expect(level.title).toBe("Pavement Regular");
+    expect(level.level).toBe(5);
+  });
+
+  it("returns Thousand-Mile Carrier at 1000+ miles", () => {
+    const level = getCarrierLevel([
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 1200 }),
+    ]);
+    expect(level.title).toBe("Thousand-Mile Carrier");
+    expect(level.progressToNext).toBe(100);
+    expect(level.nextTitle).toBeUndefined();
+  });
+
+  it("computes XP as round(totalMiles * 10)", () => {
+    const level = getCarrierLevel([
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 9.5 }),
+    ]);
+    expect(level.xp).toBe(95);
+  });
+
+  it("computes progressToNext as a percentage", () => {
+    const level = getCarrierLevel([
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 17.5 }),
+    ]);
+    // 17.5 miles → Block Rookie (10–25 range). Progress = (17.5-10)/(25-10)*100 = 50%
+    expect(level.title).toBe("Block Rookie");
+    expect(level.progressToNext).toBe(50);
+  });
+});
+
+describe("getCarrierMilestones", () => {
+  it("unlocks first-dispatch when one dispatch exists", () => {
+    const milestones = getCarrierMilestones([
+      dispatch({ id: "a", date: "2026-05-01", title: "A" }),
+    ]);
+    const badge = milestones.find((m) => m.id === "first-dispatch");
+    expect(badge?.unlocked).toBe(true);
+    expect(badge?.unlockedAt).toBe("2026-05-01");
+  });
+
+  it("does not unlock five-dispatches with only 3 dispatches", () => {
+    const dispatches = [
+      dispatch({ id: "a", date: "2026-05-01", title: "A" }),
+      dispatch({ id: "b", date: "2026-05-02", title: "B" }),
+      dispatch({ id: "c", date: "2026-05-03", title: "C" }),
+    ];
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "five-dispatches");
+    expect(badge?.unlocked).toBe(false);
+    expect(badge?.progress).toBe(3);
+  });
+
+  it("unlocks hundred-miles badge when total miles >= 100", () => {
+    const dispatches = [
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 60 }),
+      dispatch({ id: "b", date: "2026-05-02", title: "B", milesWalked: 50 }),
+    ];
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "hundred-miles");
+    expect(badge?.unlocked).toBe(true);
+  });
+
+  it("uses heatIndexF for first-heat-80 badge when heatIndexF >= 80", () => {
+    const dispatches = [
+      dispatch({
+        id: "a",
+        date: "2026-05-01",
+        title: "A",
+        temperatureF: 75,
+        heatIndexF: 82,
+      }),
+    ];
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-80");
+    expect(badge?.unlocked).toBe(true);
+  });
+
+  it("does not unlock first-heat-80 when temp and heatIndex are both below 80", () => {
+    const dispatches = [
+      dispatch({ id: "a", date: "2026-05-01", title: "A", temperatureF: 75 }),
+    ];
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-80");
+    expect(badge?.unlocked).toBe(false);
+  });
+
+  it("unlocks Good Samaritan badge from tags", () => {
+    const dispatches = [
+      dispatch({
+        id: "a",
+        date: "2026-05-01",
+        title: "A",
+        tags: ["good-samaritan"],
+      }),
+    ];
+    const badge = getCarrierMilestones(dispatches).find(
+      (m) => m.id === "first-good-samaritan"
+    );
+    expect(badge?.unlocked).toBe(true);
+  });
+
+  it("unlocks Good Samaritan badge from goodSamaritanAct flag", () => {
+    const dispatches = [
+      dispatch({
+        id: "a",
+        date: "2026-05-01",
+        title: "A",
+        goodSamaritanAct: true,
+      }),
+    ];
+    const badge = getCarrierMilestones(dispatches).find(
+      (m) => m.id === "first-good-samaritan"
+    );
+    expect(badge?.unlocked).toBe(true);
+  });
+});
+
+describe("splitPublicNoteParagraphs", () => {
+  it("splits blank-line-separated paragraphs", () => {
+    const text = "First paragraph.\n\nSecond paragraph.";
+    expect(splitPublicNoteParagraphs(text)).toEqual([
+      "First paragraph.",
+      "Second paragraph.",
+    ]);
+  });
+
+  it("preserves single line breaks within a paragraph", () => {
+    const text = "Line one.\nLine two.";
+    expect(splitPublicNoteParagraphs(text)).toEqual(["Line one.\nLine two."]);
+  });
+
+  it("trims leading and trailing whitespace from each paragraph", () => {
+    const text = "  First.  \n\n  Second.  ";
+    expect(splitPublicNoteParagraphs(text)).toEqual(["First.", "Second."]);
+  });
+
+  it("filters out blank-only paragraphs", () => {
+    const text = "First.\n\n\n\nSecond.";
+    expect(splitPublicNoteParagraphs(text)).toEqual(["First.", "Second."]);
+  });
+
+  it("returns empty array for empty string", () => {
+    expect(splitPublicNoteParagraphs("")).toEqual([]);
+  });
+
+  it("returns a single paragraph when there are no blank lines", () => {
+    const text = "Just one paragraph here.";
+    expect(splitPublicNoteParagraphs(text)).toEqual(["Just one paragraph here."]);
   });
 });
 

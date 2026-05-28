@@ -34,11 +34,12 @@ function logError(context: string, err: unknown): void {
 }
 
 type Props = Record<string, unknown>;
+type RichTextFragment = { plain_text?: string };
 
 function str(prop: Props | undefined, key: "title" | "rich_text"): string {
   if (!prop) return "";
-  const arr = prop[key] as { plain_text?: string }[] | undefined;
-  return arr?.[0]?.plain_text ?? "";
+  const arr = prop[key] as RichTextFragment[] | undefined;
+  return arr?.map((fragment) => fragment.plain_text ?? "").join("") ?? "";
 }
 
 function num(prop: Props | undefined): number | undefined {
@@ -120,7 +121,8 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const recoveryNote = str(p["Recovery Note"] as Props, "rich_text");
   const phase = parsePhase(sel(p.Phase as Props));
   const rawTags = (p.Tags as Props)?.multi_select as { name?: string }[] | undefined;
-  const tags = rawTags?.map((t) => t.name ?? "").filter(Boolean);
+  const badges = rawTags?.map((t) => t.name ?? "").filter(Boolean);
+  const goodSamaritanAct = check(p["Good Samaritan Act"] as Props);
 
   return {
     id: `cj-${page.id.replace(/-/g, "").slice(0, 8)}`,
@@ -148,7 +150,8 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(bodyNote && { bodyNote }),
     ...(recoveryNote && { recoveryNote }),
     ...(phase && { phase }),
-    ...(tags && tags.length > 0 && { tags }),
+    ...(badges && badges.length > 0 && { badges }),
+    ...(goodSamaritanAct && { goodSamaritanAct }),
   };
 }
 

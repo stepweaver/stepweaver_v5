@@ -34,8 +34,10 @@ export type CarrierDispatch = {
   bodyNote?: string;
   recoveryNote?: string;
   phase?: CarrierPhase;
-  /** Public-safe semantic tags for achievement evaluation and reflection filtering. */
+  /** Public-safe semantic tags for milestone evaluation and reflection filtering. */
   tags?: string[];
+  /** Optional flag for a Good Samaritan act logged during the dispatch. */
+  goodSamaritanAct?: boolean;
 };
 
 export type CarrierKpi = {

@@ -9,6 +9,7 @@ import {
 } from "@/lib/data/carrier-journal";
 import { CarrierKpiCard } from "./carrier-kpi-card";
 import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
+import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 
 const TRACKING_ITEMS = [
   { category: "Physical load", detail: "Miles walked, steps, soreness, recovery signals, body notes" },
@@ -128,6 +129,9 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             ))}
           </div>
         </div>
+
+        {/* Field Badges — cumulative milestones computed from dispatch data */}
+        <CarrierMilestonePanel dispatches={dispatches} />
 
         {/* Field Dispatches — live authored content, directly after KPIs */}
         <div>
