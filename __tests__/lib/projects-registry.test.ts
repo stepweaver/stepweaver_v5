@@ -20,7 +20,7 @@ describe("projects registry", () => {
   it("returns carousel projects", () => {
     const carousel = getHomepageCarouselProjects();
     expect(carousel.length).toBe(8);
-    expect(carousel[0].slug).toBe("stepweaver-dev");
+    expect(carousel[0].slug).toBe("carrier-journal");
   });
 
   it("returns all unique tags", () => {

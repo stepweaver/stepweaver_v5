@@ -18,24 +18,26 @@ import { rpgDiceRoller } from "./rpg-dice-roller";
 import { serviceBusinessDemo } from "./service-business-demo";
 import { silentAuction } from "./silent-auction";
 import { soapStache } from "./soap-stache";
+import { mailSortAcademy } from "./mail-sort-academy";
 import { stepweaverDev } from "./stepweaver-dev";
 import { websiteRefreshes } from "./website-refreshes";
 
 /** Homepage featured dossiers: carrier-journal leads as the active living project. */
 const FEATURED_SLUGS = [
   "carrier-journal",
+  "mail-sort-academy",
   "stepweaver-dev",
   "portfolio-terminal",
   "iam-resist",
   "lcerebro",
   "lsigil-setup",
   "bill-planner",
-  "silent-auction",
 ] as const;
 
 /** Full catalog sort: featured block first, then remaining order. */
 const CATALOG_ORDER = [
   ...FEATURED_SLUGS,
+  "silent-auction",
   "llambda-llm-agent",
   "ai-integrations",
   "lambda-orthodontics",
@@ -56,6 +58,7 @@ const CATALOG_SLUG_SET = new Set<string>(CATALOG_ORDER);
 const RAW_PROJECTS: Project[] = [
   aiIntegrations,
   carrierJournal,
+  mailSortAcademy,
   billPlanner,
   googleAnalytics,
   iamResist,
