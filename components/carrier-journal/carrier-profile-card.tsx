@@ -42,7 +42,7 @@ export function CarrierProfileCard() {
               <div className="pointer-events-none absolute bottom-0 right-0 z-20 h-5 w-5 border-b border-r border-[rgb(var(--cyan)/0.5)]" />
               <Image
                 src="/images/carrier_me.png"
-                alt="Stephen Weaver — City Letter Carrier"
+                alt="Stephen Weaver, City Letter Carrier"
                 width={144}
                 height={144}
                 sizes="144px"
@@ -78,7 +78,7 @@ export function CarrierProfileCard() {
               </p>
               <div className="mt-1 flex items-center gap-2">
                 <p className="text-sm text-[rgb(var(--cyan))] font-[var(--font-ibm)] whitespace-normal leading-snug">
-                  Active — On Route
+                  Active, On Route
                 </p>
                 <span className="relative flex h-4 w-4 flex-shrink-0 items-center justify-center" aria-hidden>
                   <span className="absolute inline-flex h-full w-full rounded-full bg-[rgb(var(--cyan)/0.35)] motion-safe:animate-ping" />

@@ -15,34 +15,34 @@ const RULES = [
     title:
       "First-Class, Priority, PME, Ground Advantage, Periodicals, and Package Services are never UBBM.",
     detail:
-      "UBBM (Undeliverable Bulk Business Mail) applies mainly to USPS Marketing Mail (formerly Standard Mail / Bulk Business Mail) that is undeliverable and has no mailer endorsement. Every other class receives forwarding, return, or CFS/PARS processing — never the UBBM bin. A First-Class letter to a moved customer goes to CFS or back to sender. Periodicals go through Periodicals/CFS/non-machinable processing.",
+      "UBBM (Undeliverable Bulk Business Mail) applies mainly to USPS Marketing Mail (formerly Standard Mail / Bulk Business Mail) that is undeliverable and has no mailer endorsement. Every other class receives forwarding, return, or CFS/PARS processing, never the UBBM bin. A First-Class letter to a moved customer goes to CFS or back to sender. Periodicals go through Periodicals/CFS/non-machinable processing.",
   },
   {
     number: 3,
     title:
       "USPS Marketing Mail can become UBBM only when undeliverable AND unendorsed.",
     detail:
-      "Unendorsed Marketing Mail with no mailer endorsement that cannot be delivered — because the customer moved with no forwarding order, the address does not exist, the unit is vacant, or the addressee is unknown — is handled as UBBM per local unit procedures.\n\nEndorsed Marketing Mail is NOT plain UBBM regardless of the delivery problem. Each endorsement activates a different service:\n• ASR (Address Service Requested): with active COA in months 1–12, may forward and generate address-correction notice. Carrier-facing safe bucket: CFS/PARS/local forwarding flow.\n• FSR (Forwarding Service Requested): forward if COA exists; return if not.\n• RSR (Return Service Requested): return the piece to the sender.\n• CSR (Change Service Requested): ACS/address-correction processing. Depending on option/profile and COA age, the piece may be forwarded or disposed after notice. Carrier-facing safe answer: CFS/PARS/local procedure.\n• ESR (Electronic Service Requested): NOT plain UBBM. Means CFS/PARS/ACS processing; handling is determined by the mailer's ACS profile and barcode service type. Carrier-facing safe bucket: CFS/PARS/local forwarding procedure.\n\nFinal downstream processing (fees, notices, ACS data) may happen at CFS/PARS after you hand it off. Your job is to get the piece to the right bucket.",
+      "Unendorsed Marketing Mail with no mailer endorsement that cannot be delivered, because the customer moved with no forwarding order, the address does not exist, the unit is vacant, or the addressee is unknown, is handled as UBBM per local unit procedures.\n\nEndorsed Marketing Mail is NOT plain UBBM regardless of the delivery problem. Each endorsement activates a different service:\n• ASR (Address Service Requested): with active COA in months 1–12, may forward and generate address-correction notice. Carrier-facing safe bucket: CFS/PARS/local forwarding flow.\n• FSR (Forwarding Service Requested): forward if COA exists; return if not.\n• RSR (Return Service Requested): return the piece to the sender.\n• CSR (Change Service Requested): ACS/address-correction processing. Depending on option/profile and COA age, the piece may be forwarded or disposed after notice. Carrier-facing safe answer: CFS/PARS/local procedure.\n• ESR (Electronic Service Requested): NOT plain UBBM. Means CFS/PARS/ACS processing; handling is determined by the mailer's ACS profile and barcode service type. Carrier-facing safe bucket: CFS/PARS/local forwarding procedure.\n\nFinal downstream processing (fees, notices, ACS data) may happen at CFS/PARS after you hand it off. Your job is to get the piece to the right bucket.",
   },
   {
     number: 4,
     title:
-      "Periodicals are not UBBM — they go through Periodicals/CFS processing.",
+      "Periodicals are not UBBM; they go through Periodicals/CFS processing.",
     detail:
-      "Periodicals-class mail (magazines, newspapers authorized as Periodicals) has its own DMM rules. When undeliverable, Periodicals are not automatically returned — final treatment (notice, disposal, or return) depends on whether the publisher requested return service and the piece's forwarding/CFS eligibility. Carrier-facing safe handling: send through the Periodicals/CFS/non-machinable procedure, not the UBBM bin.",
+      "Periodicals-class mail (magazines, newspapers authorized as Periodicals) has its own DMM rules. When undeliverable, Periodicals are not automatically returned; final treatment (notice, disposal, or return) depends on whether the publisher requested return service and the piece's forwarding/CFS eligibility. Carrier-facing safe handling: send through the Periodicals/CFS/non-machinable procedure, not the UBBM bin.",
   },
   {
     number: 5,
     title: "Carrier endorsements explain why the piece could not be delivered.",
     detail:
-      "Carrier endorsements are notations you apply to explain undeliverable mail:\n• ANK: Addressee Not Known at this address\n• IA: Insufficient Address (missing street, number, etc.)\n• NSN: No Such Number on this street\n• NSS: No Such Street in this city\n• NMR: No Mail Receptacle\n• REF: Refused by addressee\n• UNC: Unclaimed after notice period\n• UTF: Unable to Forward (forwarding order expired or none on file)\n• VAC: Vacant unit — used when mail is addressed to 'Occupant' or 'Current Resident' at a confirmed vacant address. Do NOT use VAC for named-addressee mail; use the appropriate endorsement (UTF, ANK, etc.) instead.\n• DEC: Deceased (confirmed; use carefully)\n• ILL: Illegible address\nApply the most accurate endorsement so the sender understands why return occurred.",
+      "Carrier endorsements are notations you apply to explain undeliverable mail:\n• ANK: Addressee Not Known at this address\n• IA: Insufficient Address (missing street, number, etc.)\n• NSN: No Such Number on this street\n• NSS: No Such Street in this city\n• NMR: No Mail Receptacle\n• REF: Refused by addressee\n• UNC: Unclaimed after notice period\n• UTF: Unable to Forward (forwarding order expired or none on file)\n• VAC: Vacant unit, used when mail is addressed to 'Occupant' or 'Current Resident' at a confirmed vacant address. Do NOT use VAC for named-addressee mail; use the appropriate endorsement (UTF, ANK, etc.) instead.\n• DEC: Deceased (confirmed; use carefully)\n• ILL: Illegible address\nApply the most accurate endorsement so the sender understands why return occurred.",
   },
   {
     number: 6,
     title:
       "Accountable / special-service mail is never casually discarded or put in UBBM.",
     detail:
-      "Certified, Registered, COD, Insured (sig required), Signature Confirmation, Priority Mail Express, and Postage Due items must all be handled through proper accountable or revenue procedures. Each tracked piece has a chain of custody. Placing any of these in UBBM or discarding them is a serious compliance violation.\n\nPostage Due is accountable revenue handling — do not UBBM or discard it.\n\nPriority Mail Express has time-value and special handling requirements. Follow your scanner, PS Form 3849, and local clearance procedures.\n\nWhen you can't deliver any accountable or special-service piece, leave PS Form 3849 and return it to the appropriate section.",
+      "Certified, Registered, COD, Insured (sig required), Signature Confirmation, Priority Mail Express, and Postage Due items must all be handled through proper accountable or revenue procedures. Each tracked piece has a chain of custody. Placing any of these in UBBM or discarding them is a serious compliance violation.\n\nPostage Due is accountable revenue handling; do not UBBM or discard it.\n\nPriority Mail Express has time-value and special handling requirements. Follow your scanner, PS Form 3849, and local clearance procedures.\n\nWhen you can't deliver any accountable or special-service piece, leave PS Form 3849 and return it to the appropriate section.",
   },
   {
     number: 7,

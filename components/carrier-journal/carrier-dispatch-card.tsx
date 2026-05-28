@@ -67,7 +67,7 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
         </div>
       </div>
 
-      {/* Authored narrative — primary content */}
+      {/* Authored narrative: primary content */}
       {d.publicNote.trim() && (
         <div className="border-l-2 border-[rgb(var(--neon)/0.4)] pl-3 space-y-3">
           {splitPublicNoteParagraphs(d.publicNote).map((paragraph, index) => (
@@ -81,7 +81,7 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
         </div>
       )}
 
-      {/* KPI telemetry row — secondary */}
+      {/* KPI telemetry row: secondary */}
       <div className="grid grid-cols-3 sm:grid-cols-5 gap-px bg-[rgb(var(--border)/0.12)]">
         {[
           { label: "MILES", value: `${d.milesWalked}` },

@@ -137,13 +137,13 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
           </div>
         </div>
 
-        {/* Field Calendar — logged days derived from dispatch data, no schedule claims */}
+        {/* Field Calendar: logged days derived from dispatch data, no schedule claims */}
         <CarrierFieldCalendar dispatches={dispatches} />
 
-        {/* Field Badges — cumulative milestones computed from dispatch data */}
+        {/* Field Badges: cumulative milestones computed from dispatch data */}
         <CarrierMilestonePanel dispatches={dispatches} />
 
-        {/* Field Dispatches — live authored content, directly after KPIs */}
+        {/* Field Dispatches: live authored content, directly after KPIs */}
         <div>
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
             FIELD DISPATCHES

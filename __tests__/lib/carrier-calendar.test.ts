@@ -204,7 +204,7 @@ describe("formatCalendarDate", () => {
 });
 
 // ---------------------------------------------------------------------------
-// buildCalendarGrid — structure and content
+// buildCalendarGrid: structure and content
 // ---------------------------------------------------------------------------
 
 describe("buildCalendarGrid", () => {
@@ -253,8 +253,8 @@ describe("buildCalendarGrid", () => {
     expect(noLogDay?.dispatchIds).toHaveLength(0);
   });
 
-  it("does not depend on a fixed five-day workweek — logs on any day pattern are valid", () => {
-    // Dispatches on Monday, Wednesday, Sunday — an irregular pattern
+  it("does not depend on a fixed five-day workweek; logs on any day pattern are valid", () => {
+    // Dispatches on Monday, Wednesday, Sunday, an irregular pattern
     const dispatches = [
       dispatch({ id: "a", date: "2026-05-18", title: "Mon", milesWalked: 8.0, steps: 17000 }), // Monday
       dispatch({ id: "b", date: "2026-05-20", title: "Wed", milesWalked: 9.5, steps: 20000 }), // Wednesday

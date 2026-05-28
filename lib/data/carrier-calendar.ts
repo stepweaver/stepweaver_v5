@@ -1,6 +1,6 @@
 /**
  * Calendar helpers for the Carrier Field Calendar.
- * Derives logged field days from CarrierDispatch entries — no schedule claims.
+ * Derives logged field days from CarrierDispatch entries. No schedule claims.
  */
 
 import type { CarrierDispatch } from "./carrier-journal";

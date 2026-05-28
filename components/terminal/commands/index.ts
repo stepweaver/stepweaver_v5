@@ -195,7 +195,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     setTimeout(() => ctx.navigate('/carrier-journal'), 400);
     return {
       lines: [
-        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier —', variant: 'success' },
+        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier,', variant: 'success' },
         { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
         { content: '', variant: 'default' },
         { content: 'Opening /carrier-journal...', variant: 'dimmed' },
@@ -207,7 +207,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     setTimeout(() => ctx.navigate('/carrier-journal'), 400);
     return {
       lines: [
-        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier —', variant: 'success' },
+        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier,', variant: 'success' },
         { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
         { content: '', variant: 'default' },
         { content: 'Opening /carrier-journal...', variant: 'dimmed' },
@@ -219,7 +219,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     setTimeout(() => ctx.navigate('/carrier-journal'), 400);
     return {
       lines: [
-        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier —', variant: 'success' },
+        { content: 'Carrier\'s Log: public-safe field notes from becoming a letter carrier,', variant: 'success' },
         { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
         { content: '', variant: 'default' },
         { content: 'Opening /carrier-journal...', variant: 'dimmed' },

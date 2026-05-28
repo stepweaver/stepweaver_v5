@@ -257,7 +257,7 @@ export const mailCards: MailCard[] = [
     correctBin: "forward_cfs",
     difficulty: "regular",
     explanation:
-      "Periodicals are NOT UBBM. Undeliverable Periodicals go through Periodicals/CFS/non-machinable processing — carrier-facing safe bucket is CFS. Final treatment (notice, disposal, or return to publisher) depends on publisher's return endorsement and CFS eligibility. Do not put Periodicals in the UBBM bin.",
+      "Periodicals are NOT UBBM. Undeliverable Periodicals go through Periodicals/CFS/non-machinable processing; carrier-facing safe bucket is CFS. Final treatment (notice, disposal, or return to publisher) depends on publisher's return endorsement and CFS eligibility. Do not put Periodicals in the UBBM bin.",
     mistakeWarnings: [
       "Periodicals are never treated as UBBM, even when the addressee has moved. Send through CFS/Periodicals processing.",
     ],
@@ -376,7 +376,7 @@ export const mailCards: MailCard[] = [
     correctBin: "forward_cfs",
     difficulty: "inspection",
     explanation:
-      "ESR (Electronic Service Requested) means the mailer receives an electronic address-correction notice via ACS. The physical piece is directed to CFS/PARS for processing according to the mailer's ACS profile and barcode service type — it is NOT plain unendorsed UBBM. Carrier-facing safe bucket: forward via CFS/PARS. Final disposition is determined downstream by the ACS profile.",
+      "ESR (Electronic Service Requested) means the mailer receives an electronic address-correction notice via ACS. The physical piece is directed to CFS/PARS for processing according to the mailer's ACS profile and barcode service type; it is NOT plain unendorsed UBBM. Carrier-facing safe bucket: forward via CFS/PARS. Final disposition is determined downstream by the ACS profile.",
     tags: ["ubbm_not", "usps_marketing_mail", "electronic_service_requested"],
   },
 
@@ -530,7 +530,7 @@ export const mailCards: MailCard[] = [
     correctBin: "ubbm",
     difficulty: "regular",
     explanation:
-      "VAC (Vacant) is the correct carrier endorsement when mail is addressed to 'Occupant' or 'Current Resident' at a confirmed vacant unit. Unendorsed Marketing Mail to a vacant Occupant address is UBBM — handle per your unit's local UBBM procedure. VAC is used specifically for Occupant-style mail at vacant addresses, not for named-addressee mail.",
+      "VAC (Vacant) is the correct carrier endorsement when mail is addressed to 'Occupant' or 'Current Resident' at a confirmed vacant unit. Unendorsed Marketing Mail to a vacant Occupant address is UBBM; handle per your unit's local UBBM procedure. VAC is used specifically for Occupant-style mail at vacant addresses, not for named-addressee mail.",
     tags: ["endorsement", "vac", "ubbm", "usps_marketing_mail", "occupant", "vacant"],
   },
 
@@ -701,7 +701,7 @@ export const mailCards: MailCard[] = [
     id: "MSA-037",
     title: "Priority Mail Express: Notice Required",
     scenario:
-      "A Priority Mail Express overnight envelope addressed to a customer on your route. Today is the scheduled delivery date. You arrive at the address — no one answers. There is no safe location to leave the piece and no Hold Mail request on file.",
+      "A Priority Mail Express overnight envelope addressed to a customer on your route. Today is the scheduled delivery date. You arrive at the address; no one answers. There is no safe location to leave the piece and no Hold Mail request on file.",
     class: "priority_mail_express",
     shape: "letter",
     mailerEndorsement: "none",
@@ -713,7 +713,7 @@ export const mailCards: MailCard[] = [
     explanation:
       "Priority Mail Express is time-value mail with special handling requirements. When no one is home and no safe delivery location exists, leave PS Form 3849 and return the piece to the post office for customer pickup or redelivery. Follow your scanner, PS Form 3849 procedure, and local clearance instructions. PME is never UBBM.",
     mistakeWarnings: [
-      "Priority Mail Express is never UBBM. It requires special handling — leave a notice and return to office.",
+      "Priority Mail Express is never UBBM. It requires special handling: leave a notice and return to office.",
     ],
     tags: ["accountable", "priority_mail_express", "ubbm_not"],
   },
@@ -732,7 +732,7 @@ export const mailCards: MailCard[] = [
     correctBin: "leave_notice",
     difficulty: "regular",
     explanation:
-      "Postage Due pieces require collection of unpaid postage before delivery. Postage Due is accountable revenue handling — do not discard or UBBM it. If the customer isn't home, leave a PS Form 3849 notice and bring the piece back to the office.",
+      "Postage Due pieces require collection of unpaid postage before delivery. Postage Due is accountable revenue handling; do not discard or UBBM it. If the customer isn't home, leave a PS Form 3849 notice and bring the piece back to the office.",
     mistakeWarnings: [
       "Postage Due is accountable revenue handling. Do not discard or UBBM it.",
     ],
@@ -813,7 +813,7 @@ export const mailCards: MailCard[] = [
     correctBin: "return_to_sender",
     difficulty: "inspection",
     explanation:
-      "FSR (Forwarding Service Requested) on Marketing Mail: forward if a forwarding order exists; otherwise return to sender. With no active COA, return to sender. This is NOT UBBM — the endorsement always generates a return or forward, never disposal. Carrier-facing safe bucket: CFS if a COA exists; return to sender if not.",
+      "FSR (Forwarding Service Requested) on Marketing Mail: forward if a forwarding order exists; otherwise return to sender. With no active COA, return to sender. This is NOT UBBM; the endorsement always generates a return or forward, never disposal. Carrier-facing safe bucket: CFS if a COA exists; return to sender if not.",
     tags: ["ubbm_not", "usps_marketing_mail", "forwarding_service_requested"],
   },
 
@@ -871,7 +871,7 @@ export const mailCards: MailCard[] = [
     correctBin: "return_to_sender",
     difficulty: "regular",
     explanation:
-      "If a customer refuses a Postage Due piece, mark REF (Refused) and return it to sender. Postage Due is accountable revenue handling — you cannot discard it. The piece must be returned through proper procedures.",
+      "If a customer refuses a Postage Due piece, mark REF (Refused) and return it to sender. Postage Due is accountable revenue handling; you cannot discard it. The piece must be returned through proper procedures.",
     mistakeWarnings: [
       "Postage Due is accountable revenue handling. Do not discard or UBBM it.",
     ],
