@@ -10,6 +10,7 @@ import {
 import { CarrierKpiCard } from "./carrier-kpi-card";
 import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
 import { CarrierMilestonePanel } from "./carrier-milestone-panel";
+import { CarrierProfileCard } from "./carrier-profile-card";
 
 const TRACKING_ITEMS = [
   { category: "Physical load", detail: "Miles walked, steps, soreness, recovery signals, body notes" },
@@ -91,17 +92,22 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
 
         {/* Hero */}
-        <div>
-          <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
-            CARRIER&apos;S LOG // MAILWALKER
+        <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
+          <div className="flex-1 min-w-0">
+            <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
+              CARRIER&apos;S LOG // MAILWALKER
+            </div>
+            <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))] mb-4">
+              Carrier&apos;s Log
+            </h1>
+            <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
+              A public-safe field log from starting overweight and learning life as a city letter carrier:
+              miles, hydration, recovery, phase progression, and the operational lessons hiding inside a walking route.
+            </p>
           </div>
-          <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))] mb-4">
-            Carrier&apos;s Log
-          </h1>
-          <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
-            A public-safe field log from starting overweight and learning life as a city letter carrier:
-            miles, hydration, recovery, phase progression, and the operational lessons hiding inside a walking route.
-          </p>
+          <div className="lg:shrink-0">
+            <CarrierProfileCard />
+          </div>
         </div>
 
         {/* Disclaimer */}
