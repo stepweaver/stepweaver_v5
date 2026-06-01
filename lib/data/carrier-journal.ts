@@ -431,3 +431,15 @@ export function dispatchHasPublicKpiData(d: CarrierDispatch): boolean {
     !!d.phase
   );
 }
+
+// A dispatch earns a card in the feed only when the carrier has actually written something,
+// or flagged a notable event. Pure numeric rows (miles, steps, temp) flow silently into
+// aggregates (KPIs, calendar, milestones) without cluttering the feed.
+export function isDispatchFeedWorthy(d: CarrierDispatch): boolean {
+  return !!(
+    d.publicNote?.trim() ||
+    d.bodyNote?.trim() ||
+    d.recoveryNote?.trim() ||
+    d.goodSamaritanAct
+  );
+}

@@ -5,6 +5,7 @@ import {
   getCarrierKpis,
   computeTotalsFromDispatches,
   totalsToKpis,
+  isDispatchFeedWorthy,
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
 import { CarrierKpiCard } from "./carrier-kpi-card";
@@ -81,7 +82,10 @@ type Props = {
 };
 
 export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {}) {
+  // All published rows feed aggregates (KPIs, calendar, milestones).
+  // Only rows with authored content appear in the feed.
   const dispatches = notionDispatches ?? getCarrierDispatches();
+  const feedDispatches = dispatches.filter(isDispatchFeedWorthy);
   const totals = computeTotalsFromDispatches(dispatches);
   const kpis =
     notionDispatches && notionDispatches.length > 0
@@ -143,13 +147,15 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
         {/* Field Badges: cumulative milestones computed from dispatch data */}
         <CarrierMilestonePanel dispatches={dispatches} />
 
-        {/* Field Dispatches: live authored content, directly after KPIs */}
-        <div>
-          <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
-            FIELD DISPATCHES
+        {/* Field Dispatches: only entries with authored content */}
+        {feedDispatches.length > 0 && (
+          <div>
+            <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
+              FIELD DISPATCHES
+            </div>
+            <CarrierDispatchFeed dispatches={feedDispatches} />
           </div>
-          <CarrierDispatchFeed dispatches={dispatches} />
-        </div>
+        )}
 
         {/* Transformation Arc */}
         <div>

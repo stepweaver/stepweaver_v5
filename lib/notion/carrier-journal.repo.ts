@@ -5,7 +5,6 @@ import type { PageObjectResponse, PartialPageObjectResponse } from "@notionhq/cl
 import { getNotion } from "./client";
 import { paginate } from "./paginate";
 import {
-  dispatchHasPublicKpiData,
   type CarrierDispatch,
   type CarrierPhase,
   type MailLoad,
@@ -191,8 +190,7 @@ async function fetchDispatchesUncached(): Promise<CarrierDispatch[]> {
     return (pages as PageObjectResponse[])
       .filter((page) => page && typeof page === "object" && "properties" in page)
       .map(formatPage)
-      .filter((d): d is CarrierDispatch => d !== null)
-      .filter((d) => d.publicNote.trim() || dispatchHasPublicKpiData(d));
+      .filter((d): d is CarrierDispatch => d !== null);
   } catch (err) {
     logError("fetchDispatches", err);
     return [];
