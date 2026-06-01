@@ -8,6 +8,9 @@ export type WeightPublicMode = "hidden" | "change-only" | "current-and-change";
 
 export type CarrierPhase = "break-in" | "adapting" | "building" | "regular";
 
+/** Private sentiment toward a worked route. Never rendered in public display. */
+export type RoutePreference = "prefer" | "like" | "dislike";
+
 export type CarrierDispatch = {
   id: string;
   date: string;
@@ -38,6 +41,10 @@ export type CarrierDispatch = {
   tags?: string[];
   /** Optional flag for a Good Samaritan act logged during the dispatch. */
   goodSamaritanAct?: boolean;
+  /** Compact route identifier, e.g. "SB-013" or "CW-015". Shown as a bare code — no label. */
+  routeCode?: string;
+  /** Private sentiment toward this route. Never rendered in public-facing UI. */
+  routePreference?: RoutePreference;
 };
 
 export type CarrierKpi = {

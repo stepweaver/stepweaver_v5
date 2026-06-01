@@ -51,6 +51,9 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-1">
             {d.date}
             {d.phase ? ` // ${PHASE_LABEL[d.phase]}` : ""}
+            {d.routeCode ? (
+              <span className="text-[rgb(var(--text-label)/0.45)] ml-2">{d.routeCode}</span>
+            ) : null}
           </div>
           <h3 className="font-[var(--font-ibm)] text-lg text-[rgb(var(--text-color))] leading-snug">
             {d.title}

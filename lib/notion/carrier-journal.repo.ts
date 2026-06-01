@@ -9,6 +9,7 @@ import {
   type CarrierDispatch,
   type CarrierPhase,
   type MailLoad,
+  type RoutePreference,
   type WeightPublicMode,
 } from "@/lib/data/carrier-journal";
 
@@ -86,6 +87,14 @@ function parsePhase(raw: string): CarrierPhase | undefined {
   return undefined;
 }
 
+function parseRoutePreference(raw: string): RoutePreference | undefined {
+  const normalized = raw.toLowerCase().trim();
+  if (normalized === "prefer") return "prefer";
+  if (normalized === "like") return "like";
+  if (normalized === "dislike") return "dislike";
+  return undefined;
+}
+
 function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const p = page.properties as Record<string, unknown>;
 
@@ -121,8 +130,10 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const recoveryNote = str(p["Recovery Note"] as Props, "rich_text");
   const phase = parsePhase(sel(p.Phase as Props));
   const rawTags = (p.Tags as Props)?.multi_select as { name?: string }[] | undefined;
-  const badges = rawTags?.map((t) => t.name ?? "").filter(Boolean);
+  const tags = rawTags?.map((t) => t.name ?? "").filter(Boolean);
   const goodSamaritanAct = check(p["Good Samaritan Act"] as Props);
+  const routeCode = str(p.Route as Props, "rich_text") || undefined;
+  const routePreference = parseRoutePreference(sel(p["Route Preference"] as Props));
 
   return {
     id: `cj-${page.id.replace(/-/g, "").slice(0, 8)}`,
@@ -150,8 +161,10 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(bodyNote && { bodyNote }),
     ...(recoveryNote && { recoveryNote }),
     ...(phase && { phase }),
-    ...(badges && badges.length > 0 && { badges }),
+    ...(tags && tags.length > 0 && { tags }),
     ...(goodSamaritanAct && { goodSamaritanAct }),
+    ...(routeCode && { routeCode }),
+    ...(routePreference && { routePreference }),
   };
 }
 
