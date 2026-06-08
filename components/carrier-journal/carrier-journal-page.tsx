@@ -19,7 +19,7 @@ const TRACKING_ITEMS = [
   { category: "Hydration and fuel", detail: "Water, Gatorade, route snacks, hunger and thirst adjustments" },
   { category: "Transformation", detail: "Phase progression, weekly weight trend, capacity building" },
   { category: "Environmental load", detail: "Heat index, rain, snow, storms, temperature swings" },
-  { category: "Operational load", detail: "Perceived mail-load severity, route difficulty, breaks taken" },
+  { category: "Operational load", detail: "Perceived mail-load, route difficulty, breaks taken" },
   { category: "Safety signals", detail: "Hydration discipline, heat risk, dog encounters, fatigue markers" },
   { category: "Published narrative", detail: "Route-day reflections and field notes" },
 ];
@@ -43,7 +43,7 @@ const FIELD_METHOD_CARDS = [
   {
     label: "TREND, NOT SCOREBOARD",
     title: "Weekly weight check",
-    body: "Weight is treated as a weekly trend marker, not a daily judgment.",
+    body: "Weight is a weekly trend marker.",
   },
 ];
 
@@ -62,7 +62,7 @@ const TRANSFORMATION_ARC = [
   },
   {
     title: "Mailwalker Mode",
-    body: "A repeatable carrier body: systems for shoes, water, pacing, and post-route recovery. Not perfect, just field-tested. Confidence comes from repetition, not from pretending the work is easy.",
+    body: "A repeatable carrier body: systems for shoes, water, pacing, and post-route recovery. Field-tested. Confidence comes from repetition.",
   },
 ];
 
@@ -179,16 +179,16 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
           </h2>
           <div className="space-y-4 text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-6">
             <p>
-              Carrier&apos;s Log is a personal field record, not a diet plan and not a medical study.
+              Carrier&apos;s Log is a personal field record.
               The method is simple: log the work, watch the patterns, and adjust the levers that appear to matter.
             </p>
             <p>
-              I am tracking miles, hydration, weather, heat index, mail-load severity, soreness, energy, mood, recovery
+              I am tracking miles, hydration, weather, heat index, mail-load, soreness, energy, mood, recovery
               notes, and weekly weight trend. The point is to document what the work costs, what helps, and what
-              doesn&apos;t — a field record of adaptation.
+              doesn&apos;t.
             </p>
             <p>
-              I am not weighing myself every day. Weight is a weekly trend marker, not a daily scoreboard. The
+              I am not weighing myself every day. Weight is a weekly trend marker. The
               day-to-day signals are simpler: how far I walked, how much water I needed, how sore I felt, how much
               energy I had left, and whether recovery helped me show up again.
             </p>
@@ -279,14 +279,13 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             </div>
           </div>
           <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-3">
-            Hydration is tracked as a safety and performance signal, not a wellness trophy. I am not trying to win a
+            Hydration is tracked as a safety and performance signal. I am not trying to win a
             water-drinking contest. I am learning how much fluid the work actually demands, especially when heat index,
             mail load, and walking distance stack together.
           </p>
           <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-3">
             On hotter days, thirst arrives late. If water intake is falling behind, energy drops, soreness climbs, and
-            decision-making gets worse near the end of the route. That makes hydration an operational risk, not just a
-            health habit.
+            decision-making gets worse near the end of the route. That makes hydration an operational risk.
           </p>
           <p className="text-xs text-[rgb(var(--warn))] font-[var(--font-ocr)] tracking-wide border border-[rgb(var(--warn)/0.3)] px-3 py-2">
             HEAT-DAY NOTE: If the heat index is climbing and water intake is below goal by mid-route, treat it as an
