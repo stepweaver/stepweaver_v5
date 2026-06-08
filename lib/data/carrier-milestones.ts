@@ -13,7 +13,11 @@ export type CarrierMilestoneCategory =
   | "service"
   | "hydration";
 
-export type CarrierMilestoneTier = "bronze" | "silver" | "gold" | "legendary";
+export type CarrierMilestoneTier =
+  | "basic"
+  | "field"
+  | "campaign"
+  | "veteran";
 
 export type CarrierMilestone = {
   id: string;
@@ -33,7 +37,6 @@ export type CarrierMilestone = {
 export type CarrierLevel = {
   title: string;
   level: number;
-  xp: number;
   totalMiles: number;
   nextTitle?: string;
   nextMiles?: number;
@@ -41,18 +44,20 @@ export type CarrierLevel = {
 };
 
 // ---------------------------------------------------------------------------
-// Level thresholds
+// Mileage rank ladder
 // ---------------------------------------------------------------------------
 
 const LEVEL_THRESHOLDS: { miles: number; title: string; level: number }[] = [
-  { miles: 0, title: "Academy Walker", level: 1 },
-  { miles: 10, title: "Block Rookie", level: 2 },
-  { miles: 25, title: "Loop Learner", level: 3 },
-  { miles: 50, title: "Route Walker", level: 4 },
-  { miles: 100, title: "Pavement Regular", level: 5 },
-  { miles: 250, title: "Satchel Veteran", level: 6 },
-  { miles: 500, title: "Iron Loop Carrier", level: 7 },
-  { miles: 1000, title: "Thousand-Mile Carrier", level: 8 },
+  { miles: 0,     title: "Recruit Walker",    level: 1 },
+  { miles: 25,    title: "First Loop",        level: 2 },
+  { miles: 50,    title: "Route Walker",      level: 3 },
+  { miles: 100,   title: "Foot Patrol",       level: 4 },
+  { miles: 250,   title: "Satchel Qualified", level: 5 },
+  { miles: 500,   title: "Mailwalker",        level: 6 },
+  { miles: 1000,  title: "Route Veteran",     level: 7 },
+  { miles: 2500,  title: "Relay Commander",   level: 8 },
+  { miles: 5000,  title: "Iron Route",        level: 9 },
+  { miles: 10000, title: "Carrier Legend",    level: 10 },
 ];
 
 // ---------------------------------------------------------------------------
@@ -109,13 +114,17 @@ function effectiveTemp(d: CarrierDispatch): number {
   return Math.max(d.temperatureF ?? -Infinity, d.heatIndexF ?? -Infinity);
 }
 
+function isWeatherDay(d: CarrierDispatch): boolean {
+  return !!(d.rain || d.storm || d.snow || d.heatDay);
+}
+
 // ---------------------------------------------------------------------------
 // Exported functions
 // ---------------------------------------------------------------------------
 
 export function getCarrierLevel(dispatches: CarrierDispatch[]): CarrierLevel {
   const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
-  const xp = Math.round(totalMiles * 10);
+  const rounded = Math.round(totalMiles * 10) / 10;
 
   let currentIdx = 0;
   for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
@@ -138,8 +147,7 @@ export function getCarrierLevel(dispatches: CarrierDispatch[]): CarrierLevel {
   return {
     title: current.title,
     level: current.level,
-    xp,
-    totalMiles: Math.round(totalMiles * 10) / 10,
+    totalMiles: rounded,
     ...(next ? { nextTitle: next.title, nextMiles: next.miles } : {}),
     progressToNext,
   };
@@ -153,11 +161,9 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
   const rainDays = dispatches.filter((d) => d.rain);
   const stormDays = dispatches.filter((d) => d.storm);
   const snowDays = dispatches.filter((d) => d.snow);
-  const heat80Days = dispatches.filter((d) => effectiveTemp(d) >= 80);
-  const heat90Days = dispatches.filter((d) => effectiveTemp(d) >= 90);
-  const freezeDays = dispatches.filter((d) => (d.temperatureF ?? Infinity) <= 32);
-  const belowZeroDays = dispatches.filter((d) => (d.temperatureF ?? Infinity) <= 0);
-  const heavyLoadDays = dispatches.filter(
+  const heatDays = dispatches.filter((d) => d.heatDay || effectiveTemp(d) >= 90);
+  const weatherDays = dispatches.filter(isWeatherDay);
+  const heavyOrBrutalDays = dispatches.filter(
     (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal"
   );
   const dogDays = dispatches.filter((d) => d.dogEncounter);
@@ -205,273 +211,146 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
   }
 
   return [
-    // ------- Days -------
+    // ===================================================================
+    // BASIC QUALIFICATION
+    // ===================================================================
+
+    // --- Days ---
     milestone(
-      "first-dispatch",
-      "First Field Day",
+      "day-one",
+      "Day One",
       "Day 1",
-      "Logged your first dispatch. The route starts here.",
-      "days", "bronze", "calendar",
+      "First dispatch logged. The field record starts here.",
+      "days", "basic", "calendar",
       daysLogged, 1,
       dateAtNthMatch(sorted, () => true, 1),
       "days"
     ),
     milestone(
-      "five-dispatches",
-      "Five-Day Carrier",
+      "five-logged-days",
+      "5 Logged Days",
       "5 Days",
-      "Five shifts in. The soreness is real. So is the routine.",
-      "days", "bronze", "calendar",
+      "Five field days on the record. The soreness is real. So is the routine.",
+      "days", "basic", "calendar",
       daysLogged, 5,
       dateAtNthMatch(sorted, () => true, 5),
       "days"
     ),
     milestone(
-      "ten-dispatches",
-      "Ten-Day Loop",
+      "ten-logged-days",
+      "10 Logged Days",
       "10 Days",
-      "Ten logged field days. The route is becoming second nature.",
-      "days", "silver", "calendar",
+      "Ten logged days. Route rhythm is starting to take shape.",
+      "days", "basic", "calendar",
       daysLogged, 10,
       dateAtNthMatch(sorted, () => true, 10),
       "days"
     ),
-    milestone(
-      "twenty-five-dispatches",
-      "Quarter Hundred",
-      "25 Days",
-      "Twenty-five shifts. You have built a real track record.",
-      "days", "silver", "calendar",
-      daysLogged, 25,
-      dateAtNthMatch(sorted, () => true, 25),
-      "days"
-    ),
-    milestone(
-      "fifty-dispatches",
-      "Fifty-Day Field Carrier",
-      "50 Days",
-      "Fifty full field days. You are not a rookie anymore.",
-      "days", "gold", "calendar",
-      daysLogged, 50,
-      dateAtNthMatch(sorted, () => true, 50),
-      "days"
-    ),
-    milestone(
-      "hundred-dispatches",
-      "Century Carrier",
-      "100 Days",
-      "One hundred logged dispatches. A genuine career milestone.",
-      "days", "legendary", "calendar",
-      daysLogged, 100,
-      dateAtNthMatch(sorted, () => true, 100),
-      "days"
-    ),
 
-    // ------- Miles -------
+    // --- Distance ---
     milestone(
       "first-mile",
       "First Mile",
       "1 mi",
-      "One mile on the books. Every route starts somewhere.",
-      "distance", "bronze", "map-pin",
+      "One mile on the record. Every field career starts somewhere.",
+      "distance", "basic", "map-pin",
       totalMiles, 1,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 1),
       "mi"
     ),
     milestone(
       "ten-miles",
-      "Ten-Mile Mark",
+      "10 Miles",
       "10 mi",
       "Ten miles accumulated. The body is learning what this job costs.",
-      "distance", "bronze", "map-pin",
+      "distance", "basic", "map-pin",
       totalMiles, 10,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 10),
       "mi"
     ),
+
+    // --- Weather ---
     milestone(
-      "twenty-five-miles",
-      "Quarter Century Miles",
-      "25 mi",
-      "Twenty-five miles walked. You are earning your pavement.",
-      "distance", "silver", "map-pin",
-      totalMiles, 25,
-      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 25),
-      "mi"
+      "first-rain",
+      "First Rain",
+      "Rain",
+      "First route completed in the rain. Gear tested.",
+      "weather", "basic", "cloud-rain",
+      rainDays.length, 1,
+      rainDays.length >= 1 ? sortedChronologically(rainDays)[0]?.date : undefined
     ),
+
+    // --- Load ---
+    milestone(
+      "first-heavy-day",
+      "First Heavy Day",
+      "Heavy",
+      "First dispatch logged as heavy or brutal mail load.",
+      "load", "basic", "package",
+      heavyOrBrutalDays.length, 1,
+      heavyOrBrutalDays.length >= 1
+        ? sortedChronologically(heavyOrBrutalDays)[0]?.date
+        : undefined
+    ),
+
+    // --- Hydration ---
+    milestone(
+      "first-hydration-goal",
+      "First Hydration Goal",
+      "Goal",
+      "First day hitting the full hydration target. Discipline recorded.",
+      "hydration", "basic", "droplets",
+      hydrationGoalDays.length, 1,
+      hydrationGoalDays.length >= 1
+        ? sortedChronologically(hydrationGoalDays)[0]?.date
+        : undefined
+    ),
+
+    // ===================================================================
+    // FIELD QUALIFICATION
+    // ===================================================================
+
+    // --- Days ---
+    milestone(
+      "twenty-five-logged-days",
+      "25 Logged Days",
+      "25 Days",
+      "Twenty-five field days. A real track record is forming.",
+      "days", "field", "calendar",
+      daysLogged, 25,
+      dateAtNthMatch(sorted, () => true, 25),
+      "days"
+    ),
+
+    // --- Distance ---
     milestone(
       "fifty-miles",
-      "Fifty-Mile Walker",
+      "50 Miles",
       "50 mi",
-      "Fifty miles. Half a hundred. The route is yours now.",
-      "distance", "silver", "map-pin",
+      "Fifty miles under your boots. The route is becoming yours.",
+      "distance", "field", "map-pin",
       totalMiles, 50,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 50),
       "mi"
     ),
     milestone(
       "hundred-miles",
-      "Hundred-Mile Carrier",
+      "100 Miles",
       "100 mi",
-      "One hundred miles on foot. A real carrier's badge.",
-      "distance", "gold", "map-pin",
+      "One hundred miles on foot. A real carrier milestone.",
+      "distance", "field", "map-pin",
       totalMiles, 100,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 100),
       "mi"
     ),
-    milestone(
-      "two-fifty-miles",
-      "Quarter-Thousand Miles",
-      "250 mi",
-      "Two hundred fifty miles. You have walked a small state.",
-      "distance", "gold", "map-pin",
-      totalMiles, 250,
-      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 250),
-      "mi"
-    ),
-    milestone(
-      "five-hundred-miles",
-      "Iron Loop 500",
-      "500 mi",
-      "Five hundred miles of field work. Legendary durability.",
-      "distance", "legendary", "map-pin",
-      totalMiles, 500,
-      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 500),
-      "mi"
-    ),
-    milestone(
-      "thousand-miles",
-      "Routebound",
-      "1,000 mi",
-      "One thousand miles on foot. The route is part of you now.",
-      "distance", "legendary", "map-pin",
-      totalMiles, 1000,
-      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 1000),
-      "mi"
-    ),
 
-    // ------- Weather -------
-    milestone(
-      "first-rain",
-      "First Rain Day",
-      "Rain",
-      "Walked a full route in the rain. Gear tested.",
-      "weather", "bronze", "cloud-rain",
-      rainDays.length, 1,
-      rainDays.length >= 1 ? sortedChronologically(rainDays)[0]?.date : undefined
-    ),
-    milestone(
-      "first-storm",
-      "First Storm Day",
-      "Storm",
-      "Weathered a storm route. Conditions were real.",
-      "weather", "bronze", "zap",
-      stormDays.length, 1,
-      stormDays.length >= 1 ? sortedChronologically(stormDays)[0]?.date : undefined
-    ),
-    milestone(
-      "first-snow",
-      "First Snow Day",
-      "Snow",
-      "Walked the route in snow. A different kind of challenge.",
-      "weather", "bronze", "snowflake",
-      snowDays.length, 1,
-      snowDays.length >= 1 ? sortedChronologically(snowDays)[0]?.date : undefined
-    ),
-    milestone(
-      "first-heat-80",
-      "First 80° Day",
-      "80°F",
-      "First shift where the heat index or temp hit 80°F or higher.",
-      "weather", "bronze", "sun",
-      heat80Days.length, 1,
-      heat80Days.length >= 1 ? sortedChronologically(heat80Days)[0]?.date : undefined
-    ),
-    milestone(
-      "first-heat-90",
-      "First 90° Day",
-      "90°F",
-      "Heat index or temp hit 90°F. Hydration became survival.",
-      "weather", "silver", "flame",
-      heat90Days.length, 1,
-      heat90Days.length >= 1 ? sortedChronologically(heat90Days)[0]?.date : undefined
-    ),
-    milestone(
-      "first-freeze",
-      "First Freeze Day",
-      "≤32°F",
-      "Temperature at or below freezing. The route does not pause for winter.",
-      "weather", "silver", "thermometer",
-      freezeDays.length, 1,
-      freezeDays.length >= 1 ? sortedChronologically(freezeDays)[0]?.date : undefined
-    ),
-    milestone(
-      "first-below-zero",
-      "Below Zero",
-      "≤0°F",
-      "Temperature at or below zero. Rare and legendary field conditions.",
-      "weather", "legendary", "thermometer",
-      belowZeroDays.length, 1,
-      belowZeroDays.length >= 1 ? sortedChronologically(belowZeroDays)[0]?.date : undefined
-    ),
-
-    // ------- Load -------
-    milestone(
-      "first-heavy-load",
-      "First Heavy Load",
-      "Heavy",
-      "First shift logged as heavy or brutal mail load.",
-      "load", "bronze", "package",
-      heavyLoadDays.length, 1,
-      heavyLoadDays.length >= 1 ? sortedChronologically(heavyLoadDays)[0]?.date : undefined
-    ),
-    milestone(
-      "ten-heavy-loads",
-      "Ten Heavy Days",
-      "10 Heavy",
-      "Ten heavy or brutal load days. The work builds character.",
-      "load", "silver", "package",
-      heavyLoadDays.length, 10,
-      dateAtNthMatch(sorted, (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal", 10)
-    ),
-
-    // ------- Dogs -------
-    milestone(
-      "first-dog-encounter",
-      "First Dog Day",
-      "Dog",
-      "First logged dog encounter. Redirected cleanly.",
-      "safety", "bronze", "shield",
-      dogDays.length, 1,
-      dogDays.length >= 1 ? sortedChronologically(dogDays)[0]?.date : undefined
-    ),
-    milestone(
-      "five-dog-days",
-      "Five Dog Days",
-      "5 Dogs",
-      "Five days with dog encounters. You are reading the route now.",
-      "safety", "silver", "shield",
-      dogDays.length, 5,
-      dateAtNthMatch(sorted, (d) => !!d.dogEncounter, 5)
-    ),
-
-    // ------- Hydration -------
-    milestone(
-      "first-hydration-goal",
-      "Hydration Goal Hit",
-      "Goal",
-      "First day hitting the full hydration target. Discipline pays off.",
-      "hydration", "bronze", "droplets",
-      hydrationGoalDays.length, 1,
-      hydrationGoalDays.length >= 1
-        ? sortedChronologically(hydrationGoalDays)[0]?.date
-        : undefined
-    ),
+    // --- Hydration ---
     milestone(
       "five-hydration-goals",
-      "Five Hydration Days",
+      "5 Hydration Goals",
       "5x Goal",
-      "Five days hitting the hydration goal. A real system now.",
-      "hydration", "silver", "droplets",
+      "Five days hitting the hydration target. A system is forming.",
+      "hydration", "field", "droplets",
       hydrationGoalDays.length, 5,
       dateAtNthMatch(
         sorted,
@@ -482,34 +361,265 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
         5
       )
     ),
+
+    // --- Load ---
     milestone(
-      "ten-hydration-goals",
-      "Ten Hydration Days",
-      "10x Goal",
-      "Ten hydration goal days. Safety and performance locked in.",
-      "hydration", "gold", "droplets",
-      hydrationGoalDays.length, 10,
+      "five-heavy-days",
+      "5 Heavy Days",
+      "5 Heavy",
+      "Five heavy or brutal load days on the record.",
+      "load", "field", "package",
+      heavyOrBrutalDays.length, 5,
+      dateAtNthMatch(sorted, (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal", 5)
+    ),
+
+    // --- Weather ---
+    milestone(
+      "first-heat-day",
+      "First Heat Day",
+      "Heat",
+      "First dispatch logged on a heat day. Hydration becomes survival.",
+      "weather", "field", "flame",
+      heatDays.length, 1,
+      heatDays.length >= 1 ? sortedChronologically(heatDays)[0]?.date : undefined
+    ),
+    milestone(
+      "first-storm",
+      "First Storm",
+      "Storm",
+      "First route completed in storm conditions. Conditions were real.",
+      "weather", "field", "zap",
+      stormDays.length, 1,
+      stormDays.length >= 1 ? sortedChronologically(stormDays)[0]?.date : undefined
+    ),
+
+    // --- Safety ---
+    milestone(
+      "first-dog-encounter",
+      "First Dog Encounter",
+      "Dog",
+      "First logged dog encounter. Assessed and redirected.",
+      "safety", "field", "shield",
+      dogDays.length, 1,
+      dogDays.length >= 1 ? sortedChronologically(dogDays)[0]?.date : undefined
+    ),
+
+    // ===================================================================
+    // CAMPAIGN QUALIFICATION
+    // ===================================================================
+
+    // --- Days ---
+    milestone(
+      "fifty-logged-days",
+      "50 Logged Days",
+      "50 Days",
+      "Fifty field days. Not a rookie anymore.",
+      "days", "campaign", "calendar",
+      daysLogged, 50,
+      dateAtNthMatch(sorted, () => true, 50),
+      "days"
+    ),
+
+    // --- Distance ---
+    milestone(
+      "two-fifty-miles",
+      "250 Miles",
+      "250 mi",
+      "Two hundred fifty miles of field work. Satchel-hardened.",
+      "distance", "campaign", "map-pin",
+      totalMiles, 250,
+      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 250),
+      "mi"
+    ),
+    milestone(
+      "five-hundred-miles",
+      "500 Miles",
+      "500 mi",
+      "Five hundred miles on foot. The route is part of you now.",
+      "distance", "campaign", "map-pin",
+      totalMiles, 500,
+      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 500),
+      "mi"
+    ),
+
+    // --- Weather ---
+    milestone(
+      "ten-heat-days",
+      "10 Heat Days",
+      "10 Heat",
+      "Ten heat days worked and logged. The body has adapted.",
+      "weather", "campaign", "flame",
+      heatDays.length, 10,
+      dateAtNthMatch(sorted, (d) => !!(d.heatDay || effectiveTemp(d) >= 90), 10)
+    ),
+    milestone(
+      "ten-weather-days",
+      "10 Weather Days",
+      "10 Wx",
+      "Ten days in meaningful weather: rain, storm, snow, or heat.",
+      "weather", "campaign", "cloud-rain",
+      weatherDays.length, 10,
+      dateAtNthMatch(sorted, isWeatherDay, 10)
+    ),
+    milestone(
+      "first-snow",
+      "First Snow",
+      "Snow",
+      "First route completed in snow. A different kind of challenge.",
+      "weather", "campaign", "snowflake",
+      snowDays.length, 1,
+      snowDays.length >= 1 ? sortedChronologically(snowDays)[0]?.date : undefined
+    ),
+
+    // --- Hydration ---
+    milestone(
+      "twenty-five-hydration-goals",
+      "25 Hydration Goals",
+      "25x Goal",
+      "Twenty-five hydration goal days. Consistency on record.",
+      "hydration", "campaign", "droplets",
+      hydrationGoalDays.length, 25,
       dateAtNthMatch(
         sorted,
         (d) =>
           d.waterOz !== undefined &&
           d.hydrationGoalOz !== undefined &&
           d.waterOz >= d.hydrationGoalOz,
-        10
+        25
       )
     ),
 
-    // ------- Good Samaritan -------
+    // --- Load ---
+    milestone(
+      "ten-heavy-days",
+      "10 Heavy Days",
+      "10 Heavy",
+      "Ten heavy or brutal load days on the record. Character built.",
+      "load", "campaign", "package",
+      heavyOrBrutalDays.length, 10,
+      dateAtNthMatch(sorted, (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal", 10)
+    ),
+
+    // --- Service ---
     milestone(
       "first-good-samaritan",
-      "Good Samaritan Act",
+      "Good Samaritan",
       "Samaritan",
-      "First logged Good Samaritan act on the route.",
-      "service", "gold", "heart",
+      "First Good Samaritan act logged on the route.",
+      "service", "campaign", "heart",
       goodSamaritanDays.length, 1,
       goodSamaritanDays.length >= 1
         ? sortedChronologically(goodSamaritanDays)[0]?.date
         : undefined
+    ),
+
+    // ===================================================================
+    // VETERAN RECORD
+    // ===================================================================
+
+    // --- Days ---
+    milestone(
+      "hundred-logged-days",
+      "100 Logged Days",
+      "100 Days",
+      "One hundred logged dispatches. A genuine field service milestone.",
+      "days", "veteran", "calendar",
+      daysLogged, 100,
+      dateAtNthMatch(sorted, () => true, 100),
+      "days"
+    ),
+
+    // --- Distance ---
+    milestone(
+      "thousand-miles",
+      "1,000 Miles",
+      "1K mi",
+      "One thousand miles on foot. Routebound.",
+      "distance", "veteran", "map-pin",
+      totalMiles, 1000,
+      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 1000),
+      "mi"
+    ),
+    milestone(
+      "twenty-five-hundred-miles",
+      "2,500 Miles",
+      "2.5K mi",
+      "Twenty-five hundred miles. Relay Commander territory.",
+      "distance", "veteran", "map-pin",
+      totalMiles, 2500,
+      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 2500),
+      "mi"
+    ),
+
+    // --- Hydration ---
+    milestone(
+      "hundred-hydration-goals",
+      "100 Hydration Goals",
+      "100x Goal",
+      "One hundred hydration goal days. A documented commitment to field safety.",
+      "hydration", "veteran", "droplets",
+      hydrationGoalDays.length, 100,
+      dateAtNthMatch(
+        sorted,
+        (d) =>
+          d.waterOz !== undefined &&
+          d.hydrationGoalOz !== undefined &&
+          d.waterOz >= d.hydrationGoalOz,
+        100
+      )
+    ),
+
+    // --- Weather ---
+    milestone(
+      "twenty-five-heat-days",
+      "25 Heat Days",
+      "25 Heat",
+      "Twenty-five heat days worked. Heat-tested and qualified.",
+      "weather", "veteran", "flame",
+      heatDays.length, 25,
+      dateAtNthMatch(sorted, (d) => !!(d.heatDay || effectiveTemp(d) >= 90), 25)
+    ),
+    milestone(
+      "twenty-five-weather-days",
+      "25 Weather Days",
+      "25 Wx",
+      "Twenty-five weather days on record. Conditions are never a surprise.",
+      "weather", "veteran", "cloud-rain",
+      weatherDays.length, 25,
+      dateAtNthMatch(sorted, isWeatherDay, 25)
+    ),
+
+    // --- Load ---
+    milestone(
+      "fifty-heavy-days",
+      "50 Heavy Days",
+      "50 Heavy",
+      "Fifty heavy or brutal load days on the record. Field-hardened.",
+      "load", "veteran", "package",
+      heavyOrBrutalDays.length, 50,
+      dateAtNthMatch(sorted, (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal", 50)
+    ),
+
+    // --- Safety ---
+    milestone(
+      "twenty-five-dog-encounters",
+      "25 Dog Encounters",
+      "25 Dogs",
+      "Twenty-five logged dog encounters. Reading the route is second nature.",
+      "safety", "veteran", "shield",
+      dogDays.length, 25,
+      dateAtNthMatch(sorted, (d) => !!d.dogEncounter, 25)
+    ),
+
+    // --- Service ---
+    milestone(
+      "five-good-samaritan",
+      "5 Good Samaritan Notes",
+      "5 Sam.",
+      "Five Good Samaritan acts on the field record.",
+      "service", "veteran", "heart",
+      goodSamaritanDays.length, 5,
+      dateAtNthMatch(sorted, isGoodSamaritanAct, 5)
     ),
   ];
 }

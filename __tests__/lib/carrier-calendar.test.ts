@@ -74,7 +74,7 @@ describe("groupDispatchesByDate", () => {
     const map = groupDispatchesByDate(dispatches);
     const group = map.get("2026-05-20") ?? [];
     const totalMiles = Math.round(group.reduce((s, d) => s + d.milesWalked, 0) * 10) / 10;
-    const totalSteps = group.reduce((s, d) => s + d.steps, 0);
+    const totalSteps = group.reduce((s, d) => s + (d.steps ?? 0), 0);
     expect(totalMiles).toBe(8.7);
     expect(totalSteps).toBe(17800);
   });

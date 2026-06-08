@@ -47,21 +47,28 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 // ---------------------------------------------------------------------------
-// Tier colors
+// Tier colors — grounded field-record palette (no fantasy RPG hues)
 // ---------------------------------------------------------------------------
 
 const TIER_COLOR: Record<CarrierMilestoneTier, string> = {
-  bronze: "rgb(180 83 9)",    // amber-700
-  silver: "rgb(148 163 184)", // slate-400
-  gold: "rgb(234 179 8)",     // yellow-500
-  legendary: "rgb(167 139 250)", // violet-400
+  basic:    "rgb(148 163 184)",    // slate-400 — entry qualification
+  field:    "rgb(var(--neon))",    // site neon — active field service
+  campaign: "rgb(234 179 8)",      // yellow-500 — sustained campaign record
+  veteran:  "rgb(167 139 250)",    // violet-400 — veteran record
 };
 
 const TIER_BORDER: Record<CarrierMilestoneTier, string> = {
-  bronze: "rgba(180, 83, 9, 0.4)",
-  silver: "rgba(148, 163, 184, 0.4)",
-  gold: "rgba(234, 179, 8, 0.4)",
-  legendary: "rgba(167, 139, 250, 0.4)",
+  basic:    "rgba(148, 163, 184, 0.4)",
+  field:    "rgba(var(--neon), 0.4)",
+  campaign: "rgba(234, 179, 8, 0.4)",
+  veteran:  "rgba(167, 139, 250, 0.4)",
+};
+
+const TIER_LABEL: Record<CarrierMilestoneTier, string> = {
+  basic:    "BASIC QUALIFICATION",
+  field:    "FIELD QUALIFICATION",
+  campaign: "CAMPAIGN QUALIFICATION",
+  veteran:  "VETERAN RECORD",
 };
 
 // ---------------------------------------------------------------------------
@@ -83,7 +90,7 @@ function BadgeCard({ badge }: { badge: CarrierMilestone }) {
       }}
       title={badge.description}
     >
-      {/* Tier indicator */}
+      {/* Tier indicator dot */}
       {badge.unlocked && (
         <div
           className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full"
@@ -106,7 +113,7 @@ function BadgeCard({ badge }: { badge: CarrierMilestone }) {
         {badge.shortLabel}
       </div>
 
-      {/* Progress (when locked) */}
+      {/* Progress (when locked and target > 1) */}
       {!badge.unlocked && badge.target > 1 && (
         <div className="font-[var(--font-ocr)] text-[8px] text-[rgb(var(--text-meta))] tracking-wide leading-tight">
           {badge.progress.toLocaleString()}/{badge.target.toLocaleString()}
@@ -144,7 +151,11 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
   const milestones = getCarrierMilestones(dispatches);
   const unlockedCount = milestones.filter((m) => m.unlocked).length;
 
-  const tierOrder: CarrierMilestoneTier[] = ["bronze", "silver", "gold", "legendary"];
+  const tierOrder: CarrierMilestoneTier[] = ["basic", "field", "campaign", "veteran"];
+
+  const milesUntilNext = level.nextMiles != null
+    ? Math.max(0, Math.round((level.nextMiles - level.totalMiles) * 10) / 10)
+    : null;
 
   return (
     <div className="surface-panel p-5 sm:p-6 space-y-5">
@@ -152,59 +163,48 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))] mb-1">
-            FIELD BADGES // CARRIER RANK
+            FIELD QUALIFICATIONS // CARRIER RECORD
           </div>
           <div className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--text-color))]">
             {level.title}
           </div>
         </div>
-        <div className="flex gap-3 shrink-0">
-          <div className="border border-[rgb(var(--neon)/0.2)] px-3 py-2 text-center min-w-[72px]">
-            <div className="font-[var(--font-ibm)] text-xl text-[rgb(var(--neon))]">
-              {level.xp.toLocaleString()}
-            </div>
-            <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
-              XP
-            </div>
+        <div className="border border-[rgb(var(--neon)/0.2)] px-3 py-2 text-center min-w-[72px] shrink-0">
+          <div className="font-[var(--font-ibm)] text-xl text-[rgb(var(--neon))]">
+            {unlockedCount}/{milestones.length}
           </div>
-          <div className="border border-[rgb(var(--neon)/0.2)] px-3 py-2 text-center min-w-[72px]">
-            <div className="font-[var(--font-ibm)] text-xl text-[rgb(var(--neon))]">
-              {unlockedCount}/{milestones.length}
-            </div>
-            <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
-              BADGES
-            </div>
+          <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
+            QUALS
           </div>
         </div>
       </div>
 
-      {/* Level progression */}
+      {/* Rank progression */}
       <div className="space-y-1.5">
         <div className="flex justify-between text-[10px] font-[var(--font-ocr)] tracking-widest">
           <span className="text-[rgb(var(--text-label))]">
             {level.totalMiles} mi
           </span>
-          {level.nextTitle && (
+          {level.nextTitle && milesUntilNext != null && (
             <span className="text-[rgb(var(--text-meta))]">
-              {level.nextMiles} mi → {level.nextTitle}
+              {milesUntilNext} mi until {level.nextTitle}
             </span>
           )}
         </div>
         <ProgressBar value={level.progressToNext} color="rgb(var(--neon))" />
       </div>
 
-      {/* Badge grid by tier */}
+      {/* Qualification groups by tier */}
       {tierOrder.map((tier) => {
         const badges = milestones.filter((m) => m.tier === tier);
         if (badges.length === 0) return null;
-        const tierLabel = tier.toUpperCase();
         return (
           <div key={tier}>
             <div
               className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] mb-2"
               style={{ color: TIER_COLOR[tier] }}
             >
-              {tierLabel}
+              {TIER_LABEL[tier]}
             </div>
             <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-1.5">
               {badges.map((badge) => (
@@ -215,9 +215,9 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
         );
       })}
 
-      {/* Footer note */}
+      {/* Footer */}
       <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] pt-1 border-t border-[rgb(var(--border)/0.15)]">
-        BADGES COMPUTED FROM LOGGED DISPATCH DATA // NO MANUAL INPUT
+        QUALIFICATIONS COMPUTED FROM FIELD DATA
       </div>
     </div>
   );

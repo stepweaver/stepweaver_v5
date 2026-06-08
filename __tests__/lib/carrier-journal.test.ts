@@ -108,72 +108,72 @@ describe("carrier's log totals", () => {
 });
 
 describe("getCarrierLevel", () => {
-  it("returns Academy Walker at 0 miles", () => {
+  it("returns Recruit Walker at 0 miles", () => {
     const level = getCarrierLevel([]);
-    expect(level.title).toBe("Academy Walker");
+    expect(level.title).toBe("Recruit Walker");
     expect(level.level).toBe(1);
-    expect(level.xp).toBe(0);
   });
 
-  it("returns Block Rookie between 10 and 24 miles", () => {
+  it("returns First Loop between 25 and 49 miles", () => {
     const level = getCarrierLevel([
-      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 15 }),
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 30 }),
     ]);
-    expect(level.title).toBe("Block Rookie");
+    expect(level.title).toBe("First Loop");
     expect(level.level).toBe(2);
   });
 
-  it("returns Pavement Regular at exactly 100 miles", () => {
+  it("returns Foot Patrol at exactly 100 miles", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 100 }),
     ]);
-    expect(level.title).toBe("Pavement Regular");
-    expect(level.level).toBe(5);
+    expect(level.title).toBe("Foot Patrol");
+    expect(level.level).toBe(4);
   });
 
-  it("returns Thousand-Mile Carrier at 1000+ miles", () => {
+  it("returns Route Veteran at 1000+ miles with no next rank", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 1200 }),
     ]);
-    expect(level.title).toBe("Thousand-Mile Carrier");
+    expect(level.title).toBe("Route Veteran");
+    expect(level.nextTitle).toBe("Relay Commander");
+  });
+
+  it("returns Carrier Legend at max rank with no next rank", () => {
+    const level = getCarrierLevel([
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 10001 }),
+    ]);
+    expect(level.title).toBe("Carrier Legend");
     expect(level.progressToNext).toBe(100);
     expect(level.nextTitle).toBeUndefined();
   });
 
-  it("computes XP as round(totalMiles * 10)", () => {
-    const level = getCarrierLevel([
-      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 9.5 }),
-    ]);
-    expect(level.xp).toBe(95);
-  });
-
   it("computes progressToNext as a percentage", () => {
     const level = getCarrierLevel([
-      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 17.5 }),
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 37.5 }),
     ]);
-    // 17.5 miles → Block Rookie (10–25 range). Progress = (17.5-10)/(25-10)*100 = 50%
-    expect(level.title).toBe("Block Rookie");
+    // 37.5 miles → First Loop (25–50 range). Progress = (37.5-25)/(50-25)*100 = 50%
+    expect(level.title).toBe("First Loop");
     expect(level.progressToNext).toBe(50);
   });
 });
 
 describe("getCarrierMilestones", () => {
-  it("unlocks first-dispatch when one dispatch exists", () => {
+  it("unlocks day-one when one dispatch exists", () => {
     const milestones = getCarrierMilestones([
       dispatch({ id: "a", date: "2026-05-01", title: "A" }),
     ]);
-    const badge = milestones.find((m) => m.id === "first-dispatch");
+    const badge = milestones.find((m) => m.id === "day-one");
     expect(badge?.unlocked).toBe(true);
     expect(badge?.unlockedAt).toBe("2026-05-01");
   });
 
-  it("does not unlock five-dispatches with only 3 dispatches", () => {
+  it("does not unlock five-logged-days with only 3 dispatches", () => {
     const dispatches = [
       dispatch({ id: "a", date: "2026-05-01", title: "A" }),
       dispatch({ id: "b", date: "2026-05-02", title: "B" }),
       dispatch({ id: "c", date: "2026-05-03", title: "C" }),
     ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "five-dispatches");
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "five-logged-days");
     expect(badge?.unlocked).toBe(false);
     expect(badge?.progress).toBe(3);
   });
@@ -187,25 +187,38 @@ describe("getCarrierMilestones", () => {
     expect(badge?.unlocked).toBe(true);
   });
 
-  it("uses heatIndexF for first-heat-80 badge when heatIndexF >= 80", () => {
+  it("unlocks first-heat-day badge via heatDay flag", () => {
     const dispatches = [
       dispatch({
         id: "a",
         date: "2026-05-01",
         title: "A",
-        temperatureF: 75,
-        heatIndexF: 82,
+        heatDay: true,
       }),
     ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-80");
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-day");
     expect(badge?.unlocked).toBe(true);
   });
 
-  it("does not unlock first-heat-80 when temp and heatIndex are both below 80", () => {
+  it("unlocks first-heat-day badge when heatIndexF >= 90", () => {
     const dispatches = [
-      dispatch({ id: "a", date: "2026-05-01", title: "A", temperatureF: 75 }),
+      dispatch({
+        id: "a",
+        date: "2026-05-01",
+        title: "A",
+        temperatureF: 85,
+        heatIndexF: 92,
+      }),
     ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-80");
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-day");
+    expect(badge?.unlocked).toBe(true);
+  });
+
+  it("does not unlock first-heat-day when heatDay is false and temp/heatIndex below 90", () => {
+    const dispatches = [
+      dispatch({ id: "a", date: "2026-05-01", title: "A", temperatureF: 85, heatIndexF: 88 }),
+    ];
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-day");
     expect(badge?.unlocked).toBe(false);
   });
 
