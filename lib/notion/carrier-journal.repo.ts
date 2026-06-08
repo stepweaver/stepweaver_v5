@@ -97,9 +97,9 @@ function parseRoutePreference(raw: string): RoutePreference | undefined {
 function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const p = page.properties as Record<string, unknown>;
 
-  const title = str(p.Title as Props, "title");
   const date = dateStr(p.Date as Props);
-  if (!title || !date) return null;
+  if (!date) return null;
+  const title = str(p.Title as Props, "title") || date;
 
   const milesWalked = num(p["Miles Walked"] as Props) ?? 0;
   const steps = num(p.Steps as Props) ?? 0;
