@@ -7,7 +7,6 @@ import type { CarrierDispatch } from "./carrier-journal";
 export type CarrierMilestoneCategory =
   | "days"
   | "distance"
-  | "steps"
   | "weather"
   | "load"
   | "safety"
@@ -149,7 +148,6 @@ export function getCarrierLevel(dispatches: CarrierDispatch[]): CarrierLevel {
 export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMilestone[] {
   const sorted = sortedChronologically(dispatches);
   const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
-  const totalSteps = dispatches.reduce((s, d) => s + d.steps, 0);
   const daysLogged = dispatches.length;
 
   const rainDays = dispatches.filter((d) => d.rain);
@@ -340,57 +338,15 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 500),
       "mi"
     ),
-
-    // ------- Steps -------
     milestone(
-      "twenty-five-k-steps",
-      "25K Steps",
-      "25K",
-      "Twenty-five thousand steps logged in total.",
-      "steps", "bronze", "activity",
-      totalSteps, 25_000,
-      dateAtCumulativeThreshold(sorted, (d) => d.steps, 25_000),
-      "steps"
-    ),
-    milestone(
-      "hundred-k-steps",
-      "100K Steps",
-      "100K",
-      "A hundred thousand cumulative steps. That is not nothing.",
-      "steps", "silver", "activity",
-      totalSteps, 100_000,
-      dateAtCumulativeThreshold(sorted, (d) => d.steps, 100_000),
-      "steps"
-    ),
-    milestone(
-      "quarter-million-steps",
-      "Quarter Million",
-      "250K",
-      "Two hundred fifty thousand steps. Built one route at a time.",
-      "steps", "silver", "activity",
-      totalSteps, 250_000,
-      dateAtCumulativeThreshold(sorted, (d) => d.steps, 250_000),
-      "steps"
-    ),
-    milestone(
-      "half-million-steps",
-      "Half Million Steps",
-      "500K",
-      "Five hundred thousand steps. A certified pavement warrior.",
-      "steps", "gold", "activity",
-      totalSteps, 500_000,
-      dateAtCumulativeThreshold(sorted, (d) => d.steps, 500_000),
-      "steps"
-    ),
-    milestone(
-      "million-steps",
-      "Million-Step Carrier",
-      "1M",
-      "One million steps. Legendary endurance.",
-      "steps", "legendary", "activity",
-      totalSteps, 1_000_000,
-      dateAtCumulativeThreshold(sorted, (d) => d.steps, 1_000_000),
-      "steps"
+      "thousand-miles",
+      "Routebound",
+      "1,000 mi",
+      "One thousand miles on foot. The route is part of you now.",
+      "distance", "legendary", "map-pin",
+      totalMiles, 1000,
+      dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 1000),
+      "mi"
     ),
 
     // ------- Weather -------

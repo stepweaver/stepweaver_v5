@@ -15,12 +15,36 @@ import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 import { CarrierProfileCard } from "./carrier-profile-card";
 
 const TRACKING_ITEMS = [
-  { category: "Physical load", detail: "Miles walked, steps, soreness, recovery signals, body notes" },
-  { category: "Transformation", detail: "Phase progression, weight trend (public-safe modes only), capacity building" },
-  { category: "Environmental load", detail: "Heat index, rain, snow, storms" },
-  { category: "Operational load", detail: "Perceived mail volume, route difficulty, breaks taken" },
-  { category: "Safety signals", detail: "Hydration discipline, heat risk, dog encounters" },
-  { category: "Public narrative", detail: "Sanitized field reflections only, with no addresses, names, or route data" },
+  { category: "Physical load", detail: "Miles walked, soreness, recovery signals, body notes" },
+  { category: "Hydration and fuel", detail: "Water, Gatorade, route snacks, hunger and thirst adjustments" },
+  { category: "Transformation", detail: "Phase progression, weekly weight trend, capacity building" },
+  { category: "Environmental load", detail: "Heat index, rain, snow, storms, temperature swings" },
+  { category: "Operational load", detail: "Perceived mail-load severity, route difficulty, breaks taken" },
+  { category: "Safety signals", detail: "Hydration discipline, heat risk, dog encounters, fatigue markers" },
+  { category: "Published narrative", detail: "Route-day reflections and field notes" },
+];
+
+const FIELD_METHOD_CARDS = [
+  {
+    label: "MOVEMENT LOAD",
+    title: "Miles, not steps",
+    body: "Miles are the main movement signal because they map cleanly to route effort and are easier to compare across days.",
+  },
+  {
+    label: "FUEL + HYDRATION",
+    title: "Eat and drink by field demand",
+    body: "Food and water are adjusted around hunger, thirst, heat, soreness, and end-of-shift energy.",
+  },
+  {
+    label: "RECOVERY SIGNALS",
+    title: "Soreness, energy, mood",
+    body: "Subjective scores help identify whether the body is adapting or just accumulating fatigue.",
+  },
+  {
+    label: "TREND, NOT SCOREBOARD",
+    title: "Weekly weight check",
+    body: "Weight is treated as a weekly trend marker, not a daily judgment.",
+  },
 ];
 
 const TRANSFORMATION_ARC = [
@@ -106,7 +130,7 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
               Carrier&apos;s Log
             </h1>
             <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
-              A public-safe field log from starting overweight and learning life as a city letter carrier:
+              A personal field log from starting overweight and learning life as a city letter carrier:
               miles, hydration, recovery, phase progression, and the operational lessons hiding inside a walking route.
             </p>
           </div>
@@ -121,11 +145,9 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             NOTICE // UNOFFICIAL PERSONAL LOG
           </div>
           <p className="text-xs text-[rgb(var(--text-meta))] leading-relaxed">
-            Carrier&apos;s Log is an unofficial personal field log. It is not affiliated with, endorsed by, or
-            representative of the United States Postal Service or any other organization. Entries deliberately omit
-            addresses, route numbers, customer names, coworker names, scanner data, and official mail volume figures.
-            Weight and body data follow explicit public-sharing modes, and raw numbers are never shown unless configured.
-            All observations are personal and public-safe only.
+            Carrier&apos;s Log is an unofficial personal field log. Not affiliated with, endorsed by, or representative
+            of the United States Postal Service or any other organization. This log does not include addresses, customer
+            names, coworker names, route numbers, scanner data, or internal USPS operational details.
           </p>
         </div>
 
@@ -146,6 +168,69 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
 
         {/* Field Badges: cumulative milestones computed from dispatch data */}
         <CarrierMilestonePanel dispatches={dispatches} />
+
+        {/* Field Method */}
+        <div className="surface-panel p-6 sm:p-8">
+          <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--neon))] mb-2">
+            FIELD METHOD
+          </div>
+          <h2 className="font-[var(--font-ibm)] text-xl text-[rgb(var(--text-color))] mb-4">
+            How I&apos;m Tracking the Transformation
+          </h2>
+          <div className="space-y-4 text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-6">
+            <p>
+              Carrier&apos;s Log is a personal field record, not a diet plan and not a medical study.
+              The method is simple: log the work, watch the patterns, and adjust the levers that appear to matter.
+            </p>
+            <p>
+              I am tracking miles, hydration, weather, heat index, mail-load severity, soreness, energy, mood, recovery
+              notes, and weekly weight trend. The point is to document what the work costs, what helps, and what
+              doesn&apos;t — a field record of adaptation.
+            </p>
+            <p>
+              I am not weighing myself every day. Weight is a weekly trend marker, not a daily scoreboard. The
+              day-to-day signals are simpler: how far I walked, how much water I needed, how sore I felt, how much
+              energy I had left, and whether recovery helped me show up again.
+            </p>
+            <p>
+              I am also not running a strict diet. I am letting the work create the signal. I eat when I&apos;m hungry
+              and drink when I&apos;m thirsty, then I adjust based on what the route teaches me. As the miles increased,
+              the food changed naturally: more trail mix, nuts, bananas, Gatorade, water, and a daily multivitamin.
+              The goal is not perfection. The goal is enough fuel, enough hydration, and enough recovery to keep adapting.
+            </p>
+            <p>
+              Mountain Dew remains part of the story. I still drink it, because I love it, but I keep it at home after
+              shift instead of treating it like route fuel.
+            </p>
+          </div>
+
+          <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-4">
+            THE WORKING LOOP
+          </div>
+          <div className="font-[var(--font-ibm)] text-sm text-[rgb(var(--neon))] mb-6 tracking-wide">
+            Observe → Log → Recover → Adjust → Repeat
+          </div>
+
+          <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-6">
+            If weight drops, soreness changes, endurance improves, heat tolerance improves, or energy stabilizes, I will
+            pull harder on the levers that seem to be working. If something creates problems, I will back off. The system
+            is organic, but it is still documented.
+          </p>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
+            {FIELD_METHOD_CARDS.map((card) => (
+              <div key={card.label} className="bg-[rgb(var(--panel))] p-5">
+                <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mb-1">
+                  {card.label}
+                </div>
+                <h3 className="font-[var(--font-ibm)] text-sm text-[rgb(var(--text-color))] mb-2">
+                  {card.title}
+                </h3>
+                <p className="text-xs text-[rgb(var(--text-secondary))] leading-relaxed">{card.body}</p>
+              </div>
+            ))}
+          </div>
+        </div>
 
         {/* Field Dispatches: only entries with authored content */}
         {feedDispatches.length > 0 && (
@@ -194,12 +279,18 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             </div>
           </div>
           <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-3">
-            Hydration is tracked as a safety and performance signal, not a wellness trophy. On heat-index days,
-            falling behind on water shows up as energy crashes, soreness spikes, and bad decision-making late in the route.
+            Hydration is tracked as a safety and performance signal, not a wellness trophy. I am not trying to win a
+            water-drinking contest. I am learning how much fluid the work actually demands, especially when heat index,
+            mail load, and walking distance stack together.
+          </p>
+          <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-3">
+            On hotter days, thirst arrives late. If water intake is falling behind, energy drops, soreness climbs, and
+            decision-making gets worse near the end of the route. That makes hydration an operational risk, not just a
+            health habit.
           </p>
           <p className="text-xs text-[rgb(var(--warn))] font-[var(--font-ocr)] tracking-wide border border-[rgb(var(--warn)/0.3)] px-3 py-2">
-            HEAT-DAY NOTE: If the heat index is climbing and water intake is below goal by mid-route, treat it as a
-            operational risk, so slow down, drink, and adjust expectations for the rest of the shift.
+            HEAT-DAY NOTE: If the heat index is climbing and water intake is below goal by mid-route, treat it as an
+            operational risk. Slow down, drink, and adjust expectations for the rest of the shift.
           </p>
         </div>
 
@@ -344,7 +435,7 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)] mt-8">
             {[
               { signal: "Static → Notion", title: "Evolving data source", explanation: "Phase 1 is static; Phase 2 wires to a private Notion database with a public filter" },
-              { signal: "Public / Private", title: "Hard data boundary", explanation: "Only public-safe entries and aggregate KPIs ever appear here" },
+              { signal: "Public / Private", title: "Hard data boundary", explanation: "Only published entries and aggregate KPIs appear here; private notes never leave the logging tool" },
               { signal: "Field-first UX", title: "Mobile constraint", explanation: "The logging tool runs on a phone mid-route; friction is the enemy" },
             ].map((s) => (
               <div key={s.title} className="bg-[rgb(var(--panel))] p-5">

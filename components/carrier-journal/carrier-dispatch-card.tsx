@@ -85,10 +85,9 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
       )}
 
       {/* KPI telemetry row: secondary */}
-      <div className="grid grid-cols-3 sm:grid-cols-5 gap-px bg-[rgb(var(--border)/0.12)]">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[rgb(var(--border)/0.12)]">
         {[
           { label: "MILES", value: `${d.milesWalked}` },
-          { label: "STEPS", value: d.steps.toLocaleString() },
           { label: "SORENESS", value: `${d.soreness}/10` },
           { label: "ENERGY", value: `${d.energy}/10` },
           { label: "MOOD", value: `${d.mood}/10` },

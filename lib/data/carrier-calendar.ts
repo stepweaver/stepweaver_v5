@@ -148,7 +148,8 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
   }
 
   const totalMiles = Math.round(dispatches.reduce((s, d) => s + d.milesWalked, 0) * 10) / 10;
-  const totalSteps = dispatches.reduce((s, d) => s + d.steps, 0);
+  // Steps are retained internally but not surfaced in public UI.
+  const totalSteps = dispatches.reduce((s, d) => s + (d.steps ?? 0), 0);
 
   let rain = false;
   let storm = false;

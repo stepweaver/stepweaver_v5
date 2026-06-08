@@ -1,4 +1,4 @@
-/** Public-safe letter carrier field log data. No addresses, route numbers, coworker/customer names, scanner data, or official mail volume. */
+/** Letter carrier field log data. No addresses, route numbers, coworker/customer names, scanner data, or official mail volume. */
 
 export const CARRIER_KPI_EMPTY = "n/a";
 
@@ -16,7 +16,8 @@ export type CarrierDispatch = {
   date: string;
   title: string;
   milesWalked: number;
-  steps: number;
+  /** Steps are logged internally but not surfaced in public UI or KPIs. */
+  steps?: number;
   soreness: number; // 1–10
   energy: number; // 1–10
   mood: number; // 1–10
@@ -37,7 +38,7 @@ export type CarrierDispatch = {
   bodyNote?: string;
   recoveryNote?: string;
   phase?: CarrierPhase;
-  /** Public-safe semantic tags for milestone evaluation and reflection filtering. */
+  /** Semantic tags for milestone evaluation and reflection filtering. */
   tags?: string[];
   /** Optional flag for a Good Samaritan act logged during the dispatch. */
   goodSamaritanAct?: boolean;
@@ -234,7 +235,8 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
   }
 
   const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
-  const totalSteps = dispatches.reduce((s, d) => s + d.steps, 0);
+  // Steps are retained for internal computation but not exposed in public KPIs or UI.
+  const totalSteps = dispatches.reduce((s, d) => s + (d.steps ?? 0), 0);
   const heatDays = dispatches.filter((d) => d.heatDay).length;
   const weatherDays = dispatches.filter((d) => d.rain || d.storm || d.snow).length;
   const heavyBrutalDays = dispatches.filter(
@@ -372,7 +374,6 @@ export function totalsToKpis(t: CarrierTotals, dispatches: CarrierDispatch[] = [
     { label: "Days Logged", value: String(t.daysLogged), detail: "Active field days" },
     { label: "Total Miles", value: `${t.totalMiles} mi`, detail: "Cumulative walking distance" },
     { label: "Avg Miles / Day", value: `${t.avgMilesPerDay} mi`, detail: "Per logged shift" },
-    { label: "Total Steps", value: t.totalSteps.toLocaleString(), detail: "Cumulative step count" },
     {
       label: "Avg Water / Day",
       value: t.avgWaterOz > 0 ? `${t.avgWaterOz} oz` : CARRIER_KPI_EMPTY,
@@ -423,7 +424,6 @@ export function getMailLoadSummary(): Record<MailLoad, number> {
 export function dispatchHasPublicKpiData(d: CarrierDispatch): boolean {
   return (
     d.milesWalked > 0 ||
-    d.steps > 0 ||
     d.waterOz !== undefined ||
     d.weightLbs !== undefined ||
     !!d.bodyNote?.trim() ||

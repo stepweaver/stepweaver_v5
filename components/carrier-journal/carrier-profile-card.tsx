@@ -101,7 +101,7 @@ export function CarrierProfileCard() {
         <div className="pt-1">
           <p className="font-[var(--font-ibm)] text-[rgb(var(--text-color))] text-sm leading-relaxed">
             Started overweight and green. Learning what a walking route actually costs: feet, hydration, heat,
-            and the quiet math of showing up five days a week and not falling apart.
+            and the quiet math of showing up shift after shift and not falling apart.
           </p>
         </div>
 

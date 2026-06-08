@@ -177,14 +177,6 @@ function SelectedDayPanel({ day, onClose }: { day: DaySummary; onClose: () => vo
                 MILES
               </div>
             </div>
-            <div>
-              <div className="font-[var(--font-ibm)] text-lg text-[rgb(var(--neon))]">
-                {day.totalSteps.toLocaleString()}
-              </div>
-              <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))]">
-                STEPS
-              </div>
-            </div>
           </div>
 
           {/* Conditions */}

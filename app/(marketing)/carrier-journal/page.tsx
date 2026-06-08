@@ -10,11 +10,11 @@ const absoluteImageUrl = `${SITE_URL}/images/carrier_log.png`;
 export const metadata: Metadata = {
   title: "Carrier's Log | Stephen Weaver",
   description:
-    "A public-safe letter carrier field log: miles, hydration, recovery, phase progression, and field KPIs from city mail routes.",
+    "A personal field log from life as a city letter carrier: miles, hydration, recovery, phase progression, and field KPIs from walking routes.",
   openGraph: {
     title: "Carrier's Log",
     description:
-      "A public-safe letter carrier field log: miles, hydration, recovery, phase progression, and field KPIs from city mail routes.",
+      "A personal field log from life as a city letter carrier: miles, hydration, recovery, phase progression, and field KPIs from walking routes.",
     type: "website",
     url: `${SITE_URL}/carrier-journal`,
     images: [{ url: absoluteImageUrl, width: 1200, height: 630, alt: "Carrier's Log" }],
@@ -23,7 +23,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Carrier's Log",
     description:
-      "A public-safe letter carrier field log: miles, hydration, recovery, phase progression, and field KPIs from city mail routes.",
+      "A personal field log from life as a city letter carrier: miles, hydration, recovery, phase progression, and field KPIs from walking routes.",
     images: [absoluteImageUrl],
   },
 };
