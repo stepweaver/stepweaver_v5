@@ -47,7 +47,6 @@ const COMMAND_GUIDE = [
   { command: "roll <notation>", summary: "Dice, advantage, disadvantage" },
   { command: "cd <dest>", summary: "Jump to sections/pages" },
   { command: "zork", summary: "Play terminal adventure" },
-  { command: "adventure", summary: "Alias for zork" },
   { command: "blackjack", summary: "Play Blackjack" },
   { command: "contact", summary: "Send message" },
   { command: "clear", summary: "Clear screen" },

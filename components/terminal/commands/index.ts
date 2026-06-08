@@ -2,7 +2,7 @@ import type { CommandContext, CommandResult, WeatherPickOption } from '../types'
 import { buildChatRequestPayload } from '@/lib/chat/request-builder';
 import { resumeMenuLines } from '@/lib/terminal/resume-content';
 import { codexHelpLines, ensureCodexPosts } from '@/lib/terminal/codex-terminal';
-import { startAdventureGame, startZorkGame } from '@/lib/terminal/zork-terminal';
+import { startZorkGame } from '@/lib/terminal/zork-terminal';
 import { startBlackjack } from '@/lib/terminal/blackjack-engine';
 import {
   roll as executeRoll,
@@ -38,7 +38,6 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: 'Games:', variant: 'lambda' },
       { content: '  blackjack | bj: hit, stand, deal, exit', variant: 'default' },
       { content: '  zork: Play terminal adventure (save / restore / restart)', variant: 'default' },
-      { content: '  adventure: Alias for zork', variant: 'default' },
     ],
   }),
 
@@ -167,12 +166,6 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       mode: 'codex',
       lines: [...codexHelpLines(), { content: 'Type ls to list posts.', variant: 'dimmed' }],
     };
-  },
-
-  adventure: (_args, ctx) => {
-    ctx.setMode('adventure');
-    const { lines } = startAdventureGame();
-    return { mode: 'adventure', lines };
   },
 
   zork: (_args, ctx) => {
