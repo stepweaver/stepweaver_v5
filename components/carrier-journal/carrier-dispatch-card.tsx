@@ -103,11 +103,13 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
 
       {/* Meta row: weather, flags, hydration */}
       <div className="flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--text-secondary))]">
-        <span className="font-[var(--font-ocr)] tracking-wide text-[rgb(var(--text-meta))]">
-          {d.weather}
-          {d.temperatureF ? ` · ${d.temperatureF}°F` : ""}
-          {d.heatIndexF ? ` (feels ${d.heatIndexF}°F)` : ""}
-        </span>
+        {(d.weather || d.temperatureF) && (
+          <span className="font-[var(--font-ocr)] tracking-wide text-[rgb(var(--text-meta))]">
+            {d.weather}
+            {d.temperatureF ? `${d.weather ? " · " : ""}${d.temperatureF}°F` : ""}
+            {d.heatIndexF ? ` (feels ${d.heatIndexF}°F)` : ""}
+          </span>
+        )}
         {weatherFlags.map((f) => (
           <span
             key={f}

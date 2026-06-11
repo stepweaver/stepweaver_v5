@@ -106,7 +106,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const soreness = num(p["Soreness (1-10)"] as Props) ?? num(p.Soreness as Props) ?? 5;
   const energy = num(p["Energy (1-10)"] as Props) ?? num(p.Energy as Props) ?? 5;
   const mood = num(p["Mood (1-10)"] as Props) ?? num(p.Mood as Props) ?? 5;
-  const weather = str(p.Weather as Props, "rich_text") || "Unknown";
+  const weather = str(p.Weather as Props, "rich_text") || undefined;
   const temperatureF = num(p["Temperature F"] as Props);
   const heatIndexF = num(p["Heat Index F"] as Props);
   const rawLoad = sel(p["Mail Load"] as Props).toLowerCase();
@@ -143,7 +143,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     soreness,
     energy,
     mood,
-    weather,
+    ...(weather !== undefined && { weather }),
     ...(temperatureF !== undefined && { temperatureF }),
     ...(heatIndexF !== undefined && { heatIndexF }),
     mailLoad,

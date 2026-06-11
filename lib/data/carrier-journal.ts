@@ -21,7 +21,7 @@ export type CarrierDispatch = {
   soreness: number; // 1–10
   energy: number; // 1–10
   mood: number; // 1–10
-  weather: string;
+  weather?: string;
   temperatureF?: number;
   heatIndexF?: number;
   mailLoad: MailLoad;
