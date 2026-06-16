@@ -19,12 +19,14 @@ import { serviceBusinessDemo } from "./service-business-demo";
 import { silentAuction } from "./silent-auction";
 import { soapStache } from "./soap-stache";
 import { mailSortAcademy } from "./mail-sort-academy";
+import { parcelSweep } from "./parcel-sweep";
 import { stepweaverDev } from "./stepweaver-dev";
 import { websiteRefreshes } from "./website-refreshes";
 
 /** Homepage featured dossiers: carrier-journal leads as the active living project. */
 const FEATURED_SLUGS = [
   "carrier-journal",
+  "parcel-sweep",
   "mail-sort-academy",
   "stepweaver-dev",
   "portfolio-terminal",
@@ -59,6 +61,7 @@ const RAW_PROJECTS: Project[] = [
   aiIntegrations,
   carrierJournal,
   mailSortAcademy,
+  parcelSweep,
   billPlanner,
   googleAnalytics,
   iamResist,
