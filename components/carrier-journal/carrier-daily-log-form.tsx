@@ -7,11 +7,12 @@ import {
   MAIL_DAY_CONTEXT_OPTIONS,
   type DpsClassification,
 } from "@/lib/dps";
+import type { CarrierJournalLogStatus } from "@/lib/notion/carrier-journal.repo";
 
 const LOG_SECRET_STORAGE_KEY = "carrier-journal-log-secret";
 
 type Props = {
-  logEnabled: boolean;
+  logStatus: CarrierJournalLogStatus;
 };
 
 function todayIsoDate(): string {
@@ -22,7 +23,9 @@ function todayIsoDate(): string {
   return `${year}-${month}-${day}`;
 }
 
-export function CarrierDailyLogForm({ logEnabled }: Props) {
+export function CarrierDailyLogForm({ logStatus }: Props) {
+  const logEnabled =
+    logStatus.notionConfigured && logStatus.logSecretConfigured;
   const [logSecret, setLogSecret] = useState("");
   const [date, setDate] = useState(todayIsoDate);
   const [dpsCount, setDpsCount] = useState("");
@@ -132,12 +135,22 @@ export function CarrierDailyLogForm({ logEnabled }: Props) {
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-2">
           LOGGING UNAVAILABLE
         </div>
-        <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
-          Configure <code className="text-[rgb(var(--neon))]">NOTION_API_KEY</code>,{" "}
-          <code className="text-[rgb(var(--neon))]">NOTION_CARRIER_JOURNAL_DB_ID</code>, and{" "}
-          <code className="text-[rgb(var(--neon))]">CARRIER_JOURNAL_LOG_SECRET</code> to enable
-          private mobile logging.
-        </p>
+        {logStatus.notionConfigured ? (
+          <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
+            Notion is connected for Carrier&apos;s Log. Add{" "}
+            <code className="text-[rgb(var(--neon))]">CARRIER_JOURNAL_LOG_SECRET</code> in Vercel
+            (Production), pick a private passphrase, redeploy, then enter that same value in the
+            Log Secret field here.
+          </p>
+        ) : (
+          <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
+            Configure <code className="text-[rgb(var(--neon))]">NOTION_API_KEY</code> and{" "}
+            <code className="text-[rgb(var(--neon))]">NOTION_CARRIER_JOURNAL_DB_ID</code> to connect
+            the Carrier&apos;s Log database, then add{" "}
+            <code className="text-[rgb(var(--neon))]">CARRIER_JOURNAL_LOG_SECRET</code> for private
+            mobile writes.
+          </p>
+        )}
       </div>
     );
   }

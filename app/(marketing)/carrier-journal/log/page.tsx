@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { CarrierDailyLogForm } from "@/components/carrier-journal/carrier-daily-log-form";
-import { isCarrierJournalLogEnabled } from "@/lib/notion/carrier-journal.repo";
+import { getCarrierJournalLogStatus } from "@/lib/notion/carrier-journal.repo";
+
+export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "Carrier Log | Stephen Weaver",
@@ -8,7 +10,7 @@ export const metadata = {
 };
 
 export default function CarrierLogPage() {
-  const logEnabled = isCarrierJournalLogEnabled();
+  const logStatus = getCarrierJournalLogStatus();
 
   return (
     <div className="min-h-screen pt-20 pb-16">
@@ -26,7 +28,7 @@ export default function CarrierLogPage() {
           </p>
         </div>
 
-        <CarrierDailyLogForm logEnabled={logEnabled} />
+        <CarrierDailyLogForm logStatus={logStatus} />
 
         <div className="text-center">
           <Link href="/carrier-journal" className="text-xs text-[rgb(var(--text-meta))] hover:text-[rgb(var(--neon))]">

@@ -239,8 +239,21 @@ export async function fetchAllCarrierDispatches(): Promise<CarrierDispatch[]> {
   return fetchDispatchesUncached(false);
 }
 
+export type CarrierJournalLogStatus = {
+  notionConfigured: boolean;
+  logSecretConfigured: boolean;
+};
+
+export function getCarrierJournalLogStatus(): CarrierJournalLogStatus {
+  return {
+    notionConfigured: isConfigured(),
+    logSecretConfigured: !!(process.env.CARRIER_JOURNAL_LOG_SECRET ?? "").trim(),
+  };
+}
+
 export function isCarrierJournalLogEnabled(): boolean {
-  return isConfigured() && !!(process.env.CARRIER_JOURNAL_LOG_SECRET ?? "").trim();
+  const status = getCarrierJournalLogStatus();
+  return status.notionConfigured && status.logSecretConfigured;
 }
 
 export function verifyCarrierLogSecret(secret: string): boolean {
