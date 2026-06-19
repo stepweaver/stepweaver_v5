@@ -1,16 +1,21 @@
 // Carrier's Log DB (NOTION_CARRIER_JOURNAL_DB_ID).
-// Only pages with Publish Public = true are ever returned; Private Note is never read.
-import { unstable_cache } from "next/cache";
+// Public reads only return pages with Publish Public = true; Private Note is never read.
+import { revalidateTag, unstable_cache } from "next/cache";
 import type { PageObjectResponse, PartialPageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { getNotion } from "./client";
 import { paginate } from "./paginate";
 import {
+  classifyDpsForEntry,
+} from "@/lib/dps";
+import {
+  enrichDispatchDpsFields,
   type CarrierDispatch,
   type CarrierPhase,
   type MailLoad,
   type RoutePreference,
   type WeightPublicMode,
 } from "@/lib/data/carrier-journal";
+import type { CarrierLogDpsInput } from "@/lib/validation/carrier-log.schema";
 
 const CACHE_REVALIDATE = 300; // 5 minutes
 
@@ -94,6 +99,12 @@ function parseRoutePreference(raw: string): RoutePreference | undefined {
   return undefined;
 }
 
+function multiSelect(prop: Props | undefined): string[] {
+  if (!prop) return [];
+  const items = prop.multi_select as { name?: string }[] | undefined;
+  return items?.map((item) => item.name ?? "").filter(Boolean) ?? [];
+}
+
 function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const p = page.properties as Record<string, unknown>;
 
@@ -133,6 +144,9 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const goodSamaritanAct = check(p["Good Samaritan Act"] as Props);
   const routeCode = str(p.Route as Props, "rich_text") || undefined;
   const routePreference = parseRoutePreference(sel(p["Route Preference"] as Props));
+  const dpsCount = num(p["DPS Count"] as Props);
+  const dpsRatio = num(p["DPS Ratio"] as Props);
+  const mailDayContext = multiSelect(p["Mail Day Context"] as Props);
 
   return {
     id: `cj-${page.id.replace(/-/g, "").slice(0, 8)}`,
@@ -164,35 +178,49 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(goodSamaritanAct && { goodSamaritanAct }),
     ...(routeCode && { routeCode }),
     ...(routePreference && { routePreference }),
+    ...(dpsCount !== undefined && { dpsCount }),
+    ...(dpsRatio !== undefined && { dpsRatio }),
+    ...(mailDayContext.length > 0 && { mailDayContext }),
   };
 }
 
 type QueryPage = PageObjectResponse | PartialPageObjectResponse;
 
-async function fetchDispatchesUncached(): Promise<CarrierDispatch[]> {
+async function queryDatabasePages(
+  filter?: Parameters<ReturnType<typeof getNotion>["databases"]["query"]>[0]["filter"]
+): Promise<PageObjectResponse[]> {
   const dbId = getDbId();
   if (!dbId || !(process.env.NOTION_API_KEY ?? "").trim()) return [];
 
+  const pages = await paginate<QueryPage>((cursor) =>
+    getNotion().databases.query({
+      database_id: dbId,
+      ...(filter ? { filter } : {}),
+      sorts: [{ property: "Date", direction: "descending" }],
+      page_size: 100,
+      ...(cursor ? { start_cursor: cursor } : {}),
+    })
+  );
+
+  return (pages as PageObjectResponse[]).filter(
+    (page) => page && typeof page === "object" && "properties" in page
+  );
+}
+
+async function fetchDispatchesUncached(publicOnly = true): Promise<CarrierDispatch[]> {
   try {
-    const pages = await paginate<QueryPage>((cursor) =>
-      getNotion().databases.query({
-        database_id: dbId,
-        filter: {
+    const filter = publicOnly
+      ? {
           property: "Publish Public",
           checkbox: { equals: true },
-        },
-        sorts: [{ property: "Date", direction: "descending" }],
-        page_size: 100,
-        ...(cursor ? { start_cursor: cursor } : {}),
-      })
-    );
+        }
+      : undefined;
 
-    return (pages as PageObjectResponse[])
-      .filter((page) => page && typeof page === "object" && "properties" in page)
+    return (await queryDatabasePages(filter))
       .map(formatPage)
       .filter((d): d is CarrierDispatch => d !== null);
   } catch (err) {
-    logError("fetchDispatches", err);
+    logError(publicOnly ? "fetchDispatches" : "fetchAllDispatches", err);
     return [];
   }
 }
@@ -200,12 +228,143 @@ async function fetchDispatchesUncached(): Promise<CarrierDispatch[]> {
 export async function fetchCarrierDispatches(): Promise<CarrierDispatch[]> {
   if (!isConfigured()) return [];
   return unstable_cache(
-    async () => fetchDispatchesUncached(),
+    async () => fetchDispatchesUncached(true),
     ["notion-carrier-journal-dispatches"],
     { revalidate: CACHE_REVALIDATE, tags: ["notion-carrier-journal"] }
   )();
 }
 
-export function isCarrierJournalConfigured(): boolean {
-  return isConfigured();
+export async function fetchAllCarrierDispatches(): Promise<CarrierDispatch[]> {
+  if (!isConfigured()) return [];
+  return fetchDispatchesUncached(false);
+}
+
+export function isCarrierJournalLogEnabled(): boolean {
+  return isConfigured() && !!(process.env.CARRIER_JOURNAL_LOG_SECRET ?? "").trim();
+}
+
+export function verifyCarrierLogSecret(secret: string): boolean {
+  const expected = (process.env.CARRIER_JOURNAL_LOG_SECRET ?? "").trim();
+  return !!expected && secret === expected;
+}
+
+async function findPageIdByDate(date: string): Promise<string | null> {
+  const pages = await queryDatabasePages({
+    property: "Date",
+    date: { equals: date },
+  });
+  return pages[0]?.id ?? null;
+}
+
+function buildDpsNotionProperties(input: {
+  dpsCount?: number;
+  dpsRatio?: number | null;
+  mailDayContext?: string[];
+}): Record<string, unknown> {
+  const properties: Record<string, unknown> = {};
+
+  if (input.dpsCount !== undefined) {
+    properties["DPS Count"] = { number: input.dpsCount };
+    properties["DPS Ratio"] =
+      input.dpsRatio != null ? { number: input.dpsRatio } : { number: null };
+  } else {
+    properties["DPS Count"] = { number: null };
+    properties["DPS Ratio"] = { number: null };
+  }
+
+  if (input.mailDayContext !== undefined) {
+    properties["Mail Day Context"] = {
+      multi_select: input.mailDayContext.map((name) => ({ name })),
+    };
+  }
+
+  return properties;
+}
+
+export async function upsertCarrierLogDps(input: CarrierLogDpsInput): Promise<{
+  pageId: string;
+  classification: ReturnType<typeof classifyDpsForEntry>;
+}> {
+  const dbId = getDbId();
+  if (!dbId) {
+    throw new Error("Carrier journal database is not configured");
+  }
+
+  const allDispatches = await fetchAllCarrierDispatches();
+  const existing = allDispatches.find((dispatch) => dispatch.date === input.date);
+
+  const classification = classifyDpsForEntry(
+    allDispatches.map((dispatch) => ({
+      date: dispatch.date,
+      id: dispatch.id,
+      dpsCount: dispatch.dpsCount,
+    })),
+    {
+      date: input.date,
+      id: existing?.id,
+      dpsCount: input.dpsCount,
+    }
+  );
+
+  const properties = buildDpsNotionProperties({
+    ...(input.dpsCount !== undefined && { dpsCount: input.dpsCount }),
+    dpsRatio: classification.ratio,
+    ...(input.mailDayContext !== undefined && { mailDayContext: input.mailDayContext }),
+  });
+
+  const notion = getNotion();
+  const pageId = await findPageIdByDate(input.date);
+
+  if (pageId) {
+    await notion.pages.update({
+      page_id: pageId,
+      properties: properties as never,
+    });
+    revalidateTag("notion-carrier-journal");
+    return { pageId, classification };
+  }
+
+  const created = await notion.pages.create({
+    parent: { database_id: dbId },
+    properties: {
+      Title: {
+        title: [{ text: { content: input.date } }],
+      },
+      Date: {
+        date: { start: input.date },
+      },
+      "Publish Public": {
+        checkbox: false,
+      },
+      ...properties,
+    } as never,
+  });
+
+  revalidateTag("notion-carrier-journal");
+  return { pageId: created.id, classification };
+}
+
+export async function previewCarrierLogDps(input: {
+  date: string;
+  dpsCount?: number;
+}): Promise<ReturnType<typeof classifyDpsForEntry>> {
+  const allDispatches = await fetchAllCarrierDispatches();
+  const existing = allDispatches.find((dispatch) => dispatch.date === input.date);
+
+  return classifyDpsForEntry(
+    allDispatches.map((dispatch) => ({
+      date: dispatch.date,
+      id: dispatch.id,
+      dpsCount: dispatch.dpsCount,
+    })),
+    {
+      date: input.date,
+      id: existing?.id,
+      dpsCount: input.dpsCount,
+    }
+  );
+}
+
+export function enrichFetchedDispatches(dispatches: CarrierDispatch[]): CarrierDispatch[] {
+  return dispatches.map((dispatch) => enrichDispatchDpsFields(dispatches, dispatch));
 }

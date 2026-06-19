@@ -1,5 +1,13 @@
 /** Letter carrier field log data. No addresses, route numbers, coworker/customer names, scanner data, or official mail volume. */
 
+import {
+  classifyDpsForEntry,
+  computeDpsPerMile,
+  isHeavyDpsRatio,
+  isVeryHeavyDpsRatio,
+  type DpsHistoryEntry,
+} from "@/lib/dps";
+
 export const CARRIER_KPI_EMPTY = "n/a";
 
 export type MailLoad = "light" | "normal" | "heavy" | "brutal";
@@ -46,6 +54,12 @@ export type CarrierDispatch = {
   routeCode?: string;
   /** Private sentiment toward this route. Never rendered in public-facing UI. */
   routePreference?: RoutePreference;
+  /** Manually entered DPS piece count for the day. */
+  dpsCount?: number;
+  /** App-calculated ratio vs recent DPS baseline. Never manually entered. */
+  dpsRatio?: number;
+  /** Optional tags explaining why a day felt heavier or lighter. */
+  mailDayContext?: string[];
 };
 
 export type CarrierKpi = {
@@ -75,6 +89,13 @@ export type CarrierTotals = {
   weightChangeLbs?: number;
   phaseCounts: Record<CarrierPhase, number>;
   latestPhase?: CarrierPhase;
+  avgDpsCount?: number;
+  medianDpsCount?: number;
+  highestDpsCount?: number;
+  heavyDaysCount?: number;
+  veryHeavyDaysCount?: number;
+  latestDpsRatio?: number;
+  latestDpsPerMile?: number;
 };
 
 export type PublicWeightTrend = {
@@ -289,6 +310,8 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
   const latestPhase = latestWithPhase?.phase;
 
+  const dpsStats = computeDpsStats(dispatches);
+
   return {
     daysLogged: count,
     totalMiles: Math.round(totalMiles * 10) / 10,
@@ -310,6 +333,84 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
     ...(weightChangeLbs !== undefined && { weightChangeLbs }),
     phaseCounts,
     ...(latestPhase && { latestPhase }),
+    ...dpsStats,
+  };
+}
+
+function isValidDpsCount(value: number | undefined): value is number {
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
+}
+
+export function enrichDispatchDpsFields(
+  dispatches: CarrierDispatch[],
+  dispatch: CarrierDispatch
+): CarrierDispatch {
+  if (!isValidDpsCount(dispatch.dpsCount)) {
+    return dispatch;
+  }
+
+  if (dispatch.dpsRatio !== undefined) {
+    return dispatch;
+  }
+
+  const history: DpsHistoryEntry[] = dispatches.map((entry) => ({
+    date: entry.date,
+    id: entry.id,
+    dpsCount: entry.dpsCount,
+  }));
+
+  const classification = classifyDpsForEntry(history, {
+    date: dispatch.date,
+    id: dispatch.id,
+    dpsCount: dispatch.dpsCount,
+  });
+
+  return {
+    ...dispatch,
+    ...(classification.ratio != null && {
+      dpsRatio: Math.round(classification.ratio * 1000) / 1000,
+    }),
+  };
+}
+
+export function enrichDispatchesDpsFields(dispatches: CarrierDispatch[]): CarrierDispatch[] {
+  return dispatches.map((dispatch) => enrichDispatchDpsFields(dispatches, dispatch));
+}
+
+export function computeDpsStats(dispatches: CarrierDispatch[]): Partial<CarrierTotals> {
+  const dpsEntries = dispatches.filter((d) => isValidDpsCount(d.dpsCount));
+  if (dpsEntries.length === 0) {
+    return {};
+  }
+
+  const counts = dpsEntries.map((d) => d.dpsCount as number);
+  const sortedCounts = [...counts].sort((a, b) => a - b);
+  const middle = Math.floor(sortedCounts.length / 2);
+  const medianDpsCount =
+    sortedCounts.length % 2 === 0
+      ? Math.round(((sortedCounts[middle - 1] + sortedCounts[middle]) / 2) * 10) / 10
+      : sortedCounts[middle];
+
+  const enriched = enrichDispatchesDpsFields(dispatches);
+  const heavyDaysCount = enriched.filter((d) => isHeavyDpsRatio(d.dpsRatio)).length;
+  const veryHeavyDaysCount = enriched.filter((d) => isVeryHeavyDpsRatio(d.dpsRatio)).length;
+
+  const latestWithDps = [...enriched]
+    .filter((d) => isValidDpsCount(d.dpsCount))
+    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
+
+  const latestDpsPerMile = latestWithDps
+    ? computeDpsPerMile(latestWithDps.dpsCount, latestWithDps.milesWalked) ?? undefined
+    : undefined;
+
+  return {
+    avgDpsCount: Math.round((counts.reduce((sum, value) => sum + value, 0) / counts.length) * 10) / 10,
+    medianDpsCount,
+    highestDpsCount: Math.max(...counts),
+    heavyDaysCount,
+    veryHeavyDaysCount,
+    ...(latestWithDps?.dpsRatio != null && { latestDpsRatio: latestWithDps.dpsRatio }),
+    ...(latestDpsPerMile !== undefined && { latestDpsPerMile }),
   };
 }
 
@@ -370,7 +471,7 @@ const PHASE_LABEL: Record<CarrierPhase, string> = {
 export function totalsToKpis(t: CarrierTotals, dispatches: CarrierDispatch[] = []): CarrierKpi[] {
   const weightTrend = formatPublicWeightTrend(t, dispatches);
 
-  return [
+  const kpis: CarrierKpi[] = [
     { label: "Days Logged", value: String(t.daysLogged), detail: "Active field days" },
     { label: "Total Miles", value: `${t.totalMiles} mi`, detail: "Cumulative walking distance" },
     { label: "Avg Miles / Day", value: `${t.avgMilesPerDay} mi`, detail: "Per logged shift" },
@@ -401,6 +502,57 @@ export function totalsToKpis(t: CarrierTotals, dispatches: CarrierDispatch[] = [
     { label: "Avg Energy", value: `${t.avgEnergy} / 10`, detail: "Self-reported end-of-shift" },
     { label: "Avg Mood", value: `${t.avgMood} / 10`, detail: "Morale signal" },
   ];
+
+  if (t.avgDpsCount !== undefined) {
+    kpis.push(
+      {
+        label: "Avg DPS Count",
+        value: t.avgDpsCount.toLocaleString("en-US"),
+        detail: "Average logged DPS pieces per day",
+      },
+      {
+        label: "Median DPS Count",
+        value:
+          t.medianDpsCount !== undefined
+            ? t.medianDpsCount.toLocaleString("en-US")
+            : CARRIER_KPI_EMPTY,
+        detail: "Middle value across logged DPS days",
+      },
+      {
+        label: "Highest DPS Count",
+        value: (t.highestDpsCount ?? CARRIER_KPI_EMPTY).toLocaleString("en-US"),
+        detail: "Peak logged DPS day",
+      },
+      {
+        label: "Heavy DPS Days",
+        value: String(t.heavyDaysCount ?? 0),
+        detail: "Days above 115% of recent baseline",
+      },
+      {
+        label: "Very Heavy DPS Days",
+        value: String(t.veryHeavyDaysCount ?? 0),
+        detail: "Days above 140% of recent baseline",
+      },
+      {
+        label: "Latest DPS Ratio",
+        value:
+          t.latestDpsRatio != null
+            ? `${Math.round(t.latestDpsRatio * 100)}%`
+            : CARRIER_KPI_EMPTY,
+        detail: "Most recent day vs recent baseline",
+      }
+    );
+
+    if (t.latestDpsPerMile !== undefined) {
+      kpis.push({
+        label: "Latest DPS / Mile",
+        value: String(t.latestDpsPerMile),
+        detail: "DPS count divided by miles walked",
+      });
+    }
+  }
+
+  return kpis;
 }
 
 export function getCarrierKpis(): CarrierKpi[] {

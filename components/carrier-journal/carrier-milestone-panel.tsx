@@ -21,8 +21,10 @@ import type { CarrierDispatch } from "@/lib/data/carrier-journal";
 import {
   getCarrierLevel,
   getCarrierMilestones,
+  getCarrierRankLadder,
   type CarrierMilestone,
   type CarrierMilestoneTier,
+  type CarrierRank,
 } from "@/lib/data/carrier-milestones";
 
 // ---------------------------------------------------------------------------
@@ -138,6 +140,72 @@ function ProgressBar({ value, color }: { value: number; color: string }) {
   );
 }
 
+function RankLadderHeader() {
+  return (
+    <div className="grid grid-cols-[2rem_1fr_4.5rem_5.5rem] sm:grid-cols-[2.5rem_1fr_5rem_6rem] gap-x-2 sm:gap-x-3 items-baseline py-1.5 border-b border-[rgb(var(--border)/0.15)]">
+      <div className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta))]">
+        LVL
+      </div>
+      <div className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta))]">
+        RANK
+      </div>
+      <div className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta))] text-right">
+        AT
+      </div>
+      <div className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta))] text-right">
+        TO GO
+      </div>
+    </div>
+  );
+}
+
+function RankLadderRow({ rank }: { rank: CarrierRank }) {
+  const isCurrent = rank.status === "current";
+  const isReached = rank.status === "reached";
+
+  return (
+    <div
+      className="grid grid-cols-[2rem_1fr_4.5rem_5.5rem] sm:grid-cols-[2.5rem_1fr_5rem_6rem] gap-x-2 sm:gap-x-3 items-baseline py-1.5 border-b border-[rgb(var(--border)/0.1)] last:border-b-0"
+      style={{
+        opacity: rank.status === "locked" ? 0.55 : 1,
+        background: isCurrent ? "rgba(var(--neon), 0.06)" : undefined,
+      }}
+    >
+      <div
+        className="font-[var(--font-ocr)] text-[9px] tracking-widest tabular-nums"
+        style={{ color: isCurrent ? "rgb(var(--neon))" : "rgb(var(--text-meta))" }}
+      >
+        {String(rank.level).padStart(2, "0")}
+      </div>
+      <div
+        className="font-[var(--font-ibm)] text-xs truncate"
+        style={{ color: isCurrent ? "rgb(var(--neon))" : "rgb(var(--text-color))" }}
+      >
+        {rank.title}
+        {isCurrent && (
+          <span className="ml-1.5 font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--neon))]">
+            ACTIVE
+          </span>
+        )}
+      </div>
+      <div className="font-[var(--font-ocr)] text-[9px] tracking-wide text-[rgb(var(--text-meta))] text-right tabular-nums">
+        {rank.miles.toLocaleString()} mi
+      </div>
+      <div className="font-[var(--font-ocr)] text-[9px] tracking-wide text-right tabular-nums">
+        {isReached ? (
+          <span className="text-[rgb(var(--neon))]">CLEAR</span>
+        ) : isCurrent ? (
+          <span className="text-[rgb(var(--text-label))]">—</span>
+        ) : (
+          <span className="text-[rgb(var(--text-meta))]">
+            {rank.milesRemaining.toLocaleString()} mi
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Panel
 // ---------------------------------------------------------------------------
@@ -148,6 +216,7 @@ type Props = {
 
 export function CarrierMilestonePanel({ dispatches }: Props) {
   const level = getCarrierLevel(dispatches);
+  const rankLadder = getCarrierRankLadder(level.totalMiles);
   const milestones = getCarrierMilestones(dispatches);
   const unlockedCount = milestones.filter((m) => m.unlocked).length;
 
@@ -167,6 +236,9 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
           </div>
           <div className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--text-color))]">
             {level.title}
+          </div>
+          <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] text-[rgb(var(--text-meta))] mt-1">
+            LEVEL {level.level} OF {level.totalLevels}
           </div>
         </div>
         <div className="border border-[rgb(var(--neon)/0.2)] px-3 py-2 text-center min-w-[72px] shrink-0">
@@ -192,6 +264,19 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
           )}
         </div>
         <ProgressBar value={level.progressToNext} color="rgb(var(--neon))" />
+      </div>
+
+      {/* Rank ladder */}
+      <div>
+        <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] text-[rgb(var(--text-label))] mb-2">
+          RANK LADDER // {level.totalLevels} LEVELS
+        </div>
+        <div className="border border-[rgb(var(--border)/0.2)] px-2 sm:px-3 py-0.5">
+          <RankLadderHeader />
+          {rankLadder.map((rank) => (
+            <RankLadderRow key={rank.level} rank={rank} />
+          ))}
+        </div>
       </div>
 
       {/* Qualification groups by tier */}

@@ -1,6 +1,8 @@
 import {
   CARRIER_KPI_EMPTY,
   computeTotalsFromDispatches,
+  computeDpsStats,
+  enrichDispatchesDpsFields,
   formatPublicWeightTrend,
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
@@ -358,5 +360,33 @@ describe("formatPublicWeightTrend", () => {
     const totals = computeTotalsFromDispatches(dispatches);
     const trend = formatPublicWeightTrend(totals, dispatches);
     expect(trend.value).toBe("244 lbs (-4.0 lbs)");
+  });
+});
+
+describe("DPS stats", () => {
+  it("computes DPS aggregates when counts are logged", () => {
+    const dispatches = [
+      dispatch({ id: "a", date: "2026-05-01", title: "A", dpsCount: 2000, milesWalked: 8 }),
+      dispatch({ id: "b", date: "2026-05-02", title: "B", dpsCount: 2100, milesWalked: 8 }),
+      dispatch({ id: "c", date: "2026-05-03", title: "C", dpsCount: 2200, milesWalked: 8 }),
+      dispatch({ id: "d", date: "2026-05-04", title: "D", dpsCount: 2300, milesWalked: 8 }),
+      dispatch({ id: "e", date: "2026-05-05", title: "E", dpsCount: 2400, milesWalked: 8 }),
+      dispatch({ id: "f", date: "2026-05-06", title: "F", dpsCount: 2800, milesWalked: 8 }),
+    ];
+
+    const totals = computeTotalsFromDispatches(dispatches);
+    expect(totals.avgDpsCount).toBe(2300);
+    expect(totals.medianDpsCount).toBe(2250);
+    expect(totals.highestDpsCount).toBe(2800);
+    expect(totals.heavyDaysCount).toBe(1);
+    expect(totals.latestDpsRatio).toBeCloseTo(2800 / 2200, 2);
+    expect(totals.latestDpsPerMile).toBe(350);
+  });
+
+  it("leaves legacy dispatches without DPS fields untouched", () => {
+    const dispatches = [dispatch({ id: "a", date: "2026-05-01", title: "A" })];
+    const enriched = enrichDispatchesDpsFields(dispatches);
+    expect(enriched[0].dpsCount).toBeUndefined();
+    expect(computeDpsStats(dispatches)).toEqual({});
   });
 });

@@ -1,5 +1,6 @@
 import type { CarrierDispatch, CarrierPhase, MailLoad } from "@/lib/data/carrier-journal";
 import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
+import { formatPrivateDpsLine, formatPublicDpsLoadLine } from "@/lib/dps";
 
 const MAIL_LOAD_LABEL: Record<MailLoad, string> = {
   light: "LIGHT",
@@ -24,9 +25,11 @@ const PHASE_LABEL: Record<CarrierPhase, string> = {
 
 type Props = {
   dispatch: CarrierDispatch;
+  /** Show private DPS line with count and ratio. Default false for public feed. */
+  showPrivateDps?: boolean;
 };
 
-export function CarrierDispatchCard({ dispatch: d }: Props) {
+export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Props) {
   const weatherFlags: string[] = [];
   if (d.heatDay) weatherFlags.push("HEAT");
   if (d.rain) weatherFlags.push("RAIN");
@@ -42,6 +45,14 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
       color: goal && d.waterOz >= goal ? "rgb(var(--green))" : "rgb(var(--neon))",
     });
   }
+
+  const privateDpsLine = showPrivateDps
+    ? formatPrivateDpsLine({
+        dpsCount: d.dpsCount,
+        dpsRatio: d.dpsRatio,
+      })
+    : null;
+  const publicDpsLine = formatPublicDpsLoadLine(d.dpsRatio);
 
   return (
     <div id={d.id} className="surface-panel p-5 sm:p-6 space-y-3">
@@ -81,6 +92,21 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
               {paragraph}
             </p>
           ))}
+        </div>
+      )}
+
+      {(privateDpsLine || (!showPrivateDps && publicDpsLine)) && (
+        <div className="text-xs text-[rgb(var(--text-secondary))] space-y-1">
+          {privateDpsLine && (
+            <div className="font-[var(--font-ibm)] text-sm text-[rgb(var(--neon))]">
+              {privateDpsLine}
+            </div>
+          )}
+          {!showPrivateDps && publicDpsLine && (
+            <div className="font-[var(--font-ocr)] tracking-wide text-[rgb(var(--text-meta))]">
+              {publicDpsLine}
+            </div>
+          )}
         </div>
       )}
 

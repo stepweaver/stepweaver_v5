@@ -37,10 +37,19 @@ export type CarrierMilestone = {
 export type CarrierLevel = {
   title: string;
   level: number;
+  totalLevels: number;
   totalMiles: number;
   nextTitle?: string;
   nextMiles?: number;
   progressToNext: number;
+};
+
+export type CarrierRank = {
+  level: number;
+  title: string;
+  miles: number;
+  status: "reached" | "current" | "locked";
+  milesRemaining: number;
 };
 
 // ---------------------------------------------------------------------------
@@ -147,10 +156,42 @@ export function getCarrierLevel(dispatches: CarrierDispatch[]): CarrierLevel {
   return {
     title: current.title,
     level: current.level,
+    totalLevels: LEVEL_THRESHOLDS.length,
     totalMiles: rounded,
     ...(next ? { nextTitle: next.title, nextMiles: next.miles } : {}),
     progressToNext,
   };
+}
+
+export function getCarrierRankLadder(totalMiles: number): CarrierRank[] {
+  const rounded = Math.round(totalMiles * 10) / 10;
+
+  let currentIdx = 0;
+  for (let i = LEVEL_THRESHOLDS.length - 1; i >= 0; i--) {
+    if (totalMiles >= LEVEL_THRESHOLDS[i].miles) {
+      currentIdx = i;
+      break;
+    }
+  }
+
+  return LEVEL_THRESHOLDS.map((threshold, idx) => {
+    const reached = totalMiles >= threshold.miles;
+    const status: CarrierRank["status"] =
+      idx === currentIdx ? "current" : reached ? "reached" : "locked";
+
+    const milesRemaining =
+      status === "reached"
+        ? 0
+        : Math.max(0, Math.round((threshold.miles - rounded) * 10) / 10);
+
+    return {
+      level: threshold.level,
+      title: threshold.title,
+      miles: threshold.miles,
+      status,
+      milesRemaining,
+    };
+  });
 }
 
 export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMilestone[] {
