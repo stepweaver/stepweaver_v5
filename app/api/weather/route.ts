@@ -96,12 +96,19 @@ async function fetchShiftPeak(
   if (!res.ok) return null;
 
   const data = (await res.json()) as {
-    hourly?: { time?: string[]; temperature_2m?: number[]; relativehumidity_2m?: number[] };
+    hourly?: {
+      time?: string[];
+      temperature_2m?: number[];
+      relative_humidity_2m?: number[];   // current Open-Meteo name
+      relativehumidity_2m?: number[];    // legacy name (kept for compatibility)
+    };
   };
 
   const times = data.hourly?.time ?? [];
   const temps = data.hourly?.temperature_2m ?? [];
-  const humidities = data.hourly?.relativehumidity_2m ?? [];
+  // Accept both the current and legacy variable names
+  const humidities =
+    data.hourly?.relative_humidity_2m ?? data.hourly?.relativehumidity_2m ?? [];
 
   let peakTemp: number | null = null;
   let peakHumidity: number | null = null;
@@ -193,14 +200,17 @@ export async function GET(request: NextRequest) {
         const peak = await fetchShiftPeak(lat, lon);
         // Attach peak fields; fall back to current temp if window has no data yet
         const peakTempF = peak?.peakTempF ?? (body as { tempF?: number }).tempF;
+        // Parentheses are required: ?? binds tighter than ternary, so without them
+        // the ternary condition would be (peak?.peakHeatIndexF ?? body.tempF !== undefined)
+        // which is always truthy — always calling heatIndex on current conditions.
         const peakHeatIndexF =
           peak?.peakHeatIndexF ??
-          (body as { tempF?: number; humidity?: number }).tempF !== undefined
+          ((body as { tempF?: number }).tempF !== undefined
             ? heatIndex(
                 (body as { tempF: number }).tempF,
                 (body as { humidity: number }).humidity
               )
-            : null;
+            : null);
         return NextResponse.json(
           { ...body, peakTempF, peakHeatIndexF, peakFromForecast: peak !== null },
           { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } }
