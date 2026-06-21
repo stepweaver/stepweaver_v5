@@ -248,14 +248,15 @@ export function CarrierDaybookForm({ token }: Props) {
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
           DATE
         </div>
-        {/* grid wrapper forces the date input to respect container width on all mobile browsers */}
-        <div className="grid w-full">
+        {/* grid-cols-1 = minmax(0,1fr): forces input below its intrinsic minimum width */}
+        <div className="grid grid-cols-1 w-full">
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)}
             required
-            className="w-full min-w-0 bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-base px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+            style={{ width: "100%", minWidth: 0 }}
+            className="min-w-0 bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-base px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
           />
         </div>
       </div>
