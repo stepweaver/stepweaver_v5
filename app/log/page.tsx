@@ -36,7 +36,7 @@ export default async function CarrierDaybookPage({ searchParams }: Props) {
 
   return (
     <main className="flex-1 pt-12 pb-16">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6">
+      <div className="w-full max-w-2xl mx-auto px-4 sm:px-6">
         <CarrierDaybookForm token={token} />
       </div>
     </main>
