@@ -11,7 +11,7 @@ import {
   type HydrationRecommendation,
 } from "@/lib/hydration";
 
-// ZIP 46614 (South Bend, IN) — fixed coordinates for weather lookup
+// ZIP 46614 (South Bend, IN) - fixed coordinates for weather lookup
 const ZIP_LAT = 41.6764;
 const ZIP_LON = -86.252;
 
@@ -398,7 +398,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
         </div>
       </div>
 
-      {/* Weather — read-only, auto-filled for today */}
+      {/* Weather - read-only, auto-filled for today */}
       <div className="surface-panel p-5 space-y-4">
         <div className="flex items-center gap-3">
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
@@ -431,7 +431,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           <WeatherCell label="HEAT INDEX (°F)" value={weatherHeat} loading={weather.status === "loading"} />
         </div>
 
-        {/* Direct sun toggle — affects hydration calc */}
+        {/* Direct sun toggle - affects hydration calc */}
         <label className="flex items-center gap-3 cursor-pointer select-none">
           <input
             type="checkbox"
@@ -487,14 +487,14 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           </div>
         </div>
 
-        {/* Monday weigh-in — only shown on Mondays, never displayed back */}
+        {/* Monday weigh-in - only shown on Mondays, never displayed back */}
         {dateIsMonday && (
           <div>
             <label
               htmlFor="db-weight"
               className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
             >
-              WEIGHT (lbs) — Monday weigh-in
+              WEIGHT (lbs) / MONDAY
             </label>
             <input
               id="db-weight"
@@ -584,7 +584,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           <label htmlFor="db-private-note" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
             PRIVATE NOTE{" "}
             <span className="text-[rgb(var(--text-meta))] normal-case tracking-normal font-[var(--font-ibm)] text-[10px]">
-              — never published
+              (never published)
             </span>
           </label>
           <textarea
@@ -594,7 +594,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
             rows={3}
             maxLength={2000}
             className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-sm px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors resize-none"
-            placeholder="Field notes, complaints, things to remember — stays private."
+            placeholder="Field notes, complaints, things to remember. Stays private."
           />
         </div>
 
@@ -870,7 +870,7 @@ function WeatherCell({
         ) : value !== null ? (
           `${Math.round(value)}`
         ) : (
-          <span className="text-[rgb(var(--text-meta)/0.5)] text-sm">—</span>
+          <span className="text-[rgb(var(--text-meta)/0.5)] text-sm">--</span>
         )}
       </div>
     </div>

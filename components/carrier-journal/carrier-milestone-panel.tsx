@@ -49,14 +49,14 @@ const ICON_MAP: Record<string, LucideIcon> = {
 };
 
 // ---------------------------------------------------------------------------
-// Tier colors — grounded field-record palette (no fantasy RPG hues)
+// Tier colors - grounded field-record palette (no fantasy RPG hues)
 // ---------------------------------------------------------------------------
 
 const TIER_COLOR: Record<CarrierMilestoneTier, string> = {
-  basic:    "rgb(148 163 184)",    // slate-400 — entry qualification
-  field:    "rgb(var(--neon))",    // site neon — active field service
-  campaign: "rgb(234 179 8)",      // yellow-500 — sustained campaign record
-  veteran:  "rgb(167 139 250)",    // violet-400 — veteran record
+  basic:    "rgb(148 163 184)",    // slate-400 - entry qualification
+  field:    "rgb(var(--neon))",    // site neon - active field service
+  campaign: "rgb(234 179 8)",      // yellow-500 - sustained campaign record
+  veteran:  "rgb(167 139 250)",    // violet-400 - veteran record
 };
 
 const TIER_BORDER: Record<CarrierMilestoneTier, string> = {
@@ -195,7 +195,7 @@ function RankLadderRow({ rank }: { rank: CarrierRank }) {
         {isReached ? (
           <span className="text-[rgb(var(--neon))]">CLEAR</span>
         ) : isCurrent ? (
-          <span className="text-[rgb(var(--text-label))]">—</span>
+          <span className="text-[rgb(var(--text-label))]">--</span>
         ) : (
           <span className="text-[rgb(var(--text-meta))]">
             {rank.milesRemaining.toLocaleString()} mi

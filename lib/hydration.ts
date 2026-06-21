@@ -123,7 +123,7 @@ export function calculateHydrationGoal(
   }
   if (heatBand === "extreme-danger") {
     warnings.push(
-      "Extreme-danger heat. Hydration alone is not enough — reduce heat exposure."
+      "Extreme-danger heat. Hydration alone is not enough. Reduce heat exposure."
     );
   }
   if (routeWaterGoalOz > maxSafeRouteWaterOz) {

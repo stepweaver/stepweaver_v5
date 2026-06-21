@@ -386,7 +386,7 @@ export function enrichFetchedDispatches(dispatches: CarrierDispatch[]): CarrierD
 /**
  * Returns the weight from the most recent Notion entry that has Weight Lbs set.
  * Used server-side to seed the Monday weigh-in system.
- * Uncached — only called on the protected /log page which is force-dynamic.
+ * Uncached - only called on the protected /log page which is force-dynamic.
  */
 export async function fetchLatestWeightLbs(): Promise<number | null> {
   if (!isConfigured()) return null;

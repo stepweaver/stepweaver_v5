@@ -10,7 +10,7 @@ import { buildPublicSummary } from "@/lib/carrier-journal/helpers";
 function unauthorized() {
   return NextResponse.json(
     {
-      error: "403 — YOU SHALL NOT PASS",
+      error: "403 // YOU SHALL NOT PASS",
       message:
         "Nice try, route goblin. No token. No entry. No DPS glory.",
     },

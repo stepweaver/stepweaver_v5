@@ -6,7 +6,7 @@ const GEO_URL = "https://api.openweathermap.org/geo/1.0/direct";
 const WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
 const FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
-// South Bend / Indianapolis Eastern time — covers ZIP 46614 year-round
+// South Bend / Indianapolis Eastern time - covers ZIP 46614 year-round
 const CARRIER_TZ = "America/Indiana/Indianapolis";
 // Carrier shift window (local hour, inclusive)
 const SHIFT_START_HOUR = 8;
@@ -202,7 +202,7 @@ export async function GET(request: NextRequest) {
         const peakTempF = peak?.peakTempF ?? (body as { tempF?: number }).tempF;
         // Parentheses are required: ?? binds tighter than ternary, so without them
         // the ternary condition would be (peak?.peakHeatIndexF ?? body.tempF !== undefined)
-        // which is always truthy — always calling heatIndex on current conditions.
+        // which is always truthy - always calling heatIndex on current conditions.
         const peakHeatIndexF =
           peak?.peakHeatIndexF ??
           ((body as { tempF?: number }).tempF !== undefined

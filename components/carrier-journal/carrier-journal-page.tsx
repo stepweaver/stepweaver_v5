@@ -474,7 +474,7 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
           </div>
         </div>
 
-        {/* private access — not the security mechanism */}
+        {/* private access - not the security mechanism */}
         <div className="text-center py-2">
           <Link
             href="/log"

@@ -6,7 +6,7 @@ export function CarrierDaybookUnauthorized() {
       <div className="w-full max-w-lg space-y-6">
         <div className="border border-[rgb(var(--red)/0.4)] bg-[rgb(var(--red)/0.04)] p-6 sm:p-8 space-y-4">
           <div className="font-[var(--font-ocr)] text-[rgb(var(--red))] text-sm tracking-widest">
-            403 — YOU SHALL NOT PASS
+            403 // YOU SHALL NOT PASS
           </div>
           <div className="space-y-3 font-[var(--font-ibm)] text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
             <p>Nice try, route goblin.</p>
