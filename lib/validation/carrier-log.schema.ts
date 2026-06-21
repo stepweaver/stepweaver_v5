@@ -17,3 +17,24 @@ export const carrierLogDpsPreviewSchema = z.object({
 });
 
 export type CarrierLogDpsInput = z.infer<typeof carrierLogDpsSchema>;
+
+export const carrierDaybookSchema = z.object({
+  logSecret: z.string().min(1),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  miles: z.number().finite().min(0),
+  dpsCount: z.number().finite().min(0).optional(),
+  mailDayContext: z.array(mailDayContextSchema).optional(),
+  parcels: z.number().finite().min(0).optional(),
+  waterOz: z.number().finite().min(0).optional(),
+  hydrationGoalOz: z.number().finite().min(0).optional(),
+  weightLbs: z.number().finite().min(0).optional(),
+  mood: z.number().int().min(1).max(10).optional(),
+  energy: z.number().int().min(1).max(10).optional(),
+  temperatureF: z.number().finite().optional(),
+  heatIndexF: z.number().finite().optional(),
+  publicNote: z.string().trim().max(2000).optional(),
+  privateNote: z.string().trim().max(2000).optional(),
+  published: z.boolean().default(true),
+});
+
+export type CarrierDaybookInput = z.infer<typeof carrierDaybookSchema>;

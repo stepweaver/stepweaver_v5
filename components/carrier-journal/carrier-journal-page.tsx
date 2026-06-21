@@ -474,6 +474,17 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
           </div>
         </div>
 
+        {/* private access — not the security mechanism */}
+        <div className="text-center py-2">
+          <Link
+            href="/log"
+            aria-label="Carrier daybook"
+            className="text-[rgb(var(--text-meta)/0.18)] hover:text-[rgb(var(--text-meta)/0.45)] text-[10px] font-[var(--font-ocr)] tracking-widest transition-colors"
+          >
+            λ
+          </Link>
+        </div>
+
       </div>
     </div>
   );

@@ -15,7 +15,8 @@ import {
   type RoutePreference,
   type WeightPublicMode,
 } from "@/lib/data/carrier-journal";
-import type { CarrierLogDpsInput } from "@/lib/validation/carrier-log.schema";
+import type { CarrierDaybookInput, CarrierLogDpsInput } from "@/lib/validation/carrier-log.schema";
+import { calculateDpsRatio } from "@/lib/carrier-journal/helpers";
 
 const CACHE_REVALIDATE = 300; // 5 minutes
 
@@ -380,4 +381,105 @@ export async function previewCarrierLogDps(input: {
 
 export function enrichFetchedDispatches(dispatches: CarrierDispatch[]): CarrierDispatch[] {
   return dispatches.map((dispatch) => enrichDispatchDpsFields(dispatches, dispatch));
+}
+
+export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<{
+  pageId: string;
+  dpsPerMile: number | null;
+}> {
+  const dbId = getDbId();
+  if (!dbId) {
+    throw new Error("Carrier journal database is not configured");
+  }
+
+  const dpsPerMile =
+    input.dpsCount !== undefined && input.miles > 0
+      ? calculateDpsRatio(input.dpsCount, input.miles)
+      : null;
+
+  const properties: Record<string, unknown> = {
+    "Miles Walked": { number: input.miles },
+    "Publish Public": { checkbox: input.published },
+  };
+
+  if (input.dpsCount !== undefined) {
+    properties["DPS Count"] = { number: input.dpsCount };
+    properties["DPS Ratio"] = dpsPerMile != null ? { number: dpsPerMile } : { number: null };
+  }
+
+  if (input.mailDayContext !== undefined) {
+    properties["Mail Day Context"] = {
+      multi_select: input.mailDayContext.map((name) => ({ name })),
+    };
+  }
+
+  if (input.temperatureF !== undefined) {
+    properties["Temperature F"] = { number: input.temperatureF };
+  }
+
+  if (input.heatIndexF !== undefined) {
+    properties["Heat Index F"] = { number: input.heatIndexF };
+  }
+
+  if (input.waterOz !== undefined) {
+    properties["Water Oz"] = { number: input.waterOz };
+  }
+
+  if (input.hydrationGoalOz !== undefined) {
+    properties["Hydration Goal Oz"] = { number: input.hydrationGoalOz };
+  }
+
+  if (input.weightLbs !== undefined) {
+    properties["Weight Lbs"] = { number: input.weightLbs };
+  }
+
+  if (input.mood !== undefined) {
+    properties["Mood (1-10)"] = { number: input.mood };
+  }
+
+  if (input.energy !== undefined) {
+    properties["Energy (1-10)"] = { number: input.energy };
+  }
+
+  if (input.publicNote !== undefined) {
+    properties["Public Note"] = {
+      rich_text: [{ text: { content: input.publicNote } }],
+    };
+  }
+
+  // TODO: Add "Parcels" (Number) property to the Notion database, then uncomment:
+  // if (input.parcels !== undefined) {
+  //   properties["Parcels"] = { number: input.parcels };
+  // }
+
+  // TODO: Add "Private Note" (Rich Text) property to the Notion database, then uncomment:
+  // if (input.privateNote !== undefined) {
+  //   properties["Private Note"] = {
+  //     rich_text: [{ text: { content: input.privateNote } }],
+  //   };
+  // }
+
+  const notion = getNotion();
+  const pageId = await findPageIdByDate(input.date);
+
+  if (pageId) {
+    await notion.pages.update({
+      page_id: pageId,
+      properties: properties as never,
+    });
+    revalidateTag("notion-carrier-journal");
+    return { pageId, dpsPerMile };
+  }
+
+  const created = await notion.pages.create({
+    parent: { database_id: dbId },
+    properties: {
+      Title: { title: [{ text: { content: input.date } }] },
+      Date: { date: { start: input.date } },
+      ...properties,
+    } as never,
+  });
+
+  revalidateTag("notion-carrier-journal");
+  return { pageId: created.id, dpsPerMile };
 }
