@@ -383,6 +383,38 @@ export function enrichFetchedDispatches(dispatches: CarrierDispatch[]): CarrierD
   return dispatches.map((dispatch) => enrichDispatchDpsFields(dispatches, dispatch));
 }
 
+/**
+ * Returns the weight from the most recent Notion entry that has Weight Lbs set.
+ * Used server-side to seed the Monday weigh-in system.
+ * Uncached — only called on the protected /log page which is force-dynamic.
+ */
+export async function fetchLatestWeightLbs(): Promise<number | null> {
+  if (!isConfigured()) return null;
+  const dbId = getDbId();
+  if (!dbId) return null;
+
+  try {
+    const response = await getNotion().databases.query({
+      database_id: dbId,
+      filter: {
+        property: "Weight Lbs",
+        number: { is_not_empty: true },
+      },
+      sorts: [{ property: "Date", direction: "descending" }],
+      page_size: 1,
+    });
+
+    const page = response.results[0] as PageObjectResponse | undefined;
+    if (!page || !("properties" in page)) return null;
+
+    const p = page.properties as Record<string, unknown>;
+    return num(p["Weight Lbs"] as Props) ?? null;
+  } catch (err) {
+    logError("fetchLatestWeightLbs", err);
+    return null;
+  }
+}
+
 export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<{
   pageId: string;
   dpsPerMile: number | null;

@@ -1,9 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { MAIL_DAY_CONTEXT_OPTIONS } from "@/lib/dps";
 import { formatMileage, formatTemperature } from "@/lib/carrier-journal/helpers";
+import {
+  calculateHydrationGoal,
+  HEAT_BAND_LABEL,
+  type HeatBand,
+  type HydrationRecommendation,
+} from "@/lib/hydration";
 
 // ZIP 46614 (South Bend, IN) — fixed coordinates for weather lookup
 const ZIP_LAT = 41.6764;
@@ -21,15 +27,23 @@ type SubmitResult = {
   publicSummary: string;
 };
 
-type Props = { token: string };
+type Props = {
+  token: string;
+  /** Most recent recorded weight from Notion. Used as the active weight on non-Monday days. */
+  latestWeightLbs?: number | null;
+};
 
 function todayIsoDate(): string {
   const now = new Date();
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
+/** Uses noon to avoid DST edge cases at midnight boundaries. */
+function isMonday(dateStr: string): boolean {
+  return new Date(`${dateStr}T12:00:00`).getDay() === 1;
+}
 
-export function CarrierDaybookForm({ token }: Props) {
+export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
   const today = todayIsoDate();
 
   const [date, setDate] = useState(today);
@@ -38,17 +52,22 @@ export function CarrierDaybookForm({ token }: Props) {
   const [mailDayContext, setMailDayContext] = useState<string[]>([]);
   const [parcels, setParcels] = useState("");
   const [waterOz, setWaterOz] = useState("");
+
+  // Weight: entered on Mondays; on other days latestWeightLbs is the baseline.
   const [weightLbs, setWeightLbs] = useState("");
+  const [showWeightOverride, setShowWeightOverride] = useState(false);
+
+  const [directSun, setDirectSun] = useState(false);
+  const [hydrationGoalOverride, setHydrationGoalOverride] = useState("");
+  const [showGoalOverride, setShowGoalOverride] = useState(false);
+
   const [mood, setMood] = useState("");
   const [energy, setEnergy] = useState("");
   const [publicNote, setPublicNote] = useState("");
   const [privateNote, setPrivateNote] = useState("");
   const [published, setPublished] = useState(true);
 
-  const [hydrationGoalOz, setHydrationGoalOz] = useState("");
-
   const [weather, setWeather] = useState<WeatherState>({ status: "idle" });
-  // tempF/heatIndexF come from the weather fetch; never user-edited
   const [weatherTemp, setWeatherTemp] = useState<number | null>(null);
   const [weatherHeat, setWeatherHeat] = useState<number | null>(null);
 
@@ -57,6 +76,8 @@ export function CarrierDaybookForm({ token }: Props) {
   const [result, setResult] = useState<SubmitResult | null>(null);
 
   const weatherAbort = useRef<AbortController | null>(null);
+
+  const dateIsMonday = isMonday(date);
 
   // Auto-fetch weather when date == today
   useEffect(() => {
@@ -95,6 +116,44 @@ export function CarrierDaybookForm({ token }: Props) {
 
     return () => controller.abort();
   }, [date, today]);
+
+  // Reset weight override when the date changes (Monday ↔ non-Monday flip)
+  useEffect(() => {
+    setShowWeightOverride(false);
+    setWeightLbs("");
+  }, [date]);
+
+  /**
+   * The effective weight used for hydration calculation:
+   * - Monday: whatever was typed in the weigh-in field (falls back to latest)
+   * - Non-Monday: latest recorded weight, or manual override if shown
+   */
+  const activeWeightLbs = useMemo((): number | undefined => {
+    const fromInput = weightLbs.trim() ? parseFloat(weightLbs) : null;
+    const validInput = fromInput !== null && Number.isFinite(fromInput) && fromInput > 0
+      ? fromInput
+      : null;
+
+    if (dateIsMonday || showWeightOverride) {
+      return validInput ?? latestWeightLbs ?? undefined;
+    }
+    return latestWeightLbs ?? undefined;
+  }, [dateIsMonday, showWeightOverride, weightLbs, latestWeightLbs]);
+
+  // Compute hydration goal from available inputs
+  const computedHydration = useMemo((): HydrationRecommendation => {
+    const peakTempF = weatherTemp ?? 72;
+    const peakHeatIndexF = weatherHeat ?? peakTempF;
+    const milesNum = miles.trim() ? parseFloat(miles) : undefined;
+
+    return calculateHydrationGoal({
+      weightLbs: activeWeightLbs,
+      peakTempF,
+      peakHeatIndexF,
+      milesWalked: milesNum,
+      directSun,
+    });
+  }, [weatherTemp, weatherHeat, miles, activeWeightLbs, directSun]);
 
   const toggleContext = useCallback((tag: string) => {
     setMailDayContext((prev) =>
@@ -139,14 +198,25 @@ export function CarrierDaybookForm({ token }: Props) {
         body.waterOz = waterNum;
       }
 
-      const hydrationGoalNum = hydrationGoalOz.trim() ? Number(hydrationGoalOz) : undefined;
-      if (hydrationGoalNum !== undefined && Number.isFinite(hydrationGoalNum) && hydrationGoalNum >= 0) {
-        body.hydrationGoalOz = hydrationGoalNum;
+      // Only write weight to Notion on Monday weigh-in or explicit override
+      const weightInputNum = weightLbs.trim() ? Number(weightLbs) : undefined;
+      if (
+        (dateIsMonday || showWeightOverride) &&
+        weightInputNum !== undefined &&
+        Number.isFinite(weightInputNum) &&
+        weightInputNum > 0
+      ) {
+        body.weightLbs = weightInputNum;
       }
 
-      const weightNum = weightLbs.trim() ? Number(weightLbs) : undefined;
-      if (weightNum !== undefined && Number.isFinite(weightNum) && weightNum >= 0) {
-        body.weightLbs = weightNum;
+      // Use manual override if present; otherwise commit the computed goal
+      const overrideNum = hydrationGoalOverride.trim() ? Number(hydrationGoalOverride) : undefined;
+      const effectiveGoalOz =
+        overrideNum !== undefined && Number.isFinite(overrideNum) && overrideNum > 0
+          ? overrideNum
+          : computedHydration.totalSuggestedOz;
+      if (effectiveGoalOz > 0) {
+        body.hydrationGoalOz = effectiveGoalOz;
       }
 
       const moodNum = mood.trim() ? Number(mood) : undefined;
@@ -192,8 +262,10 @@ export function CarrierDaybookForm({ token }: Props) {
       }
     },
     [
-      token, date, miles, dpsCount, mailDayContext, parcels, waterOz, hydrationGoalOz,
-      weightLbs, mood, energy, publicNote, privateNote, published, weatherTemp, weatherHeat,
+      token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
+      weightLbs, showWeightOverride,
+      hydrationGoalOverride, computedHydration,
+      mood, energy, publicNote, privateNote, published, weatherTemp, weatherHeat,
     ]
   );
 
@@ -216,8 +288,11 @@ export function CarrierDaybookForm({ token }: Props) {
           setMailDayContext([]);
           setParcels("");
           setWaterOz("");
-          setHydrationGoalOz("");
           setWeightLbs("");
+          setShowWeightOverride(false);
+          setDirectSun(false);
+          setHydrationGoalOverride("");
+          setShowGoalOverride(false);
           setMood("");
           setEnergy("");
           setPublicNote("");
@@ -248,7 +323,7 @@ export function CarrierDaybookForm({ token }: Props) {
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
           DATE
         </div>
-        <label htmlFor="db-date" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2 sr-only">
+        <label htmlFor="db-date" className="sr-only">
           DATE (YYYY-MM-DD)
         </label>
         <input
@@ -383,6 +458,35 @@ export function CarrierDaybookForm({ token }: Props) {
           <WeatherCell label="TEMPERATURE (°F)" value={weatherTemp} loading={weather.status === "loading"} />
           <WeatherCell label="HEAT INDEX (°F)" value={weatherHeat} loading={weather.status === "loading"} />
         </div>
+
+        {/* Direct sun toggle — affects hydration calc */}
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={directSun}
+            onChange={(e) => setDirectSun(e.target.checked)}
+            className="sr-only"
+          />
+          <span
+            className={`relative flex-none w-10 h-6 border transition-colors ${
+              directSun
+                ? "bg-[rgb(var(--warn)/0.15)] border-[rgb(var(--warn)/0.5)]"
+                : "bg-transparent border-[rgb(var(--border)/0.4)]"
+            }`}
+            role="presentation"
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 transition-transform ${
+                directSun
+                  ? "translate-x-4 bg-[rgb(var(--warn))]"
+                  : "translate-x-0 bg-[rgb(var(--text-meta)/0.5)]"
+              }`}
+            />
+          </span>
+          <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))]">
+            {directSun ? "DIRECT SUN (adds ~10°F to effective heat)" : "DIRECT SUN"}
+          </span>
+        </label>
       </div>
 
       {/* Body stats */}
@@ -391,10 +495,11 @@ export function CarrierDaybookForm({ token }: Props) {
           BODY &amp; HYDRATION
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+        {/* Water drank */}
+        <div className="grid grid-cols-2 gap-4">
           <div>
             <label htmlFor="db-water" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
-              WATER (oz)
+              WATER DRANK (oz)
             </label>
             <input
               id="db-water"
@@ -408,41 +513,29 @@ export function CarrierDaybookForm({ token }: Props) {
               placeholder="96"
             />
           </div>
-
-          <div>
-            <label htmlFor="db-hydration-goal" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
-              GOAL (oz)
-            </label>
-            <input
-              id="db-hydration-goal"
-              type="number"
-              inputMode="numeric"
-              step="1"
-              min="0"
-              value={hydrationGoalOz}
-              onChange={(e) => setHydrationGoalOz(e.target.value)}
-              className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
-              placeholder="96"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="db-weight" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
-              WEIGHT (lbs)
-            </label>
-            <input
-              id="db-weight"
-              type="number"
-              inputMode="decimal"
-              step="0.1"
-              min="0"
-              value={weightLbs}
-              onChange={(e) => setWeightLbs(e.target.value)}
-              className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
-              placeholder="242"
-            />
-          </div>
         </div>
+
+        {/* Weight — Monday: input field; other days: read-only basis display */}
+        <WeightSection
+          dateIsMonday={dateIsMonday}
+          weightLbs={weightLbs}
+          onWeightChange={setWeightLbs}
+          latestWeightLbs={latestWeightLbs ?? null}
+          showOverride={showWeightOverride}
+          onToggleOverride={() => setShowWeightOverride((v) => !v)}
+        />
+
+        {/* Computed hydration goal */}
+        <HydrationGoalPanel
+          recommendation={computedHydration}
+          hasWeather={weather.status === "ok"}
+          milesStr={miles}
+          activeWeightLbs={activeWeightLbs}
+          override={hydrationGoalOverride}
+          onOverrideChange={setHydrationGoalOverride}
+          showOverride={showGoalOverride}
+          onToggleOverride={() => setShowGoalOverride((v) => !v)}
+        />
 
         <div className="grid grid-cols-2 gap-4">
           <div>
@@ -574,6 +667,229 @@ export function CarrierDaybookForm({ token }: Props) {
   );
 }
 
+// ─── Weight section ───────────────────────────────────────────────────────────
+
+function WeightSection({
+  dateIsMonday,
+  weightLbs,
+  onWeightChange,
+  latestWeightLbs,
+  showOverride,
+  onToggleOverride,
+}: {
+  dateIsMonday: boolean;
+  weightLbs: string;
+  onWeightChange: (v: string) => void;
+  latestWeightLbs: number | null;
+  showOverride: boolean;
+  onToggleOverride: () => void;
+}) {
+  if (dateIsMonday) {
+    return (
+      <div>
+        <label
+          htmlFor="db-weight"
+          className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] block mb-2"
+        >
+          MONDAY WEIGH-IN (lbs)
+        </label>
+        <input
+          id="db-weight"
+          type="number"
+          inputMode="decimal"
+          step="0.1"
+          min="0"
+          value={weightLbs}
+          onChange={(e) => onWeightChange(e.target.value)}
+          className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+          placeholder={latestWeightLbs ? String(latestWeightLbs) : "242"}
+        />
+        {latestWeightLbs && !weightLbs.trim() && (
+          <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.7)] mt-1">
+            LAST RECORDED: {latestWeightLbs} lb — enter today&apos;s if different
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))]">
+        WEIGHT BASIS
+      </div>
+      <div className="w-full bg-[rgb(var(--window)/0.4)] border border-[rgb(var(--border)/0.15)] px-4 py-3 flex items-baseline gap-2">
+        {latestWeightLbs ? (
+          <>
+            <span className="font-[var(--font-ibm)] text-xl text-[rgb(var(--text-color))]">
+              {latestWeightLbs}
+            </span>
+            <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
+              lb — latest Monday weigh-in
+            </span>
+          </>
+        ) : (
+          <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.6)]">
+            No Monday weigh-in on record
+          </span>
+        )}
+      </div>
+      <button
+        type="button"
+        onClick={onToggleOverride}
+        className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.5)] hover:text-[rgb(var(--text-meta))] transition-colors"
+      >
+        {showOverride ? "▲ HIDE OVERRIDE" : "▼ OVERRIDE WEIGHT"}
+      </button>
+      {showOverride && (
+        <input
+          type="number"
+          inputMode="decimal"
+          step="0.1"
+          min="0"
+          value={weightLbs}
+          onChange={(e) => onWeightChange(e.target.value)}
+          className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+          placeholder="Custom weight lbs"
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── Hydration Goal Panel ─────────────────────────────────────────────────────
+
+const HEAT_BAND_COLOR: Record<HeatBand, string> = {
+  "normal": "rgb(var(--text-secondary))",
+  "caution": "rgb(var(--warn))",
+  "extreme-caution": "rgb(var(--orange))",
+  "danger": "rgb(var(--red))",
+  "extreme-danger": "rgb(var(--red))",
+};
+
+function HydrationGoalPanel({
+  recommendation,
+  hasWeather,
+  milesStr,
+  activeWeightLbs,
+  override,
+  onOverrideChange,
+  showOverride,
+  onToggleOverride,
+}: {
+  recommendation: HydrationRecommendation;
+  hasWeather: boolean;
+  milesStr: string;
+  activeWeightLbs: number | undefined;
+  override: string;
+  onOverrideChange: (v: string) => void;
+  showOverride: boolean;
+  onToggleOverride: () => void;
+}) {
+  const {
+    routeWaterGoalOz,
+    preShiftWaterOz,
+    totalSuggestedOz,
+    heatBand,
+    effectiveHeatF,
+    routeHours,
+    electrolyteRecommended,
+    warnings,
+  } = recommendation;
+
+  const overrideNum = override.trim() ? Number(override) : null;
+  const displayOz =
+    overrideNum !== null && Number.isFinite(overrideNum) && overrideNum > 0
+      ? overrideNum
+      : totalSuggestedOz;
+
+  const basisParts: string[] = [];
+  if (milesStr.trim()) basisParts.push(`${milesStr} mi`);
+  if (hasWeather) basisParts.push(`${Math.round(effectiveHeatF)}°F eff. heat`);
+  if (activeWeightLbs) basisParts.push(`${activeWeightLbs} lb`);
+
+  return (
+    <div className="space-y-2">
+      <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))]">
+        HYDRATION GOAL (oz)
+      </div>
+
+      <div className="w-full bg-[rgb(var(--window)/0.5)] border border-[rgb(var(--border)/0.2)] px-4 py-3 space-y-1">
+        <div className="flex items-baseline gap-3 flex-wrap">
+          <span className="font-[var(--font-ibm)] text-2xl text-[rgb(var(--neon))]">
+            {displayOz}
+          </span>
+          <span
+            className="font-[var(--font-ocr)] text-[9px] tracking-widest"
+            style={{ color: HEAT_BAND_COLOR[heatBand] }}
+          >
+            {HEAT_BAND_LABEL[heatBand]}
+          </span>
+          {electrolyteRecommended && (
+            <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--warn)/0.9)]">
+              ELECTROLYTES REC.
+            </span>
+          )}
+          {override.trim() && (
+            <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.7)]">
+              OVERRIDE
+            </span>
+          )}
+        </div>
+
+        <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
+          {routeWaterGoalOz} oz route
+          {preShiftWaterOz ? ` + ${preShiftWaterOz} oz pre-shift` : ""}
+          {" · "}
+          {routeHours % 1 === 0 ? routeHours : routeHours.toFixed(1)} h est.
+        </div>
+
+        {basisParts.length > 0 && (
+          <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.6)]">
+            {basisParts.join(" · ")}
+          </div>
+        )}
+      </div>
+
+      {warnings.length > 0 && (
+        <div className="space-y-1">
+          {warnings.map((w, i) => (
+            <div
+              key={i}
+              className="font-[var(--font-ibm)] text-[11px] text-[rgb(var(--red)/0.9)] border-l-2 border-[rgb(var(--red)/0.4)] pl-2 py-0.5"
+            >
+              {w}
+            </div>
+          ))}
+        </div>
+      )}
+
+      <button
+        type="button"
+        onClick={onToggleOverride}
+        className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.5)] hover:text-[rgb(var(--text-meta))] transition-colors"
+      >
+        {showOverride ? "▲ HIDE OVERRIDE" : "▼ MANUAL OVERRIDE"}
+      </button>
+
+      {showOverride && (
+        <input
+          type="number"
+          inputMode="numeric"
+          step="1"
+          min="0"
+          value={override}
+          onChange={(e) => onOverrideChange(e.target.value)}
+          className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+          placeholder="Custom goal oz"
+        />
+      )}
+    </div>
+  );
+}
+
+// ─── Success card ─────────────────────────────────────────────────────────────
+
 type SuccessCardProps = {
   result: SubmitResult;
   date: string;
@@ -640,6 +956,8 @@ function SuccessCard({
     </div>
   );
 }
+
+// ─── Shared sub-components ────────────────────────────────────────────────────
 
 function WeatherCell({
   label,

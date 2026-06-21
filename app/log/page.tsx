@@ -2,7 +2,10 @@ import type { Metadata } from "next";
 import { CarrierDaybookGate } from "@/components/carrier-journal/carrier-daybook-gate";
 import { CarrierDaybookUnauthorized } from "@/components/carrier-journal/carrier-daybook-unauthorized";
 import { CarrierDaybookForm } from "@/components/carrier-journal/carrier-daybook-form";
-import { verifyCarrierLogSecret } from "@/lib/notion/carrier-journal.repo";
+import {
+  verifyCarrierLogSecret,
+  fetchLatestWeightLbs,
+} from "@/lib/notion/carrier-journal.repo";
 
 export const dynamic = "force-dynamic";
 
@@ -34,10 +37,12 @@ export default async function CarrierDaybookPage({ searchParams }: Props) {
     );
   }
 
+  const latestWeightLbs = await fetchLatestWeightLbs();
+
   return (
     <main className="flex-1 pt-12 pb-16">
       <div className="w-full max-w-2xl mx-auto px-4 sm:px-6">
-        <CarrierDaybookForm token={token} />
+        <CarrierDaybookForm token={token} latestWeightLbs={latestWeightLbs} />
       </div>
     </main>
   );
