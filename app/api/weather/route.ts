@@ -6,6 +6,12 @@ const GEO_URL = "https://api.openweathermap.org/geo/1.0/direct";
 const WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
 const FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
 
+// South Bend / Indianapolis Eastern time — covers ZIP 46614 year-round
+const CARRIER_TZ = "America/Indiana/Indianapolis";
+// Carrier shift window (local hour, inclusive)
+const SHIFT_START_HOUR = 8;
+const SHIFT_END_HOUR = 16;
+
 type WeatherOption = { lat: number; lon: number; label: string };
 
 type WeatherJson =
@@ -22,6 +28,78 @@ type WeatherJson =
       wind: number;
       forecast?: { date: string; condition: string; high: number; low: number }[];
     };
+
+/** Rothfusz heat index equation (returns tempF unchanged below 80°F). */
+function heatIndex(tempF: number, humidity: number): number {
+  if (tempF < 80) return tempF;
+  const T = tempF;
+  const R = humidity;
+  return Math.round(
+    -42.379 +
+      2.04901523 * T +
+      10.14333127 * R -
+      0.22475541 * T * R -
+      0.00683783 * T * T -
+      0.05481717 * R * R +
+      0.00122874 * T * T * R +
+      0.00085282 * T * R * R -
+      0.00000199 * T * T * R * R
+  );
+}
+
+/** Returns the local date string (YYYY-MM-DD) and hour (0-23) for a Unix timestamp in the carrier timezone. */
+function localDateHour(unixSec: number): { date: string; hour: number } {
+  const d = new Date(unixSec * 1000);
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: CARRIER_TZ,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    hour12: false,
+  }).formatToParts(d);
+  const get = (t: string) => parts.find((p) => p.type === t)?.value ?? "00";
+  const date = `${get("year")}-${get("month")}-${get("day")}`;
+  const hour = parseInt(get("hour"), 10);
+  return { date, hour };
+}
+
+/** Today's date string in the carrier timezone. */
+function localToday(): string {
+  return localDateHour(Math.floor(Date.now() / 1000)).date;
+}
+
+/**
+ * Scans today's 3-hour forecast entries that fall within SHIFT_START_HOUR–SHIFT_END_HOUR
+ * (local time) and returns the hottest reading with its heat index.
+ * Returns null when no entries exist in that window yet (e.g. before the shift starts).
+ */
+async function fetchShiftPeak(
+  lat: number,
+  lon: number
+): Promise<{ peakTempF: number; peakHeatIndexF: number } | null> {
+  if (!API_KEY) return null;
+  const res = await fetch(`${FORECAST_URL}?lat=${lat}&lon=${lon}&units=imperial&appid=${API_KEY}`);
+  const data = await res.json();
+  const today = localToday();
+
+  type ForecastItem = { dt: number; main: { temp: number; humidity: number } };
+  const shiftEntries: ForecastItem[] = (data.list ?? []).filter((item: ForecastItem) => {
+    const { date, hour } = localDateHour(item.dt);
+    return date === today && hour >= SHIFT_START_HOUR && hour <= SHIFT_END_HOUR;
+  });
+
+  if (shiftEntries.length === 0) return null;
+
+  const peak = shiftEntries.reduce((best: ForecastItem, item: ForecastItem) =>
+    item.main.temp > best.main.temp ? item : best
+  );
+
+  return {
+    peakTempF: Math.round(peak.main.temp),
+    peakHeatIndexF: heatIndex(peak.main.temp, peak.main.humidity),
+  };
+}
 
 async function fetchForecast(
   lat: number,
@@ -75,6 +153,7 @@ export async function GET(request: NextRequest) {
 
   const { searchParams } = new URL(request.url);
   const includeForecast = searchParams.get("forecast") === "true";
+  const includePeak = searchParams.get("peak") === "true";
   const latStr = searchParams.get("lat");
   const lonStr = searchParams.get("lon");
 
@@ -86,6 +165,23 @@ export async function GET(request: NextRequest) {
     }
     try {
       const body = await currentWeatherBundle(lat, lon, "", includeForecast);
+      if (includePeak) {
+        const peak = await fetchShiftPeak(lat, lon);
+        // Attach peak fields; fall back to current temp if window has no data yet
+        const peakTempF = peak?.peakTempF ?? (body as { tempF?: number }).tempF;
+        const peakHeatIndexF =
+          peak?.peakHeatIndexF ??
+          (body as { tempF?: number; humidity?: number }).tempF !== undefined
+            ? heatIndex(
+                (body as { tempF: number }).tempF,
+                (body as { humidity: number }).humidity
+              )
+            : null;
+        return NextResponse.json(
+          { ...body, peakTempF, peakHeatIndexF, peakFromForecast: peak !== null },
+          { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" } }
+        );
+      }
       return NextResponse.json(body, {
         headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=600" },
       });

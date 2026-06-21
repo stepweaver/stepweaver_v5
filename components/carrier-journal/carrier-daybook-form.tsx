@@ -28,23 +28,6 @@ function todayIsoDate(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
-function heatIndexFromTempHumidity(tempF: number, humidity: number): number {
-  // Rothfusz equation (simplified)
-  if (tempF < 80) return tempF;
-  const T = tempF;
-  const R = humidity;
-  return Math.round(
-    -42.379 +
-      2.04901523 * T +
-      10.14333127 * R -
-      0.22475541 * T * R -
-      0.00683783 * T * T -
-      0.05481717 * R * R +
-      0.00122874 * T * T * R +
-      0.00085282 * T * R * R -
-      0.00000199 * T * T * R * R
-  );
-}
 
 export function CarrierDaybookForm({ token }: Props) {
   const today = todayIsoDate();
@@ -88,19 +71,15 @@ export function CarrierDaybookForm({ token }: Props) {
 
     setWeather({ status: "loading" });
 
-    fetch(`/api/weather?lat=${ZIP_LAT}&lon=${ZIP_LON}`, { signal: controller.signal })
+    fetch(`/api/weather?lat=${ZIP_LAT}&lon=${ZIP_LON}&peak=true`, { signal: controller.signal })
       .then(async (res) => {
         if (!res.ok) throw new Error("Weather fetch failed");
         const data = (await res.json()) as {
-          tempF?: number;
-          humidity?: number;
+          peakTempF?: number;
+          peakHeatIndexF?: number | null;
         };
-        const tempF = data.tempF ?? null;
-        const humidity = data.humidity ?? null;
-        const heatIndexF =
-          tempF !== null && humidity !== null
-            ? heatIndexFromTempHumidity(tempF, humidity)
-            : null;
+        const tempF = data.peakTempF ?? null;
+        const heatIndexF = data.peakHeatIndexF ?? null;
         if (tempF !== null) {
           setWeather({ status: "ok", tempF, heatIndexF });
           setWeatherTemp(tempF);
