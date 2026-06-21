@@ -38,11 +38,6 @@ function todayIsoDate(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
-/** Uses noon to avoid DST edge cases at midnight boundaries. */
-function isMonday(dateStr: string): boolean {
-  return new Date(`${dateStr}T12:00:00`).getDay() === 1;
-}
-
 export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
   const today = todayIsoDate();
 
@@ -53,9 +48,8 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
   const [parcels, setParcels] = useState("");
   const [waterOz, setWaterOz] = useState("");
 
-  // Weight: entered on Mondays; on other days latestWeightLbs is the baseline.
+  // Only entered on Mondays; used silently in hydration calc all week.
   const [weightLbs, setWeightLbs] = useState("");
-  const [showWeightOverride, setShowWeightOverride] = useState(false);
 
   const [directSun, setDirectSun] = useState(false);
   const [hydrationGoalOverride, setHydrationGoalOverride] = useState("");
@@ -76,8 +70,6 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
   const [result, setResult] = useState<SubmitResult | null>(null);
 
   const weatherAbort = useRef<AbortController | null>(null);
-
-  const dateIsMonday = isMonday(date);
 
   // Auto-fetch weather when date == today
   useEffect(() => {
@@ -117,28 +109,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
     return () => controller.abort();
   }, [date, today]);
 
-  // Reset weight override when the date changes (Monday ↔ non-Monday flip)
-  useEffect(() => {
-    setShowWeightOverride(false);
-    setWeightLbs("");
-  }, [date]);
-
-  /**
-   * The effective weight used for hydration calculation:
-   * - Monday: whatever was typed in the weigh-in field (falls back to latest)
-   * - Non-Monday: latest recorded weight, or manual override if shown
-   */
-  const activeWeightLbs = useMemo((): number | undefined => {
-    const fromInput = weightLbs.trim() ? parseFloat(weightLbs) : null;
-    const validInput = fromInput !== null && Number.isFinite(fromInput) && fromInput > 0
-      ? fromInput
-      : null;
-
-    if (dateIsMonday || showWeightOverride) {
-      return validInput ?? latestWeightLbs ?? undefined;
-    }
-    return latestWeightLbs ?? undefined;
-  }, [dateIsMonday, showWeightOverride, weightLbs, latestWeightLbs]);
+  const dateIsMonday = new Date(`${date}T12:00:00`).getDay() === 1;
 
   // Compute hydration goal from available inputs
   const computedHydration = useMemo((): HydrationRecommendation => {
@@ -146,14 +117,20 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
     const peakHeatIndexF = weatherHeat ?? peakTempF;
     const milesNum = miles.trim() ? parseFloat(miles) : undefined;
 
+    const weightNum = weightLbs.trim() ? parseFloat(weightLbs) : null;
+    const activeWeight =
+      weightNum !== null && Number.isFinite(weightNum) && weightNum > 0
+        ? weightNum
+        : (latestWeightLbs ?? undefined);
+
     return calculateHydrationGoal({
-      weightLbs: activeWeightLbs,
+      weightLbs: activeWeight,
       peakTempF,
       peakHeatIndexF,
       milesWalked: milesNum,
       directSun,
     });
-  }, [weatherTemp, weatherHeat, miles, activeWeightLbs, directSun]);
+  }, [weatherTemp, weatherHeat, miles, weightLbs, latestWeightLbs, directSun]);
 
   const toggleContext = useCallback((tag: string) => {
     setMailDayContext((prev) =>
@@ -198,15 +175,12 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
         body.waterOz = waterNum;
       }
 
-      // Only write weight to Notion on Monday weigh-in or explicit override
-      const weightInputNum = weightLbs.trim() ? Number(weightLbs) : undefined;
-      if (
-        (dateIsMonday || showWeightOverride) &&
-        weightInputNum !== undefined &&
-        Number.isFinite(weightInputNum) &&
-        weightInputNum > 0
-      ) {
-        body.weightLbs = weightInputNum;
+      // Write weight only on Monday weigh-in
+      if (dateIsMonday) {
+        const weightNum = weightLbs.trim() ? Number(weightLbs) : undefined;
+        if (weightNum !== undefined && Number.isFinite(weightNum) && weightNum > 0) {
+          body.weightLbs = weightNum;
+        }
       }
 
       // Use manual override if present; otherwise commit the computed goal
@@ -263,8 +237,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
     },
     [
       token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
-      weightLbs, showWeightOverride,
-      hydrationGoalOverride, computedHydration,
+      weightLbs, hydrationGoalOverride, computedHydration,
       mood, energy, publicNote, privateNote, published, weatherTemp, weatherHeat,
     ]
   );
@@ -289,7 +262,6 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           setParcels("");
           setWaterOz("");
           setWeightLbs("");
-          setShowWeightOverride(false);
           setDirectSun(false);
           setHydrationGoalOverride("");
           setShowGoalOverride(false);
@@ -515,22 +487,34 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           </div>
         </div>
 
-        {/* Weight — Monday: input field; other days: read-only basis display */}
-        <WeightSection
-          dateIsMonday={dateIsMonday}
-          weightLbs={weightLbs}
-          onWeightChange={setWeightLbs}
-          latestWeightLbs={latestWeightLbs ?? null}
-          showOverride={showWeightOverride}
-          onToggleOverride={() => setShowWeightOverride((v) => !v)}
-        />
+        {/* Monday weigh-in — only shown on Mondays, never displayed back */}
+        {dateIsMonday && (
+          <div>
+            <label
+              htmlFor="db-weight"
+              className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+            >
+              WEIGHT (lbs) — Monday weigh-in
+            </label>
+            <input
+              id="db-weight"
+              type="number"
+              inputMode="decimal"
+              step="0.1"
+              min="0"
+              value={weightLbs}
+              onChange={(e) => setWeightLbs(e.target.value)}
+              className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+              placeholder="242"
+            />
+          </div>
+        )}
 
         {/* Computed hydration goal */}
         <HydrationGoalPanel
           recommendation={computedHydration}
           hasWeather={weather.status === "ok"}
           milesStr={miles}
-          activeWeightLbs={activeWeightLbs}
           override={hydrationGoalOverride}
           onOverrideChange={setHydrationGoalOverride}
           showOverride={showGoalOverride}
@@ -667,96 +651,6 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
   );
 }
 
-// ─── Weight section ───────────────────────────────────────────────────────────
-
-function WeightSection({
-  dateIsMonday,
-  weightLbs,
-  onWeightChange,
-  latestWeightLbs,
-  showOverride,
-  onToggleOverride,
-}: {
-  dateIsMonday: boolean;
-  weightLbs: string;
-  onWeightChange: (v: string) => void;
-  latestWeightLbs: number | null;
-  showOverride: boolean;
-  onToggleOverride: () => void;
-}) {
-  if (dateIsMonday) {
-    return (
-      <div>
-        <label
-          htmlFor="db-weight"
-          className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] block mb-2"
-        >
-          MONDAY WEIGH-IN (lbs)
-        </label>
-        <input
-          id="db-weight"
-          type="number"
-          inputMode="decimal"
-          step="0.1"
-          min="0"
-          value={weightLbs}
-          onChange={(e) => onWeightChange(e.target.value)}
-          className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
-          placeholder={latestWeightLbs ? String(latestWeightLbs) : "242"}
-        />
-        {latestWeightLbs && !weightLbs.trim() && (
-          <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.7)] mt-1">
-            LAST RECORDED: {latestWeightLbs} lb — enter today&apos;s if different
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <div className="space-y-1">
-      <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))]">
-        WEIGHT BASIS
-      </div>
-      <div className="w-full bg-[rgb(var(--window)/0.4)] border border-[rgb(var(--border)/0.15)] px-4 py-3 flex items-baseline gap-2">
-        {latestWeightLbs ? (
-          <>
-            <span className="font-[var(--font-ibm)] text-xl text-[rgb(var(--text-color))]">
-              {latestWeightLbs}
-            </span>
-            <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
-              lb — latest Monday weigh-in
-            </span>
-          </>
-        ) : (
-          <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.6)]">
-            No Monday weigh-in on record
-          </span>
-        )}
-      </div>
-      <button
-        type="button"
-        onClick={onToggleOverride}
-        className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.5)] hover:text-[rgb(var(--text-meta))] transition-colors"
-      >
-        {showOverride ? "▲ HIDE OVERRIDE" : "▼ OVERRIDE WEIGHT"}
-      </button>
-      {showOverride && (
-        <input
-          type="number"
-          inputMode="decimal"
-          step="0.1"
-          min="0"
-          value={weightLbs}
-          onChange={(e) => onWeightChange(e.target.value)}
-          className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
-          placeholder="Custom weight lbs"
-        />
-      )}
-    </div>
-  );
-}
-
 // ─── Hydration Goal Panel ─────────────────────────────────────────────────────
 
 const HEAT_BAND_COLOR: Record<HeatBand, string> = {
@@ -771,7 +665,6 @@ function HydrationGoalPanel({
   recommendation,
   hasWeather,
   milesStr,
-  activeWeightLbs,
   override,
   onOverrideChange,
   showOverride,
@@ -780,7 +673,6 @@ function HydrationGoalPanel({
   recommendation: HydrationRecommendation;
   hasWeather: boolean;
   milesStr: string;
-  activeWeightLbs: number | undefined;
   override: string;
   onOverrideChange: (v: string) => void;
   showOverride: boolean;
@@ -806,7 +698,6 @@ function HydrationGoalPanel({
   const basisParts: string[] = [];
   if (milesStr.trim()) basisParts.push(`${milesStr} mi`);
   if (hasWeather) basisParts.push(`${Math.round(effectiveHeatF)}°F eff. heat`);
-  if (activeWeightLbs) basisParts.push(`${activeWeightLbs} lb`);
 
   return (
     <div className="space-y-2">
