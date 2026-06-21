@@ -244,7 +244,7 @@ export function CarrierDaybookForm({ token }: Props) {
       </div>
 
       {/* Date */}
-      <div className="surface-panel p-5 space-y-4">
+      <div className="surface-panel p-5 space-y-4 overflow-hidden">
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
           DATE
         </div>
@@ -253,7 +253,7 @@ export function CarrierDaybookForm({ token }: Props) {
           value={date}
           onChange={(e) => setDate(e.target.value)}
           required
-          className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-lg px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+          className="w-full max-w-full min-w-0 box-border bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-lg px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
         />
       </div>
 
