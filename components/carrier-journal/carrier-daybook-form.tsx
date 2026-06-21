@@ -248,17 +248,20 @@ export function CarrierDaybookForm({ token }: Props) {
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
           DATE
         </div>
-        {/* grid-cols-1 = minmax(0,1fr): forces input below its intrinsic minimum width */}
-        <div className="grid grid-cols-1 w-full">
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-            style={{ width: "100%", minWidth: 0 }}
-            className="min-w-0 bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-base px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
-          />
-        </div>
+        <label htmlFor="db-date" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2 sr-only">
+          DATE (YYYY-MM-DD)
+        </label>
+        <input
+          id="db-date"
+          type="text"
+          inputMode="numeric"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          required
+          pattern="\d{4}-\d{2}-\d{2}"
+          placeholder="YYYY-MM-DD"
+          className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-base px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+        />
       </div>
 
       {/* Core stats */}

@@ -47,6 +47,8 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: rgb(var(--bg));
+    max-width: 100%;
+    overflow-x: hidden;
   }
 
   body {
