@@ -244,17 +244,20 @@ export function CarrierDaybookForm({ token }: Props) {
       </div>
 
       {/* Date */}
-      <div className="surface-panel p-5 space-y-4 overflow-hidden">
+      <div className="surface-panel p-5 space-y-4">
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
           DATE
         </div>
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-          className="w-full max-w-full min-w-0 box-border bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-lg px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
-        />
+        {/* grid wrapper forces the date input to respect container width on all mobile browsers */}
+        <div className="grid w-full">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+            className="w-full min-w-0 bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-base px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+          />
+        </div>
       </div>
 
       {/* Core stats */}
