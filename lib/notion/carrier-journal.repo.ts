@@ -393,14 +393,17 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
   }
 
   const dpsPerMile =
-    input.dpsCount !== undefined && input.miles > 0
+    input.dpsCount !== undefined && input.miles !== undefined && input.miles > 0
       ? calculateDpsRatio(input.dpsCount, input.miles)
       : null;
 
   const properties: Record<string, unknown> = {
-    "Miles Walked": { number: input.miles },
     "Publish Public": { checkbox: input.published },
   };
+
+  if (input.miles !== undefined) {
+    properties["Miles Walked"] = { number: input.miles };
+  }
 
   if (input.dpsCount !== undefined) {
     properties["DPS Count"] = { number: input.dpsCount };

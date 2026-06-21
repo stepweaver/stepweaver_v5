@@ -129,8 +129,8 @@ export function CarrierDaybookForm({ token }: Props) {
       setSubmitStatus("saving");
       setErrorMsg("");
 
-      const milesNum = parseFloat(miles);
-      if (!Number.isFinite(milesNum) || milesNum < 0) {
+      const milesNum = miles.trim() ? parseFloat(miles) : undefined;
+      if (milesNum !== undefined && (!Number.isFinite(milesNum) || milesNum < 0)) {
         setErrorMsg("Miles must be a valid number (0 or greater).");
         setSubmitStatus("error");
         return;
@@ -139,8 +139,8 @@ export function CarrierDaybookForm({ token }: Props) {
       const body: Record<string, unknown> = {
         logSecret: token,
         date,
-        miles: milesNum,
         published,
+        ...(milesNum !== undefined && { miles: milesNum }),
       };
 
       const dpsNum = dpsCount.trim() ? Number(dpsCount.replace(/,/g, "")) : undefined;
@@ -219,7 +219,7 @@ export function CarrierDaybookForm({ token }: Props) {
   );
 
   if (result) {
-    const milesNum = parseFloat(miles);
+    const milesNum = miles.trim() ? parseFloat(miles) : undefined;
     const dpsNum = dpsCount.trim() ? Number(dpsCount.replace(/,/g, "")) : undefined;
     return (
       <SuccessCard
@@ -287,7 +287,7 @@ export function CarrierDaybookForm({ token }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label htmlFor="db-miles" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
-              MILES WALKED <span className="text-[rgb(var(--red))]">*</span>
+              MILES WALKED
             </label>
             <input
               id="db-miles"
@@ -297,7 +297,6 @@ export function CarrierDaybookForm({ token }: Props) {
               min="0"
               value={miles}
               onChange={(e) => setMiles(e.target.value)}
-              required
               className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
               placeholder="9.4"
             />
@@ -592,7 +591,7 @@ export function CarrierDaybookForm({ token }: Props) {
 type SuccessCardProps = {
   result: SubmitResult;
   date: string;
-  miles: number;
+  miles?: number;
   dpsCount?: number;
   temperatureF?: number;
   heatIndexF?: number;
@@ -617,7 +616,7 @@ function SuccessCard({
 
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
           <StatCell label="DATE" value={date} />
-          <StatCell label="MILES" value={formatMileage(miles)} />
+          {miles !== undefined && <StatCell label="MILES" value={formatMileage(miles)} />}
           {temperatureF !== undefined && (
             <StatCell label="TEMP" value={formatTemperature(temperatureF)} />
           )}

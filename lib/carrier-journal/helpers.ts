@@ -22,7 +22,7 @@ export function formatTemperature(f: number): string {
 }
 
 export interface PublicSummaryInput {
-  miles: number;
+  miles?: number;
   dpsCount?: number;
   dpsPerMile?: number | null;
   temperatureF?: number;
@@ -42,15 +42,23 @@ export function buildPublicSummary(input: PublicSummaryInput): string {
 
   const parts: string[] = [];
 
-  parts.push(`Walked ${formatMileage(input.miles)} today`);
-
-  if (input.temperatureF !== undefined) {
-    const tempPart = `a peak temperature of ${formatTemperature(input.temperatureF)}`;
+  if (input.miles !== undefined) {
+    let lead = `Walked ${formatMileage(input.miles)} today`;
+    if (input.temperatureF !== undefined) {
+      const tempPart = `a peak temperature of ${formatTemperature(input.temperatureF)}`;
+      const heatPart =
+        input.heatIndexF !== undefined
+          ? ` and heat index of ${formatTemperature(input.heatIndexF)}`
+          : "";
+      lead += ` with ${tempPart}${heatPart}`;
+    }
+    parts.push(lead);
+  } else if (input.temperatureF !== undefined) {
     const heatPart =
       input.heatIndexF !== undefined
-        ? ` and heat index of ${formatTemperature(input.heatIndexF)}`
+        ? `, heat index ${formatTemperature(input.heatIndexF)}`
         : "";
-    parts[0] += ` with ${tempPart}${heatPart}`;
+    parts.push(`Temperature today: ${formatTemperature(input.temperatureF)}${heatPart}`);
   }
 
   if (input.dpsCount !== undefined && input.dpsCount > 0) {
@@ -60,5 +68,5 @@ export function buildPublicSummary(input: PublicSummaryInput): string {
     parts.push(`DPS volume came in at ${countStr} pieces${perMilePart}`);
   }
 
-  return parts.join(". ") + ".";
+  return parts.length > 0 ? parts.join(". ") + "." : "";
 }

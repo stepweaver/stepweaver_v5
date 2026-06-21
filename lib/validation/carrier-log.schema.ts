@@ -21,7 +21,7 @@ export type CarrierLogDpsInput = z.infer<typeof carrierLogDpsSchema>;
 export const carrierDaybookSchema = z.object({
   logSecret: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
-  miles: z.number().finite().min(0),
+  miles: z.number().finite().min(0).optional(),
   dpsCount: z.number().finite().min(0).optional(),
   mailDayContext: z.array(mailDayContextSchema).optional(),
   parcels: z.number().finite().min(0).optional(),
