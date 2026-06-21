@@ -70,34 +70,58 @@ function localToday(): string {
 }
 
 /**
- * Scans today's 3-hour forecast entries that fall within SHIFT_START_HOUR–SHIFT_END_HOUR
- * (local time) and returns the hottest reading with its heat index.
- * Returns null when no entries exist in that window yet (e.g. before the shift starts).
+ * Fetches today's hourly temperature and humidity from Open-Meteo (free, no API key,
+ * includes actual measured data for past hours today), then finds the peak temperature
+ * within the carrier shift window (SHIFT_START_HOUR–SHIFT_END_HOUR local time).
+ *
+ * Unlike the OpenWeatherMap forecast, this works whether the shift is in progress,
+ * already finished, or hasn't started yet.
  */
 async function fetchShiftPeak(
   lat: number,
   lon: number
 ): Promise<{ peakTempF: number; peakHeatIndexF: number } | null> {
-  if (!API_KEY) return null;
-  const res = await fetch(`${FORECAST_URL}?lat=${lat}&lon=${lon}&units=imperial&appid=${API_KEY}`);
-  const data = await res.json();
   const today = localToday();
 
-  type ForecastItem = { dt: number; main: { temp: number; humidity: number } };
-  const shiftEntries: ForecastItem[] = (data.list ?? []).filter((item: ForecastItem) => {
-    const { date, hour } = localDateHour(item.dt);
-    return date === today && hour >= SHIFT_START_HOUR && hour <= SHIFT_END_HOUR;
-  });
+  const url = new URL("https://api.open-meteo.com/v1/forecast");
+  url.searchParams.set("latitude", String(lat));
+  url.searchParams.set("longitude", String(lon));
+  url.searchParams.set("hourly", "temperature_2m,relativehumidity_2m");
+  url.searchParams.set("temperature_unit", "fahrenheit");
+  url.searchParams.set("timezone", CARRIER_TZ);
+  url.searchParams.set("start_date", today);
+  url.searchParams.set("end_date", today);
 
-  if (shiftEntries.length === 0) return null;
+  const res = await fetch(url.toString());
+  if (!res.ok) return null;
 
-  const peak = shiftEntries.reduce((best: ForecastItem, item: ForecastItem) =>
-    item.main.temp > best.main.temp ? item : best
-  );
+  const data = (await res.json()) as {
+    hourly?: { time?: string[]; temperature_2m?: number[]; relativehumidity_2m?: number[] };
+  };
+
+  const times = data.hourly?.time ?? [];
+  const temps = data.hourly?.temperature_2m ?? [];
+  const humidities = data.hourly?.relativehumidity_2m ?? [];
+
+  let peakTemp: number | null = null;
+  let peakHumidity: number | null = null;
+
+  for (let i = 0; i < times.length; i++) {
+    // time format from Open-Meteo: "2026-06-21T08:00"
+    const hour = parseInt(times[i]?.split("T")[1]?.slice(0, 2) ?? "-1", 10);
+    if (hour < SHIFT_START_HOUR || hour > SHIFT_END_HOUR) continue;
+    const temp = temps[i];
+    if (typeof temp === "number" && (peakTemp === null || temp > peakTemp)) {
+      peakTemp = temp;
+      peakHumidity = humidities[i] ?? null;
+    }
+  }
+
+  if (peakTemp === null) return null;
 
   return {
-    peakTempF: Math.round(peak.main.temp),
-    peakHeatIndexF: heatIndex(peak.main.temp, peak.main.humidity),
+    peakTempF: Math.round(peakTemp),
+    peakHeatIndexF: peakHumidity !== null ? heatIndex(peakTemp, peakHumidity) : Math.round(peakTemp),
   };
 }
 
