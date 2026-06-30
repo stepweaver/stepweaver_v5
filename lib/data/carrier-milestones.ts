@@ -1,11 +1,10 @@
 import type { CarrierDispatch } from "./carrier-journal";
-import { enrichDispatchesDpsFields } from "./carrier-journal";
+import { enrichDispatchesFields } from "./carrier-journal";
 import {
   deriveWeatherSignals,
   isDerivedHeatDay,
   isDerivedWeatherDay,
 } from "@/lib/carrier-journal/weather-signals";
-import { isHeavyDpsRatio } from "@/lib/dps";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -184,7 +183,7 @@ export function getCarrierRankLadder(totalMiles: number): CarrierRank[] {
 }
 
 export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMilestone[] {
-  const enriched = enrichDispatchesDpsFields(dispatches);
+  const enriched = enrichDispatchesFields(dispatches);
   const sorted = sortedChronologically(enriched);
   const totalMiles = enriched.reduce((s, d) => s + d.milesWalked, 0);
   const daysLogged = enriched.length;
@@ -194,7 +193,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
   const snowDays = enriched.filter((d) => deriveWeatherSignals(d).snow);
   const heatDays = enriched.filter(isDerivedHeatDay);
   const weatherDays = enriched.filter(isDerivedWeatherDay);
-  const heavyDpsDays = enriched.filter((d) => isHeavyDpsRatio(d.dpsRatio));
+  const heavyMailDays = enriched.filter((d) => d.mailLoadTier === "heavy");
   const hydrationGoalDays = enriched.filter(
     (d) =>
       d.waterOz !== undefined &&
@@ -311,12 +310,12 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     milestone(
       "first-heavy-day",
       "First Heavy DPS Day",
-      "Heavy DPS",
-      "First day above 115% of recent DPS baseline.",
+      "Heavy",
+      "First day above 115% of your DPS + parcel baseline.",
       "load", "basic", "package",
-      heavyDpsDays.length, 1,
-      heavyDpsDays.length >= 1
-        ? sortedChronologically(heavyDpsDays)[0]?.date
+      heavyMailDays.length, 1,
+      heavyMailDays.length >= 1
+        ? sortedChronologically(heavyMailDays)[0]?.date
         : undefined
     ),
 
@@ -396,8 +395,8 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "5 Heavy",
       "Five days above 115% of recent DPS baseline.",
       "load", "field", "package",
-      heavyDpsDays.length, 5,
-      dateAtNthMatch(sorted, (d) => isHeavyDpsRatio(d.dpsRatio), 5)
+      heavyMailDays.length, 5,
+      dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 5)
     ),
 
     // --- Weather ---
@@ -512,8 +511,8 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "10 Heavy",
       "Ten days above 115% of recent DPS baseline. Character built.",
       "load", "campaign", "package",
-      heavyDpsDays.length, 10,
-      dateAtNthMatch(sorted, (d) => isHeavyDpsRatio(d.dpsRatio), 10)
+      heavyMailDays.length, 10,
+      dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 10)
     ),
 
     // ===================================================================
@@ -599,8 +598,8 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "50 Heavy",
       "Fifty days above 115% of recent DPS baseline. Field-hardened.",
       "load", "veteran", "package",
-      heavyDpsDays.length, 50,
-      dateAtNthMatch(sorted, (d) => isHeavyDpsRatio(d.dpsRatio), 50)
+      heavyMailDays.length, 50,
+      dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 50)
     ),
   ];
 }

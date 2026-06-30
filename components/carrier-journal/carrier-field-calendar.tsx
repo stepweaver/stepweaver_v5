@@ -142,7 +142,7 @@ function SelectedDayPanel({ day, onClose }: { day: DaySummary; onClose: () => vo
   else if (day.heat80) conditionChips.push({ label: "HEAT 80°+", color: "rgb(var(--warn))" });
   if (day.freezing) conditionChips.push({ label: "FREEZING", color: "rgb(var(--cyan))" });
   if (day.belowZero) conditionChips.push({ label: "BELOW 0°", color: "rgb(180,220,255)" });
-  if (day.heavyDpsDay) conditionChips.push({ label: "HEAVY DPS", color: "rgb(var(--warn))" });
+  if (day.heavyMailDay) conditionChips.push({ label: "HEAVY MAIL", color: "rgb(var(--warn))" });
   if (day.hydrationGoalMet) conditionChips.push({ label: "HYDRATION ✓", color: "rgb(var(--neon))" });
 
   return (

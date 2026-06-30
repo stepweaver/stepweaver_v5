@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   isCarrierJournalLogEnabled,
+  previewCarrierDaybookLoad,
   upsertCarrierDaybook,
   verifyCarrierLogSecret,
 } from "@/lib/notion/carrier-journal.repo";
-import { carrierDaybookSchema } from "@/lib/validation/carrier-log.schema";
+import {
+  carrierDaybookPreviewSchema,
+  carrierDaybookSchema,
+} from "@/lib/validation/carrier-log.schema";
 import { buildPublicSummary } from "@/lib/carrier-journal/helpers";
 import { computeFuelScore, formatFuelScore } from "@/lib/carrier-journal/fuel";
+import { formatPublicMailLoadLine } from "@/lib/carrier-journal/mail-load";
 
 function unauthorized() {
   return NextResponse.json(
@@ -61,6 +66,12 @@ export async function POST(request: NextRequest) {
   try {
     const { pageId, dpsPerMile } = await upsertCarrierDaybook(parsed.data);
 
+    const mailLoad = await previewCarrierDaybookLoad({
+      date: parsed.data.date,
+      dpsCount: parsed.data.dpsCount,
+      parcels: parsed.data.parcels,
+    });
+
     const publicSummary = buildPublicSummary({
       miles: parsed.data.miles,
       dpsCount: parsed.data.dpsCount,
@@ -77,11 +88,59 @@ export async function POST(request: NextRequest) {
       pageId,
       dpsPerMile,
       publicSummary,
+      mailLoadSummary: formatPublicMailLoadLine({
+        tier: mailLoad.tier,
+        compositeRatio: mailLoad.compositeRatio,
+      }),
+      mailLoad,
       ...(fuelScore && {
         fuelScore: fuelScore.score,
         fuelScoreLabel: formatFuelScore(fuelScore.score),
         fuelIsWin: fuelScore.isWin,
       }),
+    });
+  } catch (err) {
+    return NextResponse.json({ error: notionErrorMessage(err) }, { status: 500 });
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  if (!isCarrierJournalLogEnabled()) {
+    return unavailable();
+  }
+
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+  }
+
+  const parsed = carrierDaybookPreviewSchema.safeParse(body);
+  if (!parsed.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: parsed.error.flatten() },
+      { status: 400 }
+    );
+  }
+
+  if (!verifyCarrierLogSecret(parsed.data.logSecret)) {
+    return unauthorized();
+  }
+
+  try {
+    const mailLoad = await previewCarrierDaybookLoad({
+      date: parsed.data.date,
+      dpsCount: parsed.data.dpsCount,
+      parcels: parsed.data.parcels,
+    });
+
+    return NextResponse.json({
+      mailLoadSummary: formatPublicMailLoadLine({
+        tier: mailLoad.tier,
+        compositeRatio: mailLoad.compositeRatio,
+      }),
+      mailLoad,
     });
   } catch (err) {
     return NextResponse.json({ error: notionErrorMessage(err) }, { status: 500 });

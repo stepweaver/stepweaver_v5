@@ -5,7 +5,6 @@
 
 import type { CarrierDispatch } from "./carrier-journal";
 import { deriveWeatherSignals, effectiveHeatF } from "@/lib/carrier-journal/weather-signals";
-import { isHeavyDpsRatio } from "@/lib/dps";
 
 export type WeatherMarkers = {
   rain: boolean;
@@ -26,7 +25,7 @@ export type DaySummary = WeatherMarkers & {
   hasDispatch: boolean;
   totalMiles: number;
   totalSteps: number;
-  heavyDpsDay: boolean;
+  heavyMailDay: boolean;
   hydrationGoalMet: boolean;
   dispatchIds: string[];
   noteExcerpt: string;
@@ -140,7 +139,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
       heat90: false,
       freezing: false,
       belowZero: false,
-      heavyDpsDay: false,
+      heavyMailDay: false,
       hydrationGoalMet: false,
       dispatchIds: [],
       noteExcerpt: "",
@@ -158,7 +157,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
   let heat90 = false;
   let freezing = false;
   let belowZero = false;
-  let heavyDpsDay = false;
+  let heavyMailDay = false;
 
   for (const d of dispatches) {
     const m = getWeatherMarkers(d);
@@ -169,7 +168,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
     heat90 = heat90 || m.heat90;
     freezing = freezing || m.freezing;
     belowZero = belowZero || m.belowZero;
-    heavyDpsDay = heavyDpsDay || isHeavyDpsRatio(d.dpsRatio);
+    heavyMailDay = heavyMailDay || d.mailLoadTier === "heavy";
   }
 
   // hydrationGoalMet: every dispatch with logged hydration data met its goal
@@ -194,7 +193,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
     heat90,
     freezing,
     belowZero,
-    heavyDpsDay,
+    heavyMailDay,
     hydrationGoalMet,
     dispatchIds: dispatches.map((d) => d.id),
     noteExcerpt,

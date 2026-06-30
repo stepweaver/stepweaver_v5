@@ -68,3 +68,10 @@ export const carrierDaybookSchema = z.object({
 });
 
 export type CarrierDaybookInput = z.infer<typeof carrierDaybookSchema>;
+
+export const carrierDaybookPreviewSchema = z.object({
+  logSecret: z.string().min(1),
+  date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  dpsCount: z.number().finite().min(0).optional(),
+  parcels: z.number().finite().min(0).optional(),
+});

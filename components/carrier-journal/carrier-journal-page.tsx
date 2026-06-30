@@ -1,7 +1,7 @@
 import Link from "next/link";
 import {
   CARRIER_KPI_EMPTY,
-  enrichDispatchesDpsFields,
+  enrichDispatchesFields,
   getCarrierDispatches,
   getCarrierKpis,
   computeTotalsFromDispatches,
@@ -20,7 +20,7 @@ const TRACKING_ITEMS = [
   { category: "Hydration and fuel", detail: "Water, Gatorade, route snacks, hunger and thirst adjustments" },
   { category: "Transformation", detail: "Weekly weight trend — pounds lost, not raw weight" },
   { category: "Environmental load", detail: "Heat index and weather derived from temp + field notes" },
-  { category: "Operational load", detail: "DPS ratio vs baseline, mail day context, parcels" },
+  { category: "Operational load", detail: "Mail load tier from DPS + parcels vs your baseline" },
   { category: "Published narrative", detail: "Route-day reflections and field notes" },
 ];
 
@@ -108,7 +108,7 @@ type Props = {
 export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {}) {
   // All published rows feed aggregates (KPIs, calendar, milestones).
   // Only rows with authored content appear in the feed.
-  const dispatches = enrichDispatchesDpsFields(notionDispatches ?? getCarrierDispatches());
+  const dispatches = enrichDispatchesFields(notionDispatches ?? getCarrierDispatches());
   const feedDispatches = dispatches.filter(isDispatchFeedWorthy);
   const totals = computeTotalsFromDispatches(dispatches);
   const kpis =

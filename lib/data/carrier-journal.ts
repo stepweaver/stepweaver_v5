@@ -3,16 +3,21 @@
 import {
   classifyDpsForEntry,
   computeDpsPerMile,
-  isHeavyDpsRatio,
   isVeryHeavyDpsRatio,
   type DpsHistoryEntry,
 } from "@/lib/dps";
+import {
+  classifyMailLoadForEntry,
+  type MailLoadTier,
+} from "@/lib/carrier-journal/mail-load";
 import {
   isDerivedHeatDay,
   isDerivedWeatherDay,
 } from "@/lib/carrier-journal/weather-signals";
 
 export const CARRIER_KPI_EMPTY = "n/a";
+
+export type { MailLoadTier } from "@/lib/carrier-journal/mail-load";
 
 export type MailLoad = "light" | "normal" | "heavy" | "brutal";
 
@@ -63,6 +68,14 @@ export type CarrierDispatch = {
   dpsCount?: number;
   /** App-calculated ratio vs recent DPS baseline. Never manually entered. */
   dpsRatio?: number;
+  /** Manually entered parcel count for the day. */
+  parcels?: number;
+  /** App-calculated ratio vs recent parcel baseline. */
+  parcelRatio?: number;
+  /** Computed from DPS + parcel volume vs personal baseline. */
+  mailLoadTier?: MailLoadTier;
+  /** Blended DPS/parcel ratio used for mailLoadTier. */
+  mailLoadCompositeRatio?: number;
   /** Optional tags explaining why a day felt heavier or lighter. */
   mailDayContext?: string[];
 };
@@ -80,6 +93,7 @@ export type CarrierTotals = {
   totalSteps: number;
   heatDays: number;
   weatherDays: number;
+  heavyMailDays: number;
   avgSoreness: number;
   avgEnergy: number;
   avgMood: number;
@@ -238,6 +252,7 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
       totalSteps: 0,
       heatDays: 0,
       weatherDays: 0,
+      heavyMailDays: 0,
       avgSoreness: 0,
       avgEnergy: 0,
       avgMood: 0,
@@ -248,11 +263,12 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
     };
   }
 
-  const enriched = enrichDispatchesDpsFields(dispatches);
+  const enriched = enrichDispatchesFields(dispatches);
   const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
   const totalSteps = dispatches.reduce((s, d) => s + (d.steps ?? 0), 0);
   const heatDays = enriched.filter(isDerivedHeatDay).length;
   const weatherDays = enriched.filter(isDerivedWeatherDay).length;
+  const heavyMailDays = enriched.filter((d) => d.mailLoadTier === "heavy").length;
   const avgSoreness = dispatches.reduce((s, d) => s + d.soreness, 0) / count;
   const avgEnergy = dispatches.reduce((s, d) => s + d.energy, 0) / count;
   const avgMood = dispatches.reduce((s, d) => s + d.mood, 0) / count;
@@ -298,6 +314,7 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
     totalSteps,
     heatDays,
     weatherDays,
+    heavyMailDays,
     avgSoreness: Math.round(avgSoreness * 10) / 10,
     avgEnergy: Math.round(avgEnergy * 10) / 10,
     avgMood: Math.round(avgMood * 10) / 10,
@@ -316,40 +333,74 @@ function isValidDpsCount(value: number | undefined): value is number {
   return typeof value === "number" && Number.isFinite(value) && value > 0;
 }
 
-export function enrichDispatchDpsFields(
+export function enrichDispatchFields(
   dispatches: CarrierDispatch[],
   dispatch: CarrierDispatch
 ): CarrierDispatch {
-  if (!isValidDpsCount(dispatch.dpsCount)) {
-    return dispatch;
-  }
-
-  if (dispatch.dpsRatio !== undefined) {
-    return dispatch;
-  }
-
   const history: DpsHistoryEntry[] = dispatches.map((entry) => ({
     date: entry.date,
     id: entry.id,
     dpsCount: entry.dpsCount,
   }));
 
-  const classification = classifyDpsForEntry(history, {
+  let enriched: CarrierDispatch = dispatch;
+
+  if (isValidDpsCount(dispatch.dpsCount) && dispatch.dpsRatio === undefined) {
+    const classification = classifyDpsForEntry(history, {
+      date: dispatch.date,
+      id: dispatch.id,
+      dpsCount: dispatch.dpsCount,
+    });
+
+    enriched = {
+      ...enriched,
+      ...(classification.ratio != null && {
+        dpsRatio: Math.round(classification.ratio * 1000) / 1000,
+      }),
+    };
+  }
+
+  const mailHistory = dispatches.map((entry) => ({
+    date: entry.date,
+    id: entry.id,
+    dpsCount: entry.dpsCount,
+    parcels: entry.parcels,
+  }));
+
+  const mailLoad = classifyMailLoadForEntry(mailHistory, {
     date: dispatch.date,
     id: dispatch.id,
     dpsCount: dispatch.dpsCount,
+    parcels: dispatch.parcels,
   });
 
   return {
-    ...dispatch,
-    ...(classification.ratio != null && {
-      dpsRatio: Math.round(classification.ratio * 1000) / 1000,
+    ...enriched,
+    ...(mailLoad.parcels.ratio != null && {
+      parcelRatio: Math.round(mailLoad.parcels.ratio * 1000) / 1000,
     }),
+    ...(mailLoad.compositeRatio != null && {
+      mailLoadCompositeRatio: Math.round(mailLoad.compositeRatio * 1000) / 1000,
+    }),
+    ...(mailLoad.tier && { mailLoadTier: mailLoad.tier }),
   };
 }
 
+/** @deprecated Use enrichDispatchFields */
+export function enrichDispatchDpsFields(
+  dispatches: CarrierDispatch[],
+  dispatch: CarrierDispatch
+): CarrierDispatch {
+  return enrichDispatchFields(dispatches, dispatch);
+}
+
+export function enrichDispatchesFields(dispatches: CarrierDispatch[]): CarrierDispatch[] {
+  return dispatches.map((dispatch) => enrichDispatchFields(dispatches, dispatch));
+}
+
+/** @deprecated Use enrichDispatchesFields */
 export function enrichDispatchesDpsFields(dispatches: CarrierDispatch[]): CarrierDispatch[] {
-  return dispatches.map((dispatch) => enrichDispatchDpsFields(dispatches, dispatch));
+  return enrichDispatchesFields(dispatches);
 }
 
 export function computeDpsStats(dispatches: CarrierDispatch[]): Partial<CarrierTotals> {
@@ -366,8 +417,8 @@ export function computeDpsStats(dispatches: CarrierDispatch[]): Partial<CarrierT
       ? Math.round(((sortedCounts[middle - 1] + sortedCounts[middle]) / 2) * 10) / 10
       : sortedCounts[middle];
 
-  const enriched = enrichDispatchesDpsFields(dispatches);
-  const heavyDaysCount = enriched.filter((d) => isHeavyDpsRatio(d.dpsRatio)).length;
+  const enriched = enrichDispatchesFields(dispatches);
+  const heavyDaysCount = enriched.filter((d) => d.mailLoadTier === "heavy").length;
   const veryHeavyDaysCount = enriched.filter((d) => isVeryHeavyDpsRatio(d.dpsRatio)).length;
 
   const latestWithDps = [...enriched]
@@ -441,6 +492,11 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
       label: "Weather Days",
       value: String(t.weatherDays),
       detail: "Rain, storm, or snow (from temp + notes)",
+    },
+    {
+      label: "Heavy Mail Days",
+      value: String(t.heavyMailDays),
+      detail: "DPS + parcels above 115% of your baseline",
     },
     { label: "Avg Soreness", value: `${t.avgSoreness} / 10`, detail: "Physical load marker" },
     { label: "Avg Energy", value: `${t.avgEnergy} / 10`, detail: "Self-reported end-of-shift" },

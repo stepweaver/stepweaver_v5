@@ -8,12 +8,16 @@ import {
   classifyDpsForEntry,
 } from "@/lib/dps";
 import {
-  enrichDispatchDpsFields,
+  enrichDispatchesFields,
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
 import type { CarrierDaybookInput, CarrierLogDpsInput } from "@/lib/validation/carrier-log.schema";
 import { calculateDpsRatio } from "@/lib/carrier-journal/helpers";
 import { computeFuelScore } from "@/lib/carrier-journal/fuel";
+import {
+  classifyMailLoadForEntry,
+  type MailLoadClassification,
+} from "@/lib/carrier-journal/mail-load";
 
 const CACHE_REVALIDATE = 300; // 5 minutes
 
@@ -96,6 +100,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const weightLbs = num(p["Weight Lbs"] as Props);
   const dpsCount = num(p["DPS Count"] as Props);
   const dpsRatio = num(p["DPS Ratio"] as Props);
+  const parcels = num(p.Parcels as Props);
   const mailDayContext = mailDayContextFromProp(p["Mail Day Context"] as Props);
 
   return {
@@ -114,6 +119,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(weightLbs !== undefined && { weightLbs }),
     ...(dpsCount !== undefined && { dpsCount }),
     ...(dpsRatio !== undefined && { dpsRatio }),
+    ...(parcels !== undefined && { parcels }),
     ...(mailDayContext.length > 0 && { mailDayContext }),
   };
 }
@@ -312,7 +318,30 @@ export async function previewCarrierLogDps(input: {
 }
 
 export function enrichFetchedDispatches(dispatches: CarrierDispatch[]): CarrierDispatch[] {
-  return dispatches.map((dispatch) => enrichDispatchDpsFields(dispatches, dispatch));
+  return enrichDispatchesFields(dispatches);
+}
+
+export async function previewCarrierDaybookLoad(input: {
+  date: string;
+  dpsCount?: number;
+  parcels?: number;
+}): Promise<MailLoadClassification> {
+  const allDispatches = await fetchAllCarrierDispatches();
+  const existing = allDispatches.find((dispatch) => dispatch.date === input.date);
+
+  const history = allDispatches.map((dispatch) => ({
+    date: dispatch.date,
+    id: dispatch.id,
+    dpsCount: dispatch.dpsCount,
+    parcels: dispatch.parcels,
+  }));
+
+  return classifyMailLoadForEntry(history, {
+    date: input.date,
+    id: existing?.id,
+    dpsCount: input.dpsCount,
+    parcels: input.parcels,
+  });
 }
 
 /**

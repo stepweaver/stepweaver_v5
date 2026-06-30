@@ -33,6 +33,7 @@ type SubmitResult = {
   pageId: string;
   dpsPerMile: number | null;
   publicSummary: string;
+  mailLoadSummary?: string | null;
   fuelScore?: number;
   fuelScoreLabel?: string;
   fuelIsWin?: boolean;
@@ -89,8 +90,10 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
   const [submitStatus, setSubmitStatus] = useState<"idle" | "saving" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [result, setResult] = useState<SubmitResult | null>(null);
+  const [mailLoadPreview, setMailLoadPreview] = useState<string | null>(null);
 
   const weatherAbort = useRef<AbortController | null>(null);
+  const mailLoadPreviewRequestId = useRef(0);
 
   // Auto-fetch weather when date == today
   useEffect(() => {
@@ -193,6 +196,54 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
     [fuelInput]
   );
 
+  const parsedDpsCount = useMemo(() => {
+    const trimmed = dpsCount.trim();
+    if (!trimmed) return undefined;
+    const value = Number(trimmed.replace(/,/g, ""));
+    return Number.isFinite(value) && value > 0 ? value : undefined;
+  }, [dpsCount]);
+
+  const parsedParcels = useMemo(() => {
+    const trimmed = parcels.trim();
+    if (!trimmed) return undefined;
+    const value = Number(trimmed);
+    return Number.isFinite(value) && value >= 0 ? value : undefined;
+  }, [parcels]);
+
+  useEffect(() => {
+    if (parsedDpsCount === undefined && parsedParcels === undefined) {
+      setMailLoadPreview(null);
+      return;
+    }
+
+    const requestId = ++mailLoadPreviewRequestId.current;
+    const timer = window.setTimeout(async () => {
+      try {
+        const res = await fetch("/api/carrier-journal/daybook", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            logSecret: token,
+            date,
+            ...(parsedDpsCount !== undefined && { dpsCount: parsedDpsCount }),
+            ...(parsedParcels !== undefined && { parcels: parsedParcels }),
+          }),
+        });
+        if (!res.ok) return;
+        const data = (await res.json()) as { mailLoadSummary?: string | null };
+        if (requestId === mailLoadPreviewRequestId.current) {
+          setMailLoadPreview(data.mailLoadSummary ?? null);
+        }
+      } catch {
+        if (requestId === mailLoadPreviewRequestId.current) {
+          setMailLoadPreview(null);
+        }
+      }
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [date, parsedDpsCount, parsedParcels, token]);
+
   const toggleContext = useCallback((tag: string) => {
     setMailDayContext((prev) => (prev.includes(tag) ? [] : [tag]));
   }, []);
@@ -285,6 +336,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           pageId?: string;
           dpsPerMile?: number | null;
           publicSummary?: string;
+          mailLoadSummary?: string | null;
           fuelScore?: number;
           fuelScoreLabel?: string;
           fuelIsWin?: boolean;
@@ -296,6 +348,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           pageId: data.pageId ?? "",
           dpsPerMile: data.dpsPerMile ?? null,
           publicSummary: data.publicSummary ?? "",
+          mailLoadSummary: data.mailLoadSummary ?? null,
           fuelScore: data.fuelScore,
           fuelScoreLabel: data.fuelScoreLabel,
           fuelIsWin: data.fuelIsWin,
@@ -394,6 +447,10 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
           FIELD STATS
         </div>
+        <p className="text-xs text-[rgb(var(--text-meta))] leading-relaxed">
+          DPS and parcel counts are compared to your own recent baseline (median of the last 30
+          logged days). Light, medium, and heavy are relative to you—not fixed numbers like 1,000 DPS.
+        </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
@@ -447,6 +504,17 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
             />
           </div>
         </div>
+
+        {mailLoadPreview && (
+          <div className="border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.35)] px-3 py-2">
+            <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mb-1">
+              MAIL LOAD
+            </div>
+            <div className="font-[var(--font-ibm)] text-sm text-[rgb(var(--text-color))]">
+              {mailLoadPreview}
+            </div>
+          </div>
+        )}
 
         {/* Mail Day Context */}
         <div>

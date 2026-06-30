@@ -1,7 +1,20 @@
-import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import type { CarrierDispatch, MailLoadTier } from "@/lib/data/carrier-journal";
 import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
 import { deriveWeatherSignals } from "@/lib/carrier-journal/weather-signals";
+import { formatPublicMailLoadLine } from "@/lib/carrier-journal/mail-load";
 import { formatPrivateDpsLine, formatPublicDpsLoadLine } from "@/lib/dps";
+
+const MAIL_LOAD_LABEL: Record<MailLoadTier, string> = {
+  light: "LIGHT",
+  medium: "MEDIUM",
+  heavy: "HEAVY",
+};
+
+const MAIL_LOAD_COLOR: Record<MailLoadTier, string> = {
+  light: "rgb(var(--green))",
+  medium: "rgb(var(--text-secondary))",
+  heavy: "rgb(var(--warn))",
+};
 
 const WEATHER_FLAG_LABEL: Record<"heat" | "rain" | "storm" | "snow", string> = {
   heat: "HEAT",
@@ -36,6 +49,11 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
       })
     : null;
   const publicDpsLine = formatPublicDpsLoadLine(d.dpsRatio);
+  const publicMailLine = formatPublicMailLoadLine({
+    tier: d.mailLoadTier,
+    compositeRatio: d.mailLoadCompositeRatio,
+  });
+  const publicLoadLine = publicMailLine ?? publicDpsLine;
 
   return (
     <div id={d.id} className="surface-panel p-5 sm:p-6 space-y-3">
@@ -48,6 +66,17 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
             {d.title}
           </h3>
         </div>
+        {d.mailLoadTier && (
+          <div
+            className="font-[var(--font-ocr)] text-xs tracking-widest px-2 py-1 border shrink-0"
+            style={{
+              color: MAIL_LOAD_COLOR[d.mailLoadTier],
+              borderColor: MAIL_LOAD_COLOR[d.mailLoadTier],
+            }}
+          >
+            {MAIL_LOAD_LABEL[d.mailLoadTier]}
+          </div>
+        )}
       </div>
 
       {d.publicNote.trim() && (
@@ -63,16 +92,16 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
         </div>
       )}
 
-      {(privateDpsLine || (!showPrivateDps && publicDpsLine)) && (
+      {(privateDpsLine || (!showPrivateDps && publicLoadLine)) && (
         <div className="text-xs text-[rgb(var(--text-secondary))] space-y-1">
           {privateDpsLine && (
             <div className="font-[var(--font-ibm)] text-sm text-[rgb(var(--neon))]">
               {privateDpsLine}
             </div>
           )}
-          {!showPrivateDps && publicDpsLine && (
+          {!showPrivateDps && publicLoadLine && (
             <div className="font-[var(--font-ocr)] tracking-wide text-[rgb(var(--text-meta))]">
-              {publicDpsLine}
+              {publicLoadLine}
             </div>
           )}
         </div>
