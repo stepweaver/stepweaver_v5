@@ -58,6 +58,7 @@ export const carrierDaybookSchema = z.object({
   weightLbs: z.number().finite().min(0).optional(),
   mood: z.number().int().min(1).max(10).optional(),
   energy: z.number().int().min(1).max(10).optional(),
+  soreness: z.number().int().min(1).max(10).optional(),
   temperatureF: z.number().finite().optional(),
   heatIndexF: z.number().finite().optional(),
   publicNote: z.string().trim().max(2000).optional(),

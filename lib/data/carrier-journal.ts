@@ -7,6 +7,10 @@ import {
   isVeryHeavyDpsRatio,
   type DpsHistoryEntry,
 } from "@/lib/dps";
+import {
+  isDerivedHeatDay,
+  isDerivedWeatherDay,
+} from "@/lib/carrier-journal/weather-signals";
 
 export const CARRIER_KPI_EMPTY = "n/a";
 
@@ -32,7 +36,8 @@ export type CarrierDispatch = {
   weather?: string;
   temperatureF?: number;
   heatIndexF?: number;
-  mailLoad: MailLoad;
+  /** @deprecated Legacy seed data only; no longer stored in Notion. */
+  mailLoad?: MailLoad;
   heatDay?: boolean;
   rain?: boolean;
   storm?: boolean;
@@ -75,8 +80,6 @@ export type CarrierTotals = {
   totalSteps: number;
   heatDays: number;
   weatherDays: number;
-  heavyBrutalDays: number;
-  dogEncounterDays: number;
   avgSoreness: number;
   avgEnergy: number;
   avgMood: number;
@@ -87,8 +90,6 @@ export type CarrierTotals = {
   startingWeightLbs?: number;
   latestWeightLbs?: number;
   weightChangeLbs?: number;
-  phaseCounts: Record<CarrierPhase, number>;
-  latestPhase?: CarrierPhase;
   avgDpsCount?: number;
   medianDpsCount?: number;
   highestDpsCount?: number;
@@ -103,13 +104,8 @@ export type PublicWeightTrend = {
   detail?: string;
 };
 
-const EMPTY_PHASE_COUNTS: Record<CarrierPhase, number> = {
-  "break-in": 0,
-  adapting: 0,
-  building: 0,
-  regular: 0,
-};
 
+// Legacy seed data — static fallbacks when Notion is not configured.
 const DISPATCHES: CarrierDispatch[] = [
   {
     id: "cj-001",
@@ -242,8 +238,6 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
       totalSteps: 0,
       heatDays: 0,
       weatherDays: 0,
-      heavyBrutalDays: 0,
-      dogEncounterDays: 0,
       avgSoreness: 0,
       avgEnergy: 0,
       avgMood: 0,
@@ -251,19 +245,14 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
       avgWaterOz: 0,
       hydrationGoalHitDays: 0,
       hydrationGoalHitRate: 0,
-      phaseCounts: { ...EMPTY_PHASE_COUNTS },
     };
   }
 
+  const enriched = enrichDispatchesDpsFields(dispatches);
   const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
-  // Steps are retained for internal computation but not exposed in public KPIs or UI.
   const totalSteps = dispatches.reduce((s, d) => s + (d.steps ?? 0), 0);
-  const heatDays = dispatches.filter((d) => d.heatDay).length;
-  const weatherDays = dispatches.filter((d) => d.rain || d.storm || d.snow).length;
-  const heavyBrutalDays = dispatches.filter(
-    (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal"
-  ).length;
-  const dogEncounterDays = dispatches.filter((d) => d.dogEncounter).length;
+  const heatDays = enriched.filter(isDerivedHeatDay).length;
+  const weatherDays = enriched.filter(isDerivedWeatherDay).length;
   const avgSoreness = dispatches.reduce((s, d) => s + d.soreness, 0) / count;
   const avgEnergy = dispatches.reduce((s, d) => s + d.energy, 0) / count;
   const avgMood = dispatches.reduce((s, d) => s + d.mood, 0) / count;
@@ -300,17 +289,7 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
       Math.round(((latestWeightLbs ?? 0) - (startingWeightLbs ?? 0)) * 10) / 10;
   }
 
-  const phaseCounts = { ...EMPTY_PHASE_COUNTS };
-  for (const d of dispatches) {
-    if (d.phase) phaseCounts[d.phase]++;
-  }
-
-  const latestWithPhase = [...dispatches]
-    .filter((d) => d.phase)
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())[0];
-  const latestPhase = latestWithPhase?.phase;
-
-  const dpsStats = computeDpsStats(dispatches);
+  const dpsStats = computeDpsStats(enriched);
 
   return {
     daysLogged: count,
@@ -319,8 +298,6 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
     totalSteps,
     heatDays,
     weatherDays,
-    heavyBrutalDays,
-    dogEncounterDays,
     avgSoreness: Math.round(avgSoreness * 10) / 10,
     avgEnergy: Math.round(avgEnergy * 10) / 10,
     avgMood: Math.round(avgMood * 10) / 10,
@@ -331,8 +308,6 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
     ...(startingWeightLbs !== undefined && { startingWeightLbs }),
     ...(latestWeightLbs !== undefined && { latestWeightLbs }),
     ...(weightChangeLbs !== undefined && { weightChangeLbs }),
-    phaseCounts,
-    ...(latestPhase && { latestPhase }),
     ...dpsStats,
   };
 }
@@ -414,62 +389,33 @@ export function computeDpsStats(dispatches: CarrierDispatch[]): Partial<CarrierT
   };
 }
 
-export function formatPublicWeightTrend(
-  totals: CarrierTotals,
-  dispatches: CarrierDispatch[]
-): PublicWeightTrend {
-  const withWeight = dispatches.filter((d) => d.weightLbs !== undefined);
-  if (withWeight.length === 0) {
-    return { value: CARRIER_KPI_EMPTY, detail: "No weight data logged" };
-  }
-
-  const hasPublicMode = withWeight.some(
-    (d) => d.weightPublicMode && d.weightPublicMode !== "hidden"
-  );
-  if (!hasPublicMode) {
-    return { value: "tracking privately", detail: "Weight logged but not shared publicly" };
-  }
-
+export function formatPublicWeightTrend(totals: CarrierTotals): PublicWeightTrend {
   const change = totals.weightChangeLbs;
-  if (change === undefined) {
-    return { value: CARRIER_KPI_EMPTY, detail: "Insufficient weight history" };
+  if (change === undefined || totals.startingWeightLbs === undefined) {
+    return { value: CARRIER_KPI_EMPTY, detail: "Log weight on Monday weigh-ins" };
   }
 
-  const changeStr = change >= 0 ? `+${change.toFixed(1)} lbs` : `${change.toFixed(1)} lbs`;
+  if (change === 0) {
+    return { value: "No net change", detail: "Since first Monday weigh-in" };
+  }
 
-  const publicEntries = withWeight.filter(
-    (d) =>
-      d.weightPublicMode === "change-only" || d.weightPublicMode === "current-and-change"
-  );
-  const latestPublic = [...publicEntries].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  )[0];
-
-  if (
-    latestPublic?.weightPublicMode === "current-and-change" &&
-    totals.latestWeightLbs !== undefined
-  ) {
+  const lost = -change;
+  if (lost > 0) {
     return {
-      value: `${totals.latestWeightLbs} lbs (${changeStr})`,
-      detail: "Current weight with cumulative change",
+      value: `${lost.toFixed(1)} lbs lost`,
+      detail: "Since first Monday weigh-in",
     };
   }
 
   return {
-    value: changeStr,
-    detail: "Cumulative change since first logged entry",
+    value: `${Math.abs(lost).toFixed(1)} lbs gained`,
+    detail: "Since first Monday weigh-in",
   };
 }
 
-const PHASE_LABEL: Record<CarrierPhase, string> = {
-  "break-in": "Break-In",
-  adapting: "Adapting",
-  building: "Building",
-  regular: "Regular",
-};
 
-export function totalsToKpis(t: CarrierTotals, dispatches: CarrierDispatch[] = []): CarrierKpi[] {
-  const weightTrend = formatPublicWeightTrend(t, dispatches);
+export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
+  const weightTrend = formatPublicWeightTrend(t);
 
   const kpis: CarrierKpi[] = [
     { label: "Days Logged", value: String(t.daysLogged), detail: "Active field days" },
@@ -486,18 +432,16 @@ export function totalsToKpis(t: CarrierTotals, dispatches: CarrierDispatch[] = [
       detail: `${t.hydrationGoalHitDays} of ${t.daysLogged} days met goal`,
     },
     {
-      label: "Weight Trend",
+      label: "Weight Lost",
       value: weightTrend.value,
       detail: weightTrend.detail,
     },
+    { label: "Heat Days", value: String(t.heatDays), detail: "Shift peak heat index ≥ 90°F" },
     {
-      label: "Current Phase",
-      value: t.latestPhase ? PHASE_LABEL[t.latestPhase] : CARRIER_KPI_EMPTY,
-      detail: t.latestPhase ? "Most recent logged phase" : "No phase logged yet",
+      label: "Weather Days",
+      value: String(t.weatherDays),
+      detail: "Rain, storm, or snow (from temp + notes)",
     },
-    { label: "Heat Days", value: String(t.heatDays), detail: "High heat index shifts" },
-    { label: "Weather Days", value: String(t.weatherDays), detail: "Rain, storm, or snow" },
-    { label: "Heavy / Brutal Load", value: String(t.heavyBrutalDays), detail: "High mail volume shifts" },
     { label: "Avg Soreness", value: `${t.avgSoreness} / 10`, detail: "Physical load marker" },
     { label: "Avg Energy", value: `${t.avgEnergy} / 10`, detail: "Self-reported end-of-shift" },
     { label: "Avg Mood", value: `${t.avgMood} / 10`, detail: "Morale signal" },
@@ -556,8 +500,7 @@ export function totalsToKpis(t: CarrierTotals, dispatches: CarrierDispatch[] = [
 }
 
 export function getCarrierKpis(): CarrierKpi[] {
-  const dispatches = getCarrierDispatches();
-  return totalsToKpis(getCarrierJournalTotals(), dispatches);
+  return totalsToKpis(getCarrierJournalTotals());
 }
 
 export function getMailLoadSummary(): Record<MailLoad, number> {
@@ -568,30 +511,15 @@ export function getMailLoadSummary(): Record<MailLoad, number> {
     brutal: 0,
   };
   for (const d of DISPATCHES) {
-    summary[d.mailLoad]++;
+    summary[d.mailLoad ?? "normal"]++;
   }
   return summary;
 }
 
 export function dispatchHasPublicKpiData(d: CarrierDispatch): boolean {
-  return (
-    d.milesWalked > 0 ||
-    d.waterOz !== undefined ||
-    d.weightLbs !== undefined ||
-    !!d.bodyNote?.trim() ||
-    !!d.recoveryNote?.trim() ||
-    !!d.phase
-  );
+  return d.milesWalked > 0 || d.waterOz !== undefined || d.weightLbs !== undefined;
 }
 
-// A dispatch earns a card in the feed only when the carrier has actually written something,
-// or flagged a notable event. Pure numeric rows (miles, steps, temp) flow silently into
-// aggregates (KPIs, calendar, milestones) without cluttering the feed.
 export function isDispatchFeedWorthy(d: CarrierDispatch): boolean {
-  return !!(
-    d.publicNote?.trim() ||
-    d.bodyNote?.trim() ||
-    d.recoveryNote?.trim() ||
-    d.goodSamaritanAct
-  );
+  return !!d.publicNote?.trim();
 }

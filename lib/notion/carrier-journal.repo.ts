@@ -10,10 +10,6 @@ import {
 import {
   enrichDispatchDpsFields,
   type CarrierDispatch,
-  type CarrierPhase,
-  type MailLoad,
-  type RoutePreference,
-  type WeightPublicMode,
 } from "@/lib/data/carrier-journal";
 import type { CarrierDaybookInput, CarrierLogDpsInput } from "@/lib/validation/carrier-log.schema";
 import { calculateDpsRatio } from "@/lib/carrier-journal/helpers";
@@ -55,10 +51,6 @@ function num(prop: Props | undefined): number | undefined {
   return typeof v === "number" ? v : undefined;
 }
 
-function check(prop: Props | undefined): boolean {
-  if (!prop) return false;
-  return prop.checkbox === true;
-}
 
 function sel(prop: Props | undefined): string {
   if (!prop) return "";
@@ -69,36 +61,6 @@ function dateStr(prop: Props | undefined): string {
   if (!prop) return "";
   const start = (prop.date as { start?: string } | null)?.start ?? "";
   return start.slice(0, 10);
-}
-
-function parseWeightPublicMode(raw: string): WeightPublicMode | undefined {
-  const normalized = raw.toLowerCase().trim();
-  if (normalized === "hidden") return "hidden";
-  if (normalized === "change-only" || normalized === "change only") return "change-only";
-  if (
-    normalized === "current-and-change" ||
-    normalized === "current and change"
-  ) {
-    return "current-and-change";
-  }
-  return undefined;
-}
-
-function parsePhase(raw: string): CarrierPhase | undefined {
-  const normalized = raw.toLowerCase().trim();
-  if (normalized === "break-in" || normalized === "break in") return "break-in";
-  if (normalized === "adapting") return "adapting";
-  if (normalized === "building") return "building";
-  if (normalized === "regular") return "regular";
-  return undefined;
-}
-
-function parseRoutePreference(raw: string): RoutePreference | undefined {
-  const normalized = raw.toLowerCase().trim();
-  if (normalized === "prefer") return "prefer";
-  if (normalized === "like") return "like";
-  if (normalized === "dislike") return "dislike";
-  return undefined;
 }
 
 function mailDayContextFromProp(prop: Props | undefined): string[] {
@@ -122,37 +84,16 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const title = str(p.Title as Props, "title") || date;
 
   const milesWalked = num(p["Miles Walked"] as Props) ?? 0;
-  const steps = num(p.Steps as Props) ?? 0;
   const soreness = num(p["Soreness (1-10)"] as Props) ?? num(p.Soreness as Props) ?? 5;
   const energy = num(p["Energy (1-10)"] as Props) ?? num(p.Energy as Props) ?? 5;
   const mood = num(p["Mood (1-10)"] as Props) ?? num(p.Mood as Props) ?? 5;
-  const weather = str(p.Weather as Props, "rich_text") || undefined;
   const temperatureF = num(p["Temperature F"] as Props);
   const heatIndexF = num(p["Heat Index F"] as Props);
-  const rawLoad = sel(p["Mail Load"] as Props).toLowerCase();
-  const mailLoad: MailLoad =
-    rawLoad === "light" || rawLoad === "normal" || rawLoad === "heavy" || rawLoad === "brutal"
-      ? (rawLoad as MailLoad)
-      : "normal";
-  const heatDay = check(p["Heat Day"] as Props);
-  const rain = check(p.Rain as Props);
-  const storm = check(p.Storm as Props);
-  const snow = check(p.Snow as Props);
-  const dogEncounter = check(p["Dog Encounter"] as Props);
   const publicNote = str(p["Public Note"] as Props, "rich_text");
 
   const waterOz = num(p["Water Oz"] as Props);
   const hydrationGoalOz = num(p["Hydration Goal Oz"] as Props);
   const weightLbs = num(p["Weight Lbs"] as Props);
-  const weightPublicMode = parseWeightPublicMode(sel(p["Weight Public Mode"] as Props));
-  const bodyNote = str(p["Body Note"] as Props, "rich_text");
-  const recoveryNote = str(p["Recovery Note"] as Props, "rich_text");
-  const phase = parsePhase(sel(p.Phase as Props));
-  const rawTags = (p.Tags as Props)?.multi_select as { name?: string }[] | undefined;
-  const tags = rawTags?.map((t) => t.name ?? "").filter(Boolean);
-  const goodSamaritanAct = check(p["Good Samaritan Act"] as Props);
-  const routeCode = str(p.Route as Props, "rich_text") || undefined;
-  const routePreference = parseRoutePreference(sel(p["Route Preference"] as Props));
   const dpsCount = num(p["DPS Count"] as Props);
   const dpsRatio = num(p["DPS Ratio"] as Props);
   const mailDayContext = mailDayContextFromProp(p["Mail Day Context"] as Props);
@@ -162,31 +103,15 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     date,
     title,
     milesWalked,
-    steps,
     soreness,
     energy,
     mood,
-    ...(weather !== undefined && { weather }),
     ...(temperatureF !== undefined && { temperatureF }),
     ...(heatIndexF !== undefined && { heatIndexF }),
-    mailLoad,
-    ...(heatDay && { heatDay }),
-    ...(rain && { rain }),
-    ...(storm && { storm }),
-    ...(snow && { snow }),
-    ...(dogEncounter && { dogEncounter }),
     publicNote,
     ...(waterOz !== undefined && { waterOz }),
     ...(hydrationGoalOz !== undefined && { hydrationGoalOz }),
     ...(weightLbs !== undefined && { weightLbs }),
-    ...(weightPublicMode && { weightPublicMode }),
-    ...(bodyNote && { bodyNote }),
-    ...(recoveryNote && { recoveryNote }),
-    ...(phase && { phase }),
-    ...(tags && tags.length > 0 && { tags }),
-    ...(goodSamaritanAct && { goodSamaritanAct }),
-    ...(routeCode && { routeCode }),
-    ...(routePreference && { routePreference }),
     ...(dpsCount !== undefined && { dpsCount }),
     ...(dpsRatio !== undefined && { dpsRatio }),
     ...(mailDayContext.length > 0 && { mailDayContext }),
@@ -437,7 +362,7 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
       : null;
 
   const properties: Record<string, unknown> = {
-    "Publish Public": { checkbox: input.published },
+    "Publish Public": { checkbox: true },
   };
 
   if (input.miles !== undefined) {
@@ -474,6 +399,10 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
     properties["Weight Lbs"] = { number: input.weightLbs };
   }
 
+  if (input.soreness !== undefined) {
+    properties["Soreness (1-10)"] = { number: input.soreness };
+  }
+
   if (input.mood !== undefined) {
     properties["Mood (1-10)"] = { number: input.mood };
   }
@@ -488,7 +417,6 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
     };
   }
 
-  // TODO: Add "Parcels" (Number) property to the Notion database, then uncomment:
   if (input.parcels !== undefined) {
     properties["Parcels"] = { number: input.parcels };
   }

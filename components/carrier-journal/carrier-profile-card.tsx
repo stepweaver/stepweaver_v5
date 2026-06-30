@@ -89,10 +89,10 @@ export function CarrierProfileCard() {
 
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Phase
+                Focus
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Break-In → Adaptation
+                Miles, hydration, soreness, weight lost
               </p>
             </div>
           </div>

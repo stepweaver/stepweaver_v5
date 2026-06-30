@@ -1,42 +1,17 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { CarrierDispatch, CarrierPhase, MailLoad } from "@/lib/data/carrier-journal";
+import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import { deriveWeatherSignals } from "@/lib/carrier-journal/weather-signals";
 import { CarrierDispatchCard } from "./carrier-dispatch-card";
 
-type PhaseFilter = CarrierPhase | "all";
-type LoadFilter = MailLoad | "all";
+type WeatherFilter = "heat" | "rain" | "storm" | "snow";
 
-const PHASE_OPTIONS: { value: PhaseFilter; label: string }[] = [
-  { value: "all", label: "ALL" },
-  { value: "break-in", label: "BREAK-IN" },
-  { value: "adapting", label: "ADAPTING" },
-  { value: "building", label: "BUILDING" },
-  { value: "regular", label: "REGULAR" },
-];
-
-const LOAD_OPTIONS: { value: LoadFilter; label: string }[] = [
-  { value: "all", label: "ALL" },
-  { value: "light", label: "LIGHT" },
-  { value: "normal", label: "NORMAL" },
-  { value: "heavy", label: "HEAVY" },
-  { value: "brutal", label: "BRUTAL" },
-];
-
-const LOAD_COLOR: Record<LoadFilter, string> = {
-  all: "rgb(var(--text-secondary))",
-  light: "rgb(var(--green))",
-  normal: "rgb(var(--text-secondary))",
-  heavy: "rgb(var(--warn))",
-  brutal: "rgb(var(--danger))",
-};
-
-type ConditionKey = "heat" | "rain" | "dog";
-
-const CONDITION_OPTIONS: { key: ConditionKey; label: string }[] = [
+const WEATHER_OPTIONS: { key: WeatherFilter; label: string }[] = [
   { key: "heat", label: "HEAT" },
   { key: "rain", label: "RAIN" },
-  { key: "dog", label: "DOG" },
+  { key: "storm", label: "STORM" },
+  { key: "snow", label: "SNOW" },
 ];
 
 type Props = {
@@ -44,26 +19,23 @@ type Props = {
 };
 
 export function CarrierDispatchFeed({ dispatches }: Props) {
-  const [phase, setPhase] = useState<PhaseFilter>("all");
-  const [load, setLoad] = useState<LoadFilter>("all");
-  const [conditions, setConditions] = useState<Set<ConditionKey>>(new Set());
+  const [conditions, setConditions] = useState<Set<WeatherFilter>>(new Set());
 
   const filtered = useMemo(() => {
+    if (conditions.size === 0) return dispatches;
+
     return dispatches.filter((d) => {
-      if (phase !== "all" && d.phase !== phase) return false;
-      if (load !== "all" && d.mailLoad !== load) return false;
+      const weather = deriveWeatherSignals(d);
       for (const cond of conditions) {
-        if (cond === "heat" && !d.heatDay) return false;
-        if (cond === "rain" && !d.rain) return false;
-        if (cond === "dog" && !d.dogEncounter) return false;
+        if (!weather[cond]) return false;
       }
       return true;
     });
-  }, [dispatches, phase, load, conditions]);
+  }, [dispatches, conditions]);
 
-  const isFiltered = phase !== "all" || load !== "all" || conditions.size > 0;
+  const isFiltered = conditions.size > 0;
 
-  function toggleCondition(key: ConditionKey) {
+  function toggleCondition(key: WeatherFilter) {
     setConditions((prev) => {
       const next = new Set(prev);
       if (next.has(key)) {
@@ -76,85 +48,22 @@ export function CarrierDispatchFeed({ dispatches }: Props) {
   }
 
   function clearFilters() {
-    setPhase("all");
-    setLoad("all");
     setConditions(new Set());
   }
 
   return (
     <div>
-      {/* Filter bar */}
       <div className="space-y-3 mb-5">
-        {/* Phase filter */}
         <div className="flex flex-wrap items-center gap-1">
           <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mr-2 shrink-0">
-            PHASE
+            WEATHER
           </span>
-          {PHASE_OPTIONS.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => setPhase(opt.value)}
-              className="font-[var(--font-ocr)] text-[9px] tracking-widest px-2 py-1 border transition-colors"
-              style={
-                phase === opt.value
-                  ? {
-                      color: "rgb(var(--bg))",
-                      backgroundColor: "rgb(var(--neon))",
-                      borderColor: "rgb(var(--neon))",
-                    }
-                  : {
-                      color: "rgb(var(--text-secondary))",
-                      borderColor: "rgb(var(--border)/0.4)",
-                    }
-              }
-            >
-              {opt.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Load filter */}
-        <div className="flex flex-wrap items-center gap-1">
-          <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mr-2 shrink-0">
-            LOAD
-          </span>
-          {LOAD_OPTIONS.map((opt) => {
-            const active = load === opt.value;
-            const activeColor = LOAD_COLOR[opt.value];
-            return (
-              <button
-                key={opt.value}
-                onClick={() => setLoad(opt.value)}
-                className="font-[var(--font-ocr)] text-[9px] tracking-widest px-2 py-1 border transition-colors"
-                style={
-                  active
-                    ? {
-                        color: "rgb(var(--bg))",
-                        backgroundColor: activeColor,
-                        borderColor: activeColor,
-                      }
-                    : {
-                        color: "rgb(var(--text-secondary))",
-                        borderColor: "rgb(var(--border)/0.4)",
-                      }
-                }
-              >
-                {opt.label}
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Condition toggles */}
-        <div className="flex flex-wrap items-center gap-1">
-          <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mr-2 shrink-0">
-            FLAGS
-          </span>
-          {CONDITION_OPTIONS.map(({ key, label }) => {
+          {WEATHER_OPTIONS.map(({ key, label }) => {
             const active = conditions.has(key);
             return (
               <button
                 key={key}
+                type="button"
                 onClick={() => toggleCondition(key)}
                 className="font-[var(--font-ocr)] text-[9px] tracking-widest px-2 py-1 border transition-colors"
                 style={
@@ -174,10 +83,12 @@ export function CarrierDispatchFeed({ dispatches }: Props) {
               </button>
             );
           })}
+          <span className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta)/0.6)] ml-1">
+            CALCULATED FROM TEMP + NOTES
+          </span>
         </div>
       </div>
 
-      {/* Count + clear */}
       <div className="flex items-center justify-between mb-3">
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))]">
           {isFiltered
@@ -186,6 +97,7 @@ export function CarrierDispatchFeed({ dispatches }: Props) {
         </div>
         {isFiltered && (
           <button
+            type="button"
             onClick={clearFilters}
             className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] hover:text-[rgb(var(--neon))] transition-colors"
           >
@@ -194,7 +106,6 @@ export function CarrierDispatchFeed({ dispatches }: Props) {
         )}
       </div>
 
-      {/* Dispatch list */}
       {filtered.length > 0 ? (
         <div className="space-y-px">
           {filtered.map((d) => (

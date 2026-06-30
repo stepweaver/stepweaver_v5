@@ -4,6 +4,8 @@
  */
 
 import type { CarrierDispatch } from "./carrier-journal";
+import { deriveWeatherSignals, effectiveHeatF } from "@/lib/carrier-journal/weather-signals";
+import { isHeavyDpsRatio } from "@/lib/dps";
 
 export type WeatherMarkers = {
   rain: boolean;
@@ -24,8 +26,7 @@ export type DaySummary = WeatherMarkers & {
   hasDispatch: boolean;
   totalMiles: number;
   totalSteps: number;
-  dogEncounter: boolean;
-  heavyLoad: boolean;
+  heavyDpsDay: boolean;
   hydrationGoalMet: boolean;
   dispatchIds: string[];
   noteExcerpt: string;
@@ -80,16 +81,16 @@ export function getCalendarIntensity(day: DaySummary): 0 | 1 | 2 | 3 | 4 {
  */
 export function getWeatherMarkers(d: CarrierDispatch): WeatherMarkers {
   const temp = d.temperatureF;
-  const heatIndex = d.heatIndexF;
-  const effective = Math.max(temp ?? -Infinity, heatIndex ?? -Infinity);
+  const derived = deriveWeatherSignals(d);
+  const effective = effectiveHeatF(d);
   const hasEffective = effective !== -Infinity;
 
   return {
-    rain: !!d.rain,
-    storm: !!d.storm,
-    snow: !!d.snow,
+    rain: derived.rain,
+    storm: derived.storm,
+    snow: derived.snow,
     heat80: hasEffective && effective >= 80,
-    heat90: hasEffective && effective >= 90,
+    heat90: derived.heat,
     freezing: temp !== undefined && temp <= 32,
     belowZero: temp !== undefined && temp < 0,
   };
@@ -139,8 +140,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
       heat90: false,
       freezing: false,
       belowZero: false,
-      dogEncounter: false,
-      heavyLoad: false,
+      heavyDpsDay: false,
       hydrationGoalMet: false,
       dispatchIds: [],
       noteExcerpt: "",
@@ -158,8 +158,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
   let heat90 = false;
   let freezing = false;
   let belowZero = false;
-  let dogEncounter = false;
-  let heavyLoad = false;
+  let heavyDpsDay = false;
 
   for (const d of dispatches) {
     const m = getWeatherMarkers(d);
@@ -170,8 +169,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
     heat90 = heat90 || m.heat90;
     freezing = freezing || m.freezing;
     belowZero = belowZero || m.belowZero;
-    dogEncounter = dogEncounter || !!d.dogEncounter;
-    heavyLoad = heavyLoad || d.mailLoad === "heavy" || d.mailLoad === "brutal";
+    heavyDpsDay = heavyDpsDay || isHeavyDpsRatio(d.dpsRatio);
   }
 
   // hydrationGoalMet: every dispatch with logged hydration data met its goal
@@ -196,8 +194,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
     heat90,
     freezing,
     belowZero,
-    dogEncounter,
-    heavyLoad,
+    heavyDpsDay,
     hydrationGoalMet,
     dispatchIds: dispatches.map((d) => d.id),
     noteExcerpt,

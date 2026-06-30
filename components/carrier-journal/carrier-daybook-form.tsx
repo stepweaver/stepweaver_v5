@@ -68,6 +68,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
 
   const [mood, setMood] = useState("");
   const [energy, setEnergy] = useState("");
+  const [soreness, setSoreness] = useState("");
 
   const [breakfastProtein, setBreakfastProtein] = useState<boolean | null>(null);
   const [routeFoodPacked, setRouteFoodPacked] = useState<boolean | null>(null);
@@ -80,7 +81,6 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
 
   const [publicNote, setPublicNote] = useState("");
   const [privateNote, setPrivateNote] = useState("");
-  const [published, setPublished] = useState(true);
 
   const [weather, setWeather] = useState<WeatherState>({ status: "idle" });
   const [weatherTemp, setWeatherTemp] = useState<number | null>(null);
@@ -213,7 +213,6 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
       const body: Record<string, unknown> = {
         logSecret: token,
         date,
-        published,
         ...(milesNum !== undefined && { miles: milesNum }),
       };
 
@@ -262,6 +261,11 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
         body.energy = energyNum;
       }
 
+      const sorenessNum = soreness.trim() ? Number(soreness) : undefined;
+      if (sorenessNum !== undefined && Number.isInteger(sorenessNum) && sorenessNum >= 1 && sorenessNum <= 10) {
+        body.soreness = sorenessNum;
+      }
+
       if (weatherTemp !== null) body.temperatureF = weatherTemp;
       if (weatherHeat !== null) body.heatIndexF = weatherHeat;
 
@@ -304,7 +308,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
     [
       token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
-      mood, energy, publicNote, privateNote, published, weatherTemp, weatherHeat, fuelInput,
+      mood, energy, soreness, publicNote, privateNote, weatherTemp, weatherHeat, fuelInput,
     ]
   );
 
@@ -333,6 +337,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           setShowGoalOverride(false);
           setMood("");
           setEnergy("");
+          setSoreness("");
           setBreakfastProtein(null);
           setRouteFoodPacked(null);
           setRouteFoodEaten(null);
@@ -343,7 +348,6 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           setPostShiftMealQuality(null);
           setPublicNote("");
           setPrivateNote("");
-          setPublished(true);
           setWeatherTemp(null);
           setWeatherHeat(null);
           setDate(today);
@@ -595,7 +599,24 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           onToggleOverride={() => setShowGoalOverride((v) => !v)}
         />
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+          <div>
+            <label htmlFor="db-soreness" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
+              SORENESS (1–10)
+            </label>
+            <input
+              id="db-soreness"
+              type="number"
+              inputMode="numeric"
+              step="1"
+              min="1"
+              max="10"
+              value={soreness}
+              onChange={(e) => setSoreness(e.target.value)}
+              className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+              placeholder="4"
+            />
+          </div>
           <div>
             <label htmlFor="db-mood" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
               MOOD (1–10)
@@ -785,34 +806,6 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
             placeholder="Field notes, complaints, things to remember. Stays private."
           />
         </div>
-
-        <label className="flex items-center gap-3 cursor-pointer select-none">
-          <input
-            type="checkbox"
-            checked={published}
-            onChange={(e) => setPublished(e.target.checked)}
-            className="sr-only"
-          />
-          <span
-            className={`relative flex-none w-10 h-6 border transition-colors ${
-              published
-                ? "bg-[rgb(var(--neon)/0.15)] border-[rgb(var(--neon)/0.5)]"
-                : "bg-transparent border-[rgb(var(--border)/0.4)]"
-            }`}
-            role="presentation"
-          >
-            <span
-              className={`absolute top-0.5 left-0.5 w-5 h-5 transition-transform ${
-                published
-                  ? "translate-x-4 bg-[rgb(var(--neon))]"
-                  : "translate-x-0 bg-[rgb(var(--text-meta)/0.5)]"
-              }`}
-            />
-          </span>
-          <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))]">
-            {published ? "PUBLISH PUBLIC" : "KEEP PRIVATE"}
-          </span>
-        </label>
       </div>
 
       {/* Error */}

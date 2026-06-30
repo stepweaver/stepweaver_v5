@@ -1,26 +1,13 @@
-import type { CarrierDispatch, CarrierPhase, MailLoad } from "@/lib/data/carrier-journal";
+import type { CarrierDispatch } from "@/lib/data/carrier-journal";
 import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
+import { deriveWeatherSignals } from "@/lib/carrier-journal/weather-signals";
 import { formatPrivateDpsLine, formatPublicDpsLoadLine } from "@/lib/dps";
 
-const MAIL_LOAD_LABEL: Record<MailLoad, string> = {
-  light: "LIGHT",
-  normal: "NORMAL",
-  heavy: "HEAVY",
-  brutal: "BRUTAL",
-};
-
-const MAIL_LOAD_COLOR: Record<MailLoad, string> = {
-  light: "rgb(var(--green))",
-  normal: "rgb(var(--text-secondary))",
-  heavy: "rgb(var(--warn))",
-  brutal: "rgb(var(--danger))",
-};
-
-const PHASE_LABEL: Record<CarrierPhase, string> = {
-  "break-in": "BREAK-IN",
-  adapting: "ADAPTING",
-  building: "BUILDING",
-  regular: "REGULAR",
+const WEATHER_FLAG_LABEL: Record<"heat" | "rain" | "storm" | "snow", string> = {
+  heat: "HEAT",
+  rain: "RAIN",
+  storm: "STORM",
+  snow: "SNOW",
 };
 
 type Props = {
@@ -30,14 +17,10 @@ type Props = {
 };
 
 export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Props) {
-  const weatherFlags: string[] = [];
-  if (d.heatDay) weatherFlags.push("HEAT");
-  if (d.rain) weatherFlags.push("RAIN");
-  if (d.storm) weatherFlags.push("STORM");
-  if (d.snow) weatherFlags.push("SNOW");
+  const weather = deriveWeatherSignals(d);
+  const weatherFlags = (["heat", "rain", "storm", "snow"] as const).filter((key) => weather[key]);
 
   const chips: { label: string; color?: string }[] = [];
-  if (d.phase) chips.push({ label: PHASE_LABEL[d.phase] });
   if (d.waterOz !== undefined) {
     const goal = d.hydrationGoalOz;
     chips.push({
@@ -56,32 +39,17 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
 
   return (
     <div id={d.id} className="surface-panel p-5 sm:p-6 space-y-3">
-      {/* Header: date, title, mail load */}
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-1">
             {d.date}
-            {d.phase ? ` // ${PHASE_LABEL[d.phase]}` : ""}
-            {d.routeCode ? (
-              <span className="text-[rgb(var(--text-label)/0.45)] ml-2">{d.routeCode}</span>
-            ) : null}
           </div>
           <h3 className="font-[var(--font-ibm)] text-lg text-[rgb(var(--text-color))] leading-snug">
             {d.title}
           </h3>
         </div>
-        <div
-          className="font-[var(--font-ocr)] text-xs tracking-widest px-2 py-1 border shrink-0"
-          style={{
-            color: MAIL_LOAD_COLOR[d.mailLoad],
-            borderColor: MAIL_LOAD_COLOR[d.mailLoad],
-          }}
-        >
-          {MAIL_LOAD_LABEL[d.mailLoad]}
-        </div>
       </div>
 
-      {/* Authored narrative: primary content */}
       {d.publicNote.trim() && (
         <div className="border-l-2 border-[rgb(var(--neon)/0.4)] pl-3 space-y-3">
           {splitPublicNoteParagraphs(d.publicNote).map((paragraph, index) => (
@@ -110,7 +78,6 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
         </div>
       )}
 
-      {/* KPI telemetry row: secondary */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[rgb(var(--border)/0.12)]">
         {[
           { label: "MILES", value: `${d.milesWalked}` },
@@ -127,28 +94,21 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
         ))}
       </div>
 
-      {/* Meta row: weather, flags, hydration */}
       <div className="flex flex-wrap items-center gap-2 text-xs text-[rgb(var(--text-secondary))]">
-        {(d.weather || d.temperatureF) && (
+        {d.temperatureF !== undefined && (
           <span className="font-[var(--font-ocr)] tracking-wide text-[rgb(var(--text-meta))]">
-            {d.weather}
-            {d.temperatureF ? `${d.weather ? " · " : ""}${d.temperatureF}°F` : ""}
+            {d.temperatureF}°F
             {d.heatIndexF ? ` (feels ${d.heatIndexF}°F)` : ""}
           </span>
         )}
-        {weatherFlags.map((f) => (
+        {weatherFlags.map((key) => (
           <span
-            key={f}
+            key={key}
             className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--warn))] border border-[rgb(var(--warn)/0.4)] px-1.5 py-0.5"
           >
-            {f}
+            {WEATHER_FLAG_LABEL[key]}
           </span>
         ))}
-        {d.dogEncounter && (
-          <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--yellow))] border border-[rgb(var(--yellow)/0.4)] px-1.5 py-0.5">
-            DOG
-          </span>
-        )}
         {chips.map((chip) => (
           <span
             key={chip.label}
@@ -162,28 +122,6 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
           </span>
         ))}
       </div>
-
-      {/* Body / recovery notes */}
-      {(d.bodyNote || d.recoveryNote) && (
-        <div className="flex flex-col sm:flex-row gap-2 text-xs">
-          {d.bodyNote && (
-            <span className="text-[rgb(var(--text-secondary))] border-l border-[rgb(var(--border)/0.3)] pl-2">
-              <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mr-2">
-                BODY
-              </span>
-              {d.bodyNote}
-            </span>
-          )}
-          {d.recoveryNote && (
-            <span className="text-[rgb(var(--text-secondary))] border-l border-[rgb(var(--border)/0.3)] pl-2">
-              <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mr-2">
-                RECOVERY
-              </span>
-              {d.recoveryNote}
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 }

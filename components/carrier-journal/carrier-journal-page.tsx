@@ -16,12 +16,11 @@ import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 import { CarrierProfileCard } from "./carrier-profile-card";
 
 const TRACKING_ITEMS = [
-  { category: "Physical load", detail: "Miles walked, soreness, recovery signals, body notes" },
+  { category: "Physical load", detail: "Miles walked, soreness, energy, and mood" },
   { category: "Hydration and fuel", detail: "Water, Gatorade, route snacks, hunger and thirst adjustments" },
-  { category: "Transformation", detail: "Phase progression, weekly weight trend, capacity building" },
-  { category: "Environmental load", detail: "Heat index, rain, snow, storms, temperature swings" },
-  { category: "Operational load", detail: "Perceived mail-load, DPS ratio vs baseline, route difficulty, breaks taken" },
-  { category: "Safety signals", detail: "Hydration discipline, heat risk, dog encounters, fatigue markers" },
+  { category: "Transformation", detail: "Weekly weight trend — pounds lost, not raw weight" },
+  { category: "Environmental load", detail: "Heat index and weather derived from temp + field notes" },
+  { category: "Operational load", detail: "DPS ratio vs baseline, mail day context, parcels" },
   { category: "Published narrative", detail: "Route-day reflections and field notes" },
 ];
 
@@ -43,8 +42,8 @@ const FIELD_METHOD_CARDS = [
   },
   {
     label: "TREND, NOT SCOREBOARD",
-    title: "Weekly weight check",
-    body: "Weight is a weekly trend marker.",
+    title: "Weight lost, not raw weight",
+    body: "Monday weigh-ins feed a cumulative loss number on the public log. The actual weight stays private.",
   },
 ];
 
@@ -114,7 +113,7 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
   const totals = computeTotalsFromDispatches(dispatches);
   const kpis =
     notionDispatches && notionDispatches.length > 0
-      ? totalsToKpis(totals, dispatches)
+      ? totalsToKpis(totals)
       : getCarrierKpis();
 
   return (
@@ -132,7 +131,7 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             </h1>
             <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
               A personal field log from starting overweight and learning life as a city letter carrier:
-              miles, hydration, recovery, phase progression, and the operational lessons hiding inside a walking route.
+              miles, hydration, soreness, weight lost, and the operational lessons hiding inside a walking route.
             </p>
           </div>
           <div className="lg:shrink-0">

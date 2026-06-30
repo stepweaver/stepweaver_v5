@@ -31,26 +31,18 @@ describe("carrier's log totals", () => {
     expect(totals.totalSteps).toBe(0);
     expect(totals.avgWaterOz).toBe(0);
     expect(totals.hydrationGoalHitRate).toBe(0);
-    expect(totals.dogEncounterDays).toBe(0);
     expect(totals.startingWeightLbs).toBeUndefined();
     expect(totals.latestWeightLbs).toBeUndefined();
     expect(totals.weightChangeLbs).toBeUndefined();
-    expect(totals.phaseCounts).toEqual({
-      "break-in": 0,
-      adapting: 0,
-      building: 0,
-      regular: 0,
-    });
   });
 
-  it("counts dog encounter days correctly", () => {
+  it("counts derived heat days from temperature", () => {
     const dispatches = [
-      dispatch({ id: "a", date: "2026-05-01", title: "A", dogEncounter: true }),
-      dispatch({ id: "b", date: "2026-05-02", title: "B" }),
-      dispatch({ id: "c", date: "2026-05-03", title: "C", dogEncounter: true }),
+      dispatch({ id: "a", date: "2026-05-01", title: "A", temperatureF: 92, heatIndexF: 106 }),
+      dispatch({ id: "b", date: "2026-05-02", title: "B", temperatureF: 72 }),
     ];
     const totals = computeTotalsFromDispatches(dispatches);
-    expect(totals.dogEncounterDays).toBe(2);
+    expect(totals.heatDays).toBe(1);
   });
 
   it("computes total miles and steps", () => {
@@ -236,7 +228,7 @@ describe("getCarrierMilestones", () => {
     const badge = getCarrierMilestones(dispatches).find(
       (m) => m.id === "first-good-samaritan"
     );
-    expect(badge?.unlocked).toBe(true);
+    expect(badge).toBeUndefined();
   });
 
   it("unlocks Good Samaritan badge from goodSamaritanAct flag", () => {
@@ -251,7 +243,7 @@ describe("getCarrierMilestones", () => {
     const badge = getCarrierMilestones(dispatches).find(
       (m) => m.id === "first-good-samaritan"
     );
-    expect(badge?.unlocked).toBe(true);
+    expect(badge).toBeUndefined();
   });
 });
 
@@ -290,76 +282,31 @@ describe("splitPublicNoteParagraphs", () => {
 });
 
 describe("formatPublicWeightTrend", () => {
-  it('shows em dash when no weight data exists', () => {
-    const dispatches = [dispatch({ id: "a", date: "2026-05-01", title: "A" })];
-    const totals = computeTotalsFromDispatches(dispatches);
-    expect(formatPublicWeightTrend(totals, dispatches).value).toBe(CARRIER_KPI_EMPTY);
+  it("shows em dash when no weight data exists", () => {
+    const totals = computeTotalsFromDispatches([
+      dispatch({ id: "a", date: "2026-05-01", title: "A" }),
+    ]);
+    expect(formatPublicWeightTrend(totals).value).toBe(CARRIER_KPI_EMPTY);
   });
 
-  it('shows "tracking privately" when all weight entries are hidden', () => {
-    const dispatches = [
-      dispatch({
-        id: "a",
-        date: "2026-05-01",
-        title: "A",
-        weightLbs: 250,
-        weightPublicMode: "hidden",
-      }),
-      dispatch({
-        id: "b",
-        date: "2026-05-10",
-        title: "B",
-        weightLbs: 245,
-        weightPublicMode: "hidden",
-      }),
-    ];
-    const totals = computeTotalsFromDispatches(dispatches);
-    expect(formatPublicWeightTrend(totals, dispatches).value).toBe("tracking privately");
-  });
-
-  it("shows change-only summary without raw current weight", () => {
-    const dispatches = [
+  it("shows pounds lost without raw current weight", () => {
+    const totals = computeTotalsFromDispatches([
       dispatch({
         id: "a",
         date: "2026-05-01",
         title: "A",
         weightLbs: 248,
-        weightPublicMode: "change-only",
       }),
       dispatch({
         id: "b",
         date: "2026-05-10",
         title: "B",
         weightLbs: 243.8,
-        weightPublicMode: "change-only",
       }),
-    ];
-    const totals = computeTotalsFromDispatches(dispatches);
-    const trend = formatPublicWeightTrend(totals, dispatches);
-    expect(trend.value).toBe("-4.2 lbs");
+    ]);
+    const trend = formatPublicWeightTrend(totals);
+    expect(trend.value).toBe("4.2 lbs lost");
     expect(trend.value).not.toMatch(/243/);
-  });
-
-  it("shows current weight plus change in current-and-change mode", () => {
-    const dispatches = [
-      dispatch({
-        id: "a",
-        date: "2026-05-01",
-        title: "A",
-        weightLbs: 248,
-        weightPublicMode: "change-only",
-      }),
-      dispatch({
-        id: "b",
-        date: "2026-05-10",
-        title: "B",
-        weightLbs: 244,
-        weightPublicMode: "current-and-change",
-      }),
-    ];
-    const totals = computeTotalsFromDispatches(dispatches);
-    const trend = formatPublicWeightTrend(totals, dispatches);
-    expect(trend.value).toBe("244 lbs (-4.0 lbs)");
   });
 });
 

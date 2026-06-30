@@ -44,7 +44,6 @@ function WeatherPips({ day }: { day: DaySummary }) {
   else if (day.heat80) pips.push({ color: "rgb(var(--warn))", title: "Heat 80°F+" });
   if (day.belowZero) pips.push({ color: "rgb(180,220,255)", title: "Below 0°F" });
   else if (day.freezing) pips.push({ color: "rgb(var(--blue))", title: "Freezing" });
-  if (day.dogEncounter) pips.push({ color: "rgb(var(--yellow))", title: "Dog encounter" });
 
   if (pips.length === 0) return null;
 
@@ -143,8 +142,7 @@ function SelectedDayPanel({ day, onClose }: { day: DaySummary; onClose: () => vo
   else if (day.heat80) conditionChips.push({ label: "HEAT 80°+", color: "rgb(var(--warn))" });
   if (day.freezing) conditionChips.push({ label: "FREEZING", color: "rgb(var(--cyan))" });
   if (day.belowZero) conditionChips.push({ label: "BELOW 0°", color: "rgb(180,220,255)" });
-  if (day.dogEncounter) conditionChips.push({ label: "DOG", color: "rgb(var(--yellow))" });
-  if (day.heavyLoad) conditionChips.push({ label: "HEAVY LOAD", color: "rgb(var(--warn))" });
+  if (day.heavyDpsDay) conditionChips.push({ label: "HEAVY DPS", color: "rgb(var(--warn))" });
   if (day.hydrationGoalMet) conditionChips.push({ label: "HYDRATION ✓", color: "rgb(var(--neon))" });
 
   return (

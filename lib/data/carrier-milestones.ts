@@ -1,4 +1,11 @@
 import type { CarrierDispatch } from "./carrier-journal";
+import { enrichDispatchesDpsFields } from "./carrier-journal";
+import {
+  deriveWeatherSignals,
+  isDerivedHeatDay,
+  isDerivedWeatherDay,
+} from "@/lib/carrier-journal/weather-signals";
+import { isHeavyDpsRatio } from "@/lib/dps";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -109,24 +116,6 @@ function dateAtCumulativeThreshold(
   return undefined;
 }
 
-function isGoodSamaritanAct(d: CarrierDispatch): boolean {
-  if (d.goodSamaritanAct === true) return true;
-  return (d.tags ?? []).some(
-    (t) =>
-      t === "good-samaritan" ||
-      t === "good_samaritan" ||
-      t.toLowerCase() === "good samaritan"
-  );
-}
-
-function effectiveTemp(d: CarrierDispatch): number {
-  return Math.max(d.temperatureF ?? -Infinity, d.heatIndexF ?? -Infinity);
-}
-
-function isWeatherDay(d: CarrierDispatch): boolean {
-  return !!(d.rain || d.storm || d.snow || d.heatDay);
-}
-
 // ---------------------------------------------------------------------------
 // Exported functions
 // ---------------------------------------------------------------------------
@@ -195,26 +184,23 @@ export function getCarrierRankLadder(totalMiles: number): CarrierRank[] {
 }
 
 export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMilestone[] {
-  const sorted = sortedChronologically(dispatches);
-  const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
-  const daysLogged = dispatches.length;
+  const enriched = enrichDispatchesDpsFields(dispatches);
+  const sorted = sortedChronologically(enriched);
+  const totalMiles = enriched.reduce((s, d) => s + d.milesWalked, 0);
+  const daysLogged = enriched.length;
 
-  const rainDays = dispatches.filter((d) => d.rain);
-  const stormDays = dispatches.filter((d) => d.storm);
-  const snowDays = dispatches.filter((d) => d.snow);
-  const heatDays = dispatches.filter((d) => d.heatDay || effectiveTemp(d) >= 90);
-  const weatherDays = dispatches.filter(isWeatherDay);
-  const heavyOrBrutalDays = dispatches.filter(
-    (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal"
-  );
-  const dogDays = dispatches.filter((d) => d.dogEncounter);
-  const hydrationGoalDays = dispatches.filter(
+  const rainDays = enriched.filter((d) => deriveWeatherSignals(d).rain);
+  const stormDays = enriched.filter((d) => deriveWeatherSignals(d).storm);
+  const snowDays = enriched.filter((d) => deriveWeatherSignals(d).snow);
+  const heatDays = enriched.filter(isDerivedHeatDay);
+  const weatherDays = enriched.filter(isDerivedWeatherDay);
+  const heavyDpsDays = enriched.filter((d) => isHeavyDpsRatio(d.dpsRatio));
+  const hydrationGoalDays = enriched.filter(
     (d) =>
       d.waterOz !== undefined &&
       d.hydrationGoalOz !== undefined &&
       d.waterOz >= d.hydrationGoalOz
   );
-  const goodSamaritanDays = dispatches.filter(isGoodSamaritanAct);
 
   function milestone(
     id: string,
@@ -324,13 +310,13 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     // --- Load ---
     milestone(
       "first-heavy-day",
-      "First Heavy Day",
-      "Heavy",
-      "First dispatch logged as heavy or brutal mail load.",
+      "First Heavy DPS Day",
+      "Heavy DPS",
+      "First day above 115% of recent DPS baseline.",
       "load", "basic", "package",
-      heavyOrBrutalDays.length, 1,
-      heavyOrBrutalDays.length >= 1
-        ? sortedChronologically(heavyOrBrutalDays)[0]?.date
+      heavyDpsDays.length, 1,
+      heavyDpsDays.length >= 1
+        ? sortedChronologically(heavyDpsDays)[0]?.date
         : undefined
     ),
 
@@ -406,12 +392,12 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     // --- Load ---
     milestone(
       "five-heavy-days",
-      "5 Heavy Days",
+      "5 Heavy DPS Days",
       "5 Heavy",
-      "Five heavy or brutal load days on the record.",
+      "Five days above 115% of recent DPS baseline.",
       "load", "field", "package",
-      heavyOrBrutalDays.length, 5,
-      dateAtNthMatch(sorted, (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal", 5)
+      heavyDpsDays.length, 5,
+      dateAtNthMatch(sorted, (d) => isHeavyDpsRatio(d.dpsRatio), 5)
     ),
 
     // --- Weather ---
@@ -419,7 +405,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "first-heat-day",
       "First Heat Day",
       "Heat",
-      "First dispatch logged on a heat day. Hydration becomes survival.",
+      "First shift with peak heat index ≥ 90°F. Hydration becomes survival.",
       "weather", "field", "flame",
       heatDays.length, 1,
       heatDays.length >= 1 ? sortedChronologically(heatDays)[0]?.date : undefined
@@ -432,17 +418,6 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "weather", "field", "zap",
       stormDays.length, 1,
       stormDays.length >= 1 ? sortedChronologically(stormDays)[0]?.date : undefined
-    ),
-
-    // --- Safety ---
-    milestone(
-      "first-dog-encounter",
-      "First Dog Encounter",
-      "Dog",
-      "First logged dog encounter. Assessed and redirected.",
-      "safety", "field", "shield",
-      dogDays.length, 1,
-      dogDays.length >= 1 ? sortedChronologically(dogDays)[0]?.date : undefined
     ),
 
     // ===================================================================
@@ -491,7 +466,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "Ten heat days worked and logged. The body has adapted.",
       "weather", "campaign", "flame",
       heatDays.length, 10,
-      dateAtNthMatch(sorted, (d) => !!(d.heatDay || effectiveTemp(d) >= 90), 10)
+      dateAtNthMatch(sorted, isDerivedHeatDay, 10)
     ),
     milestone(
       "ten-weather-days",
@@ -500,7 +475,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "Ten days in meaningful weather: rain, storm, snow, or heat.",
       "weather", "campaign", "cloud-rain",
       weatherDays.length, 10,
-      dateAtNthMatch(sorted, isWeatherDay, 10)
+      dateAtNthMatch(sorted, isDerivedWeatherDay, 10)
     ),
     milestone(
       "first-snow",
@@ -533,25 +508,12 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     // --- Load ---
     milestone(
       "ten-heavy-days",
-      "10 Heavy Days",
+      "10 Heavy DPS Days",
       "10 Heavy",
-      "Ten heavy or brutal load days on the record. Character built.",
+      "Ten days above 115% of recent DPS baseline. Character built.",
       "load", "campaign", "package",
-      heavyOrBrutalDays.length, 10,
-      dateAtNthMatch(sorted, (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal", 10)
-    ),
-
-    // --- Service ---
-    milestone(
-      "first-good-samaritan",
-      "Good Samaritan",
-      "Samaritan",
-      "First Good Samaritan act logged on the route.",
-      "service", "campaign", "heart",
-      goodSamaritanDays.length, 1,
-      goodSamaritanDays.length >= 1
-        ? sortedChronologically(goodSamaritanDays)[0]?.date
-        : undefined
+      heavyDpsDays.length, 10,
+      dateAtNthMatch(sorted, (d) => isHeavyDpsRatio(d.dpsRatio), 10)
     ),
 
     // ===================================================================
@@ -618,7 +580,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "Twenty-five heat days worked. Heat-tested and qualified.",
       "weather", "veteran", "flame",
       heatDays.length, 25,
-      dateAtNthMatch(sorted, (d) => !!(d.heatDay || effectiveTemp(d) >= 90), 25)
+      dateAtNthMatch(sorted, isDerivedHeatDay, 25)
     ),
     milestone(
       "twenty-five-weather-days",
@@ -627,40 +589,18 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "Twenty-five weather days on record. Conditions are never a surprise.",
       "weather", "veteran", "cloud-rain",
       weatherDays.length, 25,
-      dateAtNthMatch(sorted, isWeatherDay, 25)
+      dateAtNthMatch(sorted, isDerivedWeatherDay, 25)
     ),
 
     // --- Load ---
     milestone(
       "fifty-heavy-days",
-      "50 Heavy Days",
+      "50 Heavy DPS Days",
       "50 Heavy",
-      "Fifty heavy or brutal load days on the record. Field-hardened.",
+      "Fifty days above 115% of recent DPS baseline. Field-hardened.",
       "load", "veteran", "package",
-      heavyOrBrutalDays.length, 50,
-      dateAtNthMatch(sorted, (d) => d.mailLoad === "heavy" || d.mailLoad === "brutal", 50)
-    ),
-
-    // --- Safety ---
-    milestone(
-      "twenty-five-dog-encounters",
-      "25 Dog Encounters",
-      "25 Dogs",
-      "Twenty-five logged dog encounters. Reading the route is second nature.",
-      "safety", "veteran", "shield",
-      dogDays.length, 25,
-      dateAtNthMatch(sorted, (d) => !!d.dogEncounter, 25)
-    ),
-
-    // --- Service ---
-    milestone(
-      "five-good-samaritan",
-      "5 Good Samaritan Notes",
-      "5 Sam.",
-      "Five Good Samaritan acts on the field record.",
-      "service", "veteran", "heart",
-      goodSamaritanDays.length, 5,
-      dateAtNthMatch(sorted, isGoodSamaritanAct, 5)
+      heavyDpsDays.length, 50,
+      dateAtNthMatch(sorted, (d) => isHeavyDpsRatio(d.dpsRatio), 50)
     ),
   ];
 }
