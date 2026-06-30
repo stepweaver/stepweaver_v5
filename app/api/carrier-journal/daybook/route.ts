@@ -26,6 +26,14 @@ function unavailable() {
   );
 }
 
+function notionErrorMessage(err: unknown): string {
+  if (err && typeof err === "object" && "body" in err) {
+    const body = (err as { body?: { message?: string } }).body;
+    if (body?.message) return body.message;
+  }
+  return err instanceof Error ? err.message : "Failed to save carrier daybook entry";
+}
+
 export async function POST(request: NextRequest) {
   if (!isCarrierJournalLogEnabled()) {
     return unavailable();
@@ -76,7 +84,6 @@ export async function POST(request: NextRequest) {
       }),
     });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to save carrier daybook entry";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: notionErrorMessage(err) }, { status: 500 });
   }
 }

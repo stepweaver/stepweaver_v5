@@ -89,9 +89,7 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
   }, [date, logEnabled, logSecret, parsedDpsCount]);
 
   const toggleContext = useCallback((tag: string) => {
-    setMailDayContext((current) =>
-      current.includes(tag) ? current.filter((value) => value !== tag) : [...current, tag]
-    );
+    setMailDayContext((current) => (current.includes(tag) ? [] : [tag]));
   }, []);
 
   const handleSubmit = useCallback(

@@ -194,9 +194,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
   );
 
   const toggleContext = useCallback((tag: string) => {
-    setMailDayContext((prev) =>
-      prev.includes(tag) ? prev.filter((v) => v !== tag) : [...prev, tag]
-    );
+    setMailDayContext((prev) => (prev.includes(tag) ? [] : [tag]));
   }, []);
 
   const handleSubmit = useCallback(

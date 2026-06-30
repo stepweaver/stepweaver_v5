@@ -101,10 +101,17 @@ function parseRoutePreference(raw: string): RoutePreference | undefined {
   return undefined;
 }
 
-function multiSelect(prop: Props | undefined): string[] {
-  if (!prop) return [];
-  const items = prop.multi_select as { name?: string }[] | undefined;
-  return items?.map((item) => item.name ?? "").filter(Boolean) ?? [];
+function mailDayContextFromProp(prop: Props | undefined): string[] {
+  const value = sel(prop);
+  return value ? [value] : [];
+}
+
+function mailDayContextToNotion(tags: string[] | undefined): Record<string, unknown> | null {
+  if (tags === undefined) return null;
+  const first = tags.find(Boolean);
+  return {
+    "Mail Day Context": first ? { select: { name: first } } : { select: null },
+  };
 }
 
 function formatPage(page: PageObjectResponse): CarrierDispatch | null {
@@ -148,7 +155,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const routePreference = parseRoutePreference(sel(p["Route Preference"] as Props));
   const dpsCount = num(p["DPS Count"] as Props);
   const dpsRatio = num(p["DPS Ratio"] as Props);
-  const mailDayContext = multiSelect(p["Mail Day Context"] as Props);
+  const mailDayContext = mailDayContextFromProp(p["Mail Day Context"] as Props);
 
   return {
     id: `cj-${page.id.replace(/-/g, "").slice(0, 8)}`,
@@ -288,9 +295,8 @@ function buildDpsNotionProperties(input: {
   }
 
   if (input.mailDayContext !== undefined) {
-    properties["Mail Day Context"] = {
-      multi_select: input.mailDayContext.map((name) => ({ name })),
-    };
+    const mailDayContextProp = mailDayContextToNotion(input.mailDayContext);
+    if (mailDayContextProp) Object.assign(properties, mailDayContextProp);
   }
 
   return properties;
@@ -444,9 +450,8 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
   }
 
   if (input.mailDayContext !== undefined) {
-    properties["Mail Day Context"] = {
-      multi_select: input.mailDayContext.map((name) => ({ name })),
-    };
+    const mailDayContextProp = mailDayContextToNotion(input.mailDayContext);
+    if (mailDayContextProp) Object.assign(properties, mailDayContextProp);
   }
 
   if (input.temperatureF !== undefined) {
@@ -484,16 +489,15 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
   }
 
   // TODO: Add "Parcels" (Number) property to the Notion database, then uncomment:
-  // if (input.parcels !== undefined) {
-  //   properties["Parcels"] = { number: input.parcels };
-  // }
+  if (input.parcels !== undefined) {
+    properties["Parcels"] = { number: input.parcels };
+  }
 
-  // TODO: Add "Private Note" (Rich Text) property to the Notion database, then uncomment:
-  // if (input.privateNote !== undefined) {
-  //   properties["Private Note"] = {
-  //     rich_text: [{ text: { content: input.privateNote } }],
-  //   };
-  // }
+  if (input.privateNote !== undefined) {
+    properties["Private Note"] = {
+      rich_text: [{ text: { content: input.privateNote } }],
+    };
+  }
 
   if (input.fuel?.breakfastProtein !== undefined) {
     properties["Breakfast Protein"] = { checkbox: input.fuel.breakfastProtein };
