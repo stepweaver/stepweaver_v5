@@ -17,6 +17,7 @@ import {
 } from "@/lib/data/carrier-journal";
 import type { CarrierDaybookInput, CarrierLogDpsInput } from "@/lib/validation/carrier-log.schema";
 import { calculateDpsRatio } from "@/lib/carrier-journal/helpers";
+import { computeFuelScore } from "@/lib/carrier-journal/fuel";
 
 const CACHE_REVALIDATE = 300; // 5 minutes
 
@@ -493,6 +494,38 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
   //     rich_text: [{ text: { content: input.privateNote } }],
   //   };
   // }
+
+  if (input.fuel?.breakfastProtein !== undefined) {
+    properties["Breakfast Protein"] = { checkbox: input.fuel.breakfastProtein };
+  }
+  if (input.fuel?.routeFoodPacked !== undefined) {
+    properties["Route Food Packed"] = { checkbox: input.fuel.routeFoodPacked };
+  }
+  if (input.fuel?.routeFoodEaten !== undefined) {
+    const labels = { none: "None", partial: "Partial", all: "All" } as const;
+    properties["Route Food Eaten"] = { select: { name: labels[input.fuel.routeFoodEaten] } };
+  }
+  if (input.fuel?.proteinAnchors !== undefined) {
+    properties["Protein Anchors"] = { number: input.fuel.proteinAnchors };
+  }
+  if (input.fuel?.fruitVegServings !== undefined) {
+    properties["Fruit Veg Servings"] = { number: input.fuel.fruitVegServings };
+  }
+  if (input.fuel?.gatorade !== undefined) {
+    properties["Gatorade Count"] = { number: input.fuel.gatorade };
+  }
+  if (input.fuel?.mountainDewOz !== undefined) {
+    properties["Mountain Dew Oz"] = { number: input.fuel.mountainDewOz };
+  }
+  if (input.fuel?.postShiftMealQuality !== undefined) {
+    const labels = { poor: "Poor", okay: "Okay", solid: "Solid" } as const;
+    properties["Post Shift Meal Quality"] = {
+      select: { name: labels[input.fuel.postShiftMealQuality] },
+    };
+  }
+  if (input.fuel) {
+    properties["Fuel Score"] = { number: computeFuelScore(input.fuel).score };
+  }
 
   const notion = getNotion();
   const pageId = await findPageIdByDate(input.date);

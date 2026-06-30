@@ -10,6 +10,14 @@ import {
   type HeatBand,
   type HydrationRecommendation,
 } from "@/lib/hydration";
+import {
+  computeFuelScore,
+  FUEL_SCORE_WIN,
+  formatFuelScore,
+  type FuelLogInput,
+  type MealQuality,
+  type RouteFoodEaten,
+} from "@/lib/carrier-journal/fuel";
 
 // ZIP 46614 (South Bend, IN) - fixed coordinates for weather lookup
 const ZIP_LAT = 41.6764;
@@ -25,6 +33,9 @@ type SubmitResult = {
   pageId: string;
   dpsPerMile: number | null;
   publicSummary: string;
+  fuelScore?: number;
+  fuelScoreLabel?: string;
+  fuelIsWin?: boolean;
 };
 
 type Props = {
@@ -57,6 +68,16 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
 
   const [mood, setMood] = useState("");
   const [energy, setEnergy] = useState("");
+
+  const [breakfastProtein, setBreakfastProtein] = useState<boolean | null>(null);
+  const [routeFoodPacked, setRouteFoodPacked] = useState<boolean | null>(null);
+  const [routeFoodEaten, setRouteFoodEaten] = useState<RouteFoodEaten | null>(null);
+  const [proteinAnchors, setProteinAnchors] = useState<0 | 1 | 2 | 3 | 4 | null>(null);
+  const [fruitVegServings, setFruitVegServings] = useState<0 | 1 | 2 | 3 | null>(null);
+  const [gatorade, setGatorade] = useState<0 | 1 | 2 | null>(null);
+  const [mountainDewOz, setMountainDewOz] = useState("");
+  const [postShiftMealQuality, setPostShiftMealQuality] = useState<MealQuality | null>(null);
+
   const [publicNote, setPublicNote] = useState("");
   const [privateNote, setPrivateNote] = useState("");
   const [published, setPublished] = useState(true);
@@ -131,6 +152,46 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
       directSun,
     });
   }, [weatherTemp, weatherHeat, miles, weightLbs, latestWeightLbs, directSun]);
+
+  const fuelInput = useMemo((): FuelLogInput | null => {
+    const dewNum = mountainDewOz.trim() ? Number(mountainDewOz) : undefined;
+    const hasAny =
+      breakfastProtein !== null ||
+      routeFoodPacked !== null ||
+      routeFoodEaten !== null ||
+      proteinAnchors !== null ||
+      fruitVegServings !== null ||
+      gatorade !== null ||
+      (dewNum !== undefined && Number.isFinite(dewNum)) ||
+      postShiftMealQuality !== null;
+
+    if (!hasAny) return null;
+
+    return {
+      ...(breakfastProtein !== null && { breakfastProtein }),
+      ...(routeFoodPacked !== null && { routeFoodPacked }),
+      ...(routeFoodEaten !== null && { routeFoodEaten }),
+      ...(proteinAnchors !== null && { proteinAnchors }),
+      ...(fruitVegServings !== null && { fruitVegServings }),
+      ...(gatorade !== null && { gatorade }),
+      ...(dewNum !== undefined && Number.isFinite(dewNum) && dewNum >= 0 && { mountainDewOz: dewNum }),
+      ...(postShiftMealQuality !== null && { postShiftMealQuality }),
+    };
+  }, [
+    breakfastProtein,
+    routeFoodPacked,
+    routeFoodEaten,
+    proteinAnchors,
+    fruitVegServings,
+    gatorade,
+    mountainDewOz,
+    postShiftMealQuality,
+  ]);
+
+  const fuelScore = useMemo(
+    () => (fuelInput ? computeFuelScore(fuelInput) : null),
+    [fuelInput]
+  );
 
   const toggleContext = useCallback((tag: string) => {
     setMailDayContext((prev) =>
@@ -208,6 +269,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
 
       if (publicNote.trim()) body.publicNote = publicNote.trim();
       if (privateNote.trim()) body.privateNote = privateNote.trim();
+      if (fuelInput) body.fuel = fuelInput;
 
       try {
         const res = await fetch("/api/carrier-journal/daybook", {
@@ -221,6 +283,9 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           pageId?: string;
           dpsPerMile?: number | null;
           publicSummary?: string;
+          fuelScore?: number;
+          fuelScoreLabel?: string;
+          fuelIsWin?: boolean;
         };
         if (!res.ok) {
           throw new Error(data.error ?? "Failed to save");
@@ -229,6 +294,9 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           pageId: data.pageId ?? "",
           dpsPerMile: data.dpsPerMile ?? null,
           publicSummary: data.publicSummary ?? "",
+          fuelScore: data.fuelScore,
+          fuelScoreLabel: data.fuelScoreLabel,
+          fuelIsWin: data.fuelIsWin,
         });
       } catch (err) {
         setSubmitStatus("error");
@@ -238,7 +306,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
     [
       token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
-      mood, energy, publicNote, privateNote, published, weatherTemp, weatherHeat,
+      mood, energy, publicNote, privateNote, published, weatherTemp, weatherHeat, fuelInput,
     ]
   );
 
@@ -267,6 +335,14 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           setShowGoalOverride(false);
           setMood("");
           setEnergy("");
+          setBreakfastProtein(null);
+          setRouteFoodPacked(null);
+          setRouteFoodEaten(null);
+          setProteinAnchors(null);
+          setFruitVegServings(null);
+          setGatorade(null);
+          setMountainDewOz("");
+          setPostShiftMealQuality(null);
           setPublicNote("");
           setPrivateNote("");
           setPublished(true);
@@ -559,6 +635,120 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
         </div>
       </div>
 
+      {/* Fuel */}
+      <div className="surface-panel p-5 space-y-4">
+        <div className="flex items-baseline justify-between gap-3 flex-wrap">
+          <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
+            FUEL
+          </div>
+          {fuelScore && (
+            <div className="font-[var(--font-ocr)] text-[10px] tracking-widest">
+              <span className="text-[rgb(var(--text-label))]">SCORE </span>
+              <span
+                className={
+                  fuelScore.isWin ? "text-[rgb(var(--neon))]" : "text-[rgb(var(--text-secondary))]"
+                }
+              >
+                {formatFuelScore(fuelScore.score)}
+              </span>
+              {fuelScore.isWin && (
+                <span className="text-[rgb(var(--neon)/0.7)] ml-2">WIN</span>
+              )}
+              {!fuelScore.isWin && fuelScore.score > 0 && (
+                <span className="text-[rgb(var(--text-meta))] ml-2">
+                  {FUEL_SCORE_WIN}/{fuelScore.max} TO WIN
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+
+        <FuelYesNo
+          label="BREAKFAST PROTEIN"
+          value={breakfastProtein}
+          onChange={setBreakfastProtein}
+        />
+        <FuelYesNo
+          label="ROUTE FOOD PACKED"
+          value={routeFoodPacked}
+          onChange={setRouteFoodPacked}
+        />
+        <FuelSegment<RouteFoodEaten>
+          label="ROUTE FOOD EATEN"
+          options={[
+            { value: "none", label: "NONE" },
+            { value: "partial", label: "PARTIAL" },
+            { value: "all", label: "ALL" },
+          ]}
+          value={routeFoodEaten}
+          onChange={setRouteFoodEaten}
+        />
+        <FuelSegment<0 | 1 | 2 | 3 | 4>
+          label="PROTEIN ANCHORS"
+          options={[
+            { value: 0 as const, label: "0" },
+            { value: 1 as const, label: "1" },
+            { value: 2 as const, label: "2" },
+            { value: 3 as const, label: "3" },
+            { value: 4 as const, label: "4" },
+          ]}
+          value={proteinAnchors}
+          onChange={setProteinAnchors}
+        />
+        <FuelSegment<0 | 1 | 2 | 3>
+          label="FRUIT/VEG SERVINGS"
+          options={[
+            { value: 0, label: "0" },
+            { value: 1, label: "1" },
+            { value: 2, label: "2" },
+            { value: 3, label: "3+" },
+          ]}
+          value={fruitVegServings}
+          onChange={setFruitVegServings}
+        />
+        <FuelSegment<0 | 1 | 2>
+          label="GATORADE"
+          options={[
+            { value: 0 as const, label: "0" },
+            { value: 1 as const, label: "1" },
+            { value: 2 as const, label: "2" },
+          ]}
+          value={gatorade}
+          onChange={setGatorade}
+        />
+
+        <div>
+          <label
+            htmlFor="db-dew"
+            className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+          >
+            MOUNTAIN DEW (oz)
+          </label>
+          <input
+            id="db-dew"
+            type="number"
+            inputMode="decimal"
+            step="1"
+            min="0"
+            value={mountainDewOz}
+            onChange={(e) => setMountainDewOz(e.target.value)}
+            className="w-full sm:w-32 bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+            placeholder="20"
+          />
+        </div>
+
+        <FuelSegment<MealQuality>
+          label="POST-SHIFT MEAL QUALITY"
+          options={[
+            { value: "poor", label: "POOR" },
+            { value: "okay", label: "OKAY" },
+            { value: "solid", label: "SOLID" },
+          ]}
+          value={postShiftMealQuality}
+          onChange={setPostShiftMealQuality}
+        />
+      </div>
+
       {/* Notes */}
       <div className="surface-panel p-5 space-y-4">
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
@@ -822,6 +1012,12 @@ function SuccessCard({
           {result.dpsPerMile !== null && (
             <StatCell label="DPS / MILE" value={String(result.dpsPerMile)} />
           )}
+          {result.fuelScoreLabel && (
+            <StatCell
+              label="FUEL SCORE"
+              value={`${result.fuelScoreLabel}${result.fuelIsWin ? " · WIN" : ""}`}
+            />
+          )}
         </div>
 
         {result.publicSummary && (
@@ -884,6 +1080,68 @@ function StatCell({ label, value }: { label: string; value: string }) {
         {label}
       </div>
       <div className="font-[var(--font-ibm)] text-base text-[rgb(var(--text-color))]">{value}</div>
+    </div>
+  );
+}
+
+function FuelYesNo({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: boolean | null;
+  onChange: (next: boolean) => void;
+}) {
+  return (
+    <FuelSegment<boolean>
+      label={label}
+      options={[
+        { value: true, label: "YES" },
+        { value: false, label: "NO" },
+      ]}
+      value={value}
+      onChange={onChange}
+    />
+  );
+}
+
+function FuelSegment<T extends string | number | boolean>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: { value: T; label: string }[];
+  value: T | null;
+  onChange: (next: T) => void;
+}) {
+  return (
+    <div>
+      <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-2">
+        {label}
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {options.map((opt) => {
+          const selected = value === opt.value;
+          return (
+            <button
+              key={String(opt.value)}
+              type="button"
+              onClick={() => onChange(opt.value)}
+              className="font-[var(--font-ocr)] text-[9px] tracking-widest border px-3 py-2 transition-colors"
+              style={{
+                color: selected ? "rgb(var(--neon))" : "rgb(var(--text-secondary))",
+                borderColor: selected ? "rgb(var(--neon)/0.5)" : "rgb(var(--border)/0.4)",
+                background: selected ? "rgb(var(--neon)/0.08)" : "transparent",
+              }}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

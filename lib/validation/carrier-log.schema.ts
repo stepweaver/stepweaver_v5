@@ -3,6 +3,34 @@ import { MAIL_DAY_CONTEXT_OPTIONS } from "@/lib/dps";
 
 const mailDayContextSchema = z.enum(MAIL_DAY_CONTEXT_OPTIONS);
 
+const routeFoodEatenSchema = z.enum(["none", "partial", "all"]);
+const mealQualitySchema = z.enum(["poor", "okay", "solid"]);
+const proteinAnchorsSchema = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
+]);
+const fruitVegServingsSchema = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+]);
+const gatoradeCountSchema = z.union([z.literal(0), z.literal(1), z.literal(2)]);
+
+export const fuelLogSchema = z.object({
+  breakfastProtein: z.boolean().optional(),
+  routeFoodPacked: z.boolean().optional(),
+  routeFoodEaten: routeFoodEatenSchema.optional(),
+  proteinAnchors: proteinAnchorsSchema.optional(),
+  fruitVegServings: fruitVegServingsSchema.optional(),
+  gatorade: gatoradeCountSchema.optional(),
+  mountainDewOz: z.number().finite().min(0).optional(),
+  postShiftMealQuality: mealQualitySchema.optional(),
+});
+
 export const carrierLogDpsSchema = z.object({
   logSecret: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
@@ -35,6 +63,7 @@ export const carrierDaybookSchema = z.object({
   publicNote: z.string().trim().max(2000).optional(),
   privateNote: z.string().trim().max(2000).optional(),
   published: z.boolean().default(true),
+  fuel: fuelLogSchema.optional(),
 });
 
 export type CarrierDaybookInput = z.infer<typeof carrierDaybookSchema>;

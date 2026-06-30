@@ -6,6 +6,7 @@ import {
 } from "@/lib/notion/carrier-journal.repo";
 import { carrierDaybookSchema } from "@/lib/validation/carrier-log.schema";
 import { buildPublicSummary } from "@/lib/carrier-journal/helpers";
+import { computeFuelScore, formatFuelScore } from "@/lib/carrier-journal/fuel";
 
 function unauthorized() {
   return NextResponse.json(
@@ -61,11 +62,18 @@ export async function POST(request: NextRequest) {
       publicNote: parsed.data.publicNote,
     });
 
+    const fuelScore = parsed.data.fuel ? computeFuelScore(parsed.data.fuel) : null;
+
     return NextResponse.json({
       ok: true,
       pageId,
       dpsPerMile,
       publicSummary,
+      ...(fuelScore && {
+        fuelScore: fuelScore.score,
+        fuelScoreLabel: formatFuelScore(fuelScore.score),
+        fuelIsWin: fuelScore.isWin,
+      }),
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to save carrier daybook entry";
