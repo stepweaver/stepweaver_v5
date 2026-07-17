@@ -24,6 +24,38 @@ import {
   LEGACY_PUBLIC_DISCLAIMER,
 } from "@/lib/footwear/legacy";
 import { slugifyShoe } from "@/lib/footwear/id";
+import { normalizeFootwearDate } from "@/lib/footwear/dates";
+import { createShoeSchema } from "@/lib/validation/footwear.schema";
+
+describe("footwear dates", () => {
+  it("normalizes MM/DD/YYYY to ISO", () => {
+    expect(normalizeFootwearDate("05/15/2026")).toBe("2026-05-15");
+    expect(normalizeFootwearDate("5/18/2026")).toBe("2026-05-18");
+    expect(normalizeFootwearDate("2026-05-15")).toBe("2026-05-15");
+  });
+
+  it("accepts MM/DD/YYYY on create shoe schema", () => {
+    const parsed = createShoeSchema.safeParse({
+      logSecret: "test-secret",
+      brand: "HOKA",
+      model: "Bondi 9",
+      size: "10.5",
+      width: "2E",
+      purchaseDate: "05/15/2026",
+      firstWearDate: "05/18/2026",
+      amountPaid: 175,
+      estimatedWorkMiles: 283.2,
+      isLegacyRecord: true,
+      status: "active",
+      public: true,
+    });
+    expect(parsed.success).toBe(true);
+    if (parsed.success) {
+      expect(parsed.data.purchaseDate).toBe("2026-05-15");
+      expect(parsed.data.firstWearDate).toBe("2026-05-18");
+    }
+  });
+});
 
 describe("footwear checkpoints", () => {
   it("resolves Battle Tested at 261.8 miles", () => {

@@ -10,8 +10,31 @@ import {
   retirementReasons,
   shoeStatuses,
 } from "@/lib/db/schema";
+import { normalizeFootwearDate } from "@/lib/footwear/dates";
 
-const dateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+const isoDateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, {
+  message: "Use YYYY-MM-DD or MM/DD/YYYY",
+});
+
+/** Optional date: YYYY-MM-DD or MM/DD/YYYY → YYYY-MM-DD */
+const optionalDateSchema = z.preprocess((val) => {
+  if (val == null || val === "") return undefined;
+  return normalizeFootwearDate(val) ?? val;
+}, isoDateString.optional());
+
+/** Required date: YYYY-MM-DD or MM/DD/YYYY → YYYY-MM-DD */
+const requiredDateSchema = z.preprocess((val) => {
+  if (val == null || val === "") return val;
+  return normalizeFootwearDate(val) ?? val;
+}, isoDateString);
+
+/** Nullable date for updates */
+const nullableDateSchema = z.preprocess((val) => {
+  if (val === null) return null;
+  if (val == null || val === "") return undefined;
+  return normalizeFootwearDate(val) ?? val;
+}, isoDateString.nullable().optional());
+
 const rating1to10 = z.number().int().min(1).max(10).optional();
 const wear0to5 = z.number().int().min(0).max(5).optional();
 
@@ -32,8 +55,8 @@ export const createShoeSchema = footwearAuthSchema.extend({
   colorway: z.string().trim().max(80).optional(),
   size: z.string().trim().min(1).max(20),
   width: z.string().trim().max(20).optional(),
-  purchaseDate: dateSchema.optional(),
-  firstWearDate: dateSchema.optional(),
+  purchaseDate: optionalDateSchema,
+  firstWearDate: optionalDateSchema,
   status: z.enum(shoeStatuses).default("planned"),
   acquisitionType: z.enum(acquisitionTypes).default("purchased"),
   retailPrice: z.number().finite().min(0).optional(),
@@ -44,7 +67,6 @@ export const createShoeSchema = footwearAuthSchema.extend({
   isLegacyRecord: z.boolean().default(false),
   mileageConfidence: z.enum(mileageConfidenceLevels).default("exact"),
   public: z.boolean().default(false),
-  /** Seed estimated/legacy miles at create time. */
   estimatedWorkMiles: z.number().finite().min(0).optional(),
   estimatedPersonalMiles: z.number().finite().min(0).optional(),
 });
@@ -59,8 +81,8 @@ export const updateShoeSchema = footwearAuthSchema.extend({
   colorway: z.string().trim().max(80).optional().nullable(),
   size: z.string().trim().min(1).max(20).optional(),
   width: z.string().trim().max(20).optional().nullable(),
-  purchaseDate: dateSchema.optional().nullable(),
-  firstWearDate: dateSchema.optional().nullable(),
+  purchaseDate: nullableDateSchema,
+  firstWearDate: nullableDateSchema,
   status: z.enum(shoeStatuses).optional(),
   acquisitionType: z.enum(acquisitionTypes).optional(),
   retailPrice: z.number().finite().min(0).optional().nullable(),
@@ -79,7 +101,7 @@ export const setActiveShoeSchema = footwearAuthSchema.extend({
 
 export const createAllocationSchema = footwearAuthSchema.extend({
   shoeId: z.string().min(1),
-  date: dateSchema,
+  date: requiredDateSchema,
   miles: z.number().finite().min(0),
   mileageType: z.enum(mileageTypes),
   notes: z.string().trim().max(2000).optional(),
@@ -92,7 +114,7 @@ export const footwearAllocationItemSchema = z.object({
 
 export const createObservationSchema = footwearAuthSchema.extend({
   shoeId: z.string().min(1),
-  date: dateSchema,
+  date: requiredDateSchema,
   entryType: z.enum(observationEntryTypes),
   checkpointMiles: z.number().int().min(0).optional(),
   title: z.string().trim().max(160).optional(),
@@ -134,7 +156,7 @@ export const createObservationSchema = footwearAuthSchema.extend({
 
 export const retireShoeSchema = footwearAuthSchema.extend({
   id: z.string().min(1),
-  retirementDate: dateSchema,
+  retirementDate: requiredDateSchema,
   retirementReason: z.enum(retirementReasons),
   retiredFromWorkOnly: z.boolean().default(false),
   failureLocation: z.string().trim().max(200).optional(),
@@ -145,7 +167,6 @@ export const retireShoeSchema = footwearAuthSchema.extend({
   finalReview: z.string().trim().min(1).max(8000),
   postWorkStatus: z.enum(postWorkStatuses),
   public: z.boolean().optional(),
-  /** Optional final ratings mirrored into retirement observation */
   cushioning: rating1to10,
   stability: rating1to10,
   comfort: rating1to10,

@@ -25,7 +25,7 @@ const emptyForm = {
   model: "Bondi 9",
   nickname: "The Rookie",
   size: "10.5",
-  width: "D",
+  width: "2E",
   status: "active",
   acquisitionType: "purchased",
   isLegacyRecord: true,
@@ -38,6 +38,20 @@ const emptyForm = {
   firstWearDate: "",
   baselineNotes: "",
 };
+
+function formatValidationError(data: {
+  error?: string;
+  details?: { fieldErrors?: Record<string, string[] | undefined> };
+}): string {
+  const fieldErrors = data.details?.fieldErrors;
+  if (fieldErrors) {
+    const parts = Object.entries(fieldErrors)
+      .filter(([, msgs]) => msgs && msgs.length > 0)
+      .map(([field, msgs]) => `${field}: ${(msgs as string[]).join(", ")}`);
+    if (parts.length) return parts.join(" · ");
+  }
+  return data.error ?? "Create failed";
+}
 
 export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
   const [shoes, setShoes] = useState(initial);
@@ -94,7 +108,8 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
       });
       const data = await res.json();
       if (!res.ok) {
-        setError(data.error ?? "Create failed");
+        const detail = formatValidationError(data);
+        setError(detail);
         return;
       }
       setMessage(`Created ${data.shoe.slug}`);
@@ -271,18 +286,18 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
         <form onSubmit={onCreate} className="grid gap-4 sm:grid-cols-2">
           {(
             [
-              ["brand", "Brand"],
-              ["model", "Model"],
-              ["nickname", "Nickname"],
-              ["size", "Size"],
-              ["width", "Width"],
-              ["purchaseDate", "Purchase date"],
-              ["firstWearDate", "First wear date"],
-              ["amountPaid", "Amount paid"],
-              ["estimatedWorkMiles", "Estimated work miles"],
-              ["estimatedPersonalMiles", "Estimated personal miles"],
+              ["brand", "Brand", "text"],
+              ["model", "Model", "text"],
+              ["nickname", "Nickname", "text"],
+              ["size", "Size", "text"],
+              ["width", "Width", "text"],
+              ["purchaseDate", "Purchase date", "date"],
+              ["firstWearDate", "First wear date", "date"],
+              ["amountPaid", "Amount paid", "text"],
+              ["estimatedWorkMiles", "Estimated work miles", "text"],
+              ["estimatedPersonalMiles", "Estimated personal miles", "text"],
             ] as const
-          ).map(([key, label]) => (
+          ).map(([key, label, inputType]) => (
             <div key={key}>
               <label
                 htmlFor={`shoe-${key}`}
@@ -292,10 +307,16 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
               </label>
               <input
                 id={`shoe-${key}`}
+                type={inputType}
                 value={form[key]}
                 onChange={(e) => setForm((f) => ({ ...f, [key]: e.target.value }))}
                 className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm text-[rgb(var(--text-color))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[rgb(var(--neon))]"
               />
+              {inputType === "date" && (
+                <p className="mt-1 text-[10px] text-[rgb(var(--text-meta))]">
+                  Date picker or MM/DD/YYYY both work.
+                </p>
+              )}
             </div>
           ))}
           <div className="sm:col-span-2">
