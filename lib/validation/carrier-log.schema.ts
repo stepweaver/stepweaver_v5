@@ -65,6 +65,15 @@ export const carrierDaybookSchema = z.object({
   privateNote: z.string().trim().max(2000).optional(),
   published: z.boolean().default(true),
   fuel: fuelLogSchema.optional(),
+  /** Work miles assigned to one or more shoes for this day. Sum must be ≤ miles. */
+  footwearAllocations: z
+    .array(
+      z.object({
+        shoeId: z.string().min(1),
+        miles: z.number().finite().min(0),
+      })
+    )
+    .optional(),
 });
 
 export type CarrierDaybookInput = z.infer<typeof carrierDaybookSchema>;

@@ -12,6 +12,9 @@ import {
 import { buildPublicSummary } from "@/lib/carrier-journal/helpers";
 import { computeFuelScore, formatFuelScore } from "@/lib/carrier-journal/fuel";
 import { formatPublicMailLoadLine } from "@/lib/carrier-journal/mail-load";
+import { validateWorkAllocationSplit } from "@/lib/footwear/mileage";
+import { isFootwearDbConfigured } from "@/lib/db";
+import { replaceWorkAllocationsForDate } from "@/lib/footwear/queries";
 
 function unauthorized() {
   return NextResponse.json(
@@ -63,8 +66,36 @@ export async function POST(request: NextRequest) {
     return unauthorized();
   }
 
+  const allocations = parsed.data.footwearAllocations;
+  if (allocations && allocations.length > 0) {
+    const daybookMiles = parsed.data.miles ?? 0;
+    const split = validateWorkAllocationSplit({
+      daybookMiles,
+      allocations,
+    });
+    if (!split.ok) {
+      return NextResponse.json({ error: split.error }, { status: 400 });
+    }
+  }
+
   try {
     const { pageId, dpsPerMile } = await upsertCarrierDaybook(parsed.data);
+
+    let footwearWarning: string | undefined;
+    if (allocations && isFootwearDbConfigured()) {
+      try {
+        await replaceWorkAllocationsForDate({
+          date: parsed.data.date,
+          carrierLogNotionPageId: pageId,
+          allocations,
+        });
+      } catch (err) {
+        footwearWarning =
+          err instanceof Error
+            ? `Daybook saved, but footwear allocation failed: ${err.message}`
+            : "Daybook saved, but footwear allocation failed.";
+      }
+    }
 
     const mailLoad = await previewCarrierDaybookLoad({
       date: parsed.data.date,
@@ -93,6 +124,7 @@ export async function POST(request: NextRequest) {
         compositeRatio: mailLoad.compositeRatio,
       }),
       mailLoad,
+      ...(footwearWarning && { footwearWarning }),
       ...(fuelScore && {
         fuelScore: fuelScore.score,
         fuelScoreLabel: formatFuelScore(fuelScore.score),

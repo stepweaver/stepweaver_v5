@@ -1,0 +1,883 @@
+{
+  "id": "ad01b085-5d65-4e9e-9e74-77dfa05782ca",
+  "prevId": "00000000-0000-0000-0000-000000000000",
+  "version": "7",
+  "dialect": "postgresql",
+  "tables": {
+    "public.shoe_media": {
+      "name": "shoe_media",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "shoe_id": {
+          "name": "shoe_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "observation_id": {
+          "name": "observation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "image_url": {
+          "name": "image_url",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image_type": {
+          "name": "image_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mileage_at_photo": {
+          "name": "mileage_at_photo",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "caption": {
+          "name": "caption",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "alt_text": {
+          "name": "alt_text",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "sort_order": {
+          "name": "sort_order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "public": {
+          "name": "public",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "media_shoe_idx": {
+          "name": "media_shoe_idx",
+          "columns": [
+            {
+              "expression": "shoe_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "media_observation_idx": {
+          "name": "media_observation_idx",
+          "columns": [
+            {
+              "expression": "observation_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "shoe_media_shoe_id_shoes_id_fk": {
+          "name": "shoe_media_shoe_id_shoes_id_fk",
+          "tableFrom": "shoe_media",
+          "tableTo": "shoes",
+          "columnsFrom": [
+            "shoe_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "shoe_media_observation_id_shoe_observations_id_fk": {
+          "name": "shoe_media_observation_id_shoe_observations_id_fk",
+          "tableFrom": "shoe_media",
+          "tableTo": "shoe_observations",
+          "columnsFrom": [
+            "observation_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.shoe_mileage_allocations": {
+      "name": "shoe_mileage_allocations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "shoe_id": {
+          "name": "shoe_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "carrier_log_notion_page_id": {
+          "name": "carrier_log_notion_page_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "miles": {
+          "name": "miles",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "mileage_type": {
+          "name": "mileage_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "allocations_shoe_date_idx": {
+          "name": "allocations_shoe_date_idx",
+          "columns": [
+            {
+              "expression": "shoe_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "allocations_date_type_idx": {
+          "name": "allocations_date_type_idx",
+          "columns": [
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "mileage_type",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "shoe_mileage_allocations_shoe_id_shoes_id_fk": {
+          "name": "shoe_mileage_allocations_shoe_id_shoes_id_fk",
+          "tableFrom": "shoe_mileage_allocations",
+          "tableTo": "shoes",
+          "columnsFrom": [
+            "shoe_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.shoe_observations": {
+      "name": "shoe_observations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "shoe_id": {
+          "name": "shoe_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "date": {
+          "name": "date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "shoe_mileage_at_entry": {
+          "name": "shoe_mileage_at_entry",
+          "type": "numeric(8, 2)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "entry_type": {
+          "name": "entry_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "checkpoint_miles": {
+          "name": "checkpoint_miles",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "title": {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "notes": {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cushioning": {
+          "name": "cushioning",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "stability": {
+          "name": "stability",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "traction_dry": {
+          "name": "traction_dry",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "traction_wet": {
+          "name": "traction_wet",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "comfort": {
+          "name": "comfort",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fit_security": {
+          "name": "fit_security",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "breathability": {
+          "name": "breathability",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "durability": {
+          "name": "durability",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "foot_comfort": {
+          "name": "foot_comfort",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "knee_comfort": {
+          "name": "knee_comfort",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "hip_back_comfort": {
+          "name": "hip_back_comfort",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "end_of_shift_support": {
+          "name": "end_of_shift_support",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "outsole_wear": {
+          "name": "outsole_wear",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "midsole_wear": {
+          "name": "midsole_wear",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "upper_wear": {
+          "name": "upper_wear",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "heel_wear": {
+          "name": "heel_wear",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "insole_wear": {
+          "name": "insole_wear",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "structural_deformation": {
+          "name": "structural_deformation",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "would_continue_wearing": {
+          "name": "would_continue_wearing",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "better_than_previous": {
+          "name": "better_than_previous",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "worse_than_previous": {
+          "name": "worse_than_previous",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "new_discomfort_patterns": {
+          "name": "new_discomfort_patterns",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "traction_changed": {
+          "name": "traction_changed",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "fit_changed": {
+          "name": "fit_changed",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "unexpected_events": {
+          "name": "unexpected_events",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "monitor_next": {
+          "name": "monitor_next",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "incident_type": {
+          "name": "incident_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "conditions": {
+          "name": "conditions",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "body_impact": {
+          "name": "body_impact",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "remained_in_service": {
+          "name": "remained_in_service",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "immediately_retired": {
+          "name": "immediately_retired",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "retrospective": {
+          "name": "retrospective",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "public": {
+          "name": "public",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "observations_shoe_date_idx": {
+          "name": "observations_shoe_date_idx",
+          "columns": [
+            {
+              "expression": "shoe_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "date",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "observations_checkpoint_unique_idx": {
+          "name": "observations_checkpoint_unique_idx",
+          "columns": [
+            {
+              "expression": "shoe_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "checkpoint_miles",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"shoe_observations\".\"entry_type\" = 'checkpoint'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "shoe_observations_shoe_id_shoes_id_fk": {
+          "name": "shoe_observations_shoe_id_shoes_id_fk",
+          "tableFrom": "shoe_observations",
+          "tableTo": "shoes",
+          "columnsFrom": [
+            "shoe_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.shoes": {
+      "name": "shoes",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "brand": {
+          "name": "brand",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "model": {
+          "name": "model",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "nickname": {
+          "name": "nickname",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "colorway": {
+          "name": "colorway",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "size": {
+          "name": "size",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "width": {
+          "name": "width",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "purchase_date": {
+          "name": "purchase_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "first_wear_date": {
+          "name": "first_wear_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "retirement_date": {
+          "name": "retirement_date",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "status": {
+          "name": "status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'planned'"
+        },
+        "acquisition_type": {
+          "name": "acquisition_type",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'purchased'"
+        },
+        "retail_price": {
+          "name": "retail_price",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "amount_paid": {
+          "name": "amount_paid",
+          "type": "numeric(10, 2)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "provider": {
+          "name": "provider",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "intended_use": {
+          "name": "intended_use",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "baseline_notes": {
+          "name": "baseline_notes",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "is_legacy_record": {
+          "name": "is_legacy_record",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "mileage_confidence": {
+          "name": "mileage_confidence",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'exact'"
+        },
+        "public": {
+          "name": "public",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
+        "retirement_reason": {
+          "name": "retirement_reason",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "retired_from_work_only": {
+          "name": "retired_from_work_only",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "failure_location": {
+          "name": "failure_location",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "would_buy_again": {
+          "name": "would_buy_again",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "ideal_user": {
+          "name": "ideal_user",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "who_should_avoid": {
+          "name": "who_should_avoid",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "final_verdict": {
+          "name": "final_verdict",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "final_review": {
+          "name": "final_review",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "post_work_status": {
+          "name": "post_work_status",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "shoes_one_active_idx": {
+          "name": "shoes_one_active_idx",
+          "columns": [
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "where": "\"shoes\".\"status\" = 'active'",
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "shoes_public_status_idx": {
+          "name": "shoes_public_status_idx",
+          "columns": [
+            {
+              "expression": "public",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "status",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "shoes_slug_unique": {
+          "name": "shoes_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    }
+  },
+  "enums": {},
+  "schemas": {},
+  "sequences": {},
+  "roles": {},
+  "policies": {},
+  "views": {},
+  "_meta": {
+    "columns": {},
+    "schemas": {},
+    "tables": {}
+  }
+}

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { fetchCarrierDispatches } from "@/lib/notion/carrier-journal.repo";
 import { CarrierJournalPage } from "@/components/carrier-journal/carrier-journal-page";
+import { isFootwearDbConfigured } from "@/lib/db";
+import { getActiveShoeSummary } from "@/lib/footwear/queries";
 
 export const revalidate = 300; // 5 minutes, matches Notion cache TTL
 
@@ -30,9 +32,14 @@ export const metadata: Metadata = {
 
 export default async function Page() {
   const notionDispatches = await fetchCarrierDispatches();
+  const footwearActive = isFootwearDbConfigured()
+    ? await getActiveShoeSummary({ publicOnly: true }).catch(() => null)
+    : null;
+
   return (
     <CarrierJournalPage
       dispatches={notionDispatches.length > 0 ? notionDispatches : undefined}
+      footwearActive={footwearActive}
     />
   );
 }

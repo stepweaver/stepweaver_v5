@@ -43,6 +43,10 @@ type Props = {
   token: string;
   /** Most recent recorded weight from Notion. Used as the active weight on non-Monday days. */
   latestWeightLbs?: number | null;
+  /** Shoes available for daily mileage assignment. */
+  footwearOptions?: { id: string; label: string; status: string }[];
+  /** Active shoe id selected by default. */
+  defaultFootwearShoeId?: string | null;
 };
 
 function todayIsoDate(): string {
@@ -50,7 +54,12 @@ function todayIsoDate(): string {
   return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
 }
 
-export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
+export function CarrierDaybookForm({
+  token,
+  latestWeightLbs,
+  footwearOptions = [],
+  defaultFootwearShoeId = null,
+}: Props) {
   const today = todayIsoDate();
 
   const [date, setDate] = useState(today);
@@ -78,6 +87,13 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
   const [fruitVegServings, setFruitVegServings] = useState<0 | 1 | 2 | 3 | null>(null);
   const [gatorade, setGatorade] = useState<0 | 1 | 2 | null>(null);
   const [mountainDewOz, setMountainDewOz] = useState("");
+
+  const [primaryShoeId, setPrimaryShoeId] = useState(defaultFootwearShoeId ?? "");
+  const [assignAllMiles, setAssignAllMiles] = useState(true);
+  const [splitMode, setSplitMode] = useState(false);
+  const [splitRows, setSplitRows] = useState<{ shoeId: string; miles: string }[]>([
+    { shoeId: defaultFootwearShoeId ?? "", miles: "" },
+  ]);
   const [postShiftMealQuality, setPostShiftMealQuality] = useState<MealQuality | null>(null);
 
   const [publicNote, setPublicNote] = useState("");
@@ -324,6 +340,33 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
       if (privateNote.trim()) body.privateNote = privateNote.trim();
       if (fuelInput) body.fuel = fuelInput;
 
+      if (footwearOptions.length > 0 && milesNum !== undefined) {
+        if (splitMode) {
+          const rows = splitRows
+            .filter((r) => r.shoeId && r.miles.trim())
+            .map((r) => ({
+              shoeId: r.shoeId,
+              miles: parseFloat(r.miles),
+            }));
+          if (rows.some((r) => !Number.isFinite(r.miles) || r.miles < 0)) {
+            setErrorMsg("Footwear split miles must be valid numbers (0 or greater).");
+            setSubmitStatus("error");
+            return;
+          }
+          const sum = rows.reduce((s, r) => s + r.miles, 0);
+          if (sum > milesNum + 0.05) {
+            setErrorMsg(
+              `Footwear allocations (${sum.toFixed(1)} mi) exceed daybook miles (${milesNum} mi).`
+            );
+            setSubmitStatus("error");
+            return;
+          }
+          if (rows.length > 0) body.footwearAllocations = rows;
+        } else if (assignAllMiles && primaryShoeId) {
+          body.footwearAllocations = [{ shoeId: primaryShoeId, miles: milesNum }];
+        }
+      }
+
       try {
         const res = await fetch("/api/carrier-journal/daybook", {
           method: "POST",
@@ -337,6 +380,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           dpsPerMile?: number | null;
           publicSummary?: string;
           mailLoadSummary?: string | null;
+          footwearWarning?: string;
           fuelScore?: number;
           fuelScoreLabel?: string;
           fuelIsWin?: boolean;
@@ -353,6 +397,10 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           fuelScoreLabel: data.fuelScoreLabel,
           fuelIsWin: data.fuelIsWin,
         });
+        if (data.footwearWarning) {
+          setErrorMsg(data.footwearWarning);
+        }
+        setSubmitStatus("idle");
       } catch (err) {
         setSubmitStatus("error");
         setErrorMsg(err instanceof Error ? err.message : "Failed to save carrier daybook entry.");
@@ -362,6 +410,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
       token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
       mood, energy, soreness, publicNote, privateNote, weatherTemp, weatherHeat, fuelInput,
+      footwearOptions, splitMode, splitRows, assignAllMiles, primaryShoeId,
     ]
   );
 
@@ -449,7 +498,7 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
         </div>
         <p className="text-xs text-[rgb(var(--text-meta))] leading-relaxed">
           DPS and parcel counts are compared to your own recent baseline (median of the last 30
-          logged days). Light, medium, and heavy are relative to you—not fixed numbers like 1,000 DPS.
+          logged days). Light, medium, and heavy are relative to you, not fixed numbers like 1,000 DPS.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -543,6 +592,125 @@ export function CarrierDaybookForm({ token, latestWeightLbs }: Props) {
           </div>
         </div>
       </div>
+
+      {footwearOptions.length > 0 && (
+        <div className="surface-panel p-5 space-y-4">
+          <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
+            FOOTWEAR
+          </div>
+          <p className="text-xs text-[rgb(var(--text-meta))] leading-relaxed">
+            Assign this day&apos;s occupational mileage to a shoe. The daybook miles
+            stay authoritative; this only routes them to Footwear Lab.
+          </p>
+          {!splitMode ? (
+            <>
+              <div>
+                <label
+                  htmlFor="db-primary-shoe"
+                  className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+                >
+                  PRIMARY SHOE
+                </label>
+                <select
+                  id="db-primary-shoe"
+                  value={primaryShoeId}
+                  onChange={(e) => setPrimaryShoeId(e.target.value)}
+                  className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-base px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none"
+                >
+                  <option value="">No assignment</option>
+                  {footwearOptions.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.label}
+                      {s.status === "active" ? " (ACTIVE)" : ""}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <label className="flex items-center gap-2 text-sm text-[rgb(var(--text-secondary))]">
+                <input
+                  type="checkbox"
+                  checked={assignAllMiles}
+                  onChange={(e) => setAssignAllMiles(e.target.checked)}
+                />
+                Assign all daily mileage to this shoe
+              </label>
+            </>
+          ) : (
+            <div className="space-y-3">
+              {splitRows.map((row, idx) => (
+                <div key={idx} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label
+                      htmlFor={`db-split-shoe-${idx}`}
+                      className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+                    >
+                      SHOE {idx + 1}
+                    </label>
+                    <select
+                      id={`db-split-shoe-${idx}`}
+                      value={row.shoeId}
+                      onChange={(e) =>
+                        setSplitRows((rows) =>
+                          rows.map((r, i) =>
+                            i === idx ? { ...r, shoeId: e.target.value } : r
+                          )
+                        )
+                      }
+                      className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] px-3 py-2"
+                    >
+                      <option value="">Select shoe</option>
+                      {footwearOptions.map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label
+                      htmlFor={`db-split-miles-${idx}`}
+                      className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+                    >
+                      MILES
+                    </label>
+                    <input
+                      id={`db-split-miles-${idx}`}
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      value={row.miles}
+                      onChange={(e) =>
+                        setSplitRows((rows) =>
+                          rows.map((r, i) =>
+                            i === idx ? { ...r, miles: e.target.value } : r
+                          )
+                        )
+                      }
+                      className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] px-3 py-2"
+                    />
+                  </div>
+                </div>
+              ))}
+              <button
+                type="button"
+                onClick={() =>
+                  setSplitRows((rows) => [...rows, { shoeId: "", miles: "" }])
+                }
+                className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] underline"
+              >
+                + Add shoe split
+              </button>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => setSplitMode((v) => !v)}
+            className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))] hover:text-[rgb(var(--neon))]"
+          >
+            {splitMode ? "Use single primary shoe" : "Split day between shoes"}
+          </button>
+        </div>
+      )}
 
       {/* Weather - read-only, auto-filled for today */}
       <div className="surface-panel p-5 space-y-4">

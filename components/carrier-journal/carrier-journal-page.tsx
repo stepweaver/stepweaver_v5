@@ -14,11 +14,13 @@ import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
 import { CarrierFieldCalendar } from "./carrier-field-calendar";
 import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 import { CarrierProfileCard } from "./carrier-profile-card";
+import { FootwearActiveLoadoutCard } from "@/components/footwear/footwear-active-loadout-card";
+import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
 
 const TRACKING_ITEMS = [
   { category: "Physical load", detail: "Miles walked, soreness, energy, and mood" },
   { category: "Hydration and fuel", detail: "Water, Gatorade, route snacks, hunger and thirst adjustments" },
-  { category: "Transformation", detail: "Weekly weight trend — pounds lost, not raw weight" },
+  { category: "Transformation", detail: "Weekly weight trend: pounds lost, not raw weight" },
   { category: "Environmental load", detail: "Heat index and weather derived from temp + field notes" },
   { category: "Operational load", detail: "Mail load tier from DPS + parcels vs your baseline" },
   { category: "Published narrative", detail: "Route-day reflections and field notes" },
@@ -103,9 +105,13 @@ const WHY_THIS_BELONGS = [
 
 type Props = {
   dispatches?: CarrierDispatch[];
+  footwearActive?: ShoeDerivedSummary | null;
 };
 
-export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {}) {
+export function CarrierJournalPage({
+  dispatches: notionDispatches,
+  footwearActive = null,
+}: Props = {}) {
   // All published rows feed aggregates (KPIs, calendar, milestones).
   // Only rows with authored content appear in the feed.
   const dispatches = enrichDispatchesFields(notionDispatches ?? getCarrierDispatches());
@@ -150,6 +156,27 @@ export function CarrierJournalPage({ dispatches: notionDispatches }: Props = {})
             names, coworker names, route numbers, scanner data, or internal USPS operational details.
           </p>
         </div>
+
+        {footwearActive ? (
+          <FootwearActiveLoadoutCard summary={footwearActive} />
+        ) : (
+          <div className="border border-[rgb(var(--neon)/0.2)] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-1">
+                FOOTWEAR LAB
+              </p>
+              <p className="text-sm text-[rgb(var(--text-secondary))]">
+                Equipment roster for route footwear: mileage, checkpoints, condition.
+              </p>
+            </div>
+            <Link
+              href="/carrier-journal/footwear"
+              className="inline-flex shrink-0 border border-[rgb(var(--neon)/0.4)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)]"
+            >
+              ENTER FOOTWEAR LAB
+            </Link>
+          </div>
+        )}
 
         {/* KPI Grid */}
         <div>
