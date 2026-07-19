@@ -1,25 +1,19 @@
-/** Mileage aggregation for Carrier Footwear Lab. */
+/** Mileage aggregation for Carrier Footwear Lab (occupational miles only). */
 
 export type MileageAllocationInput = {
   date: string;
   miles: number;
-  mileageType: "work" | "personal" | "estimated" | "adjustment";
+  mileageType: "work" | "estimated" | "adjustment";
 };
 
 export type MileageBreakdown = {
   totalMiles: number;
-  /** Miles assigned from the field log (and any legacy "personal" rows). */
+  /** Miles assigned from the Carrier Journal daybook. */
   loggedMiles: number;
   /** Baseline / prior miles seeded before daybook tracking. */
   priorMiles: number;
   adjustmentMiles: number;
   daysWorn: number;
-  /** @deprecated Use loggedMiles — kept for older callers. */
-  workMiles: number;
-  /** @deprecated Personal is no longer distinguished; always 0. */
-  personalMiles: number;
-  /** @deprecated Use priorMiles. */
-  estimatedMiles: number;
 };
 
 function round1(n: number): number {
@@ -32,23 +26,32 @@ export function toMilesNumber(value: string | number | null | undefined): number
   return Number.isFinite(n) ? n : 0;
 }
 
+/** Normalize legacy DB values; anything non-prior/non-adjustment counts as work. */
+export function normalizeMileageType(
+  value: string
+): MileageAllocationInput["mileageType"] {
+  if (value === "estimated") return "estimated";
+  if (value === "adjustment") return "adjustment";
+  return "work";
+}
+
 export function aggregateMileage(
   allocations: MileageAllocationInput[]
 ): MileageBreakdown {
   let loggedMiles = 0;
   let priorMiles = 0;
   let adjustmentMiles = 0;
-  const dates = new Set<string>();
+  /** Days the shoe was assigned on the daybook — not prior-seed lump dates. */
+  const wornDates = new Set<string>();
 
   for (const a of allocations) {
     const miles = toMilesNumber(a.miles);
-    if (miles === 0 && a.mileageType !== "adjustment") continue;
-    dates.add(a.date);
-    switch (a.mileageType) {
+    const mileageType = normalizeMileageType(a.mileageType);
+    if (miles === 0 && mileageType !== "adjustment") continue;
+    switch (mileageType) {
       case "work":
-      case "personal":
-        // All footwear mileage is occupational; fold legacy personal into logged.
         loggedMiles += miles;
+        wornDates.add(a.date);
         break;
       case "estimated":
         priorMiles += miles;
@@ -59,21 +62,53 @@ export function aggregateMileage(
     }
   }
 
-  const totalMiles = round1(loggedMiles + priorMiles + adjustmentMiles);
-  const logged = round1(loggedMiles);
-  const prior = round1(priorMiles);
-  const adjustment = round1(adjustmentMiles);
-
   return {
-    totalMiles,
-    loggedMiles: logged,
-    priorMiles: prior,
-    adjustmentMiles: adjustment,
-    daysWorn: dates.size,
-    workMiles: logged,
-    personalMiles: 0,
-    estimatedMiles: prior,
+    totalMiles: round1(loggedMiles + priorMiles + adjustmentMiles),
+    loggedMiles: round1(loggedMiles),
+    priorMiles: round1(priorMiles),
+    adjustmentMiles: round1(adjustmentMiles),
+    daysWorn: wornDates.size,
   };
+}
+
+/**
+ * Days worn = unique daybook assignment dates, plus Carrier Journal days in the
+ * shoe's service window when prior/legacy mileage was seeded as a lump sum.
+ * Prior seed rows do not count as a single "day worn."
+ */
+export function resolveDaysWorn(input: {
+  allocations: MileageAllocationInput[];
+  firstWearDate: string | null | undefined;
+  retirementDate?: string | null;
+  /** Carrier Journal days with miles (date + milesWalked). */
+  carrierDays?: { date: string; miles: number }[];
+}): number {
+  const base = aggregateMileage(input.allocations);
+  const dates = new Set<string>();
+
+  for (const a of input.allocations) {
+    if (normalizeMileageType(a.mileageType) !== "work") continue;
+    if (toMilesNumber(a.miles) === 0) continue;
+    dates.add(a.date);
+  }
+
+  const needsCarrierBackfill = base.priorMiles > 0;
+  const start = input.firstWearDate ?? null;
+  if (!needsCarrierBackfill || !start || !input.carrierDays?.length) {
+    return dates.size || base.daysWorn;
+  }
+
+  const end =
+    input.retirementDate ??
+    new Date().toISOString().slice(0, 10);
+
+  for (const day of input.carrierDays) {
+    if (day.miles <= 0) continue;
+    if (day.date < start || day.date > end) continue;
+    dates.add(day.date);
+  }
+
+  return dates.size;
 }
 
 /** Work allocations for a single day must not exceed daybook miles. */

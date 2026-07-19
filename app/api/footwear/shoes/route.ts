@@ -106,17 +106,6 @@ export async function POST(request: Request) {
       });
     }
 
-    // Legacy clients may still send estimatedPersonalMiles; fold into prior miles.
-    if (data.estimatedPersonalMiles && data.estimatedPersonalMiles > 0) {
-      await createAllocation({
-        shoeId: shoe.id,
-        date: seedDate,
-        miles: data.estimatedPersonalMiles,
-        mileageType: "estimated",
-        notes: "Prior mileage (legacy personal seed folded into occupational total).",
-      });
-    }
-
     return NextResponse.json({ ok: true, shoe }, { status: 201 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to create shoe";

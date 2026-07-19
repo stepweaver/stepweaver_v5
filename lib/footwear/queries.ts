@@ -18,6 +18,8 @@ import {
   aggregateMileage,
   costPer100Miles,
   costPerMile,
+  normalizeMileageType,
+  resolveDaysWorn,
   toMilesNumber,
 } from "@/lib/footwear/mileage";
 import {
@@ -36,6 +38,7 @@ import {
   type CheckpointObservation,
 } from "@/lib/footwear/stats";
 import { LEGACY_PUBLIC_DISCLAIMER } from "@/lib/footwear/legacy";
+import { fetchCarrierDispatches } from "@/lib/notion/carrier-journal.repo";
 
 export type ShoeDerivedSummary = {
   shoe: Shoe;
@@ -47,6 +50,8 @@ export type ShoeDerivedSummary = {
   checkpointProgress: ReturnType<typeof buildCheckpointProgress>;
   condition: ReturnType<typeof getCurrentCondition>;
   conditionLabel: ReturnType<typeof deriveConditionLabel>;
+  /** Amount paid for the pair, if recorded. */
+  amountPaid: number | null;
   costPerMile: number | null;
   costPer100Miles: number | null;
   milesBeforeDecline: number | null;
@@ -92,15 +97,23 @@ export function deriveShoeSummary(
   shoe: Shoe,
   allocations: ShoeMileageAllocation[],
   observations: ShoeObservation[],
-  media: ShoeMedia[] = []
+  media: ShoeMedia[] = [],
+  carrierDays: { date: string; miles: number }[] = []
 ): ShoeDerivedSummary {
-  const mileage = aggregateMileage(
-    allocations.map((a) => ({
-      date: a.date,
-      miles: toMilesNumber(a.miles),
-      mileageType: a.mileageType,
-    }))
-  );
+  const allocationInputs = allocations.map((a) => ({
+    date: a.date,
+    miles: toMilesNumber(a.miles),
+    mileageType: normalizeMileageType(a.mileageType),
+  }));
+  const mileage = {
+    ...aggregateMileage(allocationInputs),
+    daysWorn: resolveDaysWorn({
+      allocations: allocationInputs,
+      firstWearDate: shoe.firstWearDate,
+      retirementDate: shoe.retirementDate,
+      carrierDays,
+    }),
+  };
   const checkpointObs = toCheckpointObs(observations);
   const completedCheckpoints = checkpointObs.map((o) => ({
     checkpointMiles: o.checkpointMiles,
@@ -128,12 +141,27 @@ export function deriveShoeSummary(
     }),
     condition,
     conditionLabel: deriveConditionLabel(condition),
+    amountPaid: paid,
     costPerMile: costPerMile(paid, mileage.totalMiles),
     costPer100Miles: costPer100Miles(paid, mileage.totalMiles),
     milesBeforeDecline: milesBeforeFirstDecline(checkpointObs),
     heroImageUrl: hero?.imageUrl ?? null,
     legacyDisclaimer: shoe.isLegacyRecord ? LEGACY_PUBLIC_DISCLAIMER : null,
   };
+}
+
+async function loadCarrierDaysForFootwear(): Promise<
+  { date: string; miles: number }[]
+> {
+  try {
+    const dispatches = await fetchCarrierDispatches();
+    return dispatches.map((d) => ({
+      date: d.date,
+      miles: d.milesWalked,
+    }));
+  } catch {
+    return [];
+  }
 }
 
 export async function listShoes(opts?: {
@@ -239,12 +267,13 @@ export async function getShoeSummaryBySlug(
 ): Promise<ShoeDerivedSummary | null> {
   const shoe = await getShoeBySlug(slug, opts);
   if (!shoe) return null;
-  const [allocations, observations, media] = await Promise.all([
+  const [allocations, observations, media, carrierDays] = await Promise.all([
     getAllocationsForShoe(shoe.id),
     getObservationsForShoe(shoe.id, opts),
     getMediaForShoe(shoe.id, opts),
+    loadCarrierDaysForFootwear(),
   ]);
-  return deriveShoeSummary(shoe, allocations, observations, media);
+  return deriveShoeSummary(shoe, allocations, observations, media, carrierDays);
 }
 
 export async function getActiveShoeSummary(opts?: {
@@ -253,18 +282,20 @@ export async function getActiveShoeSummary(opts?: {
   const shoe = await getActiveShoe();
   if (!shoe) return null;
   if (opts?.publicOnly && !shoe.public) return null;
-  const [allocations, observations, media] = await Promise.all([
+  const [allocations, observations, media, carrierDays] = await Promise.all([
     getAllocationsForShoe(shoe.id),
     getObservationsForShoe(shoe.id, opts),
     getMediaForShoe(shoe.id, opts),
+    loadCarrierDaysForFootwear(),
   ]);
-  return deriveShoeSummary(shoe, allocations, observations, media);
+  return deriveShoeSummary(shoe, allocations, observations, media, carrierDays);
 }
 
 export async function listShoeSummaries(opts?: {
   publicOnly?: boolean;
 }): Promise<ShoeDerivedSummary[]> {
   const all = await listShoes(opts);
+  const carrierDays = await loadCarrierDaysForFootwear();
   const results: ShoeDerivedSummary[] = [];
   for (const shoe of all) {
     const [allocations, observations, media] = await Promise.all([
@@ -272,7 +303,9 @@ export async function listShoeSummaries(opts?: {
       getObservationsForShoe(shoe.id, opts),
       getMediaForShoe(shoe.id, opts),
     ]);
-    results.push(deriveShoeSummary(shoe, allocations, observations, media));
+    results.push(
+      deriveShoeSummary(shoe, allocations, observations, media, carrierDays)
+    );
   }
   return results;
 }
@@ -362,7 +395,7 @@ export async function createAllocation(input: {
   shoeId: string;
   date: string;
   miles: number;
-  mileageType: "work" | "personal" | "estimated" | "adjustment";
+  mileageType: "work" | "estimated" | "adjustment";
   notes?: string;
   carrierLogNotionPageId?: string;
 }): Promise<ShoeMileageAllocation> {
@@ -441,7 +474,7 @@ export async function getShoeMileageTotal(shoeId: string): Promise<number> {
     allocations.map((a) => ({
       date: a.date,
       miles: toMilesNumber(a.miles),
-      mileageType: a.mileageType,
+      mileageType: normalizeMileageType(a.mileageType),
     }))
   ).totalMiles;
 }

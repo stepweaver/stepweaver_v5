@@ -68,8 +68,6 @@ export const createShoeSchema = footwearAuthSchema.extend({
   mileageConfidence: z.enum(mileageConfidenceLevels).default("exact"),
   public: z.boolean().default(false),
   estimatedWorkMiles: z.number().finite().min(0).optional(),
-  /** @deprecated Folded into prior/estimated mileage; no personal track. */
-  estimatedPersonalMiles: z.number().finite().min(0).optional(),
 });
 
 export type CreateShoeInput = z.infer<typeof createShoeSchema>;

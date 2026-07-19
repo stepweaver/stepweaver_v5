@@ -12,6 +12,7 @@ import {
   validateWorkAllocationSplit,
   costPerMile,
   costPer100Miles,
+  resolveDaysWorn,
 } from "@/lib/footwear/mileage";
 import {
   deriveConditionLabel,
@@ -141,7 +142,7 @@ describe("footwear mileage", () => {
   it("aggregates logged, prior, and adjustment miles", () => {
     const result = aggregateMileage([
       { date: "2026-05-01", miles: 10.4, mileageType: "work" },
-      { date: "2026-05-01", miles: 2, mileageType: "personal" },
+      { date: "2026-05-01", miles: 2, mileageType: "work" },
       { date: "2026-04-01", miles: 200, mileageType: "estimated" },
       { date: "2026-05-02", miles: -5, mileageType: "adjustment" },
     ]);
@@ -149,10 +150,28 @@ describe("footwear mileage", () => {
     expect(result.priorMiles).toBe(200);
     expect(result.adjustmentMiles).toBe(-5);
     expect(result.totalMiles).toBe(207.4);
-    expect(result.personalMiles).toBe(0);
-    expect(result.workMiles).toBe(12.4);
-    expect(result.estimatedMiles).toBe(200);
-    expect(result.daysWorn).toBe(3);
+    // Prior seed date does not count as a day worn.
+    expect(result.daysWorn).toBe(1);
+  });
+
+  it("resolves days worn from carrier log when prior miles were seeded", () => {
+    const days = resolveDaysWorn({
+      allocations: [
+        { date: "2026-05-18", miles: 283.2, mileageType: "estimated" },
+        { date: "2026-07-17", miles: 12.5, mileageType: "work" },
+        { date: "2026-07-18", miles: 13, mileageType: "work" },
+      ],
+      firstWearDate: "2026-05-18",
+      carrierDays: [
+        { date: "2026-05-18", miles: 11 },
+        { date: "2026-05-19", miles: 12 },
+        { date: "2026-05-20", miles: 0 },
+        { date: "2026-07-17", miles: 12.5 },
+        { date: "2026-07-18", miles: 13 },
+      ],
+    });
+    // Carrier days with miles in the service window (zero-mile day excluded).
+    expect(days).toBe(4);
   });
 
   it("validates split allocations against daybook miles", () => {

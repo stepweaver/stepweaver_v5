@@ -23,7 +23,7 @@ type Props = {
 
 const METHOD_POINTS = [
   "Occupational mileage comes from Carrier Journal daily logs, never re-entered here.",
-  "All Footwear Lab pairs are work shoes — no separate personal mileage track.",
+  "Footwear Lab tracks work miles only.",
   "One primary shoe is tested at a time as the active loadout.",
   "Checkpoint reviews occur at standardized mileage thresholds.",
   "Random field notes may be added between checkpoints.",

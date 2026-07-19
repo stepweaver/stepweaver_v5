@@ -37,7 +37,6 @@ export type MileageConfidence = (typeof mileageConfidenceLevels)[number];
 
 export const mileageTypes = [
   "work",
-  "personal",
   "estimated",
   "adjustment",
 ] as const;

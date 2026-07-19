@@ -90,10 +90,6 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
           <StatRow label="STATUS" value={shoe.status.toUpperCase()} />
           <StatRow label="LEVEL" value={level.title.toUpperCase()} />
           <StatRow label="MILEAGE" value={`${mileage.totalMiles} MI`} />
-          <StatRow label="LOGGED MI" value={mileage.loggedMiles} />
-          {mileage.priorMiles > 0 && (
-            <StatRow label="PRIOR MI" value={mileage.priorMiles} />
-          )}
           {mileage.adjustmentMiles !== 0 && (
             <StatRow label="ADJUSTMENT" value={mileage.adjustmentMiles} />
           )}
@@ -103,6 +99,16 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
           <StatRow label="ACQUISITION" value={shoe.acquisitionType.replace(/_/g, " ")} />
           {shoe.firstWearDate && (
             <StatRow label="DEPLOYED" value={shoe.firstWearDate} />
+          )}
+          {summary.amountPaid != null && (
+            <StatRow
+              label="PAID"
+              value={
+                Number.isInteger(summary.amountPaid)
+                  ? `$${summary.amountPaid}`
+                  : `$${summary.amountPaid.toFixed(2)}`
+              }
+            />
           )}
           {summary.costPer100Miles != null && (
             <StatRow label="COST / 100 MI" value={`$${summary.costPer100Miles}`} />
