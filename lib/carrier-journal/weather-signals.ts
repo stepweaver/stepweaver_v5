@@ -23,6 +23,11 @@ function narrativeText(dispatch: CarrierDispatch): string {
   return [dispatch.weather, dispatch.publicNote].filter(Boolean).join(" ");
 }
 
+/** Strip "storm door(s)" so residential door mentions don't flag weather storms. */
+function textForStormMatch(text: string): string {
+  return text.replace(/\bstorm\s+doors?\b/gi, " ");
+}
+
 const STORM_PATTERN =
   /\b(storm|stormy|thunder|lightning|hail|tornado|wind gust|gusty)\b/i;
 const SNOW_PATTERN =
@@ -37,7 +42,7 @@ const SNOW_PATTERN =
 export function deriveWeatherSignals(dispatch: CarrierDispatch): DerivedWeatherSignals {
   const text = narrativeText(dispatch);
 
-  const stormFromText = STORM_PATTERN.test(text);
+  const stormFromText = STORM_PATTERN.test(textForStormMatch(text));
   const snowFromText = SNOW_PATTERN.test(text);
   const snowFromTemp =
     dispatch.temperatureF !== undefined && dispatch.temperatureF <= FREEZING_THRESHOLD_F;

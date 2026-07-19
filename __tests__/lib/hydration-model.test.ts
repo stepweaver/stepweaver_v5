@@ -82,6 +82,33 @@ describe("weather signals rain is manual only", () => {
   });
 });
 
+describe("weather signals storm text", () => {
+  it("ignores storm door mentions", () => {
+    const signals = deriveWeatherSignals(
+      dispatch({
+        id: "a",
+        date: "2026-06-15",
+        title: "A",
+        publicNote:
+          "Two dogs jumped on the storm door. Ideal weather day otherwise.",
+      })
+    );
+    expect(signals.storm).toBe(false);
+  });
+
+  it("still flags real storm language", () => {
+    const signals = deriveWeatherSignals(
+      dispatch({
+        id: "a",
+        date: "2026-06-15",
+        title: "A",
+        publicNote: "Thunder and lightning rolled through mid-route.",
+      })
+    );
+    expect(signals.storm).toBe(true);
+  });
+});
+
 describe("dual-ZIP hourly merge", () => {
   it("keeps the hotter hour and max precip", () => {
     const merged = mergeHourlyPoints(
