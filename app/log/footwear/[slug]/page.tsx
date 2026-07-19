@@ -7,7 +7,10 @@ import { CarrierPrivateNav } from "@/components/carrier-journal/carrier-private-
 import { FootwearShoeManageClient } from "@/components/footwear/footwear-shoe-manage-client";
 import { verifyCarrierLogSecret } from "@/lib/notion/carrier-journal.repo";
 import { isFootwearDbConfigured } from "@/lib/db";
-import { getShoeSummaryBySlug } from "@/lib/footwear/queries";
+import {
+  getObservationsForShoe,
+  getShoeSummaryBySlug,
+} from "@/lib/footwear/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -20,6 +23,40 @@ type Props = {
   params: Promise<{ slug: string }>;
   searchParams: Promise<{ token?: string }>;
 };
+
+function serializeObservation(
+  o: Awaited<ReturnType<typeof getObservationsForShoe>>[number]
+) {
+  return {
+    id: o.id,
+    date: o.date,
+    entryType: o.entryType,
+    checkpointMiles: o.checkpointMiles,
+    title: o.title,
+    notes: o.notes,
+    cushioning: o.cushioning,
+    stability: o.stability,
+    tractionDry: o.tractionDry,
+    tractionWet: o.tractionWet,
+    comfort: o.comfort,
+    fitSecurity: o.fitSecurity,
+    breathability: o.breathability,
+    durability: o.durability,
+    footComfort: o.footComfort,
+    kneeComfort: o.kneeComfort,
+    hipBackComfort: o.hipBackComfort,
+    endOfShiftSupport: o.endOfShiftSupport,
+    outsoleWear: o.outsoleWear,
+    midsoleWear: o.midsoleWear,
+    upperWear: o.upperWear,
+    heelWear: o.heelWear,
+    insoleWear: o.insoleWear,
+    structuralDeformation: o.structuralDeformation,
+    retrospective: o.retrospective,
+    public: o.public,
+    shoeMileageAtEntry: o.shoeMileageAtEntry,
+  };
+}
 
 export default async function ManageShoePage({ params, searchParams }: Props) {
   const { slug } = await params;
@@ -55,6 +92,7 @@ export default async function ManageShoePage({ params, searchParams }: Props) {
   const pending = summary.checkpointProgress.filter(
     (c) => c.status === "assessment_pending"
   );
+  const observations = await getObservationsForShoe(summary.shoe.id);
 
   return (
     <main className="flex-1 pt-12 pb-16">
@@ -84,6 +122,7 @@ export default async function ManageShoePage({ params, searchParams }: Props) {
             miles: p.miles,
             title: p.title,
           }))}
+          observations={observations.map(serializeObservation)}
         />
       </div>
     </main>

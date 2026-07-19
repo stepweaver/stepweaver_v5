@@ -1,6 +1,7 @@
 import {
   groupDispatchesByDate,
   getCalendarIntensity,
+  getPrimaryCondition,
   getWeatherMarkers,
   formatCalendarDate,
   buildCalendarGrid,
@@ -106,6 +107,51 @@ describe("getCalendarIntensity", () => {
   it("returns 4 for 11+ miles", () => {
     const day: DaySummary = { ...emptyDay("2026-05-20"), hasDispatch: true, totalMiles: 11.3 };
     expect(getCalendarIntensity(day)).toBe(4);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// getPrimaryCondition
+// ---------------------------------------------------------------------------
+
+describe("getPrimaryCondition", () => {
+  it("returns null for an empty day", () => {
+    expect(getPrimaryCondition(emptyDay("2026-05-20"))).toBeNull();
+  });
+
+  it("returns null for a clear logged day", () => {
+    const day: DaySummary = { ...emptyDay("2026-05-20"), hasDispatch: true, totalMiles: 10 };
+    expect(getPrimaryCondition(day)).toBeNull();
+  });
+
+  it("prefers heat90 over rain when both apply", () => {
+    const day: DaySummary = {
+      ...emptyDay("2026-07-18"),
+      hasDispatch: true,
+      totalMiles: 13,
+      rain: true,
+      heat90: true,
+    };
+    expect(getPrimaryCondition(day)).toBe("heat90");
+  });
+
+  it("prefers storm over rain", () => {
+    const day: DaySummary = {
+      ...emptyDay("2026-05-20"),
+      hasDispatch: true,
+      rain: true,
+      storm: true,
+    };
+    expect(getPrimaryCondition(day)).toBe("storm");
+  });
+
+  it("returns rain when it is the only marker", () => {
+    const day: DaySummary = {
+      ...emptyDay("2026-05-20"),
+      hasDispatch: true,
+      rain: true,
+    };
+    expect(getPrimaryCondition(day)).toBe("rain");
   });
 });
 

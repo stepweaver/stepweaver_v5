@@ -8,11 +8,18 @@ export type MileageAllocationInput = {
 
 export type MileageBreakdown = {
   totalMiles: number;
-  workMiles: number;
-  personalMiles: number;
-  estimatedMiles: number;
+  /** Miles assigned from the field log (and any legacy "personal" rows). */
+  loggedMiles: number;
+  /** Baseline / prior miles seeded before daybook tracking. */
+  priorMiles: number;
   adjustmentMiles: number;
   daysWorn: number;
+  /** @deprecated Use loggedMiles — kept for older callers. */
+  workMiles: number;
+  /** @deprecated Personal is no longer distinguished; always 0. */
+  personalMiles: number;
+  /** @deprecated Use priorMiles. */
+  estimatedMiles: number;
 };
 
 function round1(n: number): number {
@@ -28,9 +35,8 @@ export function toMilesNumber(value: string | number | null | undefined): number
 export function aggregateMileage(
   allocations: MileageAllocationInput[]
 ): MileageBreakdown {
-  let workMiles = 0;
-  let personalMiles = 0;
-  let estimatedMiles = 0;
+  let loggedMiles = 0;
+  let priorMiles = 0;
   let adjustmentMiles = 0;
   const dates = new Set<string>();
 
@@ -40,13 +46,12 @@ export function aggregateMileage(
     dates.add(a.date);
     switch (a.mileageType) {
       case "work":
-        workMiles += miles;
-        break;
       case "personal":
-        personalMiles += miles;
+        // All footwear mileage is occupational; fold legacy personal into logged.
+        loggedMiles += miles;
         break;
       case "estimated":
-        estimatedMiles += miles;
+        priorMiles += miles;
         break;
       case "adjustment":
         adjustmentMiles += miles;
@@ -54,17 +59,20 @@ export function aggregateMileage(
     }
   }
 
-  const totalMiles = round1(
-    workMiles + personalMiles + estimatedMiles + adjustmentMiles
-  );
+  const totalMiles = round1(loggedMiles + priorMiles + adjustmentMiles);
+  const logged = round1(loggedMiles);
+  const prior = round1(priorMiles);
+  const adjustment = round1(adjustmentMiles);
 
   return {
     totalMiles,
-    workMiles: round1(workMiles),
-    personalMiles: round1(personalMiles),
-    estimatedMiles: round1(estimatedMiles),
-    adjustmentMiles: round1(adjustmentMiles),
+    loggedMiles: logged,
+    priorMiles: prior,
+    adjustmentMiles: adjustment,
     daysWorn: dates.size,
+    workMiles: logged,
+    personalMiles: 0,
+    estimatedMiles: prior,
   };
 }
 

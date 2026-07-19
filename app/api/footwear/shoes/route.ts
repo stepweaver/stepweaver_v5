@@ -101,20 +101,19 @@ export async function POST(request: Request) {
         miles: data.estimatedWorkMiles,
         mileageType: "estimated",
         notes: data.isLegacyRecord
-          ? "Legacy estimated work mileage prior to Footwear Lab."
-          : "Estimated work mileage seed.",
+          ? "Legacy prior mileage before Footwear Lab tracking."
+          : "Prior mileage seed.",
       });
     }
 
+    // Legacy clients may still send estimatedPersonalMiles; fold into prior miles.
     if (data.estimatedPersonalMiles && data.estimatedPersonalMiles > 0) {
       await createAllocation({
         shoeId: shoe.id,
         date: seedDate,
         miles: data.estimatedPersonalMiles,
-        mileageType: "personal",
-        notes: data.isLegacyRecord
-          ? "Legacy estimated personal mileage."
-          : "Estimated personal mileage seed.",
+        mileageType: "estimated",
+        notes: "Prior mileage (legacy personal seed folded into occupational total).",
       });
     }
 

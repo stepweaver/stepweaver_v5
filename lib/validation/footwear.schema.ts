@@ -68,6 +68,7 @@ export const createShoeSchema = footwearAuthSchema.extend({
   mileageConfidence: z.enum(mileageConfidenceLevels).default("exact"),
   public: z.boolean().default(false),
   estimatedWorkMiles: z.number().finite().min(0).optional(),
+  /** @deprecated Folded into prior/estimated mileage; no personal track. */
   estimatedPersonalMiles: z.number().finite().min(0).optional(),
 });
 
@@ -152,6 +153,47 @@ export const createObservationSchema = footwearAuthSchema.extend({
   immediatelyRetired: z.boolean().optional(),
   retrospective: z.boolean().default(false),
   public: z.boolean().default(false),
+});
+
+export const updateObservationSchema = footwearAuthSchema.extend({
+  id: z.string().min(1),
+  date: optionalDateSchema,
+  checkpointMiles: z.number().int().min(0).optional().nullable(),
+  title: z.string().trim().max(160).optional().nullable(),
+  notes: z.string().trim().min(1).max(8000).optional(),
+  cushioning: rating1to10.nullable(),
+  stability: rating1to10.nullable(),
+  tractionDry: rating1to10.nullable(),
+  tractionWet: rating1to10.nullable(),
+  comfort: rating1to10.nullable(),
+  fitSecurity: rating1to10.nullable(),
+  breathability: rating1to10.nullable(),
+  durability: rating1to10.nullable(),
+  footComfort: rating1to10.nullable(),
+  kneeComfort: rating1to10.nullable(),
+  hipBackComfort: rating1to10.nullable(),
+  endOfShiftSupport: rating1to10.nullable(),
+  outsoleWear: wear0to5.nullable(),
+  midsoleWear: wear0to5.nullable(),
+  upperWear: wear0to5.nullable(),
+  heelWear: wear0to5.nullable(),
+  insoleWear: wear0to5.nullable(),
+  structuralDeformation: wear0to5.nullable(),
+  wouldContinueWearing: z.boolean().optional().nullable(),
+  betterThanPrevious: z.string().trim().max(2000).optional().nullable(),
+  worseThanPrevious: z.string().trim().max(2000).optional().nullable(),
+  newDiscomfortPatterns: z.string().trim().max(2000).optional().nullable(),
+  tractionChanged: z.string().trim().max(2000).optional().nullable(),
+  fitChanged: z.string().trim().max(2000).optional().nullable(),
+  unexpectedEvents: z.string().trim().max(2000).optional().nullable(),
+  monitorNext: z.string().trim().max(2000).optional().nullable(),
+  incidentType: z.string().trim().max(80).optional().nullable(),
+  conditions: z.string().trim().max(500).optional().nullable(),
+  bodyImpact: z.string().trim().max(2000).optional().nullable(),
+  remainedInService: z.boolean().optional().nullable(),
+  immediatelyRetired: z.boolean().optional().nullable(),
+  retrospective: z.boolean().optional(),
+  public: z.boolean().optional(),
 });
 
 export const retireShoeSchema = footwearAuthSchema.extend({

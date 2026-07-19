@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, type CSSProperties } from "react";
 import type { CarrierDispatch } from "@/lib/data/carrier-journal";
 import {
   buildCalendarGrid,
   getCalendarIntensity,
+  getPrimaryCondition,
   formatCalendarDate,
   formatCalendarWeekday,
+  type CalendarCondition,
   type DaySummary,
 } from "@/lib/data/carrier-calendar";
 
@@ -21,45 +23,63 @@ const MONTH_NAMES = [
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ] as const;
 
-// Intensity fill classes: index 0–4
-const INTENSITY_STYLE: Record<0 | 1 | 2 | 3 | 4, string> = {
-  0: "bg-[rgb(var(--window)/0.4)] border border-[rgb(var(--border)/0.15)]",
-  1: "bg-[rgb(var(--neon)/0.18)]",
-  2: "bg-[rgb(var(--neon)/0.38)]",
-  3: "bg-[rgb(var(--neon)/0.62)]",
-  4: "bg-[rgb(var(--neon)/0.88)] shadow-[0_0_4px_rgb(var(--neon)/0.4)]",
+/** Miles intensity → fill alpha (shared by clear-day neon and condition hues). */
+const INTENSITY_ALPHA: Record<1 | 2 | 3 | 4, number> = {
+  1: 0.18,
+  2: 0.38,
+  3: 0.62,
+  4: 0.88,
 };
+
+/** RGB channel triples (CSS vars or literal) for condition fills. */
+const CONDITION_RGB: Record<CalendarCondition, string> = {
+  heat90: "var(--danger)",
+  storm: "var(--purple)",
+  snow: "200, 230, 255",
+  belowZero: "180, 220, 255",
+  rain: "var(--cyan)",
+  heat80: "var(--warn)",
+  freezing: "var(--blue)",
+};
+
+const CONDITION_LABEL: Record<CalendarCondition, string> = {
+  heat90: "Heat 90°+",
+  storm: "Storm",
+  snow: "Snow",
+  belowZero: "Below 0°",
+  rain: "Rain",
+  heat80: "Heat 80°+",
+  freezing: "Freezing",
+};
+
+function emptyCellClass(): string {
+  return "bg-[rgb(var(--window)/0.4)] border border-[rgb(var(--border)/0.15)]";
+}
+
+function cellFillStyle(day: DaySummary): { className: string; style?: CSSProperties } {
+  const intensity = getCalendarIntensity(day);
+  if (intensity === 0) return { className: emptyCellClass() };
+
+  const alpha = INTENSITY_ALPHA[intensity];
+  const condition = getPrimaryCondition(day);
+  const rgb = condition ? CONDITION_RGB[condition] : "var(--neon)";
+  const glow =
+    intensity === 4
+      ? { boxShadow: `0 0 4px rgb(${rgb} / 0.4)` }
+      : undefined;
+
+  return {
+    className: "",
+    style: {
+      backgroundColor: `rgb(${rgb} / ${alpha})`,
+      ...glow,
+    },
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
-
-function WeatherPips({ day }: { day: DaySummary }) {
-  const pips: { color: string; title: string }[] = [];
-
-  if (day.storm) pips.push({ color: "rgb(var(--purple))", title: "Storm" });
-  else if (day.rain) pips.push({ color: "rgb(var(--cyan))", title: "Rain" });
-  if (day.snow) pips.push({ color: "rgb(200,230,255)", title: "Snow" });
-  if (day.heat90) pips.push({ color: "rgb(var(--danger))", title: "Heat 90°F+" });
-  else if (day.heat80) pips.push({ color: "rgb(var(--warn))", title: "Heat 80°F+" });
-  if (day.belowZero) pips.push({ color: "rgb(180,220,255)", title: "Below 0°F" });
-  else if (day.freezing) pips.push({ color: "rgb(var(--blue))", title: "Freezing" });
-
-  if (pips.length === 0) return null;
-
-  return (
-    <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-px pointer-events-none">
-      {pips.slice(0, 3).map((p) => (
-        <span
-          key={p.title}
-          title={p.title}
-          className="block w-[3px] h-[3px] rounded-full shrink-0"
-          style={{ backgroundColor: p.color }}
-        />
-      ))}
-    </div>
-  );
-}
 
 function DayCell({
   day,
@@ -72,18 +92,19 @@ function DayCell({
   isFuture: boolean;
   onClick: (_day: DaySummary) => void;
 }) {
-  const intensity = getCalendarIntensity(day);
-  const base = INTENSITY_STYLE[intensity];
+  const fill = cellFillStyle(day);
+  const condition = getPrimaryCondition(day);
+  const conditionHint = condition ? `, ${CONDITION_LABEL[condition]}` : "";
 
   return (
     <button
       type="button"
       onClick={() => onClick(day)}
-      aria-label={`${formatCalendarDate(day.date)}${day.hasDispatch ? `, ${day.totalMiles} mi` : ", no log"}`}
+      aria-label={`${formatCalendarDate(day.date)}${day.hasDispatch ? `, ${day.totalMiles} mi${conditionHint}` : ", no log"}`}
       aria-pressed={isSelected}
       className={[
         "relative w-[14px] h-[14px] sm:w-[15px] sm:h-[15px] flex-shrink-0",
-        base,
+        fill.className,
         isFuture && !day.hasDispatch ? "opacity-20" : "",
         isSelected ? "ring-1 ring-[rgb(var(--neon))] ring-offset-1 ring-offset-[rgb(var(--bg))]" : "",
         day.hasDispatch ? "cursor-pointer hover:ring-1 hover:ring-[rgb(var(--neon)/0.5)]" : "cursor-default",
@@ -91,9 +112,8 @@ function DayCell({
       ]
         .filter(Boolean)
         .join(" ")}
-    >
-      <WeatherPips day={day} />
-    </button>
+      style={fill.style}
+    />
   );
 }
 
@@ -230,46 +250,59 @@ function SelectedDayPanel({ day, onClose }: { day: DaySummary; onClose: () => vo
 // ---------------------------------------------------------------------------
 
 function CalendarLegend() {
+  const conditionEntries: { key: CalendarCondition; label: string }[] = [
+    { key: "rain", label: "Rain" },
+    { key: "storm", label: "Storm" },
+    { key: "snow", label: "Snow" },
+    { key: "heat80", label: "Heat 80°+" },
+    { key: "heat90", label: "Heat 90°+" },
+    { key: "freezing", label: "Freezing" },
+  ];
+
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2">
-      {/* Intensity scale */}
-      <div className="flex items-center gap-1">
+    <div className="mt-4 flex flex-col gap-2">
+      {/* Miles = brightness within whatever hue the cell uses */}
+      <div className="flex items-center gap-1 flex-wrap">
         <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))] mr-1">
           MILES
         </span>
-        {([0, 1, 2, 3, 4] as const).map((level) => (
+        <span className={`block w-[12px] h-[12px] shrink-0 ${emptyCellClass()}`} title="No log" />
+        {([1, 2, 3, 4] as const).map((level) => (
           <span
             key={level}
-            className={`block w-[12px] h-[12px] shrink-0 ${INTENSITY_STYLE[level]}`}
+            className="block w-[12px] h-[12px] shrink-0"
+            style={{
+              backgroundColor: `rgb(var(--neon) / ${INTENSITY_ALPHA[level]})`,
+              ...(level === 4
+                ? { boxShadow: "0 0 4px rgb(var(--neon) / 0.4)" }
+                : undefined),
+            }}
             title={
-              level === 0
-                ? "No log"
-                : level === 1
-                  ? "< 7 mi"
-                  : level === 2
-                    ? "7–9 mi"
-                    : level === 3
-                      ? "9–11 mi"
-                      : "11+ mi"
+              level === 1
+                ? "< 7 mi"
+                : level === 2
+                  ? "7–9 mi"
+                  : level === 3
+                    ? "9–11 mi"
+                    : "11+ mi"
             }
           />
         ))}
-        <span className="font-[var(--font-ocr)] text-[9px] text-[rgb(var(--text-meta))] ml-1">more</span>
+        <span className="font-[var(--font-ocr)] text-[9px] text-[rgb(var(--text-meta))] ml-1">
+          brighter = more
+        </span>
       </div>
 
-      {/* Event pips */}
-      <div className="flex items-center gap-3">
-        {[
-          { color: "rgb(var(--cyan))", label: "Rain" },
-          { color: "rgb(var(--purple))", label: "Storm" },
-          { color: "rgb(200,230,255)", label: "Snow" },
-          { color: "rgb(var(--warn))", label: "Heat" },
-          { color: "rgb(var(--yellow))", label: "Dog" },
-        ].map(({ color, label }) => (
-          <span key={label} className="flex items-center gap-1">
+      {/* Condition = fill hue (primary when several apply) */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))]">
+          CONDITIONS
+        </span>
+        {conditionEntries.map(({ key, label }) => (
+          <span key={key} className="flex items-center gap-1">
             <span
-              className="block w-[5px] h-[5px] rounded-full shrink-0"
-              style={{ backgroundColor: color }}
+              className="block w-[12px] h-[12px] shrink-0"
+              style={{ backgroundColor: `rgb(${CONDITION_RGB[key]} / 0.72)` }}
             />
             <span className="font-[var(--font-ocr)] text-[9px] text-[rgb(var(--text-meta))]">
               {label}
@@ -331,7 +364,7 @@ export function CarrierFieldCalendar({ dispatches }: Props) {
         )}
       </div>
       <p className="font-[var(--font-ocr)] text-[10px] tracking-wide text-[rgb(var(--text-label))] mb-4">
-        Logged field days, miles, weather, and route experience.
+        Hue = primary condition. Brightness = miles.
       </p>
 
       <div className="surface-panel p-4 sm:p-5">

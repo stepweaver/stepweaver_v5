@@ -138,18 +138,20 @@ describe("footwear checkpoints", () => {
 });
 
 describe("footwear mileage", () => {
-  it("aggregates work personal estimated and adjustments", () => {
+  it("aggregates logged, prior, and adjustment miles", () => {
     const result = aggregateMileage([
       { date: "2026-05-01", miles: 10.4, mileageType: "work" },
       { date: "2026-05-01", miles: 2, mileageType: "personal" },
       { date: "2026-04-01", miles: 200, mileageType: "estimated" },
       { date: "2026-05-02", miles: -5, mileageType: "adjustment" },
     ]);
-    expect(result.workMiles).toBe(10.4);
-    expect(result.personalMiles).toBe(2);
-    expect(result.estimatedMiles).toBe(200);
+    expect(result.loggedMiles).toBe(12.4);
+    expect(result.priorMiles).toBe(200);
     expect(result.adjustmentMiles).toBe(-5);
     expect(result.totalMiles).toBe(207.4);
+    expect(result.personalMiles).toBe(0);
+    expect(result.workMiles).toBe(12.4);
+    expect(result.estimatedMiles).toBe(200);
     expect(result.daysWorn).toBe(3);
   });
 

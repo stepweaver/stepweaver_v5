@@ -12,6 +12,7 @@ import {
   type ShoeMedia,
   type ShoeStatus,
   type NewShoe,
+  type NewShoeObservation,
 } from "@/lib/db/schema";
 import {
   aggregateMileage,
@@ -393,6 +394,32 @@ export async function createObservation(
     .values({ ...input, id: input.id ?? createId("obs") })
     .returning();
   return row;
+}
+
+export async function getObservationById(
+  id: string
+): Promise<ShoeObservation | null> {
+  if (!isFootwearDbConfigured()) return null;
+  const db = getDb();
+  const rows = await db
+    .select()
+    .from(shoeObservations)
+    .where(eq(shoeObservations.id, id))
+    .limit(1);
+  return rows[0] ?? null;
+}
+
+export async function updateObservation(
+  id: string,
+  patch: Partial<NewShoeObservation>
+): Promise<ShoeObservation | null> {
+  const db = getDb();
+  const [row] = await db
+    .update(shoeObservations)
+    .set({ ...patch, updatedAt: new Date() })
+    .where(eq(shoeObservations.id, id))
+    .returning();
+  return row ?? null;
 }
 
 export async function createMedia(

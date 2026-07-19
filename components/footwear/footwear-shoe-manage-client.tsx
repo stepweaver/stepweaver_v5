@@ -3,6 +3,36 @@
 import { useState } from "react";
 import { getSuggestedCheckpoint } from "@/lib/footwear/checkpoints";
 
+export type ManageObservation = {
+  id: string;
+  date: string;
+  entryType: string;
+  checkpointMiles: number | null;
+  title: string | null;
+  notes: string;
+  cushioning: number | null;
+  stability: number | null;
+  tractionDry: number | null;
+  tractionWet: number | null;
+  comfort: number | null;
+  fitSecurity: number | null;
+  breathability: number | null;
+  durability: number | null;
+  footComfort: number | null;
+  kneeComfort: number | null;
+  hipBackComfort: number | null;
+  endOfShiftSupport: number | null;
+  outsoleWear: number | null;
+  midsoleWear: number | null;
+  upperWear: number | null;
+  heelWear: number | null;
+  insoleWear: number | null;
+  structuralDeformation: number | null;
+  retrospective: boolean;
+  public: boolean;
+  shoeMileageAtEntry: string | number | null;
+};
+
 type Props = {
   token: string;
   shoe: {
@@ -16,6 +46,7 @@ type Props = {
   };
   totalMiles: number;
   pendingCheckpoints: { miles: number; title: string }[];
+  observations?: ManageObservation[];
 };
 
 const RATING_FIELDS = [
@@ -45,11 +76,18 @@ const WEAR_FIELDS = [
   ["structuralDeformation", "Structural deformation"],
 ] as const;
 
+const EDITABLE_ENTRY_TYPES = new Set(["checkpoint", "field_note", "incident"]);
+
+function numToField(v: number | null | undefined): string {
+  return v == null ? "" : String(v);
+}
+
 export function FootwearShoeManageClient({
   token,
   shoe,
   totalMiles,
   pendingCheckpoints,
+  observations: initialObservations = [],
 }: Props) {
   const [tab, setTab] = useState<
     "checkpoint" | "field_note" | "incident" | "allocation" | "retire" | "photo"
@@ -57,6 +95,8 @@ export function FootwearShoeManageClient({
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [observations, setObservations] = useState(initialObservations);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const suggested = getSuggestedCheckpoint({
     totalMiles,
@@ -80,7 +120,7 @@ export function FootwearShoeManageClient({
   const [retrospective, setRetrospective] = useState(shoe.isLegacyRecord);
 
   const [allocMiles, setAllocMiles] = useState("");
-  const [allocType, setAllocType] = useState("personal");
+  const [allocType, setAllocType] = useState("estimated");
   const [allocNotes, setAllocNotes] = useState("");
 
   const [retireReason, setRetireReason] = useState("cushioning_degradation");
@@ -94,13 +134,55 @@ export function FootwearShoeManageClient({
   const [photoCaption, setPhotoCaption] = useState("");
   const [photoPublic, setPhotoPublic] = useState(true);
 
-  function ratingPayload() {
-    const out: Record<string, number> = {};
+  function ratingPayload(forUpdate = false) {
+    const out: Record<string, number | null> = {};
     for (const [key] of [...RATING_FIELDS, ...BODY_FIELDS, ...WEAR_FIELDS]) {
       const v = ratings[key];
       if (v != null && v !== "") out[key] = parseInt(v, 10);
+      else if (forUpdate) out[key] = null;
     }
     return out;
+  }
+
+  function resetObservationForm() {
+    setEditingId(null);
+    setCheckpointMiles(String(suggested.miles));
+    setDate(new Date().toISOString().slice(0, 10));
+    setNotes("");
+    setTitle(suggested.title ?? "");
+    setRatings({});
+    setPublicObs(true);
+    setRetrospective(shoe.isLegacyRecord);
+  }
+
+  function startEdit(obs: ManageObservation) {
+    if (!EDITABLE_ENTRY_TYPES.has(obs.entryType)) {
+      setError("This entry type cannot be edited here.");
+      return;
+    }
+    setError(null);
+    setMessage(null);
+    setEditingId(obs.id);
+    setTab(
+      obs.entryType === "checkpoint"
+        ? "checkpoint"
+        : obs.entryType === "incident"
+          ? "incident"
+          : "field_note"
+    );
+    setDate(obs.date);
+    setCheckpointMiles(
+      obs.checkpointMiles != null ? String(obs.checkpointMiles) : ""
+    );
+    setTitle(obs.title ?? "");
+    setNotes(obs.notes);
+    setPublicObs(obs.public);
+    setRetrospective(obs.retrospective);
+    const next: Record<string, string> = {};
+    for (const [key] of [...RATING_FIELDS, ...BODY_FIELDS, ...WEAR_FIELDS]) {
+      next[key] = numToField(obs[key]);
+    }
+    setRatings(next);
   }
 
   async function submitObservation(entryType: string) {
@@ -108,22 +190,24 @@ export function FootwearShoeManageClient({
     setError(null);
     setMessage(null);
     try {
+      const isEdit = editingId != null;
       const body: Record<string, unknown> = {
         logSecret: token,
-        shoeId: shoe.id,
+        ...(isEdit
+          ? { id: editingId }
+          : { shoeId: shoe.id, entryType }),
         date,
-        entryType,
-        title: title || undefined,
+        title: title || null,
         notes,
         public: publicObs,
         retrospective,
-        ...ratingPayload(),
+        ...ratingPayload(isEdit),
       };
-      if (entryType === "checkpoint") {
+      if (entryType === "checkpoint" || (isEdit && checkpointMiles !== "")) {
         body.checkpointMiles = parseInt(checkpointMiles, 10);
       }
       const res = await fetch("/api/footwear/observations", {
-        method: "POST",
+        method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
@@ -132,9 +216,20 @@ export function FootwearShoeManageClient({
         setError(data.error ?? "Save failed");
         return;
       }
-      setMessage(`${entryType} saved at ${totalMiles} mi service mileage.`);
-      setNotes("");
-      setTitle("");
+      const saved = data.observation as ManageObservation;
+      if (isEdit) {
+        setObservations((list) =>
+          list.map((o) => (o.id === saved.id ? { ...o, ...saved } : o))
+        );
+        setMessage(`Updated ${entryType} entry.`);
+        resetObservationForm();
+      } else {
+        setObservations((list) => [saved, ...list]);
+        setMessage(`${entryType} saved at ${totalMiles} mi service mileage.`);
+        setNotes("");
+        setTitle("");
+        setRatings({});
+      }
     } finally {
       setBusy(false);
     }
@@ -277,7 +372,10 @@ export function FootwearShoeManageClient({
             type="button"
             role="tab"
             aria-selected={tab === id}
-            onClick={() => setTab(id)}
+            onClick={() => {
+              if (editingId) resetObservationForm();
+              setTab(id);
+            }}
             className={`border px-3 py-2 font-[var(--font-ocr)] text-[10px] tracking-widest uppercase focus-visible:outline focus-visible:outline-2 focus-visible:outline-[rgb(var(--neon))] ${
               tab === id
                 ? "border-[rgb(var(--neon))] text-[rgb(var(--neon))] bg-[rgb(var(--neon)/0.12)]"
@@ -300,6 +398,52 @@ export function FootwearShoeManageClient({
         </p>
       )}
 
+      {observations.length > 0 && (
+        <section className="surface-panel p-5 space-y-3" aria-labelledby="history-heading">
+          <h2
+            id="history-heading"
+            className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))]"
+          >
+            SERVICE HISTORY
+          </h2>
+          <ul className="space-y-2">
+            {observations.map((obs) => (
+              <li
+                key={obs.id}
+                className={`flex flex-col sm:flex-row sm:items-center gap-2 justify-between border p-3 ${
+                  editingId === obs.id
+                    ? "border-[rgb(var(--neon))] bg-[rgb(var(--neon)/0.08)]"
+                    : "border-[rgb(var(--neon)/0.2)]"
+                }`}
+              >
+                <div className="min-w-0">
+                  <p className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))]">
+                    {obs.entryType.replace(/_/g, " ").toUpperCase()}
+                    {obs.checkpointMiles != null ? ` // ${obs.checkpointMiles} MI` : ""}
+                    {` // ${obs.date}`}
+                    {obs.retrospective ? " // RETROSPECTIVE" : ""}
+                  </p>
+                  <p className="text-sm text-[rgb(var(--text-color))] truncate">
+                    {obs.title || obs.notes.slice(0, 80)}
+                    {!obs.title && obs.notes.length > 80 ? "…" : ""}
+                  </p>
+                </div>
+                {EDITABLE_ENTRY_TYPES.has(obs.entryType) && (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => startEdit(obs)}
+                    className="shrink-0 border border-[rgb(var(--neon)/0.4)] px-3 py-2 font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[rgb(var(--neon))]"
+                  >
+                    {editingId === obs.id ? "Editing…" : "Edit"}
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
+
       {(tab === "checkpoint" || tab === "field_note" || tab === "incident") && (
         <form
           className="surface-panel p-5 space-y-4"
@@ -310,6 +454,11 @@ export function FootwearShoeManageClient({
             );
           }}
         >
+          {editingId && (
+            <p className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
+              EDITING ENTRY // {editingId.slice(0, 12).toUpperCase()}…
+            </p>
+          )}
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label htmlFor="obs-date" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
@@ -468,21 +617,36 @@ export function FootwearShoeManageClient({
             </label>
           </div>
 
-          <button
-            type="submit"
-            disabled={busy}
-            className="glitch-button px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.2em] uppercase"
-          >
-            {busy ? "Saving…" : "Submit"}
-          </button>
+          <div className="flex flex-wrap gap-3">
+            <button
+              type="submit"
+              disabled={busy}
+              className="glitch-button px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.2em] uppercase"
+            >
+              {busy ? "Saving…" : editingId ? "Save changes" : "Submit"}
+            </button>
+            {editingId && (
+              <button
+                type="button"
+                disabled={busy}
+                onClick={() => {
+                  resetObservationForm();
+                  setMessage(null);
+                }}
+                className="border border-[rgb(var(--neon)/0.35)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.2em] uppercase text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--neon)/0.6)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[rgb(var(--neon))]"
+              >
+                Cancel
+              </button>
+            )}
+          </div>
         </form>
       )}
 
       {tab === "allocation" && (
         <form className="surface-panel p-5 space-y-4" onSubmit={submitAllocation}>
           <p className="text-sm text-[rgb(var(--text-secondary))]">
-            Use this for personal mileage, legacy estimates, or corrections.
-            Work miles should normally be assigned from the daily field log.
+            Use this for prior/baseline mileage or corrections. Day-to-day miles
+            should normally be assigned from the daily field log.
           </p>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
@@ -519,10 +683,9 @@ export function FootwearShoeManageClient({
                 onChange={(e) => setAllocType(e.target.value)}
                 className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm"
               >
-                <option value="personal">Personal</option>
-                <option value="estimated">Estimated</option>
+                <option value="estimated">Prior / baseline</option>
                 <option value="adjustment">Adjustment</option>
-                <option value="work">Work (manual)</option>
+                <option value="work">Logged (manual)</option>
               </select>
             </div>
             <div>

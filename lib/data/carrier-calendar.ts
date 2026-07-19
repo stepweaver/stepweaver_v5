@@ -73,6 +73,32 @@ export function getCalendarIntensity(day: DaySummary): 0 | 1 | 2 | 3 | 4 {
   return 4;
 }
 
+/** Dominant weather condition used for calendar cell fill hue. */
+export type CalendarCondition =
+  | "heat90"
+  | "storm"
+  | "snow"
+  | "belowZero"
+  | "rain"
+  | "heat80"
+  | "freezing";
+
+/**
+ * Picks one primary condition when a day has several markers.
+ * Order favors the most operationally severe signal for a walking route.
+ */
+export function getPrimaryCondition(day: DaySummary): CalendarCondition | null {
+  if (!day.hasDispatch) return null;
+  if (day.heat90) return "heat90";
+  if (day.storm) return "storm";
+  if (day.snow) return "snow";
+  if (day.belowZero) return "belowZero";
+  if (day.rain) return "rain";
+  if (day.heat80) return "heat80";
+  if (day.freezing) return "freezing";
+  return null;
+}
+
 /**
  * Derives weather/condition markers from a single CarrierDispatch.
  * Heat is detected from temperatureF or heatIndexF (whichever is higher).

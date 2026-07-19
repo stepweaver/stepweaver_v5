@@ -90,10 +90,12 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
           <StatRow label="STATUS" value={shoe.status.toUpperCase()} />
           <StatRow label="LEVEL" value={level.title.toUpperCase()} />
           <StatRow label="MILEAGE" value={`${mileage.totalMiles} MI`} />
-          <StatRow label="WORK MI" value={mileage.workMiles} />
-          <StatRow label="PERSONAL MI" value={mileage.personalMiles} />
-          {mileage.estimatedMiles > 0 && (
-            <StatRow label="ESTIMATED MI" value={mileage.estimatedMiles} />
+          <StatRow label="LOGGED MI" value={mileage.loggedMiles} />
+          {mileage.priorMiles > 0 && (
+            <StatRow label="PRIOR MI" value={mileage.priorMiles} />
+          )}
+          {mileage.adjustmentMiles !== 0 && (
+            <StatRow label="ADJUSTMENT" value={mileage.adjustmentMiles} />
           )}
           <StatRow label="DAYS WORN" value={mileage.daysWorn} />
           <StatRow label="CONDITION" value={conditionLabel} />

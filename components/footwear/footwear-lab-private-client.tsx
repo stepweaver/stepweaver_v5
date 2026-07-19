@@ -32,7 +32,6 @@ const emptyForm = {
   mileageConfidence: "estimated",
   public: true,
   estimatedWorkMiles: "250",
-  estimatedPersonalMiles: "",
   amountPaid: "",
   purchaseDate: "",
   firstWearDate: "",
@@ -100,9 +99,6 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
           baselineNotes: form.baselineNotes || undefined,
           estimatedWorkMiles: form.estimatedWorkMiles
             ? parseFloat(form.estimatedWorkMiles)
-            : undefined,
-          estimatedPersonalMiles: form.estimatedPersonalMiles
-            ? parseFloat(form.estimatedPersonalMiles)
             : undefined,
         }),
       });
@@ -280,8 +276,8 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
           CREATE SHOE PROFILE
         </h2>
         <p className="text-sm text-[rgb(var(--text-secondary))]">
-          Defaults are set for the legacy HOKA Bondi 9. Clear estimated miles for
-          a true Mile 0 pair.
+          Defaults are set for the legacy HOKA Bondi 9. Clear prior miles for a
+          true Mile 0 pair.
         </p>
         <form onSubmit={onCreate} className="grid gap-4 sm:grid-cols-2">
           {(
@@ -294,8 +290,7 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
               ["purchaseDate", "Purchase date", "date"],
               ["firstWearDate", "First wear date", "date"],
               ["amountPaid", "Amount paid", "text"],
-              ["estimatedWorkMiles", "Estimated work miles", "text"],
-              ["estimatedPersonalMiles", "Estimated personal miles", "text"],
+              ["estimatedWorkMiles", "Prior miles", "text"],
             ] as const
           ).map(([key, label, inputType]) => (
             <div key={key}>
