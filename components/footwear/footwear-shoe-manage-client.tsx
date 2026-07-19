@@ -547,7 +547,7 @@ export function FootwearShoeManageClient({
                           value={String(t.miles)}
                           disabled={logged}
                         >
-                          {t.miles} mi — {t.title}
+                          {t.miles} mi // {t.title}
                           {logged ? " (logged)" : ""}
                         </option>
                       );
