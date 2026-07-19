@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
 import type { ShoeObservation, ShoeMedia } from "@/lib/db/schema";
+import type { RatingTrendPoint } from "@/lib/footwear/stats";
 import { FootwearCheckpointPath } from "./footwear-checkpoint-path";
 import { getObservationTrends } from "@/lib/footwear/queries";
 
@@ -10,6 +11,14 @@ type Props = {
   observations: ShoeObservation[];
   media: ShoeMedia[];
 };
+
+const TREND_METRICS = [
+  ["cushioning", "CUSHIONING"],
+  ["stability", "STABILITY"],
+  ["comfort", "COMFORT"],
+  ["durability", "DURABILITY"],
+  ["endOfShiftSupport", "END-OF-SHIFT SUPPORT"],
+] as const;
 
 function StatRow({ label, value }: { label: string; value: string | number }) {
   return (
@@ -21,6 +30,108 @@ function StatRow({ label, value }: { label: string; value: string | number }) {
         {value}
       </span>
     </div>
+  );
+}
+
+function LifecycleTrendsSection({
+  trends,
+}: {
+  trends: Record<(typeof TREND_METRICS)[number][0], RatingTrendPoint[]>;
+}) {
+  const checkpoints = trends.cushioning.map((p) => ({
+    miles: p.checkpointMiles,
+    retrospective: p.retrospective,
+  }));
+  const hasRetrospective = checkpoints.some((c) => c.retrospective);
+  const singleCheckpoint = checkpoints.length === 1;
+
+  return (
+    <section className="space-y-4">
+      <div className="space-y-2">
+        <h2 className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))]">
+          LIFECYCLE TRENDS
+        </h2>
+        {singleCheckpoint ? (
+          <p className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))]">
+            {checkpoints[0].miles} MI
+            {checkpoints[0].retrospective ? " // RETROSPECTIVE" : ""}
+          </p>
+        ) : (
+          <p className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))]">
+            {checkpoints.map((c) => c.miles).join(" · ")} MI CHECKPOINTS
+          </p>
+        )}
+        {hasRetrospective && (
+          <p className="text-sm text-[rgb(var(--text-secondary))]">
+            Retrospective scores were logged looking back — not scored live at
+            that checkpoint.
+          </p>
+        )}
+      </div>
+
+      {singleCheckpoint ? (
+        <div className="grid gap-3 sm:grid-cols-2">
+          {TREND_METRICS.map(([key, label]) => (
+            <div
+              key={key}
+              className="flex justify-between gap-4 border border-[rgb(var(--neon)/0.15)] px-3 py-2"
+            >
+              <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
+                {label}
+              </span>
+              <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-color))]">
+                {trends[key][0]?.value ?? "-"}
+              </span>
+            </div>
+          ))}
+        </div>
+      ) : (
+        <div className="overflow-x-auto border border-[rgb(var(--neon)/0.15)]">
+          <table className="w-full min-w-[20rem] border-collapse text-left">
+            <thead>
+              <tr className="border-b border-[rgb(var(--neon)/0.15)]">
+                <th className="px-3 py-2 font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] font-normal">
+                  METRIC
+                </th>
+                {checkpoints.map((c) => (
+                  <th
+                    key={c.miles}
+                    className="px-3 py-2 font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] font-normal"
+                  >
+                    {c.miles} MI
+                    {c.retrospective ? (
+                      <span className="block text-[rgb(var(--warn))]">
+                        RETROSPECTIVE
+                      </span>
+                    ) : null}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {TREND_METRICS.map(([key, label]) => (
+                <tr
+                  key={key}
+                  className="border-b border-[rgb(var(--neon)/0.1)] last:border-b-0"
+                >
+                  <td className="px-3 py-2 font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
+                    {label}
+                  </td>
+                  {trends[key].map((p) => (
+                    <td
+                      key={`${key}-${p.checkpointMiles}`}
+                      className="px-3 py-2 font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-color))]"
+                    >
+                      {p.value ?? "-"}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }
 
@@ -140,51 +251,7 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
       </section>
 
       {trends.ratings.cushioning.length > 0 && (
-        <section className="space-y-4">
-          <h2 className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))]">
-            LIFECYCLE TRENDS
-          </h2>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {(
-              [
-                ["cushioning", "CUSHIONING"],
-                ["stability", "STABILITY"],
-                ["comfort", "COMFORT"],
-                ["durability", "DURABILITY"],
-                ["endOfShiftSupport", "END-OF-SHIFT SUPPORT"],
-              ] as const
-            ).map(([key, label]) => {
-              const points = trends.ratings[key];
-              const showMiles = points.length > 1;
-              return (
-                <div key={key} className="border border-[rgb(var(--neon)/0.15)] p-3">
-                  <p className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] mb-2">
-                    {label}
-                  </p>
-                  <ul className="space-y-1">
-                    {points.map((p) => (
-                      <li
-                        key={`${key}-${p.checkpointMiles}`}
-                        className={`flex font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-color))] ${
-                          showMiles || p.retrospective ? "justify-between" : "justify-end"
-                        }`}
-                      >
-                        {(showMiles || p.retrospective) && (
-                          <span>
-                            {showMiles
-                              ? `${p.checkpointMiles} MI${p.retrospective ? " · RETRO" : ""}`
-                              : "RETRO"}
-                          </span>
-                        )}
-                        <span>{p.value ?? "-"}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              );
-            })}
-          </div>
-        </section>
+        <LifecycleTrendsSection trends={trends.ratings} />
       )}
 
       {publicNotes.length > 0 && (
