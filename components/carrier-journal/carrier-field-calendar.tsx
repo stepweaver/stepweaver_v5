@@ -6,6 +6,7 @@ import {
   buildCalendarGrid,
   getCalendarIntensity,
   getPrimaryCondition,
+  getSecondaryConditions,
   formatCalendarDate,
   formatCalendarWeekday,
   type CalendarCondition,
@@ -81,6 +82,24 @@ function cellFillStyle(day: DaySummary): { className: string; style?: CSSPropert
 // Sub-components
 // ---------------------------------------------------------------------------
 
+function SecondaryPips({ day }: { day: DaySummary }) {
+  const secondary = getSecondaryConditions(day).slice(0, 2);
+  if (secondary.length === 0) return null;
+
+  return (
+    <div className="absolute bottom-0.5 left-0 right-0 flex justify-center gap-px pointer-events-none">
+      {secondary.map((condition) => (
+        <span
+          key={condition}
+          title={CONDITION_LABEL[condition]}
+          className="block w-[3px] h-[3px] rounded-full shrink-0"
+          style={{ backgroundColor: `rgb(${CONDITION_RGB[condition]})` }}
+        />
+      ))}
+    </div>
+  );
+}
+
 function DayCell({
   day,
   isSelected,
@@ -93,14 +112,19 @@ function DayCell({
   onClick: (_day: DaySummary) => void;
 }) {
   const fill = cellFillStyle(day);
-  const condition = getPrimaryCondition(day);
-  const conditionHint = condition ? `, ${CONDITION_LABEL[condition]}` : "";
+  const primary = getPrimaryCondition(day);
+  const secondary = getSecondaryConditions(day);
+  const primaryHint = primary ? `, ${CONDITION_LABEL[primary]}` : "";
+  const secondaryHint =
+    secondary.length > 0
+      ? ` + ${secondary.map((c) => CONDITION_LABEL[c]).join(", ")}`
+      : "";
 
   return (
     <button
       type="button"
       onClick={() => onClick(day)}
-      aria-label={`${formatCalendarDate(day.date)}${day.hasDispatch ? `, ${day.totalMiles} mi${conditionHint}` : ", no log"}`}
+      aria-label={`${formatCalendarDate(day.date)}${day.hasDispatch ? `, ${day.totalMiles} mi${primaryHint}${secondaryHint}` : ", no log"}`}
       aria-pressed={isSelected}
       className={[
         "relative w-[14px] h-[14px] sm:w-[15px] sm:h-[15px] flex-shrink-0",
@@ -113,7 +137,9 @@ function DayCell({
         .filter(Boolean)
         .join(" ")}
       style={fill.style}
-    />
+    >
+      <SecondaryPips day={day} />
+    </button>
   );
 }
 
@@ -309,6 +335,15 @@ function CalendarLegend() {
             </span>
           </span>
         ))}
+        <span className="flex items-center gap-1 ml-1">
+          <span
+            className="block w-[5px] h-[5px] rounded-full shrink-0"
+            style={{ backgroundColor: "rgb(var(--cyan))" }}
+          />
+          <span className="font-[var(--font-ocr)] text-[9px] text-[rgb(var(--text-meta))]">
+            +dot = secondary
+          </span>
+        </span>
       </div>
     </div>
   );
@@ -364,7 +399,7 @@ export function CarrierFieldCalendar({ dispatches }: Props) {
         )}
       </div>
       <p className="font-[var(--font-ocr)] text-[10px] tracking-wide text-[rgb(var(--text-label))] mb-4">
-        Hue = primary condition. Brightness = miles.
+        Hue = primary condition. Dot = secondary. Brightness = miles.
       </p>
 
       <div className="surface-panel p-4 sm:p-5">

@@ -83,20 +83,58 @@ export type CalendarCondition =
   | "heat80"
   | "freezing";
 
+/** Most → least severe; primary fill uses the first active entry. */
+export const CONDITION_SEVERITY: readonly CalendarCondition[] = [
+  "heat90",
+  "storm",
+  "snow",
+  "belowZero",
+  "rain",
+  "heat80",
+  "freezing",
+] as const;
+
+/**
+ * Active conditions for a day (mutually exclusive pairs collapsed:
+ * heat90 vs heat80, belowZero vs freezing).
+ */
+export function getActiveConditions(day: DaySummary): CalendarCondition[] {
+  if (!day.hasDispatch) return [];
+
+  const active: CalendarCondition[] = [];
+  if (day.heat90) active.push("heat90");
+  else if (day.heat80) active.push("heat80");
+  if (day.storm) active.push("storm");
+  if (day.snow) active.push("snow");
+  if (day.belowZero) active.push("belowZero");
+  else if (day.freezing) active.push("freezing");
+  if (day.rain) active.push("rain");
+  return active;
+}
+
 /**
  * Picks one primary condition when a day has several markers.
  * Order favors the most operationally severe signal for a walking route.
  */
 export function getPrimaryCondition(day: DaySummary): CalendarCondition | null {
-  if (!day.hasDispatch) return null;
-  if (day.heat90) return "heat90";
-  if (day.storm) return "storm";
-  if (day.snow) return "snow";
-  if (day.belowZero) return "belowZero";
-  if (day.rain) return "rain";
-  if (day.heat80) return "heat80";
-  if (day.freezing) return "freezing";
+  const active = new Set(getActiveConditions(day));
+  for (const condition of CONDITION_SEVERITY) {
+    if (active.has(condition)) return condition;
+  }
   return null;
+}
+
+/** Less-severe conditions shown as pips when the fill already encodes the primary. */
+export function getSecondaryConditions(day: DaySummary): CalendarCondition[] {
+  const primary = getPrimaryCondition(day);
+  if (!primary) return [];
+  const primaryRank = CONDITION_SEVERITY.indexOf(primary);
+  return getActiveConditions(day)
+    .filter((c) => c !== primary)
+    .sort(
+      (a, b) => CONDITION_SEVERITY.indexOf(a) - CONDITION_SEVERITY.indexOf(b)
+    )
+    .filter((c) => CONDITION_SEVERITY.indexOf(c) > primaryRank);
 }
 
 /**

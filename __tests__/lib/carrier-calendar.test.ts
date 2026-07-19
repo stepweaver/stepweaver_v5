@@ -2,6 +2,7 @@ import {
   groupDispatchesByDate,
   getCalendarIntensity,
   getPrimaryCondition,
+  getSecondaryConditions,
   getWeatherMarkers,
   formatCalendarDate,
   buildCalendarGrid,
@@ -152,6 +153,48 @@ describe("getPrimaryCondition", () => {
       rain: true,
     };
     expect(getPrimaryCondition(day)).toBe("rain");
+  });
+});
+
+describe("getSecondaryConditions", () => {
+  it("returns empty when only one condition applies", () => {
+    const day: DaySummary = {
+      ...emptyDay("2026-05-20"),
+      hasDispatch: true,
+      rain: true,
+    };
+    expect(getSecondaryConditions(day)).toEqual([]);
+  });
+
+  it("returns rain as a pip when heat90 is primary", () => {
+    const day: DaySummary = {
+      ...emptyDay("2026-07-18"),
+      hasDispatch: true,
+      totalMiles: 13,
+      rain: true,
+      heat90: true,
+    };
+    expect(getSecondaryConditions(day)).toEqual(["rain"]);
+  });
+
+  it("returns rain as a pip when storm is primary", () => {
+    const day: DaySummary = {
+      ...emptyDay("2026-05-20"),
+      hasDispatch: true,
+      rain: true,
+      storm: true,
+    };
+    expect(getSecondaryConditions(day)).toEqual(["rain"]);
+  });
+
+  it("does not duplicate heat80 when heat90 is primary", () => {
+    const day: DaySummary = {
+      ...emptyDay("2026-07-18"),
+      hasDispatch: true,
+      heat90: true,
+      heat80: true,
+    };
+    expect(getSecondaryConditions(day)).toEqual([]);
   });
 });
 
