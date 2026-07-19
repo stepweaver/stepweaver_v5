@@ -27,6 +27,8 @@ export interface PublicSummaryInput {
   dpsPerMile?: number | null;
   temperatureF?: number;
   heatIndexF?: number;
+  avgHeatIndexF?: number;
+  precipitationIn?: number;
   publicNote?: string;
 }
 
@@ -48,15 +50,22 @@ export function buildPublicSummary(input: PublicSummaryInput): string {
       const tempPart = `a peak temperature of ${formatTemperature(input.temperatureF)}`;
       const heatPart =
         input.heatIndexF !== undefined
-          ? ` and heat index of ${formatTemperature(input.heatIndexF)}`
+          ? ` and peak heat index of ${formatTemperature(input.heatIndexF)}`
           : "";
-      lead += ` with ${tempPart}${heatPart}`;
+      const avgPart =
+        input.avgHeatIndexF !== undefined
+          ? ` (avg HI ${formatTemperature(input.avgHeatIndexF)})`
+          : "";
+      lead += ` with ${tempPart}${heatPart}${avgPart}`;
+    }
+    if (input.precipitationIn !== undefined && input.precipitationIn >= 0.05) {
+      lead += ` and ${input.precipitationIn}" of rain on route`;
     }
     parts.push(lead);
   } else if (input.temperatureF !== undefined) {
     const heatPart =
       input.heatIndexF !== undefined
-        ? `, heat index ${formatTemperature(input.heatIndexF)}`
+        ? `, peak heat index ${formatTemperature(input.heatIndexF)}`
         : "";
     parts.push(`Temperature today: ${formatTemperature(input.temperatureF)}${heatPart}`);
   }

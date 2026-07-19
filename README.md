@@ -343,8 +343,10 @@ Expected Carrier's Log Notion properties:
 | `Soreness (1-10)` | number |
 | `Energy (1-10)` | number |
 | `Mood (1-10)` | number |
-| `Temperature F` | number |
-| `Heat Index F` | number |
+| `Temperature F` | number | Peak air temp °F during shift (9 AM–7 PM) |
+| `Heat Index F` | number | Peak heat index °F during shift (9 AM–7 PM) |
+| `Average Heat Index F` | number | Average heat index °F across shift hours |
+| `Precipitation In` | number | Precipitation inches during shift window |
 | `DPS Count` | number |
 | `DPS Ratio` | number |
 | `Parcels` | number |
@@ -607,7 +609,7 @@ cp .env.example .env.local
 | --- | --- |
 | `NEXT_PUBLIC_OPENWEATHER_API_KEY` | OpenWeather key for weather/geocoding/forecast support |
 
-The weather route also uses Open-Meteo for same-day shift peak temperature and heat-index support.
+The weather route also uses Open-Meteo for carrier shift peak temperature, peak/average heat index, and precipitation (9 AM–7 PM local). Past dates use the Open-Meteo archive API.
 
 ### Contact form
 

@@ -39,8 +39,14 @@ export type CarrierDispatch = {
   energy: number; // 1–10
   mood: number; // 1–10
   weather?: string;
+  /** Peak air temperature (°F) during shift window (9 AM–7 PM). */
   temperatureF?: number;
+  /** Peak heat index (°F) during shift window (9 AM–7 PM). */
   heatIndexF?: number;
+  /** Average heat index (°F) across shift hours. */
+  avgHeatIndexF?: number;
+  /** Precipitation inches during shift window. */
+  precipitationIn?: number;
   /** @deprecated Legacy seed data only; no longer stored in Notion. */
   mailLoad?: MailLoad;
   heatDay?: boolean;

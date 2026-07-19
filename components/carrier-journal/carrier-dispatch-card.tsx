@@ -127,7 +127,11 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
         {d.temperatureF !== undefined && (
           <span className="font-[var(--font-ocr)] tracking-wide text-[rgb(var(--text-meta))]">
             {d.temperatureF}°F
-            {d.heatIndexF ? ` (feels ${d.heatIndexF}°F)` : ""}
+            {d.heatIndexF ? ` · peak HI ${d.heatIndexF}°F` : ""}
+            {d.avgHeatIndexF ? ` · avg HI ${d.avgHeatIndexF}°F` : ""}
+            {d.precipitationIn !== undefined && d.precipitationIn >= 0.05
+              ? ` · ${d.precipitationIn}" rain`
+              : ""}
           </span>
         )}
         {weatherFlags.map((key) => (

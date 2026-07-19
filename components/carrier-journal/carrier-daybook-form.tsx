@@ -26,7 +26,13 @@ const ZIP_LON = -86.252;
 type WeatherState =
   | { status: "idle" }
   | { status: "loading" }
-  | { status: "ok"; tempF: number; heatIndexF: number | null }
+  | {
+      status: "ok";
+      tempF: number;
+      heatIndexF: number | null;
+      avgHeatIndexF: number | null;
+      precipIn: number | null;
+    }
   | { status: "error" };
 
 type SubmitResult = {
@@ -102,6 +108,8 @@ export function CarrierDaybookForm({
   const [weather, setWeather] = useState<WeatherState>({ status: "idle" });
   const [weatherTemp, setWeatherTemp] = useState<number | null>(null);
   const [weatherHeat, setWeatherHeat] = useState<number | null>(null);
+  const [weatherAvgHeat, setWeatherAvgHeat] = useState<number | null>(null);
+  const [weatherPrecip, setWeatherPrecip] = useState<number | null>(null);
 
   const [submitStatus, setSubmitStatus] = useState<"idle" | "saving" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -111,32 +119,46 @@ export function CarrierDaybookForm({
   const weatherAbort = useRef<AbortController | null>(null);
   const mailLoadPreviewRequestId = useRef(0);
 
-  // Auto-fetch weather when date == today
+  // Auto-fetch shift peak weather (9 AM–7 PM) for the selected date
   useEffect(() => {
-    if (date !== today) {
-      setWeather({ status: "idle" });
-      return;
-    }
-
     weatherAbort.current?.abort();
     const controller = new AbortController();
     weatherAbort.current = controller;
 
     setWeather({ status: "loading" });
+    setWeatherTemp(null);
+    setWeatherHeat(null);
+    setWeatherAvgHeat(null);
+    setWeatherPrecip(null);
 
-    fetch(`/api/weather?lat=${ZIP_LAT}&lon=${ZIP_LON}&peak=true`, { signal: controller.signal })
+    fetch(
+      `/api/weather?lat=${ZIP_LAT}&lon=${ZIP_LON}&peak=true&date=${encodeURIComponent(date)}`,
+      { signal: controller.signal }
+    )
       .then(async (res) => {
         if (!res.ok) throw new Error("Weather fetch failed");
         const data = (await res.json()) as {
           peakTempF?: number;
           peakHeatIndexF?: number | null;
+          avgHeatIndexF?: number | null;
+          precipIn?: number | null;
         };
         const tempF = data.peakTempF ?? null;
         const heatIndexF = data.peakHeatIndexF ?? null;
+        const avgHeatIndexF = data.avgHeatIndexF ?? null;
+        const precipIn = data.precipIn ?? null;
         if (tempF !== null) {
-          setWeather({ status: "ok", tempF, heatIndexF });
+          setWeather({
+            status: "ok",
+            tempF,
+            heatIndexF,
+            avgHeatIndexF,
+            precipIn,
+          });
           setWeatherTemp(tempF);
           setWeatherHeat(heatIndexF);
+          setWeatherAvgHeat(avgHeatIndexF);
+          setWeatherPrecip(precipIn);
         } else {
           setWeather({ status: "error" });
         }
@@ -147,7 +169,7 @@ export function CarrierDaybookForm({
       });
 
     return () => controller.abort();
-  }, [date, today]);
+  }, [date]);
 
   const dateIsMonday = new Date(`${date}T12:00:00`).getDay() === 1;
 
@@ -335,6 +357,8 @@ export function CarrierDaybookForm({
 
       if (weatherTemp !== null) body.temperatureF = weatherTemp;
       if (weatherHeat !== null) body.heatIndexF = weatherHeat;
+      if (weatherAvgHeat !== null) body.avgHeatIndexF = weatherAvgHeat;
+      if (weatherPrecip !== null) body.precipitationIn = weatherPrecip;
 
       if (publicNote.trim()) body.publicNote = publicNote.trim();
       if (privateNote.trim()) body.privateNote = privateNote.trim();
@@ -409,7 +433,8 @@ export function CarrierDaybookForm({
     [
       token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
-      mood, energy, soreness, publicNote, privateNote, weatherTemp, weatherHeat, fuelInput,
+      mood, energy, soreness, publicNote, privateNote,
+      weatherTemp, weatherHeat, weatherAvgHeat, weatherPrecip, fuelInput,
       footwearOptions, splitMode, splitRows, assignAllMiles, primaryShoeId,
     ]
   );
@@ -425,6 +450,8 @@ export function CarrierDaybookForm({
         dpsCount={dpsNum}
         temperatureF={weatherTemp ?? undefined}
         heatIndexF={weatherHeat ?? undefined}
+        avgHeatIndexF={weatherAvgHeat ?? undefined}
+        precipitationIn={weatherPrecip ?? undefined}
         onLogAnother={() => {
           setResult(null);
           setSubmitStatus("idle");
@@ -712,11 +739,11 @@ export function CarrierDaybookForm({
         </div>
       )}
 
-      {/* Weather - read-only, auto-filled for today */}
+      {/* Weather - read-only, auto-filled for selected date (9 AM–7 PM peak) */}
       <div className="surface-panel p-5 space-y-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
-            WEATHER // ZIP 46614
+            WEATHER // ZIP 46614 // 9–7 PEAK
           </div>
           {weather.status === "loading" && (
             <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] animate-pulse">
@@ -733,16 +760,18 @@ export function CarrierDaybookForm({
               LOOKUP FAILED
             </div>
           )}
-          {date !== today && (
-            <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
-              PAST DATE
-            </div>
-          )}
         </div>
 
         <div className="grid grid-cols-2 gap-4">
-          <WeatherCell label="TEMPERATURE (°F)" value={weatherTemp} loading={weather.status === "loading"} />
-          <WeatherCell label="HEAT INDEX (°F)" value={weatherHeat} loading={weather.status === "loading"} />
+          <WeatherCell label="PEAK TEMP (°F)" value={weatherTemp} loading={weather.status === "loading"} />
+          <WeatherCell label="PEAK HEAT INDEX (°F)" value={weatherHeat} loading={weather.status === "loading"} />
+          <WeatherCell label="AVG HEAT INDEX (°F)" value={weatherAvgHeat} loading={weather.status === "loading"} />
+          <WeatherCell
+            label="SHIFT PRECIP (IN)"
+            value={weatherPrecip}
+            loading={weather.status === "loading"}
+            decimals={2}
+          />
         </div>
 
         {/* Direct sun toggle - affects hydration calc */}
@@ -1205,6 +1234,8 @@ type SuccessCardProps = {
   dpsCount?: number;
   temperatureF?: number;
   heatIndexF?: number;
+  avgHeatIndexF?: number;
+  precipitationIn?: number;
   onLogAnother: () => void;
 };
 
@@ -1215,6 +1246,8 @@ function SuccessCard({
   dpsCount,
   temperatureF,
   heatIndexF,
+  avgHeatIndexF,
+  precipitationIn,
   onLogAnother,
 }: SuccessCardProps) {
   return (
@@ -1228,10 +1261,16 @@ function SuccessCard({
           <StatCell label="DATE" value={date} />
           {miles !== undefined && <StatCell label="MILES" value={formatMileage(miles)} />}
           {temperatureF !== undefined && (
-            <StatCell label="TEMP" value={formatTemperature(temperatureF)} />
+            <StatCell label="PEAK TEMP" value={formatTemperature(temperatureF)} />
           )}
           {heatIndexF !== undefined && (
-            <StatCell label="HEAT INDEX" value={formatTemperature(heatIndexF)} />
+            <StatCell label="PEAK HI" value={formatTemperature(heatIndexF)} />
+          )}
+          {avgHeatIndexF !== undefined && (
+            <StatCell label="AVG HI" value={formatTemperature(avgHeatIndexF)} />
+          )}
+          {precipitationIn !== undefined && (
+            <StatCell label="PRECIP" value={`${precipitationIn.toFixed(2)}"`} />
           )}
           {dpsCount !== undefined && (
             <StatCell label="DPS COUNT" value={dpsCount.toLocaleString("en-US")} />
@@ -1277,10 +1316,12 @@ function WeatherCell({
   label,
   value,
   loading,
+  decimals = 0,
 }: {
   label: string;
   value: number | null;
   loading: boolean;
+  decimals?: number;
 }) {
   return (
     <div>
@@ -1291,7 +1332,7 @@ function WeatherCell({
         {loading ? (
           <span className="text-[rgb(var(--text-meta))] animate-pulse text-sm">···</span>
         ) : value !== null ? (
-          `${Math.round(value)}`
+          decimals > 0 ? value.toFixed(decimals) : `${Math.round(value)}`
         ) : (
           <span className="text-[rgb(var(--text-meta)/0.5)] text-sm">--</span>
         )}

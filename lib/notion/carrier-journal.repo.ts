@@ -93,6 +93,8 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const mood = num(p["Mood (1-10)"] as Props) ?? num(p.Mood as Props) ?? 5;
   const temperatureF = num(p["Temperature F"] as Props);
   const heatIndexF = num(p["Heat Index F"] as Props);
+  const avgHeatIndexF = num(p["Average Heat Index F"] as Props);
+  const precipitationIn = num(p["Precipitation In"] as Props);
   const publicNote = str(p["Public Note"] as Props, "rich_text");
 
   const waterOz = num(p["Water Oz"] as Props);
@@ -113,6 +115,8 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     mood,
     ...(temperatureF !== undefined && { temperatureF }),
     ...(heatIndexF !== undefined && { heatIndexF }),
+    ...(avgHeatIndexF !== undefined && { avgHeatIndexF }),
+    ...(precipitationIn !== undefined && { precipitationIn }),
     publicNote,
     ...(waterOz !== undefined && { waterOz }),
     ...(hydrationGoalOz !== undefined && { hydrationGoalOz }),
@@ -414,6 +418,14 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
 
   if (input.heatIndexF !== undefined) {
     properties["Heat Index F"] = { number: input.heatIndexF };
+  }
+
+  if (input.avgHeatIndexF !== undefined) {
+    properties["Average Heat Index F"] = { number: input.avgHeatIndexF };
+  }
+
+  if (input.precipitationIn !== undefined) {
+    properties["Precipitation In"] = { number: input.precipitationIn };
   }
 
   if (input.waterOz !== undefined) {

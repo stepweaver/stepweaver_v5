@@ -1,0 +1,553 @@
+{
+  "dryRun": false,
+  "generatedAt": "2026-07-19T14:04:06.077Z",
+  "updated": 34,
+  "skipped": 0,
+  "missingArchive": 0,
+  "results": [
+    {
+      "date": "2026-05-22",
+      "before": {
+        "temperatureF": 70,
+        "heatIndexF": 73,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 72,
+        "heatIndexF": 72,
+        "avgHeatIndexF": 66,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-02",
+      "before": {
+        "temperatureF": 76,
+        "heatIndexF": null,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 77,
+        "heatIndexF": 77,
+        "avgHeatIndexF": 73,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-03",
+      "before": {
+        "temperatureF": 80,
+        "heatIndexF": null,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 81,
+        "heatIndexF": 79,
+        "avgHeatIndexF": 76,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-05",
+      "before": {
+        "temperatureF": 77,
+        "heatIndexF": 78,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 81,
+        "heatIndexF": 83,
+        "avgHeatIndexF": 74,
+        "precipitationIn": 0.36
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-06",
+      "before": {
+        "temperatureF": 85,
+        "heatIndexF": null,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 81,
+        "heatIndexF": 85,
+        "avgHeatIndexF": 78,
+        "precipitationIn": 1.1
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-08",
+      "before": {
+        "temperatureF": 82,
+        "heatIndexF": 85,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 86,
+        "heatIndexF": 88,
+        "avgHeatIndexF": 82,
+        "precipitationIn": 0.24
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-10",
+      "before": {
+        "temperatureF": 91,
+        "heatIndexF": 103,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 91,
+        "heatIndexF": 96,
+        "avgHeatIndexF": 90,
+        "precipitationIn": 0.02
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-11",
+      "before": {
+        "temperatureF": 81,
+        "heatIndexF": 84,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 85,
+        "heatIndexF": 89,
+        "avgHeatIndexF": 78,
+        "precipitationIn": 0.13
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-12",
+      "before": {
+        "temperatureF": 81,
+        "heatIndexF": 80,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 78,
+        "heatIndexF": 78,
+        "avgHeatIndexF": 74,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-13",
+      "before": {
+        "temperatureF": 80,
+        "heatIndexF": 81,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 84,
+        "heatIndexF": 83,
+        "avgHeatIndexF": 80,
+        "precipitationIn": 0.02
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-15",
+      "before": {
+        "temperatureF": 73,
+        "heatIndexF": 73,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 74,
+        "heatIndexF": 74,
+        "avgHeatIndexF": 70,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-16",
+      "before": {
+        "temperatureF": 74,
+        "heatIndexF": 74,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 73,
+        "heatIndexF": 73,
+        "avgHeatIndexF": 68,
+        "precipitationIn": 0.17
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-17",
+      "before": {
+        "temperatureF": 72,
+        "heatIndexF": 72,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 71,
+        "heatIndexF": 71,
+        "avgHeatIndexF": 65,
+        "precipitationIn": 0.8
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-18",
+      "before": {
+        "temperatureF": 71,
+        "heatIndexF": 71,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 68,
+        "heatIndexF": 68,
+        "avgHeatIndexF": 66,
+        "precipitationIn": 0.03
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-20",
+      "before": {
+        "temperatureF": 76,
+        "heatIndexF": 76,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 73,
+        "heatIndexF": 73,
+        "avgHeatIndexF": 71,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-22",
+      "before": {
+        "temperatureF": 72,
+        "heatIndexF": 71.8,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 74,
+        "heatIndexF": 74,
+        "avgHeatIndexF": 68,
+        "precipitationIn": 0.02
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-23",
+      "before": {
+        "temperatureF": 73,
+        "heatIndexF": 72.7,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 72,
+        "heatIndexF": 72,
+        "avgHeatIndexF": 68,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-24",
+      "before": {
+        "temperatureF": 69,
+        "heatIndexF": 68.7,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 69,
+        "heatIndexF": 69,
+        "avgHeatIndexF": 65,
+        "precipitationIn": 0.27
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-25",
+      "before": {
+        "temperatureF": 76,
+        "heatIndexF": 76,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 76,
+        "heatIndexF": 76,
+        "avgHeatIndexF": 73,
+        "precipitationIn": 0.21
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-27",
+      "before": {
+        "temperatureF": 80,
+        "heatIndexF": 82,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 79,
+        "heatIndexF": 79,
+        "avgHeatIndexF": 76,
+        "precipitationIn": 0.01
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-29",
+      "before": {
+        "temperatureF": 91,
+        "heatIndexF": 102,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 91,
+        "heatIndexF": 101,
+        "avgHeatIndexF": 95,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-06-30",
+      "before": {
+        "temperatureF": 92,
+        "heatIndexF": 106,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 92,
+        "heatIndexF": 103,
+        "avgHeatIndexF": 97,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-01",
+      "before": {
+        "temperatureF": 94,
+        "heatIndexF": 105,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 95,
+        "heatIndexF": 102,
+        "avgHeatIndexF": 99,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-02",
+      "before": {
+        "temperatureF": 93,
+        "heatIndexF": 104,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 92,
+        "heatIndexF": 97,
+        "avgHeatIndexF": 94,
+        "precipitationIn": 0.1
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-06",
+      "before": {
+        "temperatureF": 80,
+        "heatIndexF": 84,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 81,
+        "heatIndexF": 83,
+        "avgHeatIndexF": 79,
+        "precipitationIn": 0.05
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-07",
+      "before": {
+        "temperatureF": 84,
+        "heatIndexF": 87,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 84,
+        "heatIndexF": 85,
+        "avgHeatIndexF": 82,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-08",
+      "before": {
+        "temperatureF": 86,
+        "heatIndexF": 87,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 88,
+        "heatIndexF": 88,
+        "avgHeatIndexF": 84,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-10",
+      "before": {
+        "temperatureF": 84,
+        "heatIndexF": 91,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 87,
+        "heatIndexF": 89,
+        "avgHeatIndexF": 84,
+        "precipitationIn": 0.06
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-11",
+      "before": {
+        "temperatureF": 82,
+        "heatIndexF": 85,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 85,
+        "heatIndexF": 85,
+        "avgHeatIndexF": 81,
+        "precipitationIn": 0.04
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-13",
+      "before": {
+        "temperatureF": 89,
+        "heatIndexF": 90,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 90,
+        "heatIndexF": 90,
+        "avgHeatIndexF": 86,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-14",
+      "before": {
+        "temperatureF": 91,
+        "heatIndexF": 98,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 94,
+        "heatIndexF": 99,
+        "avgHeatIndexF": 94,
+        "precipitationIn": 0
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-16",
+      "before": {
+        "temperatureF": 91,
+        "heatIndexF": 98,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 93,
+        "heatIndexF": 97,
+        "avgHeatIndexF": 90,
+        "precipitationIn": 0.04
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-17",
+      "before": {
+        "temperatureF": 87,
+        "heatIndexF": 98,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 87,
+        "heatIndexF": 93,
+        "avgHeatIndexF": 88,
+        "precipitationIn": 0.1
+      },
+      "status": "updated"
+    },
+    {
+      "date": "2026-07-18",
+      "before": {
+        "temperatureF": 88,
+        "heatIndexF": 97,
+        "avgHeatIndexF": null,
+        "precipitationIn": null
+      },
+      "after": {
+        "temperatureF": 85,
+        "heatIndexF": 92,
+        "avgHeatIndexF": 82,
+        "precipitationIn": 0.17
+      },
+      "status": "updated"
+    }
+  ]
+}

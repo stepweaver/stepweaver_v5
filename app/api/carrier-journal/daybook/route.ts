@@ -109,6 +109,8 @@ export async function POST(request: NextRequest) {
       dpsPerMile,
       temperatureF: parsed.data.temperatureF,
       heatIndexF: parsed.data.heatIndexF,
+      avgHeatIndexF: parsed.data.avgHeatIndexF,
+      precipitationIn: parsed.data.precipitationIn,
       publicNote: parsed.data.publicNote,
     });
 

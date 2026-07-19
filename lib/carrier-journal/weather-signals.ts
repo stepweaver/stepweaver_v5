@@ -1,4 +1,5 @@
 import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import { isRainDay } from "@/lib/carrier-journal/shift-weather";
 
 /** Effective peak heat (°F) from logged shift weather. */
 export const HEAT_DAY_THRESHOLD_F = 90;
@@ -12,7 +13,11 @@ export type DerivedWeatherSignals = {
 };
 
 export function effectiveHeatF(dispatch: CarrierDispatch): number {
-  return Math.max(dispatch.temperatureF ?? -Infinity, dispatch.heatIndexF ?? -Infinity);
+  return Math.max(
+    dispatch.temperatureF ?? -Infinity,
+    dispatch.heatIndexF ?? -Infinity,
+    dispatch.avgHeatIndexF ?? -Infinity
+  );
 }
 
 function narrativeText(dispatch: CarrierDispatch): string {
@@ -27,12 +32,13 @@ const SNOW_PATTERN =
   /\b(snow|snowing|snowy|sleet|blizzard|icy|ice|slush|freezing rain)\b/i;
 
 /**
- * Weather condition flags derived from temperature/heat index and narrative text.
+ * Weather condition flags derived from temperature/heat index, precip, and narrative text.
  * Replaces manual Notion checkboxes (Heat Day, Rain, Storm, Snow).
  */
 export function deriveWeatherSignals(dispatch: CarrierDispatch): DerivedWeatherSignals {
   const text = narrativeText(dispatch);
 
+  const rainFromPrecip = isRainDay(dispatch.precipitationIn);
   const rainFromText = RAIN_PATTERN.test(text);
   const stormFromText = STORM_PATTERN.test(text);
   const snowFromText = SNOW_PATTERN.test(text);
@@ -42,7 +48,7 @@ export function deriveWeatherSignals(dispatch: CarrierDispatch): DerivedWeatherS
   return {
     heat:
       effectiveHeatF(dispatch) >= HEAT_DAY_THRESHOLD_F || !!dispatch.heatDay,
-    rain: !!dispatch.rain || (rainFromText && !snowFromText),
+    rain: !!dispatch.rain || rainFromPrecip || (rainFromText && !snowFromText),
     storm: !!dispatch.storm || stormFromText,
     snow: !!dispatch.snow || snowFromText || snowFromTemp,
   };
