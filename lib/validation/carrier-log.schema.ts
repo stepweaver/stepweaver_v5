@@ -63,6 +63,8 @@ export const carrierDaybookSchema = z.object({
   heatIndexF: z.number().finite().optional(),
   avgHeatIndexF: z.number().finite().optional(),
   precipitationIn: z.number().finite().min(0).optional(),
+  /** Manual: carrier was rained on during the route. */
+  rain: z.boolean().optional(),
   publicNote: z.string().trim().max(2000).optional(),
   privateNote: z.string().trim().max(2000).optional(),
   published: z.boolean().default(true),

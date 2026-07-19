@@ -1,0 +1,349 @@
+{
+  "dryRun": false,
+  "generatedAt": "2026-07-19T14:17:58.557Z",
+  "goalsUpdated": 30,
+  "rainUpdated": 1,
+  "hitRateAfter": 70.6,
+  "results": [
+    {
+      "date": "2026-05-22",
+      "beforeGoal": 96,
+      "afterGoal": 88,
+      "waterOz": 60,
+      "hitAfter": false,
+      "band": "normal",
+      "hours": 7.6000000000000005,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-02",
+      "beforeGoal": 64,
+      "afterGoal": 64,
+      "waterOz": 64,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-03",
+      "beforeGoal": 96,
+      "afterGoal": 64,
+      "waterOz": 96,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 5.6000000000000005,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-05",
+      "beforeGoal": 40,
+      "afterGoal": 64,
+      "waterOz": 128,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-06",
+      "beforeGoal": 128,
+      "afterGoal": 88,
+      "waterOz": 128,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 5.666666666666667,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-08",
+      "beforeGoal": 128,
+      "afterGoal": 120,
+      "waterOz": 128,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 7.6000000000000005,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-10",
+      "beforeGoal": 128,
+      "afterGoal": 152,
+      "waterOz": 128,
+      "hitAfter": false,
+      "band": "extreme-caution",
+      "hours": 6.333333333333333,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-11",
+      "beforeGoal": 128,
+      "afterGoal": 96,
+      "waterOz": 148,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 6.2,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-12",
+      "beforeGoal": 128,
+      "afterGoal": 64,
+      "waterOz": 120,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 5.533333333333334,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-13",
+      "beforeGoal": 128,
+      "afterGoal": 128,
+      "waterOz": 140,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 8.200000000000001,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-15",
+      "beforeGoal": 96,
+      "afterGoal": 72,
+      "waterOz": 64,
+      "hitAfter": false,
+      "band": "normal",
+      "hours": 6,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-16",
+      "beforeGoal": 96,
+      "afterGoal": 64,
+      "waterOz": 96,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-17",
+      "beforeGoal": 64,
+      "afterGoal": 64,
+      "waterOz": 64,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-18",
+      "beforeGoal": 64,
+      "afterGoal": 64,
+      "waterOz": 28,
+      "hitAfter": false,
+      "band": "normal",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-20",
+      "beforeGoal": 92,
+      "afterGoal": 80,
+      "waterOz": 92,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 6.333333333333333,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-22",
+      "beforeGoal": 128,
+      "afterGoal": 72,
+      "waterOz": 64,
+      "hitAfter": false,
+      "band": "normal",
+      "hours": 5.933333333333334,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-23",
+      "beforeGoal": 120,
+      "afterGoal": 72,
+      "waterOz": 64,
+      "hitAfter": false,
+      "band": "normal",
+      "hours": 5.933333333333334,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-24",
+      "beforeGoal": 104,
+      "afterGoal": 64,
+      "waterOz": 56,
+      "hitAfter": false,
+      "band": "normal",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-25",
+      "beforeGoal": 128,
+      "afterGoal": 88,
+      "waterOz": 120,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 7.333333333333333,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-27",
+      "beforeGoal": 112,
+      "afterGoal": 64,
+      "waterOz": 96,
+      "hitAfter": true,
+      "band": "normal",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-29",
+      "beforeGoal": 168,
+      "afterGoal": 120,
+      "waterOz": 152,
+      "hitAfter": true,
+      "band": "extreme-caution",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-06-30",
+      "beforeGoal": 240,
+      "afterGoal": 128,
+      "waterOz": 138,
+      "hitAfter": true,
+      "band": "extreme-caution",
+      "hours": 5.3999999999999995,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-01",
+      "beforeGoal": 288,
+      "afterGoal": 160,
+      "waterOz": 152,
+      "hitAfter": false,
+      "band": "extreme-caution",
+      "hours": 6.666666666666667,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-02",
+      "beforeGoal": 200,
+      "afterGoal": 120,
+      "waterOz": 164,
+      "hitAfter": true,
+      "band": "extreme-caution",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-06",
+      "beforeGoal": 160,
+      "afterGoal": 112,
+      "waterOz": 92,
+      "hitAfter": false,
+      "band": "caution",
+      "hours": 7.2,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-07",
+      "beforeGoal": 184,
+      "afterGoal": 144,
+      "waterOz": 126,
+      "hitAfter": false,
+      "band": "caution",
+      "hours": 8.799999999999999,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-08",
+      "beforeGoal": 112,
+      "afterGoal": 80,
+      "waterOz": 108,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-10",
+      "beforeGoal": 168,
+      "afterGoal": 80,
+      "waterOz": 92,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 5.133333333333334,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-11",
+      "beforeGoal": 88,
+      "afterGoal": 80,
+      "waterOz": 92,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 5,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-13",
+      "beforeGoal": 256,
+      "afterGoal": 128,
+      "waterOz": 148,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 8.066666666666666,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-14",
+      "beforeGoal": 216,
+      "afterGoal": 192,
+      "waterOz": 200,
+      "hitAfter": true,
+      "band": "extreme-caution",
+      "hours": 7.933333333333334,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-16",
+      "beforeGoal": 216,
+      "afterGoal": 152,
+      "waterOz": 197,
+      "hitAfter": true,
+      "band": "extreme-caution",
+      "hours": 6.333333333333333,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-17",
+      "beforeGoal": 264,
+      "afterGoal": 200,
+      "waterOz": 216,
+      "hitAfter": true,
+      "band": "extreme-caution",
+      "hours": 8.333333333333334,
+      "rainSet": false
+    },
+    {
+      "date": "2026-07-18",
+      "beforeGoal": 264,
+      "afterGoal": 136,
+      "waterOz": 185,
+      "hitAfter": true,
+      "band": "caution",
+      "hours": 8.666666666666666,
+      "rainSet": true
+    }
+  ]
+}

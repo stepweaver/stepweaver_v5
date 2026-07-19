@@ -1,22 +1,8 @@
 import {
   computeShiftWeatherMetrics,
   heatIndexF,
-  isRainDay,
-  RAIN_DAY_PRECIP_IN,
+  mergeHourlyPoints,
 } from "@/lib/carrier-journal/shift-weather";
-import { deriveWeatherSignals } from "@/lib/carrier-journal/weather-signals";
-import type { CarrierDispatch } from "@/lib/data/carrier-journal";
-
-function dispatch(partial: Partial<CarrierDispatch> & Pick<CarrierDispatch, "id" | "date" | "title">): CarrierDispatch {
-  return {
-    milesWalked: 8,
-    soreness: 5,
-    energy: 5,
-    mood: 5,
-    publicNote: "",
-    ...partial,
-  };
-}
 
 describe("shift-weather", () => {
   it("computes Rothfusz heat index above 80°F", () => {
@@ -43,39 +29,11 @@ describe("shift-weather", () => {
     expect(metrics!.avgHeatIndexF).toBeGreaterThan(0);
   });
 
-  it("flags rain days at the precip threshold", () => {
-    expect(isRainDay(RAIN_DAY_PRECIP_IN)).toBe(true);
-    expect(isRainDay(0.04)).toBe(false);
-    expect(isRainDay(undefined)).toBe(false);
-  });
-});
-
-describe("deriveWeatherSignals precip", () => {
-  it("marks rain from precipitationIn without note text", () => {
-    const signals = deriveWeatherSignals(
-      dispatch({
-        id: "a",
-        date: "2026-07-18",
-        title: "A",
-        temperatureF: 85,
-        heatIndexF: 92,
-        precipitationIn: 0.17,
-      })
+  it("merges dual-ZIP hours by hotter temp", () => {
+    const merged = mergeHourlyPoints(
+      [{ hour: 12, tempF: 80, humidity: 40, precipIn: 0 }],
+      [{ hour: 12, tempF: 83, humidity: 55, precipIn: 0.1 }]
     );
-    expect(signals.rain).toBe(true);
-    expect(signals.heat).toBe(true);
-  });
-
-  it("does not mark rain below threshold without note text", () => {
-    const signals = deriveWeatherSignals(
-      dispatch({
-        id: "a",
-        date: "2026-07-18",
-        title: "A",
-        temperatureF: 85,
-        precipitationIn: 0.02,
-      })
-    );
-    expect(signals.rain).toBe(false);
+    expect(merged[0]).toMatchObject({ tempF: 83, humidity: 55, precipIn: 0.1 });
   });
 });

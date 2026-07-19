@@ -55,6 +55,12 @@ function num(prop: Props | undefined): number | undefined {
   return typeof v === "number" ? v : undefined;
 }
 
+function bool(prop: Props | undefined): boolean | undefined {
+  if (!prop) return undefined;
+  const v = (prop as { checkbox?: unknown }).checkbox;
+  return typeof v === "boolean" ? v : undefined;
+}
+
 
 function sel(prop: Props | undefined): string {
   if (!prop) return "";
@@ -95,6 +101,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const heatIndexF = num(p["Heat Index F"] as Props);
   const avgHeatIndexF = num(p["Average Heat Index F"] as Props);
   const precipitationIn = num(p["Precipitation In"] as Props);
+  const rain = bool(p.Rain as Props);
   const publicNote = str(p["Public Note"] as Props, "rich_text");
 
   const waterOz = num(p["Water Oz"] as Props);
@@ -117,6 +124,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(heatIndexF !== undefined && { heatIndexF }),
     ...(avgHeatIndexF !== undefined && { avgHeatIndexF }),
     ...(precipitationIn !== undefined && { precipitationIn }),
+    ...(rain !== undefined && { rain }),
     publicNote,
     ...(waterOz !== undefined && { waterOz }),
     ...(hydrationGoalOz !== undefined && { hydrationGoalOz }),
@@ -426,6 +434,10 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
 
   if (input.precipitationIn !== undefined) {
     properties["Precipitation In"] = { number: input.precipitationIn };
+  }
+
+  if (input.rain !== undefined) {
+    properties.Rain = { checkbox: input.rain };
   }
 
   if (input.waterOz !== undefined) {

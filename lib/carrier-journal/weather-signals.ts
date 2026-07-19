@@ -1,5 +1,4 @@
 import type { CarrierDispatch } from "@/lib/data/carrier-journal";
-import { isRainDay } from "@/lib/carrier-journal/shift-weather";
 
 /** Effective peak heat (°F) from logged shift weather. */
 export const HEAT_DAY_THRESHOLD_F = 90;
@@ -24,22 +23,20 @@ function narrativeText(dispatch: CarrierDispatch): string {
   return [dispatch.weather, dispatch.publicNote].filter(Boolean).join(" ");
 }
 
-const RAIN_PATTERN =
-  /\b(rain|raining|rainy|drizzle|downpour|wet route|puddles)\b/i;
 const STORM_PATTERN =
   /\b(storm|stormy|thunder|lightning|hail|tornado|wind gust|gusty)\b/i;
 const SNOW_PATTERN =
   /\b(snow|snowing|snowy|sleet|blizzard|icy|ice|slush|freezing rain)\b/i;
 
 /**
- * Weather condition flags derived from temperature/heat index, precip, and narrative text.
- * Replaces manual Notion checkboxes (Heat Day, Rain, Storm, Snow).
+ * Weather condition flags.
+ * Rain is manual only (`dispatch.rain` from the daybook checkbox / Notion).
+ * Storm/snow can still be inferred from notes; heat from temps.
+ * Grid precipitation is informational and does not set the rain flag.
  */
 export function deriveWeatherSignals(dispatch: CarrierDispatch): DerivedWeatherSignals {
   const text = narrativeText(dispatch);
 
-  const rainFromPrecip = isRainDay(dispatch.precipitationIn);
-  const rainFromText = RAIN_PATTERN.test(text);
   const stormFromText = STORM_PATTERN.test(text);
   const snowFromText = SNOW_PATTERN.test(text);
   const snowFromTemp =
@@ -48,7 +45,7 @@ export function deriveWeatherSignals(dispatch: CarrierDispatch): DerivedWeatherS
   return {
     heat:
       effectiveHeatF(dispatch) >= HEAT_DAY_THRESHOLD_F || !!dispatch.heatDay,
-    rain: !!dispatch.rain || rainFromPrecip || (rainFromText && !snowFromText),
+    rain: !!dispatch.rain,
     storm: !!dispatch.storm || stormFromText,
     snow: !!dispatch.snow || snowFromText || snowFromTemp,
   };

@@ -1,17 +1,25 @@
 /**
  * Carrier shift weather: peak air temp, peak/avg heat index, and precip
  * over the working window (default 9 AM–7 PM local).
+ *
+ * Coverage: ZIP 46613 + 46614 (South Bend route areas). Metrics merge the
+ * hotter of the two grid points each hour so exposure reflects both zones.
  */
 
 export const CARRIER_TZ = "America/Indiana/Indianapolis";
 /** Inclusive local hours for route exposure (9 AM–7 PM). */
 export const SHIFT_START_HOUR = 9;
 export const SHIFT_END_HOUR = 19;
-/** Inches during shift at/above this count as a rain day. */
-export const RAIN_DAY_PRECIP_IN = 0.05;
 
-export const CARRIER_WEATHER_LAT = 41.6764;
-export const CARRIER_WEATHER_LON = -86.252;
+/** ZIP 46614 centroid (existing daybook default). */
+export const CARRIER_WEATHER_POINTS = [
+  { zip: "46614", lat: 41.6764, lon: -86.252 },
+  { zip: "46613", lat: 41.6539, lon: -86.264 },
+] as const;
+
+/** @deprecated Prefer CARRIER_WEATHER_POINTS — kept for callers expecting a single point. */
+export const CARRIER_WEATHER_LAT = CARRIER_WEATHER_POINTS[0].lat;
+export const CARRIER_WEATHER_LON = CARRIER_WEATHER_POINTS[0].lon;
 
 export type HourlyWeatherPoint = {
   hour: number;
@@ -46,10 +54,6 @@ export function heatIndexF(tempF: number, humidity: number): number {
       0.00085282 * T * R * R -
       0.00000199 * T * T * R * R
   );
-}
-
-export function isRainDay(precipIn: number | undefined | null): boolean {
-  return (precipIn ?? 0) >= RAIN_DAY_PRECIP_IN;
 }
 
 /**
@@ -110,6 +114,36 @@ export function computeShiftWeatherMetrics(
     peakTempHour,
     peakHeatIndexHour: peakHiHour,
   };
+}
+
+/** Merge two hourly series: hotter temp (and its humidity) + max precip each hour. */
+export function mergeHourlyPoints(
+  a: HourlyWeatherPoint[],
+  b: HourlyWeatherPoint[]
+): HourlyWeatherPoint[] {
+  const byHour = new Map<number, HourlyWeatherPoint>();
+
+  const ingest = (points: HourlyWeatherPoint[]) => {
+    for (const p of points) {
+      const existing = byHour.get(p.hour);
+      if (!existing) {
+        byHour.set(p.hour, { ...p });
+        continue;
+      }
+      const hotter = p.tempF >= existing.tempF ? p : existing;
+      const cooler = p.tempF >= existing.tempF ? existing : p;
+      byHour.set(p.hour, {
+        hour: p.hour,
+        tempF: hotter.tempF,
+        humidity: hotter.humidity ?? cooler.humidity,
+        precipIn: Math.max(existing.precipIn ?? 0, p.precipIn ?? 0),
+      });
+    }
+  };
+
+  ingest(a);
+  ingest(b);
+  return [...byHour.values()].sort((x, y) => x.hour - y.hour);
 }
 
 export function localToday(timeZone: string = CARRIER_TZ): string {
@@ -178,9 +212,9 @@ async function fetchOpenMeteoJson(
 }
 
 /**
- * Fetch shift metrics for a calendar date at lat/lon.
- * Uses forecast endpoint for today (includes recent observations + near-term hours),
- * archive endpoint for past dates.
+ * Fetch shift metrics for a calendar date across carrier ZIPs (46613 + 46614).
+ * Uses forecast endpoint for today, archive for past dates.
+ * Optional lat/lon override still supported (single-point callers / terminal).
  */
 export async function fetchShiftWeatherForDate(
   lat: number,
@@ -192,6 +226,23 @@ export async function fetchShiftWeatherForDate(
     date >= today
       ? "https://api.open-meteo.com/v1/forecast"
       : "https://archive-api.open-meteo.com/v1/archive";
+
+  const isCarrierDefault =
+    CARRIER_WEATHER_POINTS.some(
+      (p) => Math.abs(p.lat - lat) < 0.01 && Math.abs(p.lon - lon) < 0.01
+    );
+
+  if (isCarrierDefault) {
+    const series = await Promise.all(
+      CARRIER_WEATHER_POINTS.map((p) => fetchOpenMeteoJson(base, p.lat, p.lon, date))
+    );
+    const pointSets = series
+      .map(pointsFromHourly)
+      .filter((pts) => pts.length > 0);
+    if (!pointSets.length) return null;
+    const merged = pointSets.reduce((acc, pts) => mergeHourlyPoints(acc, pts));
+    return computeShiftWeatherMetrics(merged);
+  }
 
   const hourly = await fetchOpenMeteoJson(base, lat, lon, date);
   if (!hourly) return null;

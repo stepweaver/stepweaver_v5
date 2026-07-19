@@ -45,11 +45,12 @@ export type CarrierDispatch = {
   heatIndexF?: number;
   /** Average heat index (°F) across shift hours. */
   avgHeatIndexF?: number;
-  /** Precipitation inches during shift window. */
+  /** Precipitation inches during shift window (informational; does not set rain flag). */
   precipitationIn?: number;
-  /** @deprecated Legacy seed data only; no longer stored in Notion. */
+  /** @deprecated Legacy seed mail-load only; no longer stored in Notion. */
   mailLoad?: MailLoad;
   heatDay?: boolean;
+  /** Manual checkbox: got rained on during the route. */
   rain?: boolean;
   storm?: boolean;
   snow?: boolean;

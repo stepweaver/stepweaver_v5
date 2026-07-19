@@ -1,19 +1,19 @@
 /**
  * Hydration goal calculator for outdoor mail carriers.
  *
- * Formula basis:
- * - OSHA heat guidance: 24–32 oz/hr during hot outdoor work
- * - CDC/NIOSH working-heat range: up to 48 oz/hr upper safe limit
- * - NWS heat-index bands: caution / extreme caution / danger / extreme danger
- * - NWS sun adjustment: direct sun raises effective heat index ~10–15°F
- * - Pre-shift hydration: ~6 ml/kg body weight before extended activity
- * - Mail carrier walk rate modeled at ~1.25 mph (slower than exercise due to stops)
+ * Tuned for achievable route targets (not OSHA peak rates applied all day):
+ * - Heat input blends sustained load (avg HI) with spike (peak HI)
+ * - Route hours from miles ÷ 1.5, clamped 5–9
+ * - Saved / scored goal is route water only; pre-shift is advice, not part of hit/miss
+ * - Hourly rates still follow NWS heat-index bands (caution → extreme danger)
  */
 
 export type HydrationInputs = {
   weightLbs?: number | null;
   peakTempF: number;
   peakHeatIndexF: number;
+  /** Average heat index across the shift; used in the blended heat model. */
+  avgHeatIndexF?: number | null;
   milesWalked?: number | null;
   routeHours?: number | null;
   directSun?: boolean;
@@ -27,11 +27,14 @@ export type HeatBand =
   | "extreme-danger";
 
 export type HydrationRecommendation = {
+  /** Blended effective heat used for band selection (°F). */
   effectiveHeatF: number;
   routeHours: number;
   heatBand: HeatBand;
+  /** Route drinking target — this is what gets saved as Hydration Goal Oz. */
   routeWaterGoalOz: number;
   preShiftWaterOz: number | null;
+  /** Route + pre-shift advisory total (not used for hit/miss scoring). */
   totalSuggestedOz: number;
   electrolyteRecommended: boolean;
   maxSafeRouteWaterOz: number;
@@ -46,6 +49,10 @@ function roundToNearest8(value: number): number {
   return Math.round(value / 8) * 8;
 }
 
+/**
+ * Estimate on-street exposure hours from mileage.
+ * 1.5 mi/h effective pace reflects relays, porches, parcels, and mounted segments.
+ */
 function estimateRouteHours(
   milesWalked?: number | null,
   routeHours?: number | null
@@ -55,12 +62,24 @@ function estimateRouteHours(
   }
 
   if (milesWalked && milesWalked > 0) {
-    // Mail delivery walking is slower than exercise walking because of stops,
-    // relays, porches, stairs, parcels, and mounted sections.
-    return clamp(milesWalked / 1.25, 4, 10);
+    return clamp(milesWalked / 1.5, 5, 9);
   }
 
-  return 8;
+  return 7;
+}
+
+/**
+ * 70% average HI + 30% peak HI so a short spike does not price the whole day.
+ * Falls back to peak when avg is missing.
+ */
+export function blendedEffectiveHeatF(
+  peakTempF: number,
+  peakHeatIndexF: number,
+  avgHeatIndexF?: number | null
+): number {
+  const peak = Math.max(peakTempF, peakHeatIndexF);
+  const avg = avgHeatIndexF != null && Number.isFinite(avgHeatIndexF) ? avgHeatIndexF : peak;
+  return Math.round(0.7 * avg + 0.3 * peak);
 }
 
 function getHeatBand(effectiveHeatF: number): HeatBand {
@@ -99,8 +118,12 @@ export function calculateHydrationGoal(
 ): HydrationRecommendation {
   const routeHours = estimateRouteHours(input.milesWalked, input.routeHours);
 
-  const rawEffectiveHeat = Math.max(input.peakTempF, input.peakHeatIndexF);
-  const effectiveHeatF = input.directSun ? rawEffectiveHeat + 10 : rawEffectiveHeat;
+  const blended = blendedEffectiveHeatF(
+    input.peakTempF,
+    input.peakHeatIndexF,
+    input.avgHeatIndexF
+  );
+  const effectiveHeatF = input.directSun ? blended + 10 : blended;
 
   const heatBand = getHeatBand(effectiveHeatF);
   const ozPerHour = getOzPerHour(heatBand);

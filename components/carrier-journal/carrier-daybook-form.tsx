@@ -79,6 +79,7 @@ export function CarrierDaybookForm({
   const [weightLbs, setWeightLbs] = useState("");
 
   const [directSun, setDirectSun] = useState(false);
+  const [rainedOnRoute, setRainedOnRoute] = useState(false);
   const [hydrationGoalOverride, setHydrationGoalOverride] = useState("");
   const [showGoalOverride, setShowGoalOverride] = useState(false);
 
@@ -189,10 +190,11 @@ export function CarrierDaybookForm({
       weightLbs: activeWeight,
       peakTempF,
       peakHeatIndexF,
+      avgHeatIndexF: weatherAvgHeat,
       milesWalked: milesNum,
       directSun,
     });
-  }, [weatherTemp, weatherHeat, miles, weightLbs, latestWeightLbs, directSun]);
+  }, [weatherTemp, weatherHeat, weatherAvgHeat, miles, weightLbs, latestWeightLbs, directSun]);
 
   const fuelInput = useMemo((): FuelLogInput | null => {
     const dewNum = mountainDewOz.trim() ? Number(mountainDewOz) : undefined;
@@ -335,7 +337,7 @@ export function CarrierDaybookForm({
       const effectiveGoalOz =
         overrideNum !== undefined && Number.isFinite(overrideNum) && overrideNum > 0
           ? overrideNum
-          : computedHydration.totalSuggestedOz;
+          : computedHydration.routeWaterGoalOz;
       if (effectiveGoalOz > 0) {
         body.hydrationGoalOz = effectiveGoalOz;
       }
@@ -359,6 +361,7 @@ export function CarrierDaybookForm({
       if (weatherHeat !== null) body.heatIndexF = weatherHeat;
       if (weatherAvgHeat !== null) body.avgHeatIndexF = weatherAvgHeat;
       if (weatherPrecip !== null) body.precipitationIn = weatherPrecip;
+      body.rain = rainedOnRoute;
 
       if (publicNote.trim()) body.publicNote = publicNote.trim();
       if (privateNote.trim()) body.privateNote = privateNote.trim();
@@ -434,7 +437,7 @@ export function CarrierDaybookForm({
       token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
       mood, energy, soreness, publicNote, privateNote,
-      weatherTemp, weatherHeat, weatherAvgHeat, weatherPrecip, fuelInput,
+      weatherTemp, weatherHeat, weatherAvgHeat, weatherPrecip, rainedOnRoute, fuelInput,
       footwearOptions, splitMode, splitRows, assignAllMiles, primaryShoeId,
     ]
   );
@@ -462,6 +465,7 @@ export function CarrierDaybookForm({
           setWaterOz("");
           setWeightLbs("");
           setDirectSun(false);
+          setRainedOnRoute(false);
           setHydrationGoalOverride("");
           setShowGoalOverride(false);
           setMood("");
@@ -743,7 +747,7 @@ export function CarrierDaybookForm({
       <div className="surface-panel p-5 space-y-4">
         <div className="flex items-center gap-3 flex-wrap">
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
-            WEATHER // ZIP 46614 // 9–7 PEAK
+            WEATHER // 46613 + 46614 // 9–7 PEAK
           </div>
           {weather.status === "loading" && (
             <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] animate-pulse">
@@ -767,11 +771,14 @@ export function CarrierDaybookForm({
           <WeatherCell label="PEAK HEAT INDEX (°F)" value={weatherHeat} loading={weather.status === "loading"} />
           <WeatherCell label="AVG HEAT INDEX (°F)" value={weatherAvgHeat} loading={weather.status === "loading"} />
           <WeatherCell
-            label="SHIFT PRECIP (IN)"
+            label="AREA PRECIP (IN)"
             value={weatherPrecip}
             loading={weather.status === "loading"}
             decimals={2}
           />
+        </div>
+        <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.7)]">
+          Area precip is informational (46613/46614 grid). Use RAINED ON ROUTE if you got wet.
         </div>
 
         {/* Direct sun toggle - affects hydration calc */}
@@ -798,8 +805,36 @@ export function CarrierDaybookForm({
               }`}
             />
           </span>
-          <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))]">
-            {directSun ? "DIRECT SUN (adds ~10°F to effective heat)" : "DIRECT SUN"}
+          <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-secondary))]">
+            DIRECT SUN (+10°F for hydration)
+          </span>
+        </label>
+
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={rainedOnRoute}
+            onChange={(e) => setRainedOnRoute(e.target.checked)}
+            className="sr-only"
+          />
+          <span
+            className={`relative flex-none w-10 h-6 border transition-colors ${
+              rainedOnRoute
+                ? "bg-[rgb(var(--neon)/0.15)] border-[rgb(var(--neon)/0.5)]"
+                : "bg-transparent border-[rgb(var(--border)/0.4)]"
+            }`}
+            role="presentation"
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 transition-transform ${
+                rainedOnRoute
+                  ? "translate-x-4 bg-[rgb(var(--neon))]"
+                  : "translate-x-0 bg-[rgb(var(--text-meta)/0.5)]"
+              }`}
+            />
+          </span>
+          <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-secondary))]">
+            RAINED ON ROUTE
           </span>
         </label>
       </div>
@@ -1139,16 +1174,16 @@ function HydrationGoalPanel({
   const displayOz =
     overrideNum !== null && Number.isFinite(overrideNum) && overrideNum > 0
       ? overrideNum
-      : totalSuggestedOz;
+      : routeWaterGoalOz;
 
   const basisParts: string[] = [];
   if (milesStr.trim()) basisParts.push(`${milesStr} mi`);
-  if (hasWeather) basisParts.push(`${Math.round(effectiveHeatF)}°F eff. heat`);
+  if (hasWeather) basisParts.push(`${Math.round(effectiveHeatF)}°F blended heat`);
 
   return (
     <div className="space-y-2">
       <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))]">
-        HYDRATION GOAL (oz)
+        ROUTE HYDRATION GOAL (oz)
       </div>
 
       <div className="w-full bg-[rgb(var(--window)/0.5)] border border-[rgb(var(--border)/0.2)] px-4 py-3 space-y-1">
@@ -1175,10 +1210,11 @@ function HydrationGoalPanel({
         </div>
 
         <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
-          {routeWaterGoalOz} oz route
-          {preShiftWaterOz ? ` + ${preShiftWaterOz} oz pre-shift` : ""}
+          {routeWaterGoalOz} oz on route
+          {preShiftWaterOz ? ` · +${preShiftWaterOz} oz pre-shift tip (not in goal)` : ""}
           {" · "}
           {routeHours % 1 === 0 ? routeHours : routeHours.toFixed(1)} h est.
+          {preShiftWaterOz ? ` · ${totalSuggestedOz} oz total if you add pre-shift` : ""}
         </div>
 
         {basisParts.length > 0 && (
