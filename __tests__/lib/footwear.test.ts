@@ -5,6 +5,7 @@ import {
   milesRemainingToNext,
   progressToNextPercent,
   getPendingCheckpoints,
+  getSuggestedCheckpoint,
 } from "@/lib/footwear/checkpoints";
 import {
   aggregateMileage,
@@ -109,6 +110,30 @@ describe("footwear checkpoints", () => {
     const level = getLevelForMiles(650);
     expect(level.miles).toBe(600);
     expect(getNextCheckpoint(650)?.miles).toBe(700);
+  });
+
+  it("suggests the highest pending checkpoint, not the lowest", () => {
+    const pending = getPendingCheckpoints({
+      totalMiles: 308,
+      completedCheckpoints: [],
+    });
+    const suggested = getSuggestedCheckpoint({
+      totalMiles: 308,
+      pendingCheckpoints: pending.map((p) => ({
+        miles: p.miles,
+        title: p.title,
+      })),
+    });
+    expect(suggested.miles).toBe(300);
+    expect(suggested.title).toBe("Long Hauler");
+  });
+
+  it("falls back to rounded service mileage when caught up", () => {
+    const suggested = getSuggestedCheckpoint({
+      totalMiles: 308.4,
+      pendingCheckpoints: [],
+    });
+    expect(suggested.miles).toBe(308);
   });
 });
 

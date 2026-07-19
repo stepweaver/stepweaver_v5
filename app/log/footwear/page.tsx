@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
+import { redirect } from "next/navigation";
 import { CarrierDaybookGate } from "@/components/carrier-journal/carrier-daybook-gate";
 import { CarrierDaybookUnauthorized } from "@/components/carrier-journal/carrier-daybook-unauthorized";
 import { CarrierPrivateNav } from "@/components/carrier-journal/carrier-private-nav";
 import { FootwearLabPrivateClient } from "@/components/footwear/footwear-lab-private-client";
 import { verifyCarrierLogSecret } from "@/lib/notion/carrier-journal.repo";
 import { isFootwearDbConfigured } from "@/lib/db";
-import { listShoeSummaries } from "@/lib/footwear/queries";
+import {
+  getActiveShoe,
+  listShoeSummaries,
+} from "@/lib/footwear/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -15,11 +19,11 @@ export const metadata: Metadata = {
 };
 
 type Props = {
-  searchParams: Promise<{ token?: string }>;
+  searchParams: Promise<{ token?: string; roster?: string }>;
 };
 
 export default async function FootwearLabPrivatePage({ searchParams }: Props) {
-  const { token } = await searchParams;
+  const { token, roster } = await searchParams;
 
   if (!token) {
     return (
@@ -35,6 +39,17 @@ export default async function FootwearLabPrivatePage({ searchParams }: Props) {
         <CarrierDaybookUnauthorized />
       </main>
     );
+  }
+
+  const showRoster = roster === "1" || roster === "true";
+
+  if (isFootwearDbConfigured() && !showRoster) {
+    const active = await getActiveShoe();
+    if (active) {
+      redirect(
+        `/log/footwear/${active.slug}?token=${encodeURIComponent(token)}`
+      );
+    }
   }
 
   const shoes = isFootwearDbConfigured() ? await listShoeSummaries() : [];

@@ -62,7 +62,7 @@ export default async function ManageShoePage({ params, searchParams }: Props) {
         <CarrierPrivateNav token={token} active="footwear" />
         <p className="mb-4">
           <Link
-            href={`/log/footwear?token=${encodeURIComponent(token)}`}
+            href={`/log/footwear?token=${encodeURIComponent(token)}&roster=1`}
             className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] hover:underline"
           >
             ← Equipment roster

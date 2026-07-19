@@ -192,3 +192,25 @@ export function getPendingCheckpoints(input: {
     (c) => c.status === "assessment_pending"
   );
 }
+
+/**
+ * Suggest the checkpoint to log next: highest unlocked pending threshold.
+ * Falls back to rounded service mileage when the ladder is caught up.
+ */
+export function getSuggestedCheckpoint(input: {
+  totalMiles: number;
+  pendingCheckpoints: { miles: number; title: string }[];
+}): { miles: number; title: string | null } {
+  if (input.pendingCheckpoints.length > 0) {
+    const suggested = input.pendingCheckpoints.reduce((best, cur) =>
+      cur.miles >= best.miles ? cur : best
+    );
+    return { miles: suggested.miles, title: suggested.title };
+  }
+  const rounded = Math.round(input.totalMiles);
+  const level = getLevelForMiles(input.totalMiles);
+  return {
+    miles: rounded,
+    title: level.miles === rounded ? level.title : null,
+  };
+}

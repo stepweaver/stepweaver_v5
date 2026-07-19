@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { getSuggestedCheckpoint } from "@/lib/footwear/checkpoints";
 
 type Props = {
   token: string;
@@ -57,12 +58,23 @@ export function FootwearShoeManageClient({
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const suggested = getSuggestedCheckpoint({
+    totalMiles,
+    pendingCheckpoints,
+  });
+  const highestPending =
+    pendingCheckpoints.length > 0
+      ? pendingCheckpoints.reduce((best, cur) =>
+          cur.miles >= best.miles ? cur : best
+        )
+      : null;
+
   const [checkpointMiles, setCheckpointMiles] = useState(
-    String(pendingCheckpoints[0]?.miles ?? 250)
+    String(suggested.miles)
   );
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState("");
-  const [title, setTitle] = useState("");
+  const [title, setTitle] = useState(suggested.title ?? "");
   const [ratings, setRatings] = useState<Record<string, string>>({});
   const [publicObs, setPublicObs] = useState(true);
   const [retrospective, setRetrospective] = useState(shoe.isLegacyRecord);
@@ -252,8 +264,8 @@ export function FootwearShoeManageClient({
         )}
         <p className="mt-2 font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))]">
           SERVICE MILEAGE // {totalMiles} MI
-          {pendingCheckpoints[0]
-            ? ` // PENDING ${pendingCheckpoints[0].miles} ${pendingCheckpoints[0].title.toUpperCase()}`
+          {highestPending
+            ? ` // PENDING ${highestPending.miles} ${highestPending.title.toUpperCase()}`
             : ""}
         </p>
       </header>
@@ -322,6 +334,13 @@ export function FootwearShoeManageClient({
                   onChange={(e) => setCheckpointMiles(e.target.value)}
                   className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm"
                 />
+                <p className="mt-1 text-[10px] text-[rgb(var(--text-meta))]">
+                  Service mileage is {totalMiles} mi
+                  {highestPending
+                    ? ` · suggested checkpoint ${highestPending.miles} (${highestPending.title})`
+                    : ""}
+                  .
+                </p>
               </div>
             )}
             <div className="sm:col-span-2">
