@@ -63,7 +63,7 @@ function LifecycleTrendsSection({
         )}
         {hasRetrospective && (
           <p className="text-sm text-[rgb(var(--text-secondary))]">
-            Retrospective scores were logged looking back — not scored live at
+            Retrospective scores were logged looking back, not scored live at
             that checkpoint.
           </p>
         )}
