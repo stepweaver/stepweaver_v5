@@ -1,7 +1,10 @@
 "use client";
 
-import { useState } from "react";
-import { getSuggestedCheckpoint } from "@/lib/footwear/checkpoints";
+import { useMemo, useState } from "react";
+import {
+  getCheckpointThresholds,
+  getSuggestedCheckpoint,
+} from "@/lib/footwear/checkpoints";
 
 export type ManageObservation = {
   id: string;
@@ -108,9 +111,29 @@ export function FootwearShoeManageClient({
           cur.miles >= best.miles ? cur : best
         )
       : null;
+  const checkpointOptions = useMemo(
+    () => getCheckpointThresholds(totalMiles),
+    [totalMiles]
+  );
+  const loggedCheckpointMiles = useMemo(() => {
+    const logged = new Set<number>();
+    for (const obs of observations) {
+      if (
+        obs.entryType === "checkpoint" &&
+        obs.checkpointMiles != null &&
+        obs.id !== editingId
+      ) {
+        logged.add(obs.checkpointMiles);
+      }
+    }
+    return logged;
+  }, [observations, editingId]);
 
   const [checkpointMiles, setCheckpointMiles] = useState(
     String(suggested.miles)
+  );
+  const [customCheckpoint, setCustomCheckpoint] = useState(
+    () => !checkpointOptions.some((t) => t.miles === suggested.miles)
   );
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [notes, setNotes] = useState("");
@@ -144,8 +167,16 @@ export function FootwearShoeManageClient({
     return out;
   }
 
+  function selectNamedCheckpoint(miles: number, namedTitle: string) {
+    setCustomCheckpoint(false);
+    setCheckpointMiles(String(miles));
+    setTitle(namedTitle);
+  }
+
   function resetObservationForm() {
     setEditingId(null);
+    const isNamed = checkpointOptions.some((t) => t.miles === suggested.miles);
+    setCustomCheckpoint(!isNamed);
     setCheckpointMiles(String(suggested.miles));
     setDate(new Date().toISOString().slice(0, 10));
     setNotes("");
@@ -171,9 +202,11 @@ export function FootwearShoeManageClient({
           : "field_note"
     );
     setDate(obs.date);
-    setCheckpointMiles(
-      obs.checkpointMiles != null ? String(obs.checkpointMiles) : ""
-    );
+    const miles = obs.checkpointMiles;
+    const isNamed =
+      miles != null && checkpointOptions.some((t) => t.miles === miles);
+    setCustomCheckpoint(miles != null && !isNamed);
+    setCheckpointMiles(miles != null ? String(miles) : "");
     setTitle(obs.title ?? "");
     setNotes(obs.notes);
     setPublicObs(obs.public);
@@ -473,23 +506,78 @@ export function FootwearShoeManageClient({
               />
             </div>
             {tab === "checkpoint" && (
-              <div>
-                <label htmlFor="obs-cp" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
-                  Checkpoint miles
-                </label>
-                <input
-                  id="obs-cp"
-                  value={checkpointMiles}
-                  onChange={(e) => setCheckpointMiles(e.target.value)}
-                  className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm"
-                />
-                <p className="mt-1 text-[10px] text-[rgb(var(--text-meta))]">
-                  Service mileage is {totalMiles} mi
-                  {highestPending
-                    ? ` · suggested checkpoint ${highestPending.miles} (${highestPending.title})`
-                    : ""}
-                  .
-                </p>
+              <div className="sm:col-span-2 space-y-3">
+                <div>
+                  <label
+                    htmlFor="obs-cp-select"
+                    className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+                  >
+                    Checkpoint
+                  </label>
+                  <select
+                    id="obs-cp-select"
+                    value={
+                      customCheckpoint
+                        ? "custom"
+                        : checkpointOptions.some(
+                              (t) => String(t.miles) === checkpointMiles
+                            )
+                          ? checkpointMiles
+                          : "custom"
+                    }
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "custom") {
+                        setCustomCheckpoint(true);
+                        return;
+                      }
+                      const miles = parseInt(value, 10);
+                      const named = checkpointOptions.find(
+                        (t) => t.miles === miles
+                      );
+                      if (named) selectNamedCheckpoint(named.miles, named.title);
+                    }}
+                    className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm"
+                  >
+                    {checkpointOptions.map((t) => {
+                      const logged = loggedCheckpointMiles.has(t.miles);
+                      return (
+                        <option
+                          key={t.miles}
+                          value={String(t.miles)}
+                          disabled={logged}
+                        >
+                          {t.miles} mi — {t.title}
+                          {logged ? " (logged)" : ""}
+                        </option>
+                      );
+                    })}
+                    <option value="custom">Custom miles…</option>
+                  </select>
+                  <p className="mt-1 text-[10px] text-[rgb(var(--text-meta))]">
+                    Service mileage is {totalMiles} mi
+                    {highestPending
+                      ? ` · suggested ${highestPending.miles} mi (${highestPending.title})`
+                      : ""}
+                    .
+                  </p>
+                </div>
+                {customCheckpoint && (
+                  <div>
+                    <label
+                      htmlFor="obs-cp"
+                      className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+                    >
+                      Custom checkpoint miles
+                    </label>
+                    <input
+                      id="obs-cp"
+                      value={checkpointMiles}
+                      onChange={(e) => setCheckpointMiles(e.target.value)}
+                      className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm"
+                    />
+                  </div>
+                )}
               </div>
             )}
             <div className="sm:col-span-2">
