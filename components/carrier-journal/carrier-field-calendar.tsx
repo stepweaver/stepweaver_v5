@@ -36,8 +36,8 @@ const INTENSITY_ALPHA: Record<1 | 2 | 3 | 4, number> = {
 const CONDITION_RGB: Record<CalendarCondition, string> = {
   heat90: "var(--danger)",
   storm: "var(--purple)",
-  snow: "200, 230, 255",
-  belowZero: "180, 220, 255",
+  snow: "200 230 255",
+  belowZero: "180 220 255",
   rain: "var(--cyan)",
   heat80: "var(--warn)",
   freezing: "var(--blue)",
