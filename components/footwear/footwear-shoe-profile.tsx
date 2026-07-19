@@ -153,27 +153,36 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
                 ["durability", "DURABILITY"],
                 ["endOfShiftSupport", "END-OF-SHIFT SUPPORT"],
               ] as const
-            ).map(([key, label]) => (
-              <div key={key} className="border border-[rgb(var(--neon)/0.15)] p-3">
-                <p className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] mb-2">
-                  {label}
-                </p>
-                <ul className="space-y-1">
-                  {trends.ratings[key].map((p) => (
-                    <li
-                      key={`${key}-${p.checkpointMiles}`}
-                      className="flex justify-between font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-color))]"
-                    >
-                      <span>
-                        {p.checkpointMiles} MI
-                        {p.retrospective ? " · RETRO" : ""}
-                      </span>
-                      <span>{p.value ?? "-"}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
+            ).map(([key, label]) => {
+              const points = trends.ratings[key];
+              const showMiles = points.length > 1;
+              return (
+                <div key={key} className="border border-[rgb(var(--neon)/0.15)] p-3">
+                  <p className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] mb-2">
+                    {label}
+                  </p>
+                  <ul className="space-y-1">
+                    {points.map((p) => (
+                      <li
+                        key={`${key}-${p.checkpointMiles}`}
+                        className={`flex font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-color))] ${
+                          showMiles || p.retrospective ? "justify-between" : "justify-end"
+                        }`}
+                      >
+                        {(showMiles || p.retrospective) && (
+                          <span>
+                            {showMiles
+                              ? `${p.checkpointMiles} MI${p.retrospective ? " · RETRO" : ""}`
+                              : "RETRO"}
+                          </span>
+                        )}
+                        <span>{p.value ?? "-"}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
           </div>
         </section>
       )}
