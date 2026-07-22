@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
 import {
   getCheckpointThresholds,
   getSuggestedCheckpoint,
@@ -36,6 +38,16 @@ export type ManageObservation = {
   shoeMileageAtEntry: string | number | null;
 };
 
+export type ManageMedia = {
+  id: string;
+  imageUrl: string;
+  imageType: string;
+  observationId: string | null;
+  mileageAtPhoto: string;
+  caption: string | null;
+  public: boolean;
+};
+
 type Props = {
   token: string;
   shoe: {
@@ -50,6 +62,7 @@ type Props = {
   totalMiles: number;
   pendingCheckpoints: { miles: number; title: string }[];
   observations?: ManageObservation[];
+  media?: ManageMedia[];
 };
 
 const RATING_FIELDS = [
@@ -91,7 +104,9 @@ export function FootwearShoeManageClient({
   totalMiles,
   pendingCheckpoints,
   observations: initialObservations = [],
+  media = [],
 }: Props) {
+  const router = useRouter();
   const [tab, setTab] = useState<
     "checkpoint" | "field_note" | "incident" | "allocation" | "retire" | "photo"
   >("checkpoint");
@@ -392,6 +407,7 @@ export function FootwearShoeManageClient({
       setPhotoFile(null);
       setPhotoCaption("");
       setPhotoInputKey((k) => k + 1);
+      router.refresh();
     } finally {
       setBusy(false);
     }
@@ -984,6 +1000,71 @@ export function FootwearShoeManageClient({
             {photoScope === "hero" ? "Upload hero" : "Upload checkpoint photo"}
           </button>
         </form>
+      )}
+
+      {tab === "photo" && (
+        <section className="surface-panel p-5 space-y-4">
+          <h2 className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))]">
+            SAVED PHOTOS // {media.length}
+          </h2>
+          {media.length === 0 ? (
+            <p className="text-sm text-[rgb(var(--text-secondary))]">
+              No photos saved yet. After a successful upload they appear here and
+              on the public profile under Service History (checkpoint) or as the
+              hero image.
+            </p>
+          ) : (
+            <ul className="grid gap-3 sm:grid-cols-2">
+              {media.map((m) => {
+                const obs = m.observationId
+                  ? observations.find((o) => o.id === m.observationId)
+                  : null;
+                const attachLabel =
+                  m.imageType === "hero" && !m.observationId
+                    ? "HERO"
+                    : obs?.checkpointMiles != null
+                      ? `${obs.checkpointMiles} MI${obs.title ? ` — ${obs.title}` : ""}`
+                      : "SHOE-LEVEL";
+                return (
+                  <li key={m.id} className="border border-[rgb(var(--neon)/0.2)]">
+                    <div className="relative aspect-square bg-[rgb(var(--window)/0.3)]">
+                      <Image
+                        src={m.imageUrl}
+                        alt={m.caption || `${shoe.brand} ${shoe.model} ${m.imageType}`}
+                        fill
+                        className="object-cover"
+                        sizes="(max-width: 768px) 100vw, 400px"
+                        unoptimized
+                      />
+                    </div>
+                    <div className="p-3 space-y-1">
+                      <p className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
+                        {m.imageType.toUpperCase()} // {attachLabel}
+                        {m.public ? " // PUBLIC" : " // PRIVATE"}
+                      </p>
+                      {m.caption && (
+                        <p className="text-sm text-[rgb(var(--text-secondary))]">
+                          {m.caption}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+          <p className="text-sm text-[rgb(var(--text-meta))]">
+            Public view:{" "}
+            <a
+              href={`/carrier-journal/footwear/${shoe.slug}`}
+              className="text-[rgb(var(--neon))] hover:underline"
+              target="_blank"
+              rel="noreferrer"
+            >
+              /carrier-journal/footwear/{shoe.slug}
+            </a>
+          </p>
+        </section>
       )}
 
       {tab === "retire" && (

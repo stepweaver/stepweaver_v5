@@ -9,6 +9,7 @@ import { verifyCarrierLogSecret } from "@/lib/notion/carrier-journal.repo";
 import { isFootwearDbConfigured } from "@/lib/db";
 import {
   getObservationsForShoe,
+  getMediaForShoe,
   getShoeSummaryBySlug,
 } from "@/lib/footwear/queries";
 
@@ -93,6 +94,7 @@ export default async function ManageShoePage({ params, searchParams }: Props) {
     (c) => c.status === "assessment_pending"
   );
   const observations = await getObservationsForShoe(summary.shoe.id);
+  const media = await getMediaForShoe(summary.shoe.id);
 
   return (
     <main className="flex-1 pt-12 pb-16">
@@ -123,6 +125,15 @@ export default async function ManageShoePage({ params, searchParams }: Props) {
             title: p.title,
           }))}
           observations={observations.map(serializeObservation)}
+          media={media.map((m) => ({
+            id: m.id,
+            imageUrl: m.imageUrl,
+            imageType: m.imageType,
+            observationId: m.observationId,
+            mileageAtPhoto: String(m.mileageAtPhoto),
+            caption: m.caption,
+            public: m.public,
+          }))}
         />
       </div>
     </main>
