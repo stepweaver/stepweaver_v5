@@ -224,3 +224,8 @@ export const mediaMetaSchema = footwearAuthSchema.extend({
   sortOrder: z.number().int().min(0).default(0),
   public: z.boolean().default(false),
 });
+
+/** After client → Blob upload, register the public URL in shoe_media. */
+export const mediaRegisterSchema = mediaMetaSchema.extend({
+  imageUrl: z.string().url().max(2000),
+});

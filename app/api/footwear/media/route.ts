@@ -1,9 +1,9 @@
 import { NextResponse } from "next/server";
-import { put } from "@vercel/blob";
-import { mediaMetaSchema } from "@/lib/validation/footwear.schema";
+import { mediaRegisterSchema } from "@/lib/validation/footwear.schema";
 import {
   assertFootwearReady,
   footwearBadRequest,
+  readJsonBody,
 } from "@/lib/footwear/api";
 import {
   createMedia,
@@ -11,46 +11,25 @@ import {
   getShoeById,
   getShoeMileageTotal,
 } from "@/lib/footwear/queries";
-import { createId } from "@/lib/footwear/id";
 
 export const dynamic = "force-dynamic";
 
-const MAX_BYTES = 5 * 1024 * 1024;
-const ALLOWED = new Set(["image/jpeg", "image/png", "image/webp"]);
-
+/**
+ * Registers a Blob URL already uploaded from the browser.
+ * Files go directly to Vercel Blob (client upload) to avoid the 4.5MB
+ * Function body limit that caused HTTP 413 for phone JPEGs.
+ */
 export async function POST(request: Request) {
-  const form = await request.formData();
-  const file = form.get("file");
-  const metaRaw = form.get("meta");
+  const parsedBody = await readJsonBody(request);
+  if (!parsedBody.ok) return parsedBody.response;
 
-  if (!(file instanceof File)) {
-    return footwearBadRequest("Missing image file.");
-  }
-  if (typeof metaRaw !== "string") {
-    return footwearBadRequest("Missing meta JSON.");
-  }
-
-  let metaJson: unknown;
-  try {
-    metaJson = JSON.parse(metaRaw);
-  } catch {
-    return footwearBadRequest("Invalid meta JSON.");
-  }
-
-  const parsed = mediaMetaSchema.safeParse(metaJson);
+  const parsed = mediaRegisterSchema.safeParse(parsedBody.body);
   if (!parsed.success) {
     return footwearBadRequest("Validation failed", parsed.error.flatten());
   }
 
   const gate = assertFootwearReady(parsed.data.logSecret);
   if (gate) return gate;
-
-  if (!ALLOWED.has(file.type)) {
-    return footwearBadRequest("Only JPEG, PNG, and WebP images are allowed.");
-  }
-  if (file.size > MAX_BYTES) {
-    return footwearBadRequest("Image must be 5MB or smaller.");
-  }
 
   if (!(process.env.BLOB_READ_WRITE_TOKEN ?? "").trim()) {
     return NextResponse.json(
@@ -64,12 +43,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Shoe not found" }, { status: 404 });
   }
 
+  const imageUrl = parsed.data.imageUrl;
+  if (
+    !imageUrl.includes("blob.vercel-storage.com/") ||
+    !imageUrl.includes(`/footwear/${shoe.slug}/`)
+  ) {
+    return footwearBadRequest("Image URL is not a valid Footwear Lab blob.");
+  }
+
   const isHero = parsed.data.imageType === "hero";
   let observationId = parsed.data.observationId;
   let mileageAtPhoto: string;
 
   if (isHero) {
-    // Feature image is shoe-level only — never tied to a checkpoint.
     observationId = undefined;
     mileageAtPhoto = "0";
   } else if (observationId) {
@@ -82,24 +68,16 @@ export async function POST(request: Request) {
     mileageAtPhoto = String(await getShoeMileageTotal(shoe.id));
   }
 
-  const ext =
-    file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
-  const filename = `footwear/${shoe.slug}/${createId("img")}.${ext}`;
-
-  const blob = await put(filename, file, {
-    access: "public",
-    contentType: file.type,
-    token: process.env.BLOB_READ_WRITE_TOKEN,
-  });
-
   const media = await createMedia({
     shoeId: shoe.id,
     observationId,
-    imageUrl: blob.url,
+    imageUrl,
     imageType: parsed.data.imageType,
     mileageAtPhoto,
     caption: parsed.data.caption,
-    altText: parsed.data.altText ?? `${shoe.brand} ${shoe.model} ${parsed.data.imageType}`,
+    altText:
+      parsed.data.altText ??
+      `${shoe.brand} ${shoe.model} ${parsed.data.imageType}`,
     sortOrder: parsed.data.sortOrder,
     public: parsed.data.public,
   });

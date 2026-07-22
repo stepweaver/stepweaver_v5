@@ -3,10 +3,13 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { upload } from "@vercel/blob/client";
 import {
   getCheckpointThresholds,
   getSuggestedCheckpoint,
 } from "@/lib/footwear/checkpoints";
+import { compressImageForUpload } from "@/lib/footwear/compress-image";
+import { createId } from "@/lib/footwear/id";
 
 export type ManageObservation = {
   id: string;
@@ -374,31 +377,57 @@ export function FootwearShoeManageClient({
     }
     setBusy(true);
     setError(null);
+    setMessage(null);
     try {
-      const form = new FormData();
-      form.append("file", photoFile);
-      form.append(
-        "meta",
-        JSON.stringify({
+      const prepared = await compressImageForUpload(photoFile);
+      const ext =
+        prepared.type === "image/png"
+          ? "png"
+          : prepared.type === "image/webp"
+            ? "webp"
+            : "jpg";
+      const pathname = `footwear/${shoe.slug}/${createId("img")}.${ext}`;
+
+      const blob = await upload(pathname, prepared, {
+        access: "public",
+        handleUploadUrl: "/api/footwear/media/upload",
+        clientPayload: JSON.stringify({ logSecret: token }),
+      });
+
+      const res = await fetch("/api/footwear/media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
           logSecret: token,
           shoeId: shoe.id,
+          imageUrl: blob.url,
           imageType: photoScope === "hero" ? "hero" : photoType,
           observationId:
             photoScope === "checkpoint" ? photoObservationId : undefined,
           caption: photoCaption || undefined,
           public: photoPublic,
           sortOrder: 0,
-        })
-      );
-      const res = await fetch("/api/footwear/media", {
-        method: "POST",
-        body: form,
+        }),
       });
-      const data = await res.json();
+
+      let data: { error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+
       if (!res.ok) {
-        setError(data.error ?? "Upload failed");
+        if (res.status === 413) {
+          setError(
+            "Image is too large for the server. Try a smaller photo or wait for compression and retry."
+          );
+        } else {
+          setError(data.error ?? `Upload failed (${res.status})`);
+        }
         return;
       }
+
       setMessage(
         photoScope === "hero"
           ? "Hero image uploaded."
@@ -408,6 +437,8 @@ export function FootwearShoeManageClient({
       setPhotoCaption("");
       setPhotoInputKey((k) => k + 1);
       router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed");
     } finally {
       setBusy(false);
     }
@@ -901,7 +932,7 @@ export function FootwearShoeManageClient({
                   Choose image
                 </label>
                 <span className="text-sm text-[rgb(var(--text-secondary))]">
-                  {photoFile ? photoFile.name : "JPEG / PNG / WebP · max 5MB"}
+                  {photoFile ? photoFile.name : "JPEG / PNG / WebP · phone photos OK"}
                 </span>
               </div>
             </div>
