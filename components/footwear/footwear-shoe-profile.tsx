@@ -142,6 +142,27 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
   const publicNotes = observations.filter(
     (o) => o.entryType !== "checkpoint" || true
   );
+  const heroMedia =
+    media.find(
+      (m) =>
+        !m.observationId &&
+        m.imageUrl === summary.heroImageUrl
+    ) ??
+    media.find((m) => !m.observationId && m.imageType === "hero") ??
+    null;
+  const mediaByObservation = new Map<string, ShoeMedia[]>();
+  for (const m of media) {
+    if (!m.observationId) continue;
+    const list = mediaByObservation.get(m.observationId) ?? [];
+    list.push(m);
+    mediaByObservation.set(m.observationId, list);
+  }
+  const shoeLevelGallery = media.filter(
+    (m) =>
+      !m.observationId &&
+      m.imageType !== "hero" &&
+      m.imageUrl !== summary.heroImageUrl
+  );
 
   return (
     <article className="space-y-10">
@@ -173,7 +194,7 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
           <Image
             src={summary.heroImageUrl}
             alt={
-              media.find((m) => m.imageUrl === summary.heroImageUrl)?.altText ??
+              heroMedia?.altText ??
               `${shoe.brand} ${shoe.model}`
             }
             fill
@@ -260,36 +281,70 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
             SERVICE HISTORY
           </h2>
           <ul className="space-y-3">
-            {publicNotes.map((o) => (
-              <li key={o.id} className="border border-[rgb(var(--neon)/0.15)] p-4">
-                <p className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
-                  {o.entryType.toUpperCase()}
-                  {o.checkpointMiles != null ? ` // ${o.checkpointMiles} MI` : ""}
-                  {" // "}
-                  {o.shoeMileageAtEntry} MI SERVICE // {o.date}
-                  {o.retrospective ? " // RETROSPECTIVE" : ""}
-                </p>
-                {o.title && (
-                  <p className="mt-1 font-[var(--font-ibm)] text-[rgb(var(--text-color))]">
-                    {o.title}
+            {publicNotes.map((o) => {
+              const entryPhotos = mediaByObservation.get(o.id) ?? [];
+              return (
+                <li key={o.id} className="border border-[rgb(var(--neon)/0.15)] p-4">
+                  <p className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
+                    {o.entryType.toUpperCase()}
+                    {o.checkpointMiles != null ? ` // ${o.checkpointMiles} MI` : ""}
+                    {" // "}
+                    {o.shoeMileageAtEntry} MI SERVICE // {o.date}
+                    {o.retrospective ? " // RETROSPECTIVE" : ""}
                   </p>
-                )}
-                <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] whitespace-pre-wrap">
-                  {o.notes}
-                </p>
-              </li>
-            ))}
+                  {o.title && (
+                    <p className="mt-1 font-[var(--font-ibm)] text-[rgb(var(--text-color))]">
+                      {o.title}
+                    </p>
+                  )}
+                  <p className="mt-2 text-sm text-[rgb(var(--text-secondary))] whitespace-pre-wrap">
+                    {o.notes}
+                  </p>
+                  {entryPhotos.length > 0 && (
+                    <ul className="mt-4 grid gap-3 sm:grid-cols-2">
+                      {entryPhotos.map((m) => (
+                        <li key={m.id} className="border border-[rgb(var(--neon)/0.2)]">
+                          <div className="relative aspect-square bg-[rgb(var(--window)/0.3)]">
+                            <Image
+                              src={m.imageUrl}
+                              alt={
+                                m.altText ??
+                                `${shoe.brand} ${shoe.model} ${m.imageType}`
+                              }
+                              fill
+                              className="object-cover"
+                              sizes="(max-width: 768px) 100vw, 400px"
+                              unoptimized
+                            />
+                          </div>
+                          <div className="p-3">
+                            <p className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
+                              {m.imageType.toUpperCase()} // {m.mileageAtPhoto} MI
+                            </p>
+                            {m.caption && (
+                              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))]">
+                                {m.caption}
+                              </p>
+                            )}
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </section>
       )}
 
-      {media.length > 0 && (
+      {shoeLevelGallery.length > 0 && (
         <section className="space-y-4">
           <h2 className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))]">
             FIELD PHOTOS
           </h2>
           <ul className="grid gap-4 sm:grid-cols-2">
-            {media.map((m) => (
+            {shoeLevelGallery.map((m) => (
               <li key={m.id} className="border border-[rgb(var(--neon)/0.2)]">
                 <div className="relative aspect-square bg-[rgb(var(--window)/0.3)]">
                   <Image

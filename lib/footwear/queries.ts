@@ -121,10 +121,12 @@ export function deriveShoeSummary(
   }));
   const condition = getCurrentCondition(checkpointObs);
   const paid = amountPaidNumber(shoe);
+  // Prefer an explicit shoe-level hero; never promote checkpoint-linked photos.
+  const shoeLevel = media.filter((m) => !m.observationId);
   const hero =
-    media.find((m) => m.imageType === "hero") ??
-    media.find((m) => m.imageType === "pair") ??
-    media[0] ??
+    shoeLevel.find((m) => m.imageType === "hero") ??
+    shoeLevel.find((m) => m.imageType === "pair") ??
+    shoeLevel[0] ??
     null;
 
   return {

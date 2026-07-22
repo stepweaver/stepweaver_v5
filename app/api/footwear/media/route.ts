@@ -7,6 +7,7 @@ import {
 } from "@/lib/footwear/api";
 import {
   createMedia,
+  getObservationById,
   getShoeById,
   getShoeMileageTotal,
 } from "@/lib/footwear/queries";
@@ -63,7 +64,24 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Shoe not found" }, { status: 404 });
   }
 
-  const mileage = await getShoeMileageTotal(shoe.id);
+  const isHero = parsed.data.imageType === "hero";
+  let observationId = parsed.data.observationId;
+  let mileageAtPhoto: string;
+
+  if (isHero) {
+    // Feature image is shoe-level only — never tied to a checkpoint.
+    observationId = undefined;
+    mileageAtPhoto = "0";
+  } else if (observationId) {
+    const obs = await getObservationById(observationId);
+    if (!obs || obs.shoeId !== shoe.id) {
+      return footwearBadRequest("Observation not found for this shoe.");
+    }
+    mileageAtPhoto = String(obs.checkpointMiles ?? obs.shoeMileageAtEntry);
+  } else {
+    mileageAtPhoto = String(await getShoeMileageTotal(shoe.id));
+  }
+
   const ext =
     file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
   const filename = `footwear/${shoe.slug}/${createId("img")}.${ext}`;
@@ -76,10 +94,10 @@ export async function POST(request: Request) {
 
   const media = await createMedia({
     shoeId: shoe.id,
-    observationId: parsed.data.observationId,
+    observationId,
     imageUrl: blob.url,
     imageType: parsed.data.imageType,
-    mileageAtPhoto: String(mileage),
+    mileageAtPhoto,
     caption: parsed.data.caption,
     altText: parsed.data.altText ?? `${shoe.brand} ${shoe.model} ${parsed.data.imageType}`,
     sortOrder: parsed.data.sortOrder,

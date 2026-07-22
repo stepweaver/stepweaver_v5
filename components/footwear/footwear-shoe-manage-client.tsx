@@ -152,10 +152,27 @@ export function FootwearShoeManageClient({
   const [finalReview, setFinalReview] = useState("");
   const [wouldBuyAgain, setWouldBuyAgain] = useState(true);
 
+  const [photoScope, setPhotoScope] = useState<"hero" | "checkpoint">("checkpoint");
   const [photoType, setPhotoType] = useState("pair");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoCaption, setPhotoCaption] = useState("");
   const [photoPublic, setPhotoPublic] = useState(true);
+  const [photoObservationId, setPhotoObservationId] = useState(() => {
+    const checkpoints = observations
+      .filter((o) => o.entryType === "checkpoint" && o.checkpointMiles != null)
+      .sort((a, b) => (b.checkpointMiles ?? 0) - (a.checkpointMiles ?? 0));
+    const at300 = checkpoints.find((o) => o.checkpointMiles === 300);
+    return at300?.id ?? checkpoints[0]?.id ?? "";
+  });
+  const [photoInputKey, setPhotoInputKey] = useState(0);
+
+  const checkpointPhotoTargets = useMemo(
+    () =>
+      observations
+        .filter((o) => o.entryType === "checkpoint" && o.checkpointMiles != null)
+        .sort((a, b) => (a.checkpointMiles ?? 0) - (b.checkpointMiles ?? 0)),
+    [observations]
+  );
 
   function ratingPayload(forUpdate = false) {
     const out: Record<string, number | null> = {};
@@ -336,6 +353,10 @@ export function FootwearShoeManageClient({
       setError("Choose an image file.");
       return;
     }
+    if (photoScope === "checkpoint" && !photoObservationId) {
+      setError("Select a checkpoint for this photo.");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -346,7 +367,9 @@ export function FootwearShoeManageClient({
         JSON.stringify({
           logSecret: token,
           shoeId: shoe.id,
-          imageType: photoType,
+          imageType: photoScope === "hero" ? "hero" : photoType,
+          observationId:
+            photoScope === "checkpoint" ? photoObservationId : undefined,
           caption: photoCaption || undefined,
           public: photoPublic,
           sortOrder: 0,
@@ -361,9 +384,14 @@ export function FootwearShoeManageClient({
         setError(data.error ?? "Upload failed");
         return;
       }
-      setMessage("Photo uploaded.");
+      setMessage(
+        photoScope === "hero"
+          ? "Hero image uploaded."
+          : "Checkpoint photo uploaded."
+      );
       setPhotoFile(null);
       setPhotoCaption("");
+      setPhotoInputKey((k) => k + 1);
     } finally {
       setBusy(false);
     }
@@ -800,42 +828,129 @@ export function FootwearShoeManageClient({
 
       {tab === "photo" && (
         <form className="surface-panel p-5 space-y-4" onSubmit={submitPhoto}>
+          <p className="text-sm text-[rgb(var(--text-secondary))]">
+            Hero is the shoe&apos;s feature image. Checkpoint photos attach to a
+            mileage milestone so wear and degradation can be compared over time.
+          </p>
+          <fieldset className="space-y-2">
+            <legend className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-2">
+              Attach to
+            </legend>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="photo-scope"
+                checked={photoScope === "hero"}
+                onChange={() => {
+                  setPhotoScope("hero");
+                  setError(null);
+                }}
+              />
+              Hero / feature image
+            </label>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="radio"
+                name="photo-scope"
+                checked={photoScope === "checkpoint"}
+                onChange={() => {
+                  setPhotoScope("checkpoint");
+                  setError(null);
+                }}
+              />
+              Checkpoint photos
+            </label>
+          </fieldset>
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label htmlFor="photo-file" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
+              <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
                 Image
-              </label>
+              </span>
               <input
+                key={photoInputKey}
                 id="photo-file"
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
-                onChange={(e) => setPhotoFile(e.target.files?.[0] ?? null)}
-                className="w-full text-sm"
+                onChange={(e) => {
+                  setError(null);
+                  setPhotoFile(e.target.files?.[0] ?? null);
+                }}
+                className="sr-only"
               />
+              <div className="flex flex-wrap items-center gap-3">
+                <label
+                  htmlFor="photo-file"
+                  className="glitch-button inline-block cursor-pointer px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.2em] uppercase"
+                >
+                  Choose image
+                </label>
+                <span className="text-sm text-[rgb(var(--text-secondary))]">
+                  {photoFile ? photoFile.name : "JPEG / PNG / WebP · max 5MB"}
+                </span>
+              </div>
             </div>
-            <div>
-              <label htmlFor="photo-type" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
-                Image type
-              </label>
-              <select
-                id="photo-type"
-                value={photoType}
-                onChange={(e) => setPhotoType(e.target.value)}
-                className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm"
-              >
-                <option value="hero">Hero</option>
-                <option value="pair">Pair</option>
-                <option value="left_outsole">Left outsole</option>
-                <option value="right_outsole">Right outsole</option>
-                <option value="lateral">Lateral</option>
-                <option value="medial">Medial</option>
-                <option value="heel">Heel</option>
-                <option value="upper">Upper</option>
-                <option value="insole">Insole</option>
-                <option value="damage">Damage</option>
-                <option value="other">Other</option>
-              </select>
-            </div>
+            {photoScope === "checkpoint" ? (
+              <>
+                <div>
+                  <label
+                    htmlFor="photo-checkpoint"
+                    className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+                  >
+                    Checkpoint
+                  </label>
+                  <select
+                    id="photo-checkpoint"
+                    value={photoObservationId}
+                    onChange={(e) => setPhotoObservationId(e.target.value)}
+                    className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm"
+                    required
+                  >
+                    {checkpointPhotoTargets.length === 0 ? (
+                      <option value="">No checkpoints logged yet</option>
+                    ) : (
+                      checkpointPhotoTargets.map((o) => (
+                        <option key={o.id} value={o.id}>
+                          {o.checkpointMiles} MI
+                          {o.title ? ` — ${o.title}` : ""}
+                          {o.retrospective ? " (retrospective)" : ""}
+                        </option>
+                      ))
+                    )}
+                  </select>
+                </div>
+                <div>
+                  <label
+                    htmlFor="photo-type"
+                    className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2"
+                  >
+                    Image type
+                  </label>
+                  <select
+                    id="photo-type"
+                    value={photoType}
+                    onChange={(e) => setPhotoType(e.target.value)}
+                    className="w-full border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)] px-3 py-2 text-sm"
+                  >
+                    <option value="pair">Pair</option>
+                    <option value="left_outsole">Left outsole</option>
+                    <option value="right_outsole">Right outsole</option>
+                    <option value="lateral">Lateral</option>
+                    <option value="medial">Medial</option>
+                    <option value="heel">Heel</option>
+                    <option value="upper">Upper</option>
+                    <option value="insole">Insole</option>
+                    <option value="damage">Damage</option>
+                    <option value="other">Other</option>
+                  </select>
+                </div>
+              </>
+            ) : (
+              <div className="flex items-end">
+                <p className="text-sm text-[rgb(var(--text-meta))]">
+                  Saved as the profile hero. Not linked to a checkpoint.
+                </p>
+              </div>
+            )}
             <div className="sm:col-span-2">
               <label htmlFor="photo-caption" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
                 Caption
@@ -858,10 +973,15 @@ export function FootwearShoeManageClient({
           </label>
           <button
             type="submit"
-            disabled={busy}
-            className="glitch-button px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.2em] uppercase"
+            disabled={
+              busy ||
+              !photoFile ||
+              (photoScope === "checkpoint" &&
+                (checkpointPhotoTargets.length === 0 || !photoObservationId))
+            }
+            className="glitch-button px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.2em] uppercase disabled:opacity-40"
           >
-            Upload photo
+            {photoScope === "hero" ? "Upload hero" : "Upload checkpoint photo"}
           </button>
         </form>
       )}
