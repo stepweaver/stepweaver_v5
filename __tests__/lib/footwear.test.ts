@@ -253,6 +253,44 @@ describe("footwear stats", () => {
     expect(trends.cushioning.map((p) => p.value)).toEqual([9, 6]);
     expect(milesBeforeFirstDecline(obs)).toBe(250);
   });
+
+  it("requires avg >= 8 for STRONG (mid-7s are SERVICEABLE)", () => {
+    const strong = getCurrentCondition([
+      {
+        checkpointMiles: 100,
+        date: "2026-06-01",
+        cushioning: 8,
+        comfort: 8,
+        durability: 8,
+        endOfShiftSupport: 8,
+        outsoleWear: 1,
+        midsoleWear: 1,
+        upperWear: 0,
+        heelWear: 0,
+        insoleWear: 0,
+        structuralDeformation: 0,
+      },
+    ]);
+    expect(deriveConditionLabel(strong)).toBe("STRONG");
+
+    const serviceable = getCurrentCondition([
+      {
+        checkpointMiles: 300,
+        date: "2026-07-01",
+        cushioning: 7,
+        comfort: 8,
+        durability: 8,
+        endOfShiftSupport: 8,
+        outsoleWear: 2,
+        midsoleWear: 2,
+        upperWear: 1,
+        heelWear: 1,
+        insoleWear: 1,
+        structuralDeformation: 0,
+      },
+    ]);
+    expect(deriveConditionLabel(serviceable)).toBe("SERVICEABLE");
+  });
 });
 
 describe("footwear legacy", () => {

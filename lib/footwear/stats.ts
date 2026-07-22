@@ -250,6 +250,6 @@ export function deriveConditionLabel(
   if (maxWear >= 5 || avg <= 3) return "CRITICAL";
   if (maxWear >= 4 || avg <= 5) return "DECLINING";
   if (avg >= 8.5 && maxWear <= 1) return "EXCELLENT";
-  if (avg >= 7) return "STRONG";
+  if (avg >= 8) return "STRONG";
   return "SERVICEABLE";
 }
