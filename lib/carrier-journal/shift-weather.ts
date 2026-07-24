@@ -17,7 +17,7 @@ export const CARRIER_WEATHER_POINTS = [
   { zip: "46613", lat: 41.6539, lon: -86.264 },
 ] as const;
 
-/** @deprecated Prefer CARRIER_WEATHER_POINTS — kept for callers expecting a single point. */
+/** @deprecated Prefer CARRIER_WEATHER_POINTS - kept for callers expecting a single point. */
 export const CARRIER_WEATHER_LAT = CARRIER_WEATHER_POINTS[0].lat;
 export const CARRIER_WEATHER_LON = CARRIER_WEATHER_POINTS[0].lon;
 

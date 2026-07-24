@@ -8,7 +8,7 @@ export async function compressImageForUpload(file: File): Promise<File> {
     throw new Error("Only image files are allowed.");
   }
 
-  // Already small enough — keep original format.
+  // Already small enough - keep original format.
   if (file.size <= 1.5 * 1024 * 1024) {
     return file;
   }

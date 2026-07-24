@@ -217,7 +217,7 @@ function noteForRow(row) {
   if ((row.rec?.precipIn ?? 0) >= 0.05 || row.precipLabel) {
     parts.push(`Precip ${row.rec?.precipIn ?? 0}" (${row.precipLabel ?? "wet"})`);
   }
-  return parts.join("; ") || "—";
+  return parts.join("; ") || "-";
 }
 
 function buildHourlyByDate(data) {

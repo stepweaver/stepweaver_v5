@@ -8,19 +8,19 @@ const rows = d.rows;
 
 const tableRows = rows.map((r) => [
   r.label,
-  r.miles == null ? "—" : String(r.miles),
-  r.waterOz == null ? "—" : String(r.waterOz),
-  r.storedGoal == null ? "—" : String(r.storedGoal),
+  r.miles == null ? "-" : String(r.miles),
+  r.waterOz == null ? "-" : String(r.waterOz),
+  r.storedGoal == null ? "-" : String(r.storedGoal),
   r.deficitStored == null
-    ? "—"
+    ? "-"
     : r.deficitStored > 0
       ? `+${r.deficitStored}`
       : String(r.deficitStored),
-  r.pctOfGoal == null ? "—" : `${r.pctOfGoal}%`,
+  r.pctOfGoal == null ? "-" : `${r.pctOfGoal}%`,
   r.current.heatBand.replace("-", " "),
   `${r.current.routeHours % 1 ? r.current.routeHours.toFixed(1) : r.current.routeHours}h×${r.current.ozPerHour}`,
   String(r.current.routeWaterGoalOz),
-  r.current.preShiftWaterOz == null ? "—" : String(r.current.preShiftWaterOz),
+  r.current.preShiftWaterOz == null ? "-" : String(r.current.preShiftWaterOz),
   String(r.revised.routeGoal),
   r.hitStored ? "Hit" : "Miss",
 ]);
@@ -133,7 +133,7 @@ export default function CarrierHydrationAudit() {
       <Stack gap={8}>
         <H1>Carrier Journal hydration audit</H1>
         <Text tone="secondary">
-          All {N} entries with water + goal. The formula is working as coded — the
+          All {N} entries with water + goal. The formula is working as coded - the
           coded target is systematically above what you actually drink, especially
           on long / hot days.
         </Text>
@@ -256,7 +256,7 @@ export default function CarrierHydrationAudit() {
         <Row gap={8} wrap>
           <Pill tone="danger">1. Peak HI for whole shift</Pill>
           <Text size="small">
-            Jul 18 peak 92° vs avg 82° drops the band from extreme-caution (24 oz/h) to caution (16 oz/h) — 80 oz less on a 10 h model.
+            Jul 18 peak 92° vs avg 82° drops the band from extreme-caution (24 oz/h) to caution (16 oz/h) - 80 oz less on a 10 h model.
           </Text>
         </Row>
         <Row gap={8} wrap>
@@ -274,7 +274,7 @@ export default function CarrierHydrationAudit() {
         <Row gap={8} wrap>
           <Pill tone="warning">4. OSHA upper rates applied all day</Pill>
           <Text size="small">
-            24–32 oz/h is guidance for hot outdoor labor peaks — not necessarily every hour of a 10-hour carrier day.
+            24–32 oz/h is guidance for hot outdoor labor peaks - not necessarily every hour of a 10-hour carrier day.
           </Text>
         </Row>
       </Stack>
@@ -315,7 +315,7 @@ export default function CarrierHydrationAudit() {
               <Text size="small">Jul 17: drank {JUL17.water} · old goal {JUL17.goal} · revised route {JUL17.revisedRoute} → hit</Text>
               <Text size="small">Jul 18: drank {JUL18.water} · old goal {JUL18.goal} · revised route {JUL18.revisedRoute} → hit</Text>
               <Text size="small" tone="secondary">
-                Historical hit rate rises from {HIT_RATE}% to {s.hitRateRevisedRoute}% under the revised route-only model — ambitious but achievable, not demoralizing.
+                Historical hit rate rises from {HIT_RATE}% to {s.hitRateRevisedRoute}% under the revised route-only model - ambitious but achievable, not demoralizing.
               </Text>
             </Stack>
           </CardBody>

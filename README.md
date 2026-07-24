@@ -1,4 +1,4 @@
-# λstepweaver — stepweaver.dev
+# λstepweaver - stepweaver.dev
 
 > Systems built from first principles. A Next.js portfolio platform, terminal interface, Notion-backed Codex, AI advocate, and live operational case-study system for Stephen Weaver.
 

@@ -83,7 +83,7 @@ export default function CarrierWeatherAudit() {
         Logged values come from mixed eras: Open-Meteo shift peak (current app,
         8 AM–4 PM), OpenWeather current/feels-like fallbacks, and earlier manual
         or forecast highs. Heat index on a few hot days (Jun 10, Jul 2, Jul 17–18)
-        runs 5–7°F above archive Rothfusz — consistent with “feels like” or
+        runs 5–7°F above archive Rothfusz - consistent with “feels like” or
         sun-adjusted numbers rather than shade heat index.
       </Callout>
 
@@ -103,7 +103,7 @@ export default function CarrierWeatherAudit() {
 
       <H2>Shift precipitation (inches, 9–7)</H2>
       <Text tone="secondary" size="small">
-        {"Yesterday (Jul 18): " + YESTERDAY.precip + '" across ' + YESTERDAY.rainyHours + " hours — not stored on the journal entry today."}
+        {"Yesterday (Jul 18): " + YESTERDAY.precip + '" across ' + YESTERDAY.rainyHours + " hours - not stored on the journal entry today."}
       </Text>
       <BarChart
         categories={CHART_CATS}
@@ -149,7 +149,7 @@ export default function CarrierWeatherAudit() {
       <H2>Triple-digit heat days (archive peak HI ≥ 100)</H2>
       <Text tone="secondary">
         Only three shifts cleared 100°F peak heat index in the 9–7 window. Average
-        shift HI on those days was still mid-to-high 90s — which is why a single
+        shift HI on those days was still mid-to-high 90s - which is why a single
         peak can feel similar to a “regular” hot day if most of the route was cooler.
       </Text>
       <Table
@@ -167,7 +167,7 @@ export default function CarrierWeatherAudit() {
           r.precip + '"',
           String(r.hours),
           String(r.peakHi),
-          r.journalHi == null ? "—" : String(r.journalHi),
+          r.journalHi == null ? "-" : String(r.journalHi),
         ])}
         columnAlign={["left", "right", "right", "right", "right"]}
         striped
@@ -183,7 +183,7 @@ export default function CarrierWeatherAudit() {
             <Stack gap={8}>
               <Text weight="semibold">Peak air temp during 9 AM–7 PM</Text>
               <Text tone="secondary" size="small">
-                What you were actually exposed to on the street — not calendar-day high.
+                What you were actually exposed to on the street - not calendar-day high.
               </Text>
               <Text weight="semibold">Peak heat index during 9 AM–7 PM</Text>
               <Text tone="secondary" size="small">
@@ -192,7 +192,7 @@ export default function CarrierWeatherAudit() {
               </Text>
               <Text weight="semibold">Average heat index during 9 AM–7 PM</Text>
               <Text tone="secondary" size="small">
-                Explains why 100° peaks sometimes feel like “just another heat day” —
+                Explains why 100° peaks sometimes feel like “just another heat day” -
                 duration matters as much as the spike.
               </Text>
             </Stack>
@@ -204,7 +204,7 @@ export default function CarrierWeatherAudit() {
             <Stack gap={8}>
               <Text weight="semibold">Shift precipitation (inches) + rain flag</Text>
               <Text tone="secondary" size="small">
-                Yesterday’s wet route is invisible in structured data — only notes catch it today.
+                Yesterday’s wet route is invisible in structured data - only notes catch it today.
               </Text>
               <Text weight="semibold">Optional later: max WBGT</Text>
               <Text tone="secondary" size="small">
@@ -237,7 +237,7 @@ export default function CarrierWeatherAudit() {
         <Row gap={8} wrap>
           <Pill tone="info">3. Store avg HI</Pill>
           <Text size="small">
-            New property Average Heat Index F — backfill from archive, log going forward.
+            New property Average Heat Index F - backfill from archive, log going forward.
           </Text>
         </Row>
         <Row gap={8} wrap>
@@ -249,7 +249,7 @@ export default function CarrierWeatherAudit() {
       </Stack>
 
       <Callout tone="info" title="Data source note">
-        Archive values are Open-Meteo historical reanalysis at your route coordinates —
+        Archive values are Open-Meteo historical reanalysis at your route coordinates -
         the same family of data the daybook already uses for same-day peaks. This is
         more consistent than mixing forecast highs and instantaneous feels-like, even
         though it is not a raw KSBN ASOS station dump.
@@ -263,7 +263,7 @@ export default function CarrierWeatherAudit() {
           r.journal,
           r.archive,
           r.delta,
-          r.precip >= 0.05 ? r.precip + '"' : "—",
+          r.precip >= 0.05 ? r.precip + '"' : "-",
         ])}
         columnAlign={["left", "right", "right", "left", "right"]}
         striped

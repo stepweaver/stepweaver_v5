@@ -693,7 +693,7 @@ export function FootwearShoeManageClient({
             <>
               <fieldset>
                 <legend className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-3">
-                  PERFORMANCE (1–10)
+                  PERFORMANCE (1-10)
                 </legend>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {RATING_FIELDS.map(([key, label]) => (
@@ -718,7 +718,7 @@ export function FootwearShoeManageClient({
               </fieldset>
               <fieldset>
                 <legend className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-3">
-                  BODY RESPONSE (1–10)
+                  BODY RESPONSE (1-10)
                 </legend>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {BODY_FIELDS.map(([key, label]) => (
@@ -743,7 +743,7 @@ export function FootwearShoeManageClient({
               </fieldset>
               <fieldset>
                 <legend className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-3">
-                  WEAR (0–5)
+                  WEAR (0-5)
                 </legend>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {WEAR_FIELDS.map(([key, label]) => (
@@ -966,7 +966,7 @@ export function FootwearShoeManageClient({
                       checkpointPhotoTargets.map((o) => (
                         <option key={o.id} value={o.id}>
                           {o.checkpointMiles} MI
-                          {o.title ? ` — ${o.title}` : ""}
+                          {o.title ? ` // ${o.title}` : ""}
                           {o.retrospective ? " (retrospective)" : ""}
                         </option>
                       ))
@@ -1062,7 +1062,7 @@ export function FootwearShoeManageClient({
                   m.imageType === "hero" && !m.observationId
                     ? "HERO"
                     : obs?.checkpointMiles != null
-                      ? `${obs.checkpointMiles} MI${obs.title ? ` — ${obs.title}` : ""}`
+                      ? `${obs.checkpointMiles} MI${obs.title ? ` // ${obs.title}` : ""}`
                       : "SHOE-LEVEL";
                 return (
                   <li key={m.id} className="border border-[rgb(var(--neon)/0.2)]">

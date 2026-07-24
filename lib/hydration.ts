@@ -31,7 +31,7 @@ export type HydrationRecommendation = {
   effectiveHeatF: number;
   routeHours: number;
   heatBand: HeatBand;
-  /** Route drinking target — this is what gets saved as Hydration Goal Oz. */
+  /** Route drinking target - this is what gets saved as Hydration Goal Oz. */
   routeWaterGoalOz: number;
   preShiftWaterOz: number | null;
   /** Route + pre-shift advisory total (not used for hit/miss scoring). */

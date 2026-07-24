@@ -41,7 +41,7 @@ export function aggregateMileage(
   let loggedMiles = 0;
   let priorMiles = 0;
   let adjustmentMiles = 0;
-  /** Days the shoe was assigned on the daybook — not prior-seed lump dates. */
+  /** Days the shoe was assigned on the daybook - not prior-seed lump dates. */
   const wornDates = new Set<string>();
 
   for (const a of allocations) {

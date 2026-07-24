@@ -282,7 +282,7 @@ describe("splitPublicNoteParagraphs", () => {
 });
 
 describe("formatPublicWeightTrend", () => {
-  it("shows em dash when no weight data exists", () => {
+  it("shows n/a when no weight data exists", () => {
     const totals = computeTotalsFromDispatches([
       dispatch({ id: "a", date: "2026-05-01", title: "A" }),
     ]);

@@ -126,7 +126,7 @@ export type PublicWeightTrend = {
 };
 
 
-// Legacy seed data — static fallbacks when Notion is not configured.
+// Legacy seed data - static fallbacks when Notion is not configured.
 const DISPATCHES: CarrierDispatch[] = [
   {
     id: "cj-001",

@@ -204,7 +204,7 @@ async function main() {
   }
 
   const notion = new Client({ auth: apiKey });
-  console.error(DRY_RUN ? "DRY RUN — no writes" : "LIVE backfill");
+  console.error(DRY_RUN ? "DRY RUN - no writes" : "LIVE backfill");
 
   await ensureProperties(notion, dbId);
 
