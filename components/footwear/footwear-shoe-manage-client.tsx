@@ -438,7 +438,15 @@ export function FootwearShoeManageClient({
       setPhotoInputKey((k) => k + 1);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Upload failed");
+      const raw = err instanceof Error ? err.message : "Upload failed";
+      // CSP / network blocks often surface as opaque "Failed to fetch".
+      if (/failed to fetch|networkerror|load failed/i.test(raw)) {
+        setError(
+          "Upload blocked by the browser network policy. Refresh and try again after the latest deploy."
+        );
+      } else {
+        setError(raw);
+      }
     } finally {
       setBusy(false);
     }
