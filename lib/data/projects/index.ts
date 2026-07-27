@@ -23,25 +23,25 @@ import { parcelSweep } from "./parcel-sweep";
 import { stepweaverDev } from "./stepweaver-dev";
 import { websiteRefreshes } from "./website-refreshes";
 
-/** Homepage featured dossiers: carrier-journal leads as the active living project. */
-const FEATURED_SLUGS = [
-  "carrier-journal",
+/** Homepage / Work flagships: ops, realtime, AI, field systems. */
+export const FEATURED_SLUGS = [
   "parcel-sweep",
-  "mail-sort-academy",
-  "stepweaver-dev",
-  "portfolio-terminal",
-  "iam-resist",
-  "lcerebro",
-  "lsigil-setup",
-  "bill-planner",
+  "silent-auction",
+  "ai-integrations",
+  "carrier-journal",
 ] as const;
 
 /** Full catalog sort: featured block first, then remaining order. */
 const CATALOG_ORDER = [
   ...FEATURED_SLUGS,
-  "silent-auction",
+  "mail-sort-academy",
+  "stepweaver-dev",
+  "portfolio-terminal",
+  "lsigil-setup",
   "llambda-llm-agent",
-  "ai-integrations",
+  "bill-planner",
+  "iam-resist",
+  "lcerebro",
   "lambda-orthodontics",
   "service-business-demo",
   "n8n-automations",
@@ -106,14 +106,18 @@ export function getProjectBySlug(slug: string): Project | undefined {
   return ALL_PROJECTS.find((p) => p.slug === slug);
 }
 
-/** Curated homepage carousel: exactly the 8 featured slugs when all exist. */
-function getFeaturedProjects(): Project[] {
+/** Curated homepage carousel / Work flagship set. */
+export function getFeaturedProjects(): Project[] {
   return getHomepageCarouselProjects();
 }
 
 export function getHomepageCarouselProjects(): Project[] {
   const map = new Map(ALL_PROJECTS.map((p) => [p.slug, p]));
   return FEATURED_SLUGS.map((slug) => map.get(slug)).filter((p): p is Project => p !== undefined);
+}
+
+export function isFeaturedSlug(slug: string): boolean {
+  return (FEATURED_SLUGS as readonly string[]).includes(slug);
 }
 
 export function getProjectsByTag(tag: string): Project[] {

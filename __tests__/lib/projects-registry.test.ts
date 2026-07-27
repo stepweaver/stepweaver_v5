@@ -19,8 +19,13 @@ describe("projects registry", () => {
 
   it("returns carousel projects", () => {
     const carousel = getHomepageCarouselProjects();
-    expect(carousel.length).toBe(8);
-    expect(carousel[0].slug).toBe("carrier-journal");
+    expect(carousel.length).toBe(4);
+    expect(carousel.map((p) => p.slug)).toEqual([
+      "parcel-sweep",
+      "silent-auction",
+      "ai-integrations",
+      "carrier-journal",
+    ]);
   });
 
   it("returns all unique tags", () => {

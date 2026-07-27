@@ -3,17 +3,17 @@ import { BackgroundBio } from "@/components/brief/background-bio";
 import { briefData } from "@/lib/data/brief-data";
 
 export const metadata = {
-  title: "Brief",
+  title: "About",
   description:
-    "One-page operator brief for Stephen Weaver: systems builder, full-stack developer, automation and AI integration.",
+    "Where Stephen Weaver fits: product-minded systems builder for operations, internal tools, and AI-assisted workflows. Selective consulting when the fit is right.",
 };
 
-export default function BriefPage() {
+export default function AboutPage() {
   return (
     <div className="min-h-screen pt-20 pb-16">
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
-          {briefData.identity.eyebrow}
+          {"// ABOUT"}
         </div>
         <h1 className="font-[var(--font-ibm)] text-3xl sm:text-4xl text-[rgb(var(--text-color))] mb-2">
           {briefData.identity.name}
@@ -38,6 +38,17 @@ export default function BriefPage() {
                 </li>
               ))}
             </ul>
+          </div>
+
+          <div className="border border-[rgb(var(--border)/0.25)] p-4 bg-[rgb(var(--panel)/0.15)]">
+            <div className="text-label mb-2">SELECTIVE CONSULTING</div>
+            <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed mb-3">
+              Hiring is the primary path. I also take on custom data workflows and ops systems when the people and problem fit,
+              when there is a need I can get passionate about. Not volume consulting; relationship-gated work.
+            </p>
+            <Link href="/services" className="text-xs text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))]">
+              See how consulting fits →
+            </Link>
           </div>
 
           <div>
@@ -113,12 +124,12 @@ export default function BriefPage() {
 
         <section
           className="surface-panel border border-[rgb(var(--neon)/0.2)] p-6 sm:p-8 scroll-mt-24"
-          aria-labelledby="brief-background"
+          aria-labelledby="about-background"
         >
           <div className="mb-4 flex items-start justify-between gap-4">
             <p
               className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase sm:text-sm"
-              id="brief-background"
+              id="about-background"
             >
               Background
             </p>

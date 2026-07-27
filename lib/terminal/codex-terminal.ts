@@ -6,11 +6,11 @@ function line(content: string, variant: LineVariant = "default") {
 }
 
 let cached: CodexPost[] = [];
-let path = "~/codex";
+let path = "~/writing";
 
 export function resetCodexSession() {
   cached = [];
-  path = "~/codex";
+  path = "~/writing";
 }
 
 export async function ensureCodexPosts(): Promise<void> {
@@ -87,7 +87,7 @@ export async function handleCodexCommand(raw: string): Promise<{
     if (!filtered.length) return { lines: [line("No posts for #" + tag, "warning")] };
     const lines: { content: string; variant: LineVariant }[] = [line(`Filtered #${tag}:`, "success")];
     filtered.forEach((post, i) => {
-      lines.push(line(`${i + 1}. ${post.title} → /codex/${post.slug}`, "default"));
+      lines.push(line(`${i + 1}. ${post.title} → /writing/${post.slug}`, "default"));
     });
     return { lines };
   }
@@ -106,7 +106,7 @@ export async function handleCodexCommand(raw: string): Promise<{
     return {
       lines: [
         line(post.title, "lambda"),
-        line(`/codex/${post.slug}`, "success"),
+        line(`/writing/${post.slug}`, "success"),
         line(post.description || "(open in browser for full article)", "dimmed"),
       ],
     };

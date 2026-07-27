@@ -97,19 +97,19 @@ export const resumeData = {
         label: "Silent Auction Platform",
         summary:
           "Real-time auction system for a school PTO fundraiser; built with Next.js, Supabase, and Resend; includes alias-based bidding, realtime updates, donor portals, and admin dashboards.",
-        href: "/projects/silent-auction",
+        href: "/work/silent-auction",
       },
       {
         label: "Bill Planner",
         summary:
           "Cash-flow planning app built with Next.js, Neon, and Drizzle ORM; supports mapping income to bills, status pipeline, HUD metrics, and reusable month templates.",
-        href: "/projects/bill-planner",
+        href: "/work/bill-planner",
       },
       {
         label: "λlambda LLM Chat Agent",
         summary:
           "Portfolio-native LLM advocate with Groq/OpenAI routing, channel-aware chat across website and terminal, prompt-injection filtering, and provider fallback strategies.",
-        href: "/projects/llambda-llm-agent",
+        href: "/work/llambda-llm-agent",
       },
     ] as const,
   },

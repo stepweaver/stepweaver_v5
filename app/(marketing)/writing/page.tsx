@@ -3,8 +3,8 @@ import { CodexPageClient } from "@/components/codex/codex-page-client";
 import { normalizePostFromBlogEntry, sortPosts, type CodexPost } from "@/lib/codex/selectors";
 
 export const metadata = {
-  title: "Codex",
-  description: "Developer notes, projects, and community thoughts: digital codex.",
+  title: "Writing",
+  description: "Developer notes, build logs, and community thoughts.",
 };
 
 export default async function CodexPage() {

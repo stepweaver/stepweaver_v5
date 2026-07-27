@@ -7,9 +7,9 @@ import { getHomeRecentIntel } from "@/lib/home/recent-intel";
 import { generateStructuredData } from "@/lib/structured-data";
 
 const SITE_URL = process.env.SITE_URL || "https://stepweaver.dev";
-const HOME_TITLE = "Stephen Weaver | Full-Stack Developer, Automation, and AI";
+const HOME_TITLE = "Stephen Weaver | Systems Builder for Operations & AI";
 const HOME_DESCRIPTION =
-  "Full-stack developer building practical web apps, automation, and AI-enabled tools that reduce friction and improve operations.";
+  "Product-minded systems builder for operations-heavy teams. Internal tools, workflow automations, and AI-assisted systems. Hiring-first, with selective consulting when the fit is right.";
 const HOME_SHARE_IMAGE = `${SITE_URL}/images/stepweaver-dev.png`;
 
 export function generateMetadata(): Metadata {
@@ -109,10 +109,10 @@ function CurrentChapter() {
 
 function QuickEntry() {
   const links = [
-    { label: "Projects", href: "/projects", desc: "Proof of work" },
-    { label: "Carrier's Log", href: "/carrier-journal", desc: "Letter carrier field log" },
-    { label: "Codex", href: "/codex", desc: "Essays and notes" },
-    { label: "Brief", href: "/brief", desc: "One-page dossier" },
+    { label: "Work", href: "/work", desc: "Flagship case studies" },
+    { label: "About", href: "/about", desc: "Where I fit" },
+    { label: "Resume", href: "/resume", desc: "Hiring surface" },
+    { label: "Play", href: "/play", desc: "Terminal & experiments" },
   ];
 
   return (

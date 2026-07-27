@@ -8,11 +8,37 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: "/projects/cerebro", destination: "/projects/lcerebro", permanent: true },
-      { source: "/projects/cashflow-ledger", destination: "/projects/bill-planner", permanent: true },
-      { source: "/projects/dice-roller", destination: "/projects/rpg-dice-roller", permanent: true },
-      { source: "/projects/lambda-heating-air", destination: "/projects/service-business-demo", permanent: true },
-      { source: "/projects/terminal-ui", destination: "/projects/portfolio-terminal", permanent: true },
+      // Legacy project slug aliases (before catch-all)
+      { source: "/projects/cerebro", destination: "/work/lcerebro", permanent: true },
+      { source: "/projects/cashflow-ledger", destination: "/work/bill-planner", permanent: true },
+      { source: "/projects/dice-roller", destination: "/work/rpg-dice-roller", permanent: true },
+      { source: "/projects/lambda-heating-air", destination: "/work/service-business-demo", permanent: true },
+      { source: "/projects/terminal-ui", destination: "/work/portfolio-terminal", permanent: true },
+
+      // IA renames (hiring-first clarity)
+      { source: "/projects", destination: "/work", permanent: true },
+      { source: "/projects/:slug", destination: "/work/:slug", permanent: true },
+      { source: "/brief", destination: "/about", permanent: true },
+      { source: "/codex", destination: "/writing", permanent: true },
+      { source: "/codex/:slug", destination: "/writing/:slug", permanent: true },
+      { source: "/start-here", destination: "/", permanent: true },
+      { source: "/capabilities", destination: "/about", permanent: true },
+
+      // Legacy aliases under new /work path (in case old redirects were bookmarked after partial migrate)
+      { source: "/work/cerebro", destination: "/work/lcerebro", permanent: true },
+      { source: "/work/cashflow-ledger", destination: "/work/bill-planner", permanent: true },
+      { source: "/work/dice-roller", destination: "/work/rpg-dice-roller", permanent: true },
+      { source: "/work/lambda-heating-air", destination: "/work/service-business-demo", permanent: true },
+      { source: "/work/terminal-ui", destination: "/work/portfolio-terminal", permanent: true },
+
+      // Retired SMB service lanes → consolidated services
+      { source: "/services/reviews", destination: "/services", permanent: true },
+      { source: "/services/follow-up", destination: "/services", permanent: true },
+      { source: "/services/ops", destination: "/services", permanent: true },
+      { source: "/services/web-intake", destination: "/services", permanent: true },
+      { source: "/services/automation", destination: "/services", permanent: true },
+      { source: "/services/lead-systems", destination: "/services", permanent: true },
+      { source: "/services/web-platforms", destination: "/services", permanent: true },
     ];
   },
   images: {

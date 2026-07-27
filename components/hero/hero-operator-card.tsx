@@ -144,28 +144,28 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
 
         <div className="pt-3 flex flex-wrap gap-2">
           <Link
-            href="/resume"
+            href="/work"
             className="inline-flex cursor-pointer items-center justify-center border border-[rgb(var(--green)/0.25)] bg-[rgb(var(--window)/0.2)] px-3 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.08em] text-[rgb(var(--green))] transition-colors hover:border-[rgb(var(--green)/0.6)] hover:bg-[rgb(var(--green)/0.1)]"
+          >
+            Work
+          </Link>
+          <Link
+            href="/resume"
+            className="inline-flex cursor-pointer items-center justify-center border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.2)] px-3 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.08em] text-[rgb(var(--text-secondary))] transition-colors hover:border-[rgb(var(--neon)/0.55)] hover:bg-[rgb(var(--neon)/0.1)] hover:text-[rgb(var(--neon))]"
           >
             Resume
           </Link>
           <Link
-            href="/contact"
+            href="/contact?intent=hire"
             className="inline-flex cursor-pointer items-center justify-center border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.2)] px-3 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.08em] text-[rgb(var(--text-secondary))] transition-colors hover:border-[rgb(var(--neon)/0.55)] hover:bg-[rgb(var(--neon)/0.1)] hover:text-[rgb(var(--neon))]"
           >
             Contact
           </Link>
           <Link
-            href="/terminal"
+            href="/play"
             className="inline-flex cursor-pointer items-center justify-center border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--window)/0.2)] px-3 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.08em] text-[rgb(var(--text-meta))] transition-colors hover:border-[rgb(var(--neon)/0.4)] hover:bg-[rgb(var(--neon)/0.1)] hover:text-[rgb(var(--neon))]"
           >
-            Terminal
-          </Link>
-          <Link
-            href="/carrier-journal"
-            className="inline-flex cursor-pointer items-center justify-center border border-[rgb(var(--cyan)/0.25)] bg-[rgb(var(--window)/0.2)] px-3 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.08em] text-[rgb(var(--cyan))] transition-colors hover:border-[rgb(var(--cyan)/0.55)] hover:bg-[rgb(var(--cyan)/0.1)]"
-          >
-            Carrier&apos;s Log
+            Play
           </Link>
         </div>
 

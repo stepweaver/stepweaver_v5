@@ -13,7 +13,7 @@ function getRepoHref(githubRepo: string | undefined) {
 }
 
 function getProjectCtas(active: Project) {
-  const caseStudyHref = active.slug ? `/projects/${active.slug}` : null;
+  const caseStudyHref = active.slug ? `/work/${active.slug}` : null;
   const liveHref = active.liveUrl || active.demoUrl || active.link || null;
   const repoHref = active.repoUrl || getRepoHref(active.githubRepo);
   const isService = active.tags.some((t) => /service/i.test(t));
@@ -280,7 +280,7 @@ export const ProjectDossier = memo(function ProjectDossier({ projects = [] }: { 
             </div>
 
             <Link
-              href="/projects"
+              href="/work"
               className="text-center font-[var(--font-ibm)] text-sm text-[rgb(var(--text-secondary))] underline decoration-[rgb(var(--border)/0.5)] underline-offset-4 transition hover:text-[rgb(var(--green))] hover:decoration-[rgb(var(--green)/0.5)] sm:text-right"
             >
               Browse all projects →

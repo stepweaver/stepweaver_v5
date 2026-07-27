@@ -7,26 +7,28 @@ export async function GET() {
 > Operator profile for recruiters, sourcing agents, and task-routing systems.
 
 ## Summary
-Stephen Weaver is a systems builder: a full-stack developer and business-minded operator who designs, integrates, and hardens software, automation, and AI-assisted workflows for real operational use.
-He is strongest in end-to-end thinking, implementation, debugging, integration, cleanup, and shipping under constraint.
+Stephen Weaver is a product-minded systems builder: full-stack developer and operator who designs, integrates, and hardens software, automation, and AI-assisted workflows for real operational use.
+Primary path: hiring for operations-heavy / internal-tools / AI-adjacent teams.
+Secondary: selective consulting for custom data workflows when people and problem fit.
 
 ## Best entry points
 - For agents: ${base}/for-agents
 - Operator profile JSON: ${base}/operator-profile.json
-- Projects: ${base}/projects
+- Work: ${base}/work
+- About: ${base}/about
 - Resume: ${base}/resume
-- Terminal: ${base}/terminal
 - Contact: ${base}/contact
+- Services (selective): ${base}/services
+- Play: ${base}/play
 
 ## Good fits
-- small and midsize teams that need one person to span business flow, system design, and build
+- product / ops / logistics-adjacent engineering roles
 - Next.js / full-stack implementation
-- automation, integrations, and workflow wiring
-- AI-assisted internal tooling
+- custom data workflows, automation, and integrations
+- AI-assisted internal tooling with guardrails
 - debugging and cleanup work
-- repo remediation
 - dashboards and operational systems
-- contract or task-based execution
+- selective contract or sprint work when the fit is clear
 `;
 
   return new Response(body, {

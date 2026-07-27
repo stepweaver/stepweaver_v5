@@ -11,7 +11,7 @@ export function LoadoutIconMarquee() {
             Loadout pulse
           </p>
           <Link
-            href="/capabilities"
+            href="/about"
             className="font-[var(--font-ocr)] text-[10px] uppercase tracking-wider text-[rgb(var(--neon)/0.45)] hover:text-[rgb(var(--neon)/0.75)] transition-colors shrink-0"
           >
             Full stack →

@@ -1,161 +1,116 @@
+import Link from "next/link";
+
 export const metadata = {
   title: "Services",
   description:
-    "Precise systems that fit how you work, not bloated platforms. Custom solutions for small businesses; pay for what you use.",
+    "Selective consulting: custom data workflows, systems discovery, AI-assisted ops tools, and technical cleanup for teams where the fit is right.",
 };
 
-const SIGNALS = [
-  { title: "Shipped Systems", signal: "20 case studies", explanation: "Full catalog on /projects, builds and service lines", source: "Projects" },
-  { title: "Technical Depth", signal: "Full-stack", explanation: "Architecture through deployment", source: "Capabilities" },
-  { title: "Clean Architecture", signal: "TypeScript strict", explanation: "Typed boundaries, validated inputs", source: "Standards" },
-];
-
-const LANES = [
+const OFFERS = [
   {
-    id: "reviews",
-    title: "Review & Reputation Systems",
-    description: "Automated review requests and follow-ups after the moments that matter (appointments, jobs, deliveries).",
-    features: ["Review requests after key events", "Follow-up flows and reminders", "Simple reputation tracking", "Owner-friendly reporting"],
+    id: "discovery",
+    title: "Systems Discovery Sprint",
+    description:
+      "Workflow mapping, current-state audit, failure analysis, and a priority roadmap. Useful when you know something is broken but not what to build first.",
+    fit: "Founders, PMs, ops leads",
   },
   {
-    id: "follow-up",
-    title: "Lead Capture & Follow-up",
-    description: "Intake, routing, and first-response systems that turn inquiries into real conversations.",
-    features: ["Forms and booking flows", "Routing to the right inbox/person", "Fast first-response automation", "Simple pipeline visibility"],
+    id: "workflows",
+    title: "Custom Data Workflows & Automation",
+    description:
+      "n8n flows, API handoffs, intake/routing, reporting, and data movement shaped around how your team actually works, not shelf-ware.",
+    fit: "Ops-heavy teams with brittle handoffs",
   },
   {
-    id: "ops",
-    title: "Reporting & Admin Relief",
-    description: "Small internal systems that remove manual busywork and make the numbers usable.",
-    features: ["Recurring reports that actually help", "Dashboards for one operator", "Workflow automations", "Error-proof handoffs"],
+    id: "ai-ops",
+    title: "AI-Assisted Ops Tools",
+    description:
+      "Guardrailed assistants, approval-gated drafting, retrieval-lite features, and provider routing with explicit trust boundaries.",
+    fit: "Teams that want AI inside real workflows",
   },
   {
-    id: "web-intake",
-    title: "Fit-for-purpose Web + Intake",
-    description: "Not platform bloat. A simple site and intake flow built around how the business actually works.",
-    features: ["Clear offer + conversion path", "Intake wizards and scheduling", "Clean UX on mobile", "Simple content updates"],
+    id: "cleanup",
+    title: "Technical Cleanup & Rationalization",
+    description:
+      "Platform cleanup, form/analytics hygiene, content architecture, and migration planning when the stack no longer matches the business.",
+    fit: "Product teams stuck in accidental complexity",
   },
 ];
 
 export default function ServicesPage() {
   return (
     <div className="min-h-screen pt-20 pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-        {/* Hero */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-12">
         <div>
-          <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">{"// SERVICES"}</div>
+          <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
+            {"// SERVICES"}
+          </div>
           <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))] mb-4">
-            You do not need a big, complex platform. You need a system that actually fits the way you work.
+            Selective consulting for the right fit
           </h1>
           <div className="space-y-3 text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl">
             <p>
-              Big SaaS companies build for scale. That usually means one-size-fits-most products, broad feature sets, and entire customer segments that
-              get left behind. What is too small or too specific to matter to them may be exactly what matters to your business.
+              Hiring is the primary path. I also build custom data workflows and ops systems when I meet the right
+              people, we vibe, and there is a need I can get passionate about.
             </p>
             <p>
-              A lot of small businesses are paying for software they barely use. Maybe it comes with marketing automation, lead scoring, CRM workflows, and
-              email campaigns, but what you really need is one thing that works properly, like an automatic review request after each appointment. That
-              pattern shows up everywhere.
-            </p>
-            <p>
-              I build smaller, more precise systems for operators who need the right tool, not the biggest one. I am a small business too, so I understand
-              the difference between paying for features you do not need and investing in something that actually solves the problem. I build custom
-              solutions around the way you work, so you are only paying for what you use, and it works the way you want it to.
+              This is not an agency menu and not volume consulting. If you are looking for a partner who maps how work
+              actually moves, then ships software, automation, or AI-assisted tools with clear boundaries, start a
+              conversation.
             </p>
           </div>
           <div className="flex flex-wrap gap-3 mt-6">
-            <a href="/contact" className="glitch-button glitch-button--primary">Start a Conversation</a>
-            <a href="/brief" className="glitch-button">View Brief</a>
+            <Link href="/contact?intent=consult" className="glitch-button glitch-button--primary">
+              Start a Conversation
+            </Link>
+            <Link href="/work" className="glitch-button">
+              See Proof
+            </Link>
+            <Link href="/about" className="glitch-button">
+              About
+            </Link>
           </div>
         </div>
 
-        {/* Positioning Strip */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
           {[
-            { label: "Build for scale", value: "Segments left behind", detail: "Broad platforms often skip what is specific to you." },
-            { label: "Barely used", value: "One thing right", detail: "Review request, intake, follow-up, whatever actually fits." },
-            { label: "Small business too", value: "Pay for what you use", detail: "Custom around your workflow, not shelf-ware." },
+            { label: "Not volume", value: "Fit first", detail: "Right people, right problem, real passion." },
+            { label: "Core craft", value: "Data workflows", detail: "Handoffs, sync, automation, reporting." },
+            { label: "Primary path", value: "Hiring", detail: "Consulting is secondary and selective." },
           ].map((s) => (
             <div key={s.label} className="bg-[rgb(var(--panel))] p-6">
               <div className="text-[rgb(var(--neon))] font-[var(--font-ibm)] text-lg mb-1">{s.value}</div>
-              <div className="text-[rgb(var(--text-color))] text-sm mb-1">{s.label}</div>
-              <div className="text-[rgb(var(--text-meta))] text-xs">{s.detail}</div>
+              <div className="text-label mb-2">{s.label}</div>
+              <p className="text-[rgb(var(--text-secondary))] text-xs">{s.detail}</p>
             </div>
           ))}
         </div>
 
-        {/* Offers */}
-        <div className="space-y-px">
-          {LANES.map((lane, i) => (
-            <div key={lane.id} className="surface-panel p-6 sm:p-8">
-              <div className="text-label mb-1">OFFER {String(i + 1).padStart(2, "0")}</div>
-              <h2 className="font-[var(--font-ibm)] text-xl text-[rgb(var(--text-color))] mb-2">{lane.title}</h2>
-              <p className="text-[rgb(var(--text-secondary))] text-sm mb-4">{lane.description}</p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-                {lane.features.map((f) => (
-                  <div key={f} className="text-sm text-[rgb(var(--text-secondary))] flex gap-2">
-                    <span className="text-[rgb(var(--neon))] shrink-0">▸</span>
-                    <span>{f}</span>
-                  </div>
-                ))}
-              </div>
-              <a
-                href={`/services/${lane.id}`}
-                className="text-xs text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))] transition-colors font-[var(--font-ocr)] tracking-wider"
-              >
-                LEARN MORE →
-              </a>
-            </div>
-          ))}
-        </div>
-
-        {/* Why this works + proof */}
-        <div className="surface-panel p-6 sm:p-8">
-          <div className="text-label mb-3">WHY THIS WORKS</div>
-          <div className="space-y-3 text-sm text-[rgb(var(--text-secondary))] max-w-4xl">
-            <p>
-              Most operators are paying for software that almost fits. They use a fraction of it and work around the rest. The gap between the broad
-              platform and the real workflow is where precise systems win.
-            </p>
-            <p>
-              The goal is not a bigger stack. It is one problem that stops happening: reviews go out reliably, leads do not disappear, handoffs do not
-              break, and the numbers get readable, without paying for a shelf of features you will never touch.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)] mt-6">
-            {SIGNALS.map((s) => (
-              <div key={s.title} className="bg-[rgb(var(--panel))] p-6">
-                <div className="text-[rgb(var(--neon))] font-[var(--font-ibm)] text-lg mb-1">{s.signal}</div>
-                <div className="text-[rgb(var(--text-color))] text-sm mb-1">{s.title}</div>
-                <div className="text-[rgb(var(--text-meta))] text-xs">{s.explanation}</div>
+        <section>
+          <div className="text-label mb-4">HOW I CAN HELP</div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
+            {OFFERS.map((offer) => (
+              <div key={offer.id} id={offer.id} className="bg-[rgb(var(--panel))] p-6 scroll-mt-24">
+                <h2 className="font-[var(--font-ibm)] text-lg text-[rgb(var(--text-color))] mb-2">{offer.title}</h2>
+                <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed mb-3">{offer.description}</p>
+                <p className="text-[rgb(var(--text-meta))] text-xs font-[var(--font-ocr)] tracking-wide">
+                  Fit: {offer.fit}
+                </p>
               </div>
             ))}
           </div>
-        </div>
+        </section>
 
-        {/* Not a fit */}
-        <div className="surface-panel p-6 sm:p-8 border-[rgb(var(--warn)/0.2)]">
-          <div className="text-label mb-4 text-[rgb(var(--warn))]">NOT A FIT</div>
-          <div className="space-y-2">
-            {[
-              "Enterprise rollout, multi-region governance, or committee-driven procurement.",
-              "Replacing a full ERP or building a net-new all-in-one platform from scratch.",
-              "Anything that requires access you cannot provide (APIs, exports, admin permissions).",
-            ].map((l) => (
-              <div key={l} className="text-sm text-[rgb(var(--text-meta))] flex gap-2">
-                <span className="text-[rgb(var(--warn))] shrink-0">✕</span>
-                <span>{l}</span>
-              </div>
-            ))}
+        <div className="surface-panel p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <div className="text-label mb-2">NEXT STEP</div>
+            <p className="text-[rgb(var(--text-secondary))] text-sm max-w-xl">
+              Tell me what is broken, what you are building, and why it matters. If it is a hire conversation, say that too.
+            </p>
           </div>
-        </div>
-
-        {/* CTA */}
-        <div className="surface-panel p-6 sm:p-8 text-center">
-          <h2 className="font-[var(--font-ibm)] text-xl text-[rgb(var(--text-color))] mb-2">Ready to Build?</h2>
-          <p className="text-[rgb(var(--text-secondary))] text-sm mb-6">Tell me about your project. I will respond within 24 hours.</p>
-          <a href="/contact" className="glitch-button glitch-button--primary">Get in Touch</a>
+          <Link href="/contact?intent=consult" className="glitch-button glitch-button--primary shrink-0">
+            Get in Touch
+          </Link>
         </div>
       </div>
     </div>

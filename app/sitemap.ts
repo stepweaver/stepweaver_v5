@@ -6,21 +6,17 @@ import { MESHTASTIC_DOCS } from "@/lib/data/meshtastic-content";
 
 const STATIC_ROUTES = [
   "/",
-  "/brief",
-  "/carrier-journal",
-  "/capabilities",
+  "/about",
+  "/work",
+  "/resume",
   "/contact",
-  "/codex",
+  "/services",
+  "/writing",
+  "/play",
   "/for-agents",
+  "/carrier-journal",
   "/meshtastic",
   "/meshtastic/field-notes",
-  "/projects",
-  "/resume",
-  "/services",
-  "/services/automation",
-  "/services/lead-systems",
-  "/services/web-platforms",
-  "/start-here",
   "/terminal",
   "/dice-roller",
   "/yankee-samurai",
@@ -31,8 +27,9 @@ const STATIC_ROUTES = [
 
 function staticPriority(route: string): number {
   if (route === "/") return 1;
-  if (route.startsWith("/services")) return 0.8;
-  if (route === "/projects" || route === "/codex" || route === "/resume") return 0.85;
+  if (route === "/work" || route === "/about" || route === "/resume" || route === "/contact") return 0.9;
+  if (route === "/services" || route === "/writing") return 0.75;
+  if (route === "/play") return 0.55;
   return 0.6;
 }
 
@@ -49,7 +46,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   for (const slug of getProjectSlugs()) {
     entries.push({
-      url: `${baseUrl}/projects/${slug}`,
+      url: `${baseUrl}/work/${slug}`,
       lastModified: now,
       changeFrequency: "monthly",
       priority: 0.75,
@@ -82,14 +79,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       for (const entry of blogEntries) {
         if (!entry.slug) continue;
         entries.push({
-          url: `${baseUrl}/codex/${entry.slug}`,
+          url: `${baseUrl}/writing/${entry.slug}`,
           lastModified: now,
           changeFrequency: "weekly",
           priority: 0.7,
         });
       }
     } catch {
-      // sitemap still valid without codex posts
+      // sitemap still valid without writing posts
     }
   }
 

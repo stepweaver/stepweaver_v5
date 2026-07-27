@@ -138,13 +138,13 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
           <div className="mb-8 space-y-4 md:space-y-5">
             <div className="space-y-3">
               <p className="text-xs tracking-[0.3em] text-[rgb(var(--neon)/0.6)] font-[var(--font-ocr)] uppercase">
-                Codex
+                Writing
               </p>
               <h1 className="font-[var(--font-ibm)] text-4xl sm:text-5xl md:text-6xl font-bold text-[rgb(var(--text-color))] leading-tight">
-                Digital codex.
+                Notes and build logs.
               </h1>
               <p className="font-[var(--font-ibm)] text-base sm:text-lg text-[rgb(var(--text-secondary))] leading-relaxed max-w-3xl">
-                Developer notes, projects, and community thoughts.
+                Developer notes, essays, and community thoughts.
               </p>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-[rgb(var(--neon)/0.4)] via-[rgb(var(--neon)/0.1)] to-transparent" />

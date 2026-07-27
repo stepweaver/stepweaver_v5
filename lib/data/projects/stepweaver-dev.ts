@@ -13,7 +13,7 @@ export const stepweaverDev: Project = {
   builtFor: "Visitors who want the whole system story, not a single UI trick",
   solved: "Treating the portfolio as a brochure when the repo is a small app platform",
   delivered: [
-    "Multi-surface App Router app with reusable `/projects/[slug]` rendering and protected shared chat",
+    "Multi-surface App Router app with reusable `/work/[slug]` rendering and protected shared chat",
     "App Router surfaces (homepage, terminal, codex, project pages, APIs) driven by structured case-study data",
     "CSP nonce middleware, same-origin and rate-limited API routes, sanitization, dynamic imports for heavy client modules",
   ],

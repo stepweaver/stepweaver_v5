@@ -46,7 +46,7 @@ export function handleResumeCommand(raw: string): { lines: { content: string; va
           line("Shipping web platforms, internal tools, and integrations.", "default"),
           line("Focus: clear requirements, fast iteration, operable systems.", "dimmed"),
           line("", "default"),
-          line("See /projects and /brief for case-shaped detail.", "dimmed"),
+          line("See /work and /about for case-shaped detail.", "dimmed"),
         ],
       };
     case "projects":
@@ -54,7 +54,7 @@ export function handleResumeCommand(raw: string): { lines: { content: string; va
         lines: [
           line("PROJECTS", "lambda"),
           line("", "default"),
-          line("Browse dossiers: stepweaver.dev/projects", "success"),
+          line("Browse dossiers: stepweaver.dev/work", "success"),
           line("Includes automation, data, and AI-assisted tooling.", "dimmed"),
         ],
       };

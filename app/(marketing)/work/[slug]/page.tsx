@@ -22,7 +22,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: project.title,
       description: project.description,
       type: "article",
-      url: `${base}/projects/${slug}`,
+      url: `${base}/work/${slug}`,
     },
     twitter: {
       card: "summary_large_image",
@@ -42,10 +42,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="mb-6">
           <Link
-            href="/projects"
+            href="/work"
             className="text-xs text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))] transition-colors font-[var(--font-ocr)] tracking-wider"
           >
-            ← BACK TO PROJECTS
+            ← BACK TO WORK
           </Link>
         </div>
 
@@ -61,6 +61,43 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 {project.description}
               </p>
             </div>
+
+            {(project.builtFor || project.solved || (project.delivered && project.delivered.length > 0)) && (
+              <div className="surface-panel p-4 space-y-3">
+                <div className="text-label">SUMMARY</div>
+                {project.builtFor ? (
+                  <div>
+                    <div className="font-[var(--font-ocr)] text-[10px] uppercase tracking-wider text-[rgb(var(--neon)/0.5)] mb-1">
+                      Context / Users
+                    </div>
+                    <p className="text-[rgb(var(--text-secondary))] text-xs leading-relaxed">{project.builtFor}</p>
+                  </div>
+                ) : null}
+                {project.solved ? (
+                  <div>
+                    <div className="font-[var(--font-ocr)] text-[10px] uppercase tracking-wider text-[rgb(var(--neon)/0.5)] mb-1">
+                      What changed
+                    </div>
+                    <p className="text-[rgb(var(--text-secondary))] text-xs leading-relaxed">{project.solved}</p>
+                  </div>
+                ) : null}
+                {project.delivered && project.delivered.length > 0 ? (
+                  <div>
+                    <div className="font-[var(--font-ocr)] text-[10px] uppercase tracking-wider text-[rgb(var(--neon)/0.5)] mb-1">
+                      Key decisions
+                    </div>
+                    <ul className="space-y-1">
+                      {project.delivered.slice(0, 4).map((item) => (
+                        <li key={item} className="text-[rgb(var(--text-secondary))] text-xs leading-relaxed flex gap-2">
+                          <span className="text-[rgb(var(--neon)/0.5)] shrink-0">·</span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            )}
 
             {project.tags.length > 0 && (
               <div className="surface-panel p-4">

@@ -28,7 +28,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: '  chat <message>: Ask Lambda about experience', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Navigation:', variant: 'lambda' },
-      { content: '  cd contact | codex | dice-roller | carrier-journal | github', variant: 'default' },
+      { content: '  cd contact | writing | work | about | play | dice-roller | carrier-journal | github', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Features:', variant: 'lambda' },
       { content: '  weather [location] [--forecast] - no location: browser location, else New York', variant: 'default' },
@@ -45,7 +45,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     lines: [
       {
         content:
-          'At main shell, nothing to cancel. In contact/codex/resume/games, type cancel or use Esc.',
+          'At main shell, nothing to cancel. In contact/writing/resume/games, type cancel or use Esc.',
         variant: 'dimmed',
       },
     ],
@@ -57,7 +57,11 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     const dest = args[0]?.toLowerCase();
     const routes: Record<string, string> = {
       contact: '/contact',
-      codex: '/codex',
+      writing: '/writing',
+      codex: '/writing',
+      work: '/work',
+      about: '/about',
+      play: '/play',
       'dice-roller': '/dice-roller',
       'carrier-journal': '/carrier-journal',
       fieldlog: '/carrier-journal',
@@ -68,7 +72,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       return {
         lines: [
           { content: 'Usage: cd <destination>', variant: 'warning' },
-          { content: 'Available: contact, codex, dice-roller, carrier-journal, github', variant: 'dimmed' },
+          { content: 'Available: contact, writing, work, about, play, dice-roller, carrier-journal, github', variant: 'dimmed' },
         ],
       };
     }

@@ -488,10 +488,10 @@ export function CarrierJournalPage({
             <Link href="/mail-sort-academy" className="glitch-button glitch-button--primary">
               Mail Sort Academy
             </Link>
-            <Link href="/projects" className="glitch-button">
+            <Link href="/work" className="glitch-button">
               View Projects
             </Link>
-            <Link href="/codex" className="glitch-button">
+            <Link href="/writing" className="glitch-button">
               Read the Codex
             </Link>
             <Link href="/contact" className="glitch-button">

@@ -35,23 +35,20 @@ const STATIC_GROUPS: { group: string; items: CmdItem[] }[] = [
     group: "Navigate",
     items: [
       { id: "home", label: "Home", href: "/", icon: ChevronRight },
-      { id: "services", label: "Services", href: "/services", icon: Zap },
-      { id: "services-lead", label: "Services / Lead Systems", href: "/services/lead-systems", icon: Zap },
-      { id: "services-automation", label: "Services / Automation", href: "/services/automation", icon: Zap },
-      { id: "services-web", label: "Services / Web Platforms", href: "/services/web-platforms", icon: Zap },
-      { id: "capabilities", label: "Capabilities", href: "/capabilities", icon: ChevronRight },
-      { id: "start-here", label: "Start Here", href: "/start-here", icon: ChevronRight },
-      { id: "brief", label: "Brief", href: "/brief", icon: FileText },
-      { id: "projects", label: "All Projects", href: "/projects", icon: FolderOpen },
+      { id: "work", label: "Work", href: "/work", icon: FolderOpen },
+      { id: "about", label: "About", href: "/about", icon: FileText },
       { id: "resume", label: "Resume", href: "/resume", icon: FileText },
-      { id: "codex", label: "Codex", href: "/codex", icon: BookOpen },
+      { id: "contact", label: "Contact", href: "/contact", icon: Mail },
+      { id: "services", label: "Services", href: "/services", icon: Zap },
+      { id: "writing", label: "Writing", href: "/writing", icon: BookOpen },
+      { id: "play", label: "Play", href: "/play", icon: Terminal },
       { id: "carrier-journal", label: "Carrier's Log", href: "/carrier-journal", icon: BookOpen, meta: "letter carrier field log" },
       { id: "field-log", label: "Field Log", href: "/carrier-journal", icon: BookOpen, meta: "carrier's log" },
       { id: "mailwalker", label: "Mailwalker", href: "/carrier-journal", icon: BookOpen, meta: "carrier's log" },
       { id: "meshtastic", label: "Meshtastic", href: "/meshtastic", icon: BookOpen },
-      { id: "contact", label: "Contact", href: "/contact", icon: Mail },
       { id: "terminal", label: "Terminal", href: "/terminal", icon: Terminal },
       { id: "dice", label: "Dice Roller", href: "/dice-roller", icon: Terminal },
+      { id: "for-agents", label: "For Agents", href: "/for-agents", icon: ChevronRight },
     ],
   },
 ];
@@ -83,7 +80,7 @@ export function GlobalCommandPalette() {
         .map((p) => ({
           id: `project-${p.slug}`,
           label: p.title,
-          href: `/projects/${p.slug}`,
+          href: `/work/${p.slug}`,
           icon: FolderOpen,
           meta: p.tags[0] || "",
         })),
@@ -91,7 +88,7 @@ export function GlobalCommandPalette() {
   );
 
   const allGroups = useMemo(
-    () => [...STATIC_GROUPS, { group: "Projects", items: projectCommands }],
+    () => [...STATIC_GROUPS, { group: "Work", items: projectCommands }],
     [projectCommands]
   );
 

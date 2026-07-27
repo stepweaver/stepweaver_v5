@@ -19,18 +19,18 @@ export function Footer() {
           >
             GitHub
           </a>
-          <Link href="/carrier-journal" className="hover:text-[rgb(var(--neon))] transition-colors">
-            Carrier&apos;s Log
+          <Link href="/work" className="hover:text-[rgb(var(--neon))] transition-colors">
+            Work
+          </Link>
+          <Link href="/play" className="hover:text-[rgb(var(--neon))] transition-colors">
+            Play
           </Link>
           <Link href="/privacy" className="hover:text-[rgb(var(--neon))] transition-colors">
             Privacy
           </Link>
-          <a
-            href="mailto:hello@stepweaver.dev"
-            className="hover:text-[rgb(var(--neon))] transition-colors"
-          >
+          <Link href="/contact" className="hover:text-[rgb(var(--neon))] transition-colors">
             Contact
-          </a>
+          </Link>
         </div>
       </div>
     </footer>

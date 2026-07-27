@@ -1,33 +1,33 @@
-/** One-page brief: factual substance ported from v3 `lib/briefData.js`, tightened for v5. */
+/** About / operator dossier content. */
 
 export const briefData = {
   identity: {
-    eyebrow: "λstepweaver // operator brief",
+    eyebrow: "λstepweaver // about",
     name: "Stephen Weaver",
     roles: ["Full-Stack Developer", "Systems Builder", "Automation & AI Integration"] as const,
     statement:
-      "I build operational web systems, automation, and AI-assisted tooling for businesses that have outgrown duct-tape workflows. Former business analyst, operations manager, and Air Force cryptologic linguist. 8+ years bridging how systems work and how people actually use them.",
+      "I came into software through operations, analysis, and real-world process work. My edge is not just shipping code. It is understanding how work moves through a team, where it breaks, and how to turn that into dependable software, automation, and AI-assisted tools.",
   },
   roleFit: {
     title: "Where I fit",
     items: [
       "Full-stack engineering and implementation (Next.js, React, Node.js)",
-      "Workflow automation and tool integration (n8n, APIs, webhooks)",
-      "AI-assisted systems and LLM integration",
+      "Custom data workflows, automation, and tool integration (n8n, APIs, webhooks)",
+      "AI-assisted systems with explicit guardrails",
       "Internal tools, dashboards, and operational consoles",
-      "Contract, sprint, and project-based work",
-      "Legacy process cleanup and prototype-to-production builds",
+      "Product-minded roles on operations-heavy or logistics-adjacent teams",
+      "Contract, sprint, and project-based engagements when the fit is clear",
     ] as const,
   },
   flagshipProjects: [
     {
-      slug: "stepweaver-dev",
-      label: "stepweaver.dev",
-      type: "Multi-surface platform",
+      slug: "parcel-sweep",
+      label: "Parcel Sweep",
+      type: "Last-mile ops prototype",
       summary:
-        "Next.js 15 portfolio platform with terminal UX, AI chat, Notion-fed codex, route groups, and a shared protected API layer.",
-      tags: ["Next.js", "Notion API", "Groq", "Tailwind CSS", "Vercel"] as const,
-      href: "/projects/stepweaver-dev",
+        "Field-aware delivery workflow tooling grounded in real carrier constraints and sequencing pressure.",
+      tags: ["React", "Express", "SQLite", "Socket.io"] as const,
+      href: "/work/parcel-sweep",
     },
     {
       slug: "silent-auction",
@@ -36,16 +36,25 @@ export const briefData = {
       summary:
         "Fundraising platform with real-time bidding state, Supabase Realtime, role-based access, and live event operations under pressure.",
       tags: ["Next.js", "Supabase", "Realtime", "Auth", "PostgreSQL"] as const,
-      href: "/projects/silent-auction",
+      href: "/work/silent-auction",
     },
     {
-      slug: "lsigil-setup",
-      label: "λsigil Lead Ops Runtime",
-      type: "Lead ops runtime",
+      slug: "ai-integrations",
+      label: "AI Integrations",
+      type: "Guarded AI systems",
       summary:
-        "Local-first lead ops for contractor prospecting: discovery, contact-path analysis, verification, approval-gated review, evidence, reporting, constrained drafts. NDJSON resolver, Next.js console, optional OpenRouter over evidence.",
-      tags: ["Next.js", "NDJSON", "OpenRouter", "Node.js"] as const,
-      href: "/projects/lsigil-setup",
+        "Portfolio-native AI with shared protected backends, rate limits, sanitization, and explicit trust boundaries.",
+      tags: ["Next.js", "Groq", "OpenAI", "Vercel KV"] as const,
+      href: "/work/ai-integrations",
+    },
+    {
+      slug: "carrier-journal",
+      label: "Carrier's Log",
+      type: "Field-first data product",
+      summary:
+        "Living field journal turned into KPI/dashboard artifact: proof of operational modeling under real constraints.",
+      tags: ["Next.js", "Notion API", "Zod", "TypeScript"] as const,
+      href: "/work/carrier-journal",
     },
   ] as const,
   stackSnapshot: {
@@ -59,8 +68,8 @@ export const briefData = {
   },
   ctas: [
     { label: "View Resume", href: "/resume", variant: "primary" as const },
-    { label: "See All Projects", href: "/projects", variant: "secondary" as const },
+    { label: "See Work", href: "/work", variant: "secondary" as const },
     { label: "GitHub", href: "https://github.com/stepweaver", variant: "secondary" as const },
-    { label: "Contact", href: "/contact", variant: "secondary" as const },
+    { label: "Contact", href: "/contact?intent=hire", variant: "secondary" as const },
   ] as const,
 };

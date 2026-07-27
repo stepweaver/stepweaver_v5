@@ -20,7 +20,7 @@ export default function ForAgentsPage() {
           </div>
           <div>
             <div className="text-label mb-2">STATUS</div>
-            <div className="text-[rgb(var(--neon))] text-sm">Available for projects</div>
+            <div className="text-[rgb(var(--neon))] text-sm">Open to hire · selective consulting when the fit is right</div>
           </div>
           <div>
             <div className="text-label mb-2">TECH STACK</div>
@@ -31,9 +31,16 @@ export default function ForAgentsPage() {
             </div>
           </div>
           <div>
+            <div className="text-label mb-2">ENTRY POINTS</div>
+            <div className="text-xs text-[rgb(var(--text-meta))] font-mono space-y-1">
+              <div>Work: /work · About: /about · Resume: /resume · Contact: /contact</div>
+              <div>Services (selective): /services · Play: /play</div>
+            </div>
+          </div>
+          <div>
             <div className="text-label mb-2">STRUCTURED DATA</div>
             <div className="text-xs text-[rgb(var(--text-meta))] font-mono">
-              JSON-LD (WebSite, Person, BreadcrumbList) is emitted on the homepage. Machine-readable profile: /operator-profile.json and /llms.txt. Codex list: GET /api/codex. Contact: POST /api/contact.
+              JSON-LD (WebSite, Person, BreadcrumbList) is emitted on the homepage. Machine-readable profile: /operator-profile.json and /llms.txt. Writing list: GET /api/codex. Contact: POST /api/contact.
             </div>
           </div>
         </div>

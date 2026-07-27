@@ -9,7 +9,7 @@
 | Surface | URL |
 | --- | --- |
 | Live site | <https://stepweaver.dev> |
-| Projects | <https://stepweaver.dev/projects> |
+| Projects | <https://stepweaver.dev/work> |
 | Terminal | <https://stepweaver.dev/terminal> |
 | Codex | <https://stepweaver.dev/codex> |
 | Carrier's Log | <https://stepweaver.dev/carrier-journal> |
@@ -69,32 +69,31 @@ The visual language is terminal-forward, hard-edged, neon, cyberpunk, and system
 
 ### 1. Homepage and marketing routes
 
-The marketing side of the app presents Stephen's positioning, profile, services, capabilities, projects, resume, and contact entry points.
+The marketing side of the app presents Stephen's positioning: hiring-first with selective consulting, work case studies, writing, and a playground lane.
 
 Important routes:
 
 | Route | Purpose |
 | --- | --- |
-| `/` | Homepage, hero, operator card, featured project carousel, current positioning |
-| `/brief` | One-page operator brief |
-| `/capabilities` | Stack/loadout page with grouped systems and external validation |
-| `/services` | Service positioning and offer lanes |
-| `/services/reviews` | Review and reputation systems lane |
-| `/services/follow-up` | Lead capture and follow-up lane |
-| `/services/ops` | Reporting and admin relief lane |
-| `/services/web-intake` | Fit-for-purpose web and intake lane |
-| `/projects` | Filterable project catalog |
-| `/projects/[slug]` | Reusable project case-study renderer |
-| `/resume` | Web resume backed by structured data |
-| `/contact` | Contact form with bot protection and email delivery |
-| `/start-here` | Guided entry path for visitors |
+| `/` | Homepage, hero, operator card, featured work carousel |
+| `/work` | Flagship case studies + filterable archive |
+| `/work/[slug]` | Case-study renderer |
+| `/about` | Operator dossier / where I fit |
+| `/resume` | Web resume + PDF |
+| `/contact` | Contact form (`?intent=hire\|consult`) |
+| `/services` | Selective consulting offers |
+| `/writing` | Writing archive (formerly Codex) |
+| `/writing/[slug]` | Writing entry |
+| `/play` | Playground hub (terminal, Carrier's Log, toys) |
 | `/for-agents` | Recruiter/agent-oriented entry point |
+| `/carrier-journal` | Field log (also linked from Play) |
+| `/terminal` | Interactive terminal |
 | `/privacy` | Privacy page |
 | `/theme-audit` | Theme/testing surface |
 
 ### 2. Project case-study system
 
-Projects are modeled as typed records in `lib/data/projects/*` and rendered through a reusable project detail page at `/projects/[slug]`.
+Projects are modeled as typed records in `lib/data/projects/*` and rendered through a reusable project detail page at `/work/[slug]`.
 
 Key files:
 
@@ -102,8 +101,8 @@ Key files:
 lib/data/projects.schema.ts
 lib/data/projects/index.ts
 lib/data/projects/*.ts
-app/(marketing)/projects/page.tsx
-app/(marketing)/projects/[slug]/page.tsx
+app/(marketing)/work/page.tsx
+app/(marketing)/work/[slug]/page.tsx
 components/projects/projects-page-client.tsx
 components/project/section-renderer.tsx
 components/project/project-case-chat.tsx
@@ -188,7 +187,7 @@ The chat route:
 - falls back to OpenAI Responses API when configured
 - switches model choice when image content is present
 - injects channel-aware system instructions for terminal vs widget mode
-- can receive project-specific case-study context from `/projects/[slug]`
+- can receive project-specific case-study context from `/work/[slug]`
 - extracts and normalizes project citations from model output
 - redacts apparent prompt leaks
 - caps response length before returning to the client
@@ -203,22 +202,22 @@ The Codex is a Notion-backed publishing surface for developer notes, project pos
 Routes:
 
 ```txt
-/codex
-/codex/[slug]
+/writing
+/writing/[slug]
 /api/codex
-/api/terminal/codex
+/api/terminal/writing
 ```
 
 Primary files:
 
 ```txt
-app/(marketing)/codex/page.tsx
-app/(marketing)/codex/[slug]/page.tsx
-components/codex/*
+app/(marketing)/writing/page.tsx
+app/(marketing)/writing/[slug]/page.tsx
+components/writing/*
 lib/blog.ts
 lib/notion/blog.repo.ts
 lib/notion-blocks.ts
-lib/codex/selectors.ts
+lib/writing/selectors.ts
 ```
 
 Expected Notion blog properties:
@@ -485,7 +484,7 @@ The app uses Next.js App Router route groups to keep UI chrome explicit:
 | `/api/contact` | `POST` | Contact form email delivery with bot checks and rate limiting |
 | `/api/weather` | `GET` | Current weather, forecast, geocoding, and carrier shift peak heat fields |
 | `/api/codex` | `GET` | Public Codex post list |
-| `/api/terminal/codex` | `GET` | Terminal-friendly Codex list/post endpoints |
+| `/api/terminal/writing` | `GET` | Terminal-friendly Codex list/post endpoints |
 | `/api/notion-blocks` | `POST` | Allowlisted Notion page block retrieval |
 | `/api/notion-image` | `GET` | Signed Notion image URL refresh endpoint |
 | `/api/rss` | `GET` | Small RSS proxy/normalizer for approved feed sources |
@@ -761,7 +760,7 @@ Good future test targets:
 4. Add the slug to `FEATURED_SLUGS` if it belongs in the homepage carousel.
 5. Add the slug to `CATALOG_ORDER` if it needs a specific catalog position.
 6. Add supporting images under `public/images/`.
-7. Visit `/projects` and `/projects/[slug]` locally.
+7. Visit `/work` and `/work/[slug]` locally.
 8. Run `npm test` to catch schema/order issues.
 
 ### Add a Codex post
@@ -769,7 +768,7 @@ Good future test targets:
 1. Create or update the page in the Notion blog database.
 2. Set `Status` to `Published`.
 3. Add title, date, excerpt/description, and tags.
-4. Visit `/codex` and `/codex/[slug]`.
+4. Visit `/writing` and `/writing/[slug]`.
 5. Check `/api/codex` if the page does not appear.
 
 ### Add a Meshtastic doc
@@ -808,7 +807,7 @@ Recommended deployment checklist:
 6. Configure email credentials for the contact form.
 7. Configure Vercel KV for production rate limiting.
 8. Redeploy after changing environment variables.
-9. Smoke test `/`, `/projects`, `/terminal`, `/codex`, `/carrier-journal`, `/contact`, `/llms.txt`, and `/operator-profile.json`.
+9. Smoke test `/`, `/work`, `/terminal`, `/writing`, `/carrier-journal`, `/contact`, `/llms.txt`, and `/operator-profile.json`.
 
 ## Performance notes
 

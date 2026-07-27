@@ -66,7 +66,7 @@ export const itConsulting: Project = {
       title: "How It Shows Up Here",
       type: "engineering",
       bullets: [
-        "Same data-driven `/projects/[slug]` case-study spine as build entries",
+        "Same data-driven `/work/[slug]` case-study spine as build entries",
         "Metadata and SEO consistent with the rest of the portfolio",
       ],
     },

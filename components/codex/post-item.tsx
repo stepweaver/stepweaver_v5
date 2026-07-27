@@ -22,7 +22,7 @@ export function PostItem({ post, index, formatDate, onHashtagClick }: Props) {
 
   return (
     <article className="group" onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}>
-      <Link href={`/codex/${post.slug}`} className="block py-6 sm:py-8">
+      <Link href={`/writing/${post.slug}`} className="block py-6 sm:py-8">
         <div className="flex flex-nowrap items-center justify-between overflow-x-auto mb-3">
           <span className="font-mono text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.4)] uppercase whitespace-nowrap shrink-0">
             CODEX-{String(index + 1).padStart(2, "0")}

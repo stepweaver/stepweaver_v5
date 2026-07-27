@@ -38,7 +38,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!entry) return { title: "Not Found", description: "The page you requested was not found" };
   const title = entry.title || "Blog Post";
   const description = entry.description || `${title} · stepweaver.dev`;
-  const canonicalUrl = `${siteBaseUrl()}/codex/${slug}`;
+  const canonicalUrl = `${siteBaseUrl()}/writing/${slug}`;
   const shareImage = `${siteBaseUrl()}/images/stepweaver-dev.png`;
   return {
     title,
@@ -78,17 +78,17 @@ export default async function CodexPostPage({ params }: { params: Promise<{ slug
       <div className="relative z-10 w-full px-4 sm:px-6 md:px-8 pt-14 pb-16">
         <div className="max-w-4xl mx-auto">
           <Link
-            href="/codex"
+            href="/writing"
             className="inline-flex items-center gap-2 mb-10 font-[var(--font-ocr)] text-xs tracking-[0.15em] uppercase text-[rgb(var(--neon)/0.6)] hover:text-[rgb(var(--neon))] transition-colors"
           >
-            <span className="text-[rgb(var(--neon)/0.4)]">&larr;</span> Back to Codex
+            <span className="text-[rgb(var(--neon)/0.4)]">&larr;</span> Back to Writing
           </Link>
 
           <article>
             <header className="mb-10">
               <div className="flex flex-nowrap items-center justify-between overflow-x-auto mb-4">
                 <span className="font-mono text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.4)] uppercase whitespace-nowrap shrink-0">
-                  CODEX // ENTRY
+                  WRITING // ENTRY
                 </span>
                 <span className="font-[var(--font-ocr)] text-xs text-[rgb(var(--text-meta))] tracking-wide whitespace-nowrap shrink-0">
                   {entry.updated && entry.updated !== entry.date
@@ -112,7 +112,7 @@ export default async function CodexPostPage({ params }: { params: Promise<{ slug
                   {entry.hashtags.map((tag) => (
                     <Link
                       key={tag}
-                      href={`/codex?hashtag=${encodeURIComponent(tag)}`}
+                      href={`/writing?hashtag=${encodeURIComponent(tag)}`}
                       className="px-3 py-1 text-xs font-[var(--font-ocr)] tracking-wider uppercase border border-[rgb(var(--neon)/0.3)] text-[rgb(var(--text-secondary))] rounded-sm hover:border-[rgb(var(--neon)/0.7)] hover:text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)] transition-all"
                     >
                       #{tag}

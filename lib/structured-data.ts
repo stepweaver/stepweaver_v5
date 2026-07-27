@@ -23,7 +23,7 @@ export function generateStructuredData() {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: `${baseUrl}/codex?search={search_term_string}`,
+        urlTemplate: `${baseUrl}/writing?search={search_term_string}`,
       },
       "query-input": "required name=search_term_string",
     },
@@ -71,7 +71,7 @@ export function generateStructuredData() {
     itemListElement: [
       { "@type": "ListItem", position: 1, name: "Home", item: baseUrl },
       { "@type": "ListItem", position: 2, name: "Resume", item: `${baseUrl}/resume` },
-      { "@type": "ListItem", position: 3, name: "Codex", item: `${baseUrl}/codex` },
+      { "@type": "ListItem", position: 3, name: "Codex", item: `${baseUrl}/writing` },
       { "@type": "ListItem", position: 4, name: "Terminal", item: `${baseUrl}/terminal` },
       { "@type": "ListItem", position: 5, name: "Contact", item: `${baseUrl}/contact` },
     ],

@@ -24,7 +24,7 @@ function pathKeyToPathname(pathKey: string) {
 function isSiblingContentDocNav(fromPathname: string, toPathname: string): boolean {
   if (!fromPathname || !toPathname || fromPathname === toPathname) return false;
   if (fromPathname.startsWith("/meshtastic/") && toPathname.startsWith("/meshtastic/")) return true;
-  if (fromPathname.startsWith("/codex/") && toPathname.startsWith("/codex/")) return true;
+  if (fromPathname.startsWith("/writing/") && toPathname.startsWith("/writing/")) return true;
   return false;
 }
 

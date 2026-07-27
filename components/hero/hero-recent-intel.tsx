@@ -36,7 +36,7 @@ export function HeroRecentIntel({ intel }: { intel: HomeIntelPayload | null }) {
       {intel ? (
         <>
           <Link
-            href={`/codex/${intel.post.slug}`}
+            href={`/writing/${intel.post.slug}`}
             className="font-[var(--font-ibm)] text-base sm:text-lg text-[rgb(var(--text-color))] hover:text-[rgb(var(--neon))] transition-colors leading-snug line-clamp-2"
           >
             {intel.post.title}
@@ -69,7 +69,7 @@ export function HeroRecentIntel({ intel }: { intel: HomeIntelPayload | null }) {
                 </span>
               </div>
               <Link
-                href={`/projects/${intel.relatedProject.slug}`}
+                href={`/work/${intel.relatedProject.slug}`}
                 className="font-[var(--font-ibm)] text-sm text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))] transition-colors"
               >
                 {intel.relatedProject.title}
@@ -95,13 +95,13 @@ export function HeroRecentIntel({ intel }: { intel: HomeIntelPayload | null }) {
 
           <div className="mt-4 pt-3 border-t border-[rgb(var(--border)/0.12)] flex items-center justify-between gap-2">
             <Link
-              href={`/codex/${intel.post.slug}`}
+              href={`/writing/${intel.post.slug}`}
               className="font-[var(--font-ocr)] text-[10px] sm:text-xs uppercase tracking-wider text-[rgb(var(--neon)/0.7)] hover:text-[rgb(var(--neon))] transition-colors"
             >
               Read briefing →
             </Link>
             <Link
-              href="/codex"
+              href="/writing"
               className="font-[var(--font-ocr)] text-[10px] sm:text-xs uppercase tracking-wider text-[rgb(var(--muted-color)/0.7)] hover:text-[rgb(var(--neon)/0.6)] transition-colors shrink-0"
             >
               Archive
@@ -114,7 +114,7 @@ export function HeroRecentIntel({ intel }: { intel: HomeIntelPayload | null }) {
             Wire Notion codex env vars to surface the latest entry here. Full archive lives in the codex.
           </p>
           <Link
-            href="/codex"
+            href="/writing"
             className="mt-4 inline-flex w-fit items-center font-[var(--font-ocr)] text-xs uppercase tracking-wider text-[rgb(var(--neon))] border border-[rgb(var(--neon)/0.4)] px-3 py-2 hover:bg-[rgb(var(--neon)/0.08)] transition-colors"
           >
             Open codex →

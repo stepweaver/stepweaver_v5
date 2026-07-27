@@ -26,8 +26,11 @@ export default function ResumePage() {
             <a href="/weaver_resume.pdf" className="glitch-button glitch-button--primary text-xs">
               Download PDF
             </a>
-            <Link href="/start-here" className="glitch-button text-xs">
-              Start here
+            <Link href="/about" className="glitch-button text-xs">
+              About
+            </Link>
+            <Link href="/contact?intent=hire" className="glitch-button text-xs">
+              Contact
             </Link>
           </div>
         </div>
@@ -119,7 +122,7 @@ export default function ResumePage() {
             </div>
             <div className="mt-4">
               <Link
-                href="/projects"
+                href="/work"
                 className="text-sm text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))] transition-colors"
               >
                 View all projects →
