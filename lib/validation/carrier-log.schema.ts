@@ -65,6 +65,11 @@ export const carrierDaybookSchema = z.object({
   precipitationIn: z.number().finite().min(0).optional(),
   /** Manual: carrier was rained on during the route. */
   rain: z.boolean().optional(),
+  /**
+   * Manual incident only: stepped in dog poop.
+   * Omit or false on clean days; streak badges count consecutive logged days without this flag.
+   */
+  steppedInDogPoop: z.boolean().optional(),
   publicNote: z.string().trim().max(2000).optional(),
   privateNote: z.string().trim().max(2000).optional(),
   published: z.boolean().default(true),

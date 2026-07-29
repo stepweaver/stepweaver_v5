@@ -6,7 +6,12 @@ import {
   formatPublicWeightTrend,
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
-import { getCarrierLevel, getCarrierMilestones } from "@/lib/data/carrier-milestones";
+import {
+  bestDogPoopCleanStreak,
+  currentDogPoopCleanStreak,
+  getCarrierLevel,
+  getCarrierMilestones,
+} from "@/lib/data/carrier-milestones";
 import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
 
 function dispatch(overrides: Partial<CarrierDispatch> & Pick<CarrierDispatch, "id" | "date" | "title">): CarrierDispatch {
@@ -244,6 +249,54 @@ describe("getCarrierMilestones", () => {
       (m) => m.id === "first-good-samaritan"
     );
     expect(badge).toBeUndefined();
+  });
+
+  it("counts clean-boot streak and unlocks at 7 days without dog-poop incidents", () => {
+    const dispatches = Array.from({ length: 7 }, (_, i) =>
+      dispatch({
+        id: String(i),
+        date: `2026-05-${String(i + 1).padStart(2, "0")}`,
+        title: `D${i}`,
+        milesWalked: 1,
+      })
+    );
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "seven-clean-boots");
+    expect(badge?.unlocked).toBe(true);
+    expect(badge?.unlockedAt).toBe("2026-05-07");
+    expect(badge?.progress).toBe(7);
+  });
+
+  it("resets clean-boot streak progress after a dog-poop incident", () => {
+    const dispatches = [
+      ...Array.from({ length: 5 }, (_, i) =>
+        dispatch({
+          id: `c${i}`,
+          date: `2026-05-${String(i + 1).padStart(2, "0")}`,
+          title: `C${i}`,
+          milesWalked: 1,
+        })
+      ),
+      dispatch({
+        id: "poop",
+        date: "2026-05-06",
+        title: "Incident",
+        milesWalked: 1,
+        steppedInDogPoop: true,
+      }),
+      ...Array.from({ length: 3 }, (_, i) =>
+        dispatch({
+          id: `a${i}`,
+          date: `2026-05-${String(i + 7).padStart(2, "0")}`,
+          title: `A${i}`,
+          milesWalked: 1,
+        })
+      ),
+    ];
+    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "seven-clean-boots");
+    expect(badge?.unlocked).toBe(false);
+    expect(badge?.progress).toBe(5);
+    expect(currentDogPoopCleanStreak(dispatches)).toBe(3);
+    expect(bestDogPoopCleanStreak(dispatches)).toBe(5);
   });
 });
 

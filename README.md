@@ -347,6 +347,7 @@ Expected Carrier's Log Notion properties:
 | `Average Heat Index F` | number | Average heat index °F across shift hours |
 | `Precipitation In` | number | Area precip inches during shift (informational; does not set rain) |
 | `Rain` | checkbox | Manual: got rained on during the route |
+| `Stepped In Dog Poop` | checkbox | Manual incident only; leave unchecked on clean days (streak is automatic) |
 | `DPS Count` | number |
 | `DPS Ratio` | number |
 | `Parcels` | number |

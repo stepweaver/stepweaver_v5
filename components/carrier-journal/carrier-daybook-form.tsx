@@ -80,6 +80,8 @@ export function CarrierDaybookForm({
 
   const [directSun, setDirectSun] = useState(false);
   const [rainedOnRoute, setRainedOnRoute] = useState(false);
+  /** Rare incident — leave off; only flip when it happens. Clean streak is automatic. */
+  const [steppedInDogPoop, setSteppedInDogPoop] = useState(false);
   const [hydrationGoalOverride, setHydrationGoalOverride] = useState("");
   const [showGoalOverride, setShowGoalOverride] = useState(false);
 
@@ -362,6 +364,8 @@ export function CarrierDaybookForm({
       if (weatherAvgHeat !== null) body.avgHeatIndexF = weatherAvgHeat;
       if (weatherPrecip !== null) body.precipitationIn = weatherPrecip;
       body.rain = rainedOnRoute;
+      // Incident-only write: omit on clean days so Notion property is optional until first hit.
+      if (steppedInDogPoop) body.steppedInDogPoop = true;
 
       if (publicNote.trim()) body.publicNote = publicNote.trim();
       if (privateNote.trim()) body.privateNote = privateNote.trim();
@@ -437,7 +441,8 @@ export function CarrierDaybookForm({
       token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
       mood, energy, soreness, publicNote, privateNote,
-      weatherTemp, weatherHeat, weatherAvgHeat, weatherPrecip, rainedOnRoute, fuelInput,
+      weatherTemp, weatherHeat, weatherAvgHeat, weatherPrecip, rainedOnRoute,
+      steppedInDogPoop, fuelInput,
       footwearOptions, splitMode, splitRows, assignAllMiles, primaryShoeId,
     ]
   );
@@ -810,7 +815,13 @@ export function CarrierDaybookForm({
           </span>
         </label>
 
-        <label className="flex items-center gap-3 cursor-pointer select-none">
+        <label
+          className={`flex items-center gap-3 cursor-pointer select-none p-3 -mx-1 border transition-colors ${
+            weatherPrecip !== null && weatherPrecip > 0 && !rainedOnRoute
+              ? "border-[rgb(var(--neon)/0.55)] bg-[rgb(var(--neon)/0.06)]"
+              : "border-transparent"
+          }`}
+        >
           <input
             type="checkbox"
             checked={rainedOnRoute}
@@ -833,8 +844,15 @@ export function CarrierDaybookForm({
               }`}
             />
           </span>
-          <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-secondary))]">
-            RAINED ON ROUTE
+          <span className="flex flex-col gap-0.5 min-w-0">
+            <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-secondary))]">
+              RAINED ON ROUTE
+            </span>
+            {weatherPrecip !== null && weatherPrecip > 0 && !rainedOnRoute && (
+              <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--neon)/0.75)]">
+                Area precip detected — flip if you got wet
+              </span>
+            )}
           </span>
         </label>
       </div>
@@ -1066,6 +1084,43 @@ export function CarrierDaybookForm({
           value={postShiftMealQuality}
           onChange={setPostShiftMealQuality}
         />
+      </div>
+
+      {/* Rare field incident — clean streak is automatic unless this is flipped */}
+      <div className="surface-panel p-5 space-y-3">
+        <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
+          FIELD INCIDENT
+        </div>
+        <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta)/0.7)]">
+          Leave off. Clean-boot streak counts every logged day automatically. Flip only when it happens.
+        </div>
+        <label className="flex items-center gap-3 cursor-pointer select-none">
+          <input
+            type="checkbox"
+            checked={steppedInDogPoop}
+            onChange={(e) => setSteppedInDogPoop(e.target.checked)}
+            className="sr-only"
+          />
+          <span
+            className={`relative flex-none w-10 h-6 border transition-colors ${
+              steppedInDogPoop
+                ? "bg-[rgb(var(--orange)/0.18)] border-[rgb(var(--orange)/0.55)]"
+                : "bg-transparent border-[rgb(var(--border)/0.4)]"
+            }`}
+            role="presentation"
+          >
+            <span
+              className={`absolute top-0.5 left-0.5 w-5 h-5 transition-transform ${
+                steppedInDogPoop
+                  ? "translate-x-4 bg-[rgb(var(--orange))]"
+                  : "translate-x-0 bg-[rgb(var(--text-meta)/0.5)]"
+              }`}
+            />
+          </span>
+          <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-secondary))]">
+            STEPPED IN DOG POOP
+          </span>
+        </label>
       </div>
 
       {/* Notes */}

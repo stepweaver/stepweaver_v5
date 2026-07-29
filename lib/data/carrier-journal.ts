@@ -55,6 +55,11 @@ export type CarrierDispatch = {
   storm?: boolean;
   snow?: boolean;
   dogEncounter?: boolean;
+  /**
+   * Manual incident only: stepped in dog poop on this route.
+   * Leave unset/false on clean days — clean-streak badges count logged days without this flag.
+   */
+  steppedInDogPoop?: boolean;
   publicNote: string;
   waterOz?: number;
   hydrationGoalOz?: number;

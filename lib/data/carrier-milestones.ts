@@ -115,6 +115,50 @@ function dateAtCumulativeThreshold(
   return undefined;
 }
 
+/** Consecutive logged days without a dog-poop incident, ending at the latest dispatch. */
+export function currentDogPoopCleanStreak(dispatches: CarrierDispatch[]): number {
+  const sorted = sortedChronologically(dispatches);
+  let streak = 0;
+  for (let i = sorted.length - 1; i >= 0; i--) {
+    if (sorted[i].steppedInDogPoop) break;
+    streak++;
+  }
+  return streak;
+}
+
+/** Longest run of logged days without stepping in dog poop. */
+export function bestDogPoopCleanStreak(dispatches: CarrierDispatch[]): number {
+  const sorted = sortedChronologically(dispatches);
+  let best = 0;
+  let current = 0;
+  for (const d of sorted) {
+    if (d.steppedInDogPoop) {
+      current = 0;
+    } else {
+      current++;
+      if (current > best) best = current;
+    }
+  }
+  return best;
+}
+
+/** Date when a clean streak first reached `target` consecutive logged days. */
+function dateAtCleanStreak(
+  sorted: CarrierDispatch[],
+  target: number
+): string | undefined {
+  let current = 0;
+  for (const d of sorted) {
+    if (d.steppedInDogPoop) {
+      current = 0;
+    } else {
+      current++;
+      if (current >= target) return d.date;
+    }
+  }
+  return undefined;
+}
+
 // ---------------------------------------------------------------------------
 // Exported functions
 // ---------------------------------------------------------------------------
@@ -200,6 +244,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       d.hydrationGoalOz !== undefined &&
       d.waterOz >= d.hydrationGoalOz
   );
+  const cleanStreakBest = bestDogPoopCleanStreak(enriched);
 
   function milestone(
     id: string,
@@ -332,6 +377,18 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
         : undefined
     ),
 
+    // --- Safety (clean boots streak; incident flag only when broken) ---
+    milestone(
+      "seven-clean-boots",
+      "7 Clean Days",
+      "7 Clean",
+      "Seven logged days without stepping in dog poop. Boots still respectable.",
+      "safety", "basic", "shield",
+      cleanStreakBest, 7,
+      dateAtCleanStreak(sorted, 7),
+      "days"
+    ),
+
     // ===================================================================
     // FIELD QUALIFICATION
     // ===================================================================
@@ -417,6 +474,18 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "weather", "field", "zap",
       stormDays.length, 1,
       stormDays.length >= 1 ? sortedChronologically(stormDays)[0]?.date : undefined
+    ),
+
+    // --- Safety ---
+    milestone(
+      "twenty-five-clean-boots",
+      "25 Clean Days",
+      "25 Clean",
+      "Twenty-five logged days without stepping in it. Situational awareness holds.",
+      "safety", "field", "shield",
+      cleanStreakBest, 25,
+      dateAtCleanStreak(sorted, 25),
+      "days"
     ),
 
     // ===================================================================
@@ -515,6 +584,18 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 10)
     ),
 
+    // --- Safety ---
+    milestone(
+      "fifty-clean-boots",
+      "50 Clean Days",
+      "50 Clean",
+      "Fifty logged days clean. The lawn hazard has not claimed you yet.",
+      "safety", "campaign", "shield",
+      cleanStreakBest, 50,
+      dateAtCleanStreak(sorted, 50),
+      "days"
+    ),
+
     // ===================================================================
     // VETERAN RECORD
     // ===================================================================
@@ -600,6 +681,18 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "load", "veteran", "package",
       heavyMailDays.length, 50,
       dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 50)
+    ),
+
+    // --- Safety ---
+    milestone(
+      "hundred-clean-boots",
+      "100 Clean Days",
+      "100 Clean",
+      "One hundred logged days without a dog-poop incident. Legendary tread hygiene.",
+      "safety", "veteran", "shield",
+      cleanStreakBest, 100,
+      dateAtCleanStreak(sorted, 100),
+      "days"
     ),
   ];
 }

@@ -102,6 +102,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const avgHeatIndexF = num(p["Average Heat Index F"] as Props);
   const precipitationIn = num(p["Precipitation In"] as Props);
   const rain = bool(p.Rain as Props);
+  const steppedInDogPoop = bool(p["Stepped In Dog Poop"] as Props);
   const publicNote = str(p["Public Note"] as Props, "rich_text");
 
   const waterOz = num(p["Water Oz"] as Props);
@@ -125,6 +126,7 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(avgHeatIndexF !== undefined && { avgHeatIndexF }),
     ...(precipitationIn !== undefined && { precipitationIn }),
     ...(rain !== undefined && { rain }),
+    ...(steppedInDogPoop !== undefined && { steppedInDogPoop }),
     publicNote,
     ...(waterOz !== undefined && { waterOz }),
     ...(hydrationGoalOz !== undefined && { hydrationGoalOz }),
@@ -438,6 +440,10 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
 
   if (input.rain !== undefined) {
     properties.Rain = { checkbox: input.rain };
+  }
+
+  if (input.steppedInDogPoop !== undefined) {
+    properties["Stepped In Dog Poop"] = { checkbox: input.steppedInDogPoop };
   }
 
   if (input.waterOz !== undefined) {
