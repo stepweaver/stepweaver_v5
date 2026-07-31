@@ -3,17 +3,38 @@
 const MAX_EDGE = 2400;
 const JPEG_QUALITY = 0.82;
 
+function isImageFile(file: File): boolean {
+  if (file.type.startsWith("image/")) return true;
+  // iPhone often omits MIME or uses HEIC; trust common extensions.
+  return /\.(jpe?g|png|webp|gif|heic|heif)$/i.test(file.name);
+}
+
 export async function compressImageForUpload(file: File): Promise<File> {
-  if (!file.type.startsWith("image/")) {
+  if (!isImageFile(file)) {
     throw new Error("Only image files are allowed.");
   }
 
-  // Already small enough - keep original format.
-  if (file.size <= 1.5 * 1024 * 1024) {
+  const isHeic =
+    /image\/hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
+
+  // Already small enough and not HEIC — keep original.
+  // HEIC must be re-encoded so blob storage / browsers can display it.
+  if (!isHeic && file.size <= 1.5 * 1024 * 1024) {
     return file;
   }
 
-  const bitmap = await createImageBitmap(file);
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    if (isHeic) {
+      throw new Error(
+        "Could not read this HEIC photo. In iPhone Settings → Camera → Formats, try Most Compatible, or export/share as JPEG."
+      );
+    }
+    throw new Error("Could not read this image. Try a different photo.");
+  }
+
   const scale = Math.min(1, MAX_EDGE / Math.max(bitmap.width, bitmap.height));
   const width = Math.max(1, Math.round(bitmap.width * scale));
   const height = Math.max(1, Math.round(bitmap.height * scale));

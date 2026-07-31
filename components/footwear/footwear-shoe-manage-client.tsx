@@ -921,26 +921,25 @@ export function FootwearShoeManageClient({
               <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
                 Image
               </span>
-              <input
-                key={photoInputKey}
-                id="photo-file"
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                onChange={(e) => {
-                  setError(null);
-                  setPhotoFile(e.target.files?.[0] ?? null);
-                }}
-                className="sr-only"
-              />
               <div className="flex flex-wrap items-center gap-3">
-                <label
-                  htmlFor="photo-file"
-                  className="glitch-button inline-block cursor-pointer px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.2em] uppercase"
-                >
+                <label className="glitch-button relative inline-flex cursor-pointer overflow-hidden px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.2em] uppercase">
+                  <input
+                    key={photoInputKey}
+                    id="photo-file"
+                    type="file"
+                    accept="image/*,.heic,.heif"
+                    onChange={(e) => {
+                      setError(null);
+                      setPhotoFile(e.target.files?.[0] ?? null);
+                    }}
+                    className="absolute inset-0 z-10 h-full w-full cursor-pointer opacity-0 text-[100px]"
+                  />
                   Choose image
                 </label>
                 <span className="text-sm text-[rgb(var(--text-secondary))]">
-                  {photoFile ? photoFile.name : "JPEG / PNG / WebP · phone photos OK"}
+                  {photoFile
+                    ? photoFile.name
+                    : "Phone photos OK · HEIC / JPEG / PNG / WebP"}
                 </span>
               </div>
             </div>
