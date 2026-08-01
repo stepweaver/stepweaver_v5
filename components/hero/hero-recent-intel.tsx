@@ -18,14 +18,23 @@ function statusLabel(status: NonNullable<HomeIntelPayload["relatedProject"]>["st
   }
 }
 
-export function HeroRecentIntel({ intel }: { intel: HomeIntelPayload | null }) {
+export function HeroRecentIntel({
+  intel,
+  className = "",
+}: {
+  intel: HomeIntelPayload | null;
+  className?: string;
+}) {
   return (
     <aside
-      className="mt-8 sm:mt-10 flex flex-col flex-1 rounded-sm border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.25)] p-4 sm:p-5 min-w-0"
-      aria-label="Recent codex intel"
+      className={`flex flex-col h-full rounded-sm border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.25)] p-4 sm:p-5 min-w-0 ${className}`}
+      aria-labelledby="recent-intel-heading"
     >
       <div className="flex items-start justify-between gap-3 mb-3">
-        <p className="text-[10px] sm:text-xs tracking-[0.2em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
+        <p
+          id="recent-intel-heading"
+          className="text-[10px] sm:text-xs tracking-[0.2em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase"
+        >
           Recent intel
         </p>
         <span className="font-[var(--font-ocr)] text-[10px] text-[rgb(var(--neon)/0.35)] shrink-0 hidden sm:inline">

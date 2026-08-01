@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
@@ -9,12 +10,18 @@ import { BrandWordmark } from "@/components/ui/brand-wordmark";
 const NAV_LINKS = [
   { label: "Work", href: "/work" },
   { label: "About", href: "/about" },
+  { label: "Writing", href: "/writing" },
+  { label: "Carrier's Log", href: "/carrier-journal" },
   { label: "Resume", href: "/resume" },
   { label: "Contact", href: "/contact" },
-  { label: "Writing", href: "/writing" },
   { label: "Services", href: "/services" },
   { label: "Play", href: "/play" },
 ];
+
+function isActiveNavHref(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 const SLIDE_OUT_MS = 400;
 
@@ -42,6 +49,7 @@ function HamburgerIcon({ open }: { open: boolean }) {
 }
 
 export function Navbar() {
+  const pathname = usePathname() ?? "/";
   const [mobileOpen, setMobileOpen] = useState(false);
   const [mobileClosing, setMobileClosing] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -99,16 +107,24 @@ export function Navbar() {
             <BrandWordmark labelClassName="text-inherit" lambdaClassName="text-inherit" />
           </Link>
 
-          <nav className="hidden lg:flex items-center gap-6" aria-label="Main navigation">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="font-[var(--font-ibm)] text-xs uppercase tracking-wider text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--neon))] transition-colors"
-              >
-                {link.label}
-              </Link>
-            ))}
+          <nav className="hidden lg:flex items-center gap-5 xl:gap-6" aria-label="Primary">
+            {NAV_LINKS.map((link) => {
+              const active = isActiveNavHref(pathname, link.href);
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  aria-current={active ? "page" : undefined}
+                  className={`font-[var(--font-ibm)] text-xs uppercase tracking-wider transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))] ${
+                    active
+                      ? "text-[rgb(var(--neon))]"
+                      : "text-[rgb(var(--text-secondary))] hover:text-[rgb(var(--neon))]"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <ThemeToggle />
           </nav>
 
@@ -183,22 +199,29 @@ export function Navbar() {
                     <Link
                       href="/"
                       onClick={handleMobileClose}
-                      className="block py-4 text-[rgb(var(--text-color))] hover:text-neon transition-colors text-base tracking-wide border-b border-[rgb(var(--white)/0.05)]"
+                      aria-current={pathname === "/" ? "page" : undefined}
+                      className="block py-4 text-[rgb(var(--text-color))] hover:text-neon transition-colors text-base tracking-wide border-b border-[rgb(var(--white)/0.05)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
                     >
                       HOME
                     </Link>
                   </li>
-                  {NAV_LINKS.map((link) => (
-                    <li key={link.href}>
-                      <Link
-                        href={link.href}
-                        onClick={handleMobileClose}
-                        className="block py-4 text-[rgb(var(--text-secondary))] hover:text-neon transition-colors text-base tracking-wide border-b border-[rgb(var(--white)/0.05)] last:border-b-0"
-                      >
-                        {link.label.toUpperCase()}
-                      </Link>
-                    </li>
-                  ))}
+                  {NAV_LINKS.map((link) => {
+                    const active = isActiveNavHref(pathname, link.href);
+                    return (
+                      <li key={link.href}>
+                        <Link
+                          href={link.href}
+                          onClick={handleMobileClose}
+                          aria-current={active ? "page" : undefined}
+                          className={`block py-4 hover:text-neon transition-colors text-base tracking-wide border-b border-[rgb(var(--white)/0.05)] last:border-b-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))] ${
+                            active ? "text-[rgb(var(--neon))]" : "text-[rgb(var(--text-secondary))]"
+                          }`}
+                        >
+                          {link.label.toUpperCase()}
+                        </Link>
+                      </li>
+                    );
+                  })}
                 </ul>
               </nav>
 

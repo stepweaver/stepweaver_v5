@@ -103,6 +103,36 @@ const WHY_THIS_BELONGS = [
   "Mobile-first UX constraint: the logging tool lives on a phone and must work before your legs give out",
 ];
 
+const SECTION_NAV = [
+  { id: "aggregate-kpis", label: "AGGREGATE KPIs" },
+  { id: "field-calendar", label: "FIELD CALENDAR" },
+  { id: "field-qualifications", label: "FIELD QUALIFICATIONS" },
+  { id: "field-method", label: "FIELD METHOD" },
+  { id: "field-dispatches", label: "FIELD DISPATCHES" },
+] as const;
+
+function CarrierSectionNav() {
+  return (
+    <nav
+      aria-label="Carrier's Log sections"
+      className="carrier-section-nav sticky top-14 z-20 -mx-1 px-1 py-2 border-b border-[rgb(var(--neon)/0.12)] bg-[rgb(var(--bg)/0.92)] backdrop-blur-sm [@media(max-height:32rem)]:static"
+    >
+      <ul className="flex flex-wrap gap-x-1 gap-y-2 sm:gap-x-2 overflow-x-auto">
+        {SECTION_NAV.map((item) => (
+          <li key={item.id} className="shrink-0">
+            <a
+              href={`#${item.id}`}
+              className="inline-flex min-h-11 items-center px-2.5 py-2 font-[var(--font-ocr)] text-[10px] sm:text-[11px] tracking-widest text-[rgb(var(--text-meta))] border border-transparent hover:border-[rgb(var(--neon)/0.35)] hover:text-[rgb(var(--neon))] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
+}
+
 type Props = {
   dispatches?: CarrierDispatch[];
   footwearActive?: ShoeDerivedSummary | null;
@@ -145,6 +175,8 @@ export function CarrierJournalPage({
           </div>
         </div>
 
+        <CarrierSectionNav />
+
         {/* Disclaimer */}
         <div className="surface-panel p-5 sm:p-6 border-[rgb(var(--border)/0.3)]">
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-2">
@@ -179,7 +211,7 @@ export function CarrierJournalPage({
         )}
 
         {/* KPI Grid */}
-        <div>
+        <div id="aggregate-kpis" className="scroll-mt-28">
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
             AGGREGATE KPIs
           </div>
@@ -191,13 +223,17 @@ export function CarrierJournalPage({
         </div>
 
         {/* Field Calendar: logged days derived from dispatch data, no schedule claims */}
-        <CarrierFieldCalendar dispatches={dispatches} />
+        <div id="field-calendar" className="scroll-mt-28">
+          <CarrierFieldCalendar dispatches={dispatches} />
+        </div>
 
         {/* Field Badges: cumulative milestones computed from dispatch data */}
-        <CarrierMilestonePanel dispatches={dispatches} />
+        <div id="field-qualifications" className="scroll-mt-28">
+          <CarrierMilestonePanel dispatches={dispatches} />
+        </div>
 
         {/* Field Method */}
-        <div className="surface-panel p-6 sm:p-8">
+        <div id="field-method" className="surface-panel p-6 sm:p-8 scroll-mt-28">
           <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--neon))] mb-2">
             FIELD METHOD
           </div>
@@ -260,14 +296,14 @@ export function CarrierJournalPage({
         </div>
 
         {/* Field Dispatches: only entries with authored content */}
-        {feedDispatches.length > 0 && (
-          <div>
-            <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
-              FIELD DISPATCHES
-            </div>
-            <CarrierDispatchFeed dispatches={feedDispatches} />
+        <div id="field-dispatches" className="scroll-mt-28">
+          <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
+            FIELD DISPATCHES
           </div>
-        )}
+          {feedDispatches.length > 0 ? (
+            <CarrierDispatchFeed dispatches={feedDispatches} />
+          ) : null}
+        </div>
 
         {/* Transformation Arc */}
         <div>

@@ -56,7 +56,7 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
   const publicLoadLine = publicMailLine ?? publicDpsLine;
 
   return (
-    <div id={d.id} className="surface-panel p-5 sm:p-6 space-y-3">
+    <div id={d.id} className="surface-panel p-5 sm:p-6 space-y-3 scroll-mt-28">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-1">

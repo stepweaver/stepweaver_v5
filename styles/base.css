@@ -44,6 +44,7 @@
   html {
     font-size: 16px;
     scroll-behavior: smooth;
+    scroll-padding-top: calc(3.5rem + 0.75rem);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-color: rgb(var(--bg));
@@ -128,6 +129,10 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+
     *,
     *::before,
     *::after {

@@ -1,0 +1,116 @@
+import Link from "next/link";
+import type { HomeCarrierPreviewPayload } from "@/lib/home/carrier-preview";
+import type { HomeIntelPayload } from "@/lib/home/recent-intel";
+import type { MailLoadTier } from "@/lib/data/carrier-journal";
+import { HeroRecentIntel } from "@/components/hero/hero-recent-intel";
+
+const MAIL_LOAD_LABEL: Record<MailLoadTier, string> = {
+  light: "LIGHT",
+  medium: "MEDIUM",
+  heavy: "HEAVY",
+};
+
+const WEATHER_FLAG_LABEL: Record<"heat" | "rain" | "storm" | "snow", string> = {
+  heat: "HEAT",
+  rain: "RAIN",
+  storm: "STORM",
+  snow: "SNOW",
+};
+
+type Props = {
+  recentIntel: HomeIntelPayload | null;
+  carrierPreview: HomeCarrierPreviewPayload | null;
+};
+
+function CarrierStreamCard({ preview }: { preview: HomeCarrierPreviewPayload | null }) {
+  const dispatchHref = preview
+    ? `/carrier-journal#${preview.id}`
+    : "/carrier-journal#field-dispatches";
+
+  return (
+    <article
+      className="relative flex flex-col h-full border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)] p-5 sm:p-7 min-w-0"
+      aria-labelledby="carrier-log-heading"
+    >
+      <div className="pointer-events-none absolute left-0 top-0 h-5 w-5 border-l-2 border-t-2 border-[rgb(var(--cyan)/0.5)]" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-5 w-5 border-b-2 border-r-2 border-[rgb(var(--cyan)/0.5)]" />
+
+      <p
+        id="carrier-log-heading"
+        className="font-[var(--font-ocr)] text-xs uppercase tracking-[0.28em] text-[rgb(var(--cyan)/0.7)] mb-2"
+      >
+        Current chapter
+      </p>
+      <h2 className="font-[var(--font-ibm)] text-xl sm:text-2xl font-semibold text-[rgb(var(--text-color))] mb-3 leading-snug">
+        Mail routes, miles, and systems thinking in the field.
+      </h2>
+      <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-3 max-w-3xl">
+        I&apos;m currently working as a mail carrier and documenting the adaptation: walking distance, hydration,
+        soreness, weather, weight trend, recovery, and the daily reality of learning a physical route job.
+      </p>
+      <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-5 max-w-3xl">
+        Carrier&apos;s Log is part field log, part transformation record, and part public proof that systems thinking
+        does not only happen behind a desk.
+      </p>
+
+      {preview ? (
+        <div className="mt-auto mb-5 border-t border-[rgb(var(--border)/0.2)] pt-4 space-y-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <time
+              dateTime={preview.date}
+              className="font-[var(--font-ocr)] text-[10px] sm:text-xs tracking-widest text-[rgb(var(--text-meta))]"
+            >
+              {preview.date}
+            </time>
+            {preview.mailLoadTier ? (
+              <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon)/0.7)] border border-[rgb(var(--neon)/0.25)] px-1.5 py-0.5">
+                {MAIL_LOAD_LABEL[preview.mailLoadTier]}
+              </span>
+            ) : null}
+            {preview.weatherFlags.map((flag) => (
+              <span
+                key={flag}
+                className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))]"
+              >
+                {WEATHER_FLAG_LABEL[flag]}
+              </span>
+            ))}
+          </div>
+          <Link
+            href={dispatchHref}
+            className="block font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-color))] hover:text-[rgb(var(--neon))] transition-colors leading-snug focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
+          >
+            {preview.title}
+          </Link>
+          <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed line-clamp-3">
+            {preview.excerpt}
+          </p>
+          <Link
+            href="/carrier-journal#field-dispatches"
+            className="inline-flex font-[var(--font-ocr)] text-[10px] sm:text-xs uppercase tracking-wider text-[rgb(var(--text-meta))] hover:text-[rgb(var(--neon)/0.8)] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
+          >
+            FIELD DISPATCHES
+          </Link>
+        </div>
+      ) : null}
+
+      <a
+        href="/carrier-journal#field-dispatches"
+        className="inline-flex items-center gap-2 border border-[rgb(var(--cyan)/0.35)] bg-[rgb(var(--window)/0.2)] px-4 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.1em] text-[rgb(var(--cyan))] transition-colors hover:border-[rgb(var(--cyan)/0.65)] hover:bg-[rgb(var(--cyan)/0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))] w-fit"
+      >
+        Read Carrier&apos;s Log →
+      </a>
+    </article>
+  );
+}
+
+export function ActivityStreams({ recentIntel, carrierPreview }: Props) {
+  return (
+    <section className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 xl:px-14 pb-8">
+      <div className="grid grid-cols-1 min-[52rem]:grid-cols-2 gap-4 sm:gap-6 min-[52rem]:gap-8 items-stretch">
+        <CarrierStreamCard preview={carrierPreview} />
+        <HeroRecentIntel intel={recentIntel} />
+      </div>
+    </section>
+  );
+}
