@@ -470,6 +470,25 @@ export async function createMedia(
   return row;
 }
 
+export async function getMediaById(id: string): Promise<ShoeMedia | null> {
+  const db = getDb();
+  const [row] = await db
+    .select()
+    .from(shoeMedia)
+    .where(eq(shoeMedia.id, id))
+    .limit(1);
+  return row ?? null;
+}
+
+export async function deleteMedia(id: string): Promise<ShoeMedia | null> {
+  const db = getDb();
+  const [row] = await db
+    .delete(shoeMedia)
+    .where(eq(shoeMedia.id, id))
+    .returning();
+  return row ?? null;
+}
+
 export async function getShoeMileageTotal(shoeId: string): Promise<number> {
   const allocations = await getAllocationsForShoe(shoeId);
   return aggregateMileage(

@@ -229,3 +229,7 @@ export const mediaMetaSchema = footwearAuthSchema.extend({
 export const mediaRegisterSchema = mediaMetaSchema.extend({
   imageUrl: z.string().url().max(2000),
 });
+
+export const mediaDeleteSchema = footwearAuthSchema.extend({
+  mediaId: z.string().min(1),
+});

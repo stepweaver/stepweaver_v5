@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
-import { mediaRegisterSchema } from "@/lib/validation/footwear.schema";
+import { del } from "@vercel/blob";
+import {
+  mediaDeleteSchema,
+  mediaRegisterSchema,
+} from "@/lib/validation/footwear.schema";
 import {
   assertFootwearReady,
   footwearBadRequest,
@@ -7,6 +11,8 @@ import {
 } from "@/lib/footwear/api";
 import {
   createMedia,
+  deleteMedia,
+  getMediaById,
   getObservationById,
   getShoeById,
   getShoeMileageTotal,
@@ -83,4 +89,40 @@ export async function POST(request: Request) {
   });
 
   return NextResponse.json({ ok: true, media }, { status: 201 });
+}
+
+export async function DELETE(request: Request) {
+  const parsedBody = await readJsonBody(request);
+  if (!parsedBody.ok) return parsedBody.response;
+
+  const parsed = mediaDeleteSchema.safeParse(parsedBody.body);
+  if (!parsed.success) {
+    return footwearBadRequest("Validation failed", parsed.error.flatten());
+  }
+
+  const gate = assertFootwearReady(parsed.data.logSecret);
+  if (gate) return gate;
+
+  const existing = await getMediaById(parsed.data.mediaId);
+  if (!existing) {
+    return NextResponse.json({ error: "Photo not found" }, { status: 404 });
+  }
+
+  const removed = await deleteMedia(existing.id);
+  if (!removed) {
+    return NextResponse.json({ error: "Delete failed" }, { status: 500 });
+  }
+
+  if (
+    (process.env.BLOB_READ_WRITE_TOKEN ?? "").trim() &&
+    existing.imageUrl.includes("blob.vercel-storage.com/")
+  ) {
+    try {
+      await del(existing.imageUrl);
+    } catch {
+      // DB row is gone; orphaned blob is acceptable.
+    }
+  }
+
+  return NextResponse.json({ ok: true, mediaId: removed.id });
 }

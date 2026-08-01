@@ -452,6 +452,42 @@ export function FootwearShoeManageClient({
     }
   }
 
+  async function deletePhoto(mediaId: string) {
+    if (
+      !window.confirm(
+        "Delete this photo? It will be removed from the shoe profile and storage."
+      )
+    ) {
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const res = await fetch("/api/footwear/media", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ logSecret: token, mediaId }),
+      });
+      let data: { error?: string } = {};
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+      if (!res.ok) {
+        setError(data.error ?? `Delete failed (${res.status})`);
+        return;
+      }
+      setMessage("Photo deleted.");
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Delete failed");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   const tabs = [
     ["checkpoint", "Checkpoint"],
     ["field_note", "Field note"],
@@ -1075,7 +1111,7 @@ export function FootwearShoeManageClient({
                         unoptimized
                       />
                     </div>
-                    <div className="p-3 space-y-1">
+                    <div className="p-3 space-y-2">
                       <p className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
                         {m.imageType.toUpperCase()} // {attachLabel}
                         {m.public ? " // PUBLIC" : " // PRIVATE"}
@@ -1085,6 +1121,14 @@ export function FootwearShoeManageClient({
                           {m.caption}
                         </p>
                       )}
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void deletePhoto(m.id)}
+                        className="border border-red-400/50 px-3 py-1.5 font-[var(--font-ocr)] text-[10px] tracking-widest uppercase text-red-400 hover:bg-red-400/10 disabled:opacity-40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-red-400"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </li>
                 );
