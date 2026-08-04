@@ -41,12 +41,12 @@ export function CarrierProfileCard() {
               <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-5 w-5 border-b border-l border-[rgb(var(--cyan)/0.25)]" />
               <div className="pointer-events-none absolute bottom-0 right-0 z-20 h-5 w-5 border-b border-r border-[rgb(var(--cyan)/0.5)]" />
               <Image
-                src="/images/carrier_me.png"
+                src="/images/IMG_2704.jpeg"
                 alt="Stephen Weaver, City Letter Carrier"
                 width={144}
                 height={144}
                 sizes="144px"
-                className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-top"
+                className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover object-[62%_30%]"
                 priority
               />
             </div>
