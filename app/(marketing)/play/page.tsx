@@ -12,7 +12,7 @@ const PLAY_ITEMS = [
     description: "Command-style portfolio shell: resume, chat, codex, weather, games.",
   },
   {
-    href: "/carrier-journal",
+    href: "/field-journal",
     label: "Field Journal",
     description: "Personal walking and fitness log: miles, weather, recovery, milestones.",
   },
@@ -34,7 +34,7 @@ const PLAY_ITEMS = [
   {
     href: "/mail-sort-academy",
     label: "Mail Sort Academy",
-    description: "Study tool grounded in real postal decisions.",
+    description: "Unofficial mail-classification study drill from public educational material.",
   },
 ];
 

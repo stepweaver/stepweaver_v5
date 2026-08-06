@@ -17,7 +17,7 @@ const TREND_METRICS = [
   ["stability", "STABILITY"],
   ["comfort", "COMFORT"],
   ["durability", "DURABILITY"],
-  ["endOfShiftSupport", "END-OF-SHIFT SUPPORT"],
+  ["endOfShiftSupport", "END-OF-DAY SUPPORT"],
 ] as const;
 
 function StatRow({ label, value }: { label: string; value: string | number }) {
@@ -169,7 +169,7 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
       <header className="space-y-3">
         <p>
           <Link
-            href="/carrier-journal/footwear"
+            href="/field-journal/footwear"
             className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] hover:underline"
           >
             ← Shoe Ledger
@@ -187,6 +187,11 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
             “{shoe.nickname.toUpperCase()}”
           </p>
         )}
+        <aside className="max-w-2xl border border-[rgb(var(--border)/0.35)] bg-[rgb(var(--panel)/0.25)] p-4 text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
+          Independent personal footwear journal. The observations and opinions
+          are my own. No employer participates in, reviews, approves, sponsors,
+          or endorses this content.
+        </aside>
       </header>
 
       {summary.heroImageUrl && (
@@ -230,7 +235,7 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
           <StatRow label="SIZE" value={`${shoe.size}${shoe.width ? ` ${shoe.width}` : ""}`} />
           <StatRow label="ACQUISITION" value={shoe.acquisitionType.replace(/_/g, " ")} />
           {shoe.firstWearDate && (
-            <StatRow label="DEPLOYED" value={shoe.firstWearDate} />
+            <StatRow label="STARTED" value={shoe.firstWearDate} />
           )}
           {summary.amountPaid != null && (
             <StatRow

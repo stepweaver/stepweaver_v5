@@ -14,7 +14,7 @@ const STATIC_ROUTES = [
   "/writing",
   "/play",
   "/for-agents",
-  "/carrier-journal",
+  "/field-journal",
   "/meshtastic",
   "/meshtastic/field-notes",
   "/terminal",

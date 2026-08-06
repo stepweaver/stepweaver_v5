@@ -15,12 +15,12 @@ const SITE_URL = process.env.SITE_URL || "https://stepweaver.dev";
 export const metadata: Metadata = {
   title: "Shoe Ledger | Field Journal",
   description:
-    "Personal footwear equipment ledger: mileage and condition for shoes you own. Not a review service or partnership program.",
+    "Independent personal footwear journal: brands, mileage, ratings, and honest conclusions for shoes on high-mileage walking days.",
   openGraph: {
     title: "Shoe Ledger",
     description:
-      "Personal footwear equipment ledger: mileage and condition for shoes you own.",
-    url: `${SITE_URL}/carrier-journal/footwear`,
+      "Independent personal footwear journal: brands, mileage, ratings, and honest conclusions.",
+    url: `${SITE_URL}/field-journal/footwear`,
     type: "website",
   },
 };

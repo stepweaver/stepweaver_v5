@@ -39,7 +39,6 @@ function emptyDay(date: string): DaySummary {
     heat90: false,
     freezing: false,
     belowZero: false,
-    heavyMailDay: false,
     hydrationGoalMet: false,
     dispatchIds: [],
     noteExcerpt: "",

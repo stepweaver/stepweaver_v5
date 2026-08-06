@@ -64,7 +64,7 @@ Known flagship work:
 - Parcel Sweep: last-mile delivery workflow prototype
 - Silent Auction Platform: a real-time fundraising app built with Next.js and Supabase
 - AI Integrations / λlambda: portfolio-native AI with protected backends and guardrails
-- Carrier's Log: field-first data product and KPI journal
+- Field Journal: personal walking and fitness journal with draft-by-default publication
 - λledger (paycheck-window bill planner): household cashflow app using Next.js, Neon, Drizzle, and Auth.js
 - Portfolio Terminal: an interactive command-style portfolio experience
 

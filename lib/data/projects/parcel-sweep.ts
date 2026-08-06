@@ -53,7 +53,6 @@ export const parcelSweep: Project = {
     "parcel sweep",
     "last mile",
     "route optimization",
-    "usps",
     "sunday delivery",
     "loading dock",
     "driver gps",
@@ -86,7 +85,7 @@ export const parcelSweep: Project = {
       title: "Overview",
       type: "overview",
       content:
-        "Parcel Sweep is not a USPS product. It is a full-stack prototype I built to answer a narrow operational question: what would a modern Sunday delivery workflow look like if manifest intake, route planning, loading, dispatch, and driver execution were designed as one continuous system?\n\nMost routing demos stop at \"optimize these stops.\" Parcel Sweep follows the parcel all the way through: CSV or synthetic manifest intake, validation and hold review, multi-driver route proposals, loading-dock scanning with ghost detection, route book export, live driver mode with proximity alerts, and a Sunday Hub supervisor control tower. Each screen has a concrete place in the operational story. That through-line is the product.\n\nThe codebase is intentionally inspectable. Frontend and backend are cleanly separated, data shapes are typed, SQLite initializes predictably, API routes are organized by domain, and route planning is decomposed into clustering, matrix construction, optimization, alert generation, and export services. For a portfolio case study, that readability matters as much as the demo flow.",
+        "Parcel Sweep is not affiliated with any postal operator. It is a full-stack prototype I built to answer a narrow operational question: what would a modern Sunday delivery workflow look like if manifest intake, route planning, loading, dispatch, and driver execution were designed as one continuous system?\n\nMost routing demos stop at \"optimize these stops.\" Parcel Sweep follows the parcel all the way through: CSV or synthetic manifest intake, validation and hold review, multi-driver route proposals, loading-dock scanning with ghost detection, route book export, live driver mode with proximity alerts, and a Sunday Hub supervisor control tower. Each screen has a concrete place in the operational story. That through-line is the product.\n\nThe codebase is intentionally inspectable. Frontend and backend are cleanly separated, data shapes are typed, SQLite initializes predictably, API routes are organized by domain, and route planning is decomposed into clustering, matrix construction, optimization, alert generation, and export services. For a portfolio case study, that readability matters as much as the demo flow.",
     },
     {
       id: "problem",
@@ -235,7 +234,7 @@ export const parcelSweep: Project = {
         "Portfolio-grade logistics case study demonstrating workflow-first product thinking, not just algorithm output",
         "Credible supervisor-to-driver demo flow suitable for evaluators unfamiliar with last-mile operations",
         "Inspectable codebase where clustering, matrix construction, optimization, alerts, and export are readable services",
-        "Natural companion to Carrier's Log and Mail Sort Academy in the postal operations portfolio story - field experience informing systems design",
+        "Natural companion to Field Journal and Mail Sort Academy as adjacent ops-and-systems storytelling — not an employer product",
         "Live demo deployed on Railway; not production-ready for real drivers or customer parcels without the hardening phase above",
         "Publishable as a prototype that shows strong product judgment: narrow context, full workflow, honest tradeoffs",
       ],

@@ -2,7 +2,6 @@ import { fetchCarrierDispatches } from "@/lib/notion/carrier-journal.repo";
 import {
   enrichDispatchesFields,
   isDispatchFeedWorthy,
-  type MailLoadTier,
 } from "@/lib/data/carrier-journal";
 import { deriveWeatherSignals } from "@/lib/carrier-journal/weather-signals";
 
@@ -11,7 +10,6 @@ export type HomeCarrierPreviewPayload = {
   date: string;
   title: string;
   excerpt: string;
-  mailLoadTier?: MailLoadTier;
   weatherFlags: Array<"heat" | "rain" | "storm" | "snow">;
 };
 
@@ -49,7 +47,6 @@ export async function getHomeCarrierPreview(): Promise<HomeCarrierPreviewPayload
       date: latest.date,
       title: latest.title,
       excerpt: excerptPublicNote(latest.publicNote),
-      mailLoadTier: latest.mailLoadTier,
       weatherFlags,
     };
   } catch {

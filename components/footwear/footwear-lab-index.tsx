@@ -21,13 +21,16 @@ type Props = {
 };
 
 const METHOD_POINTS = [
-  "Mileage comes from Field Journal daily logs for shoes you own — not a brand testing program.",
-  "This ledger tracks personal walking miles and condition only.",
+  "Mileage comes from Field Journal daily logs for shoes you personally use.",
+  "Brand, model, photos, ratings, and personal conclusions stay on the public ledger.",
   "One primary pair can be marked active at a time.",
   "Checkpoint notes occur at personal mileage thresholds.",
-  "No sponsorships, free-product solicitations, or duty-linked endorsements.",
-  "This is a personal independent project with no employer affiliation.",
+  "No sponsorships, free-product solicitations, or employer-linked testing pitches.",
+  "Opinions are Stephen’s alone — no employer participates in or endorses this content.",
 ];
+
+const FOOTWEAR_DISCLAIMER =
+  "Independent personal footwear journal. Products discussed here were selected for personal use, and the opinions are solely my own. No employer participates in, reviews, sponsors, approves, or endorses this content.";
 
 export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
   const activeList = roster.filter((s) => s.shoe.status === "active");
@@ -51,13 +54,16 @@ export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
           Shoe Ledger
         </h1>
         <p className="max-w-2xl text-[rgb(var(--text-secondary))] leading-relaxed">
-          Personal equipment roster for footwear you bought yourself. Miles are
-          experience. Checkpoints are condition notes — not a product review
-          service or partnership pitch.
+          Personal equipment roster for footwear on high-mileage walking days.
+          Brand, model, photos, ratings, and honest conclusions stay public —
+          this is Stephen&apos;s consumer journal, not a partnership pitch.
         </p>
+        <aside className="max-w-2xl border border-[rgb(var(--border)/0.35)] bg-[rgb(var(--panel)/0.25)] p-4 text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
+          {FOOTWEAR_DISCLAIMER}
+        </aside>
         <p>
           <Link
-            href="/carrier-journal"
+            href="/field-journal"
             className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] hover:underline"
           >
             ← Back to Field Journal
@@ -170,7 +176,7 @@ export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
                 className="border border-[rgb(var(--border)/0.25)] p-4"
               >
                 <Link
-                  href={`/carrier-journal/footwear/${n.shoeSlug}`}
+                  href={`/field-journal/footwear/${n.shoeSlug}`}
                   className="font-[var(--font-ibm)] text-sm text-[rgb(var(--neon))] hover:underline"
                 >
                   {n.shoeLabel}

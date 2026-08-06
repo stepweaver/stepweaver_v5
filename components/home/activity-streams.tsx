@@ -1,14 +1,7 @@
 import Link from "next/link";
 import type { HomeCarrierPreviewPayload } from "@/lib/home/carrier-preview";
 import type { HomeIntelPayload } from "@/lib/home/recent-intel";
-import type { MailLoadTier } from "@/lib/data/carrier-journal";
 import { HeroRecentIntel } from "@/components/hero/hero-recent-intel";
-
-const MAIL_LOAD_LABEL: Record<MailLoadTier, string> = {
-  light: "LIGHT",
-  medium: "MEDIUM",
-  heavy: "HEAVY",
-};
 
 const WEATHER_FLAG_LABEL: Record<"heat" | "rain" | "storm" | "snow", string> = {
   heat: "HEAT",
@@ -28,8 +21,8 @@ function FieldJournalStreamCard({
   preview: HomeCarrierPreviewPayload | null;
 }) {
   const dispatchHref = preview
-    ? `/carrier-journal#${preview.id}`
-    : "/carrier-journal#field-dispatches";
+    ? `/field-journal#${preview.id}`
+    : "/field-journal#field-dispatches";
 
   return (
     <article
@@ -46,11 +39,11 @@ function FieldJournalStreamCard({
         Current chapter
       </p>
       <h2 className="font-[var(--font-ibm)] text-xl sm:text-2xl font-semibold text-[rgb(var(--text-color))] mb-3 leading-snug">
-        Long walking days, miles, and systems thinking in the field.
+        Long walking days from high-mileage delivery work, miles, and systems thinking in the field.
       </h2>
       <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-3 max-w-3xl">
-        I&apos;m documenting a personal fitness arc: walking distance, hydration,
-        soreness, weather, weight trend, and recovery from physically demanding days.
+        I&apos;m documenting a personal fitness arc from physically demanding delivery work:
+        walking distance, hydration, soreness, weather, weight trend, footwear, and recovery.
       </p>
       <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-5 max-w-3xl">
         Field Journal is part fitness log, part transformation record, and part
@@ -66,11 +59,6 @@ function FieldJournalStreamCard({
             >
               {preview.date}
             </time>
-            {preview.mailLoadTier ? (
-              <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon)/0.7)] border border-[rgb(var(--neon)/0.25)] px-1.5 py-0.5">
-                {MAIL_LOAD_LABEL[preview.mailLoadTier]}
-              </span>
-            ) : null}
             {preview.weatherFlags.map((flag) => (
               <span
                 key={flag}
@@ -90,7 +78,7 @@ function FieldJournalStreamCard({
             {preview.excerpt}
           </p>
           <Link
-            href="/carrier-journal#field-dispatches"
+            href="/field-journal#field-dispatches"
             className="inline-flex font-[var(--font-ocr)] text-[10px] sm:text-xs uppercase tracking-wider text-[rgb(var(--text-meta))] hover:text-[rgb(var(--neon)/0.8)] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
           >
             FIELD NOTES
@@ -99,7 +87,7 @@ function FieldJournalStreamCard({
       ) : null}
 
       <Link
-        href="/carrier-journal"
+        href="/field-journal"
         className="inline-flex items-center gap-2 border border-[rgb(var(--cyan)/0.35)] bg-[rgb(var(--window)/0.2)] px-4 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.1em] text-[rgb(var(--cyan))] transition-colors hover:border-[rgb(var(--cyan)/0.65)] hover:bg-[rgb(var(--cyan)/0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))] w-fit"
       >
         Read Field Journal →

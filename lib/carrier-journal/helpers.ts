@@ -59,7 +59,7 @@ export function buildPublicSummary(input: PublicSummaryInput): string {
       lead += ` with ${tempPart}${heatPart}${avgPart}`;
     }
     if (input.precipitationIn !== undefined && input.precipitationIn >= 0.05) {
-      lead += ` and ${input.precipitationIn}" of rain on route`;
+      lead += ` and ${input.precipitationIn}" of rain`;
     }
     parts.push(lead);
   } else if (input.temperatureF !== undefined) {
@@ -70,12 +70,6 @@ export function buildPublicSummary(input: PublicSummaryInput): string {
     parts.push(`Temperature today: ${formatTemperature(input.temperatureF)}${heatPart}`);
   }
 
-  if (input.dpsCount !== undefined && input.dpsCount > 0) {
-    const countStr = input.dpsCount.toLocaleString("en-US");
-    const perMilePart =
-      input.dpsPerMile != null ? `, about ${input.dpsPerMile.toLocaleString("en-US")} DPS per mile` : "";
-    parts.push(`DPS volume came in at ${countStr} pieces${perMilePart}`);
-  }
-
+  // DPS / parcel volume never enters auto-generated public summaries.
   return parts.length > 0 ? parts.join(". ") + "." : "";
 }

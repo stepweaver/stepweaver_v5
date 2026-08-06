@@ -66,13 +66,13 @@ export function FootwearActiveLoadoutCard({ summary }: Props) {
 
       <div className="mt-6 flex flex-wrap gap-3">
         <Link
-          href={`/carrier-journal/footwear/${shoe.slug}`}
+          href={`/field-journal/footwear/${shoe.slug}`}
           className="inline-flex border border-[rgb(var(--neon))] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
         >
           VIEW SHOE PROFILE
         </Link>
         <Link
-          href="/carrier-journal/footwear"
+          href="/field-journal/footwear"
           className="inline-flex border border-[rgb(var(--neon)/0.35)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--neon)/0.6)] hover:text-[rgb(var(--neon))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
         >
           OPEN SHOE LEDGER

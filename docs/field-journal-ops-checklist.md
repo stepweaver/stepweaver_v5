@@ -19,8 +19,9 @@ In Vercel (Production + Preview) and local `.env.local`:
 
 ## 3. Verify
 
-- [ ] `/carrier-journal` shows only the review notice (`noindex`).
-- [ ] `/carrier-journal/footwear` and shoe slugs return **410**.
+- [ ] `/field-journal` shows the sanitized public fitness journal.
+- [ ] `/field-journal/footwear` shows unbranded Pair A/B mileage only (no brand/ratings).
+- [ ] `/carrier-journal` permanently redirects to `/field-journal`.
 - [ ] `/log?token=anything` does **not** authenticate (no query-token gate).
 - [ ] POST login at `/log` sets HttpOnly `carrier_session`.
 - [ ] Daybook save leaves Notion **Publish Public** unchecked.

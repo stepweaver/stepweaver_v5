@@ -53,7 +53,7 @@ export function CarrierProfileCard() {
                 Current chapter
               </p>
               <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Long walking days + building after hours
+                High-mileage delivery work + building after hours
               </p>
             </div>
           </div>
@@ -64,7 +64,7 @@ export function CarrierProfileCard() {
                 Framing
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Personal walking &amp; fitness journal
+                Personal walking &amp; fitness field journal
               </p>
             </div>
 

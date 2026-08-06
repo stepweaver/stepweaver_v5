@@ -18,7 +18,7 @@ export function RoundSummary({ state, onReset, onStudyGuide }: RoundSummaryProps
     criticalMistakes > 0
       ? { label: "Needs Work", color: "text-[rgb(var(--danger))]" }
       : accuracy >= 90
-      ? { label: "Expert Carrier", color: "text-[rgb(var(--neon))]" }
+      ? { label: "Expert Drill", color: "text-[rgb(var(--neon))]" }
       : accuracy >= 70
       ? { label: "Solid Route", color: "text-[rgb(var(--warn))]" }
       : { label: "Keep Drilling", color: "text-[rgb(var(--text-secondary))]" };

@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   } | Shoe Ledger`;
   return {
     title,
-    description: `Personal equipment profile for ${summary.shoe.brand} ${summary.shoe.model}: ${summary.mileage.totalMiles} mi, ${summary.level.title}.`,
+    description: `Independent personal profile for ${summary.shoe.brand} ${summary.shoe.model}: ${summary.mileage.totalMiles} mi, ${summary.level.title}.`,
   };
 }
 

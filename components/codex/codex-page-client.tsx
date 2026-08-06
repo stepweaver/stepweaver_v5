@@ -152,14 +152,14 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
               <p className="font-[var(--font-ibm)] text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
                 Looking for the field journal?{" "}
                 <Link
-                  href="/carrier-journal"
+                  href="/field-journal"
                   className="text-[rgb(var(--cyan))] hover:text-[rgb(var(--neon))] transition-colors underline-offset-2 hover:underline"
                 >
                   Field Journal
                 </Link>{" "}
                 is where I track miles, hydration, weather, and recovery from long walking days.{" "}
                 <Link
-                  href="/carrier-journal"
+                  href="/field-journal"
                   className="inline-flex items-center gap-1 text-[rgb(var(--cyan))] hover:text-[rgb(var(--neon))] transition-colors font-medium whitespace-nowrap"
                 >
                   Open Field Journal →

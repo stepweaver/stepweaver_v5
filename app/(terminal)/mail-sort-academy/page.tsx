@@ -4,7 +4,7 @@ import { GameShell } from "@/components/mail-sort-academy/GameShell";
 export const metadata: Metadata = {
   title: "Mail Sort Academy | stepweaver.dev",
   description:
-    "Unofficial USPS Academy study game. Practice mail classes, UBBM decisions, carrier endorsements, and accountable mail handling.",
+    "Unofficial mail-classification study drill. Practice mail classes, undeliverable rulings, endorsements, and accountable mail handling. Not an official product or credential.",
   robots: { index: false, follow: false },
 };
 

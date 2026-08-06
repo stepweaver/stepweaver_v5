@@ -28,7 +28,7 @@ const MODES: Array<{
     description:
       "Decide: is this piece Undeliverable Bulk Business Mail, or does it get forwarding / return service?",
     icon: Package,
-    difficulty: "Regular carrier",
+    difficulty: "Standard drill",
   },
   {
     mode: "endorsement_drill",
@@ -37,7 +37,7 @@ const MODES: Array<{
     description:
       "Choose the correct carrier endorsement: ANK, NSN, NSS, REF, VAC, DEC, and others.",
     icon: Tag,
-    difficulty: "Regular carrier",
+    difficulty: "Standard drill",
   },
   {
     mode: "accountable_chain",
@@ -53,7 +53,7 @@ const MODES: Array<{
     label: "Route Case Simulation",
     tag: "MODE-05",
     description:
-      "Sort a mixed deck of mail into handling bins. Full carrier workflow in one session.",
+      "Sort a mixed deck of mail into handling bins. Full classification workflow in one session.",
     icon: Layers,
     difficulty: "Mixed difficulty",
   },
@@ -99,8 +99,8 @@ export function ModeSelector({
             Mail Sort Academy
           </h1>
           <p className="font-[var(--font-ibm)] text-sm text-[rgb(var(--text-secondary))] leading-relaxed max-w-lg">
-            Unofficial USPS Academy study game for mail classes, UBBM,
-            endorsements, and accountable handling.
+            Unofficial mail-classification study drill for mail classes, UBBM,
+            endorsements, and accountable handling. Not an official product or credential.
           </p>
         </div>
 
@@ -216,7 +216,7 @@ export function ModeSelector({
         </button>
 
         <p className="font-[var(--font-ocr)] text-[10px] text-[rgb(var(--text-meta)/0.5)] leading-relaxed">
-          Based on public USPS/NALC references. Not an official USPS product.
+          Based on publicly available educational references. Not an official product or credential.
           Always follow local instructions and supervisor direction.
         </p>
       </div>

@@ -81,7 +81,7 @@ export function FootwearRosterGrid({ shoes }: RosterProps) {
       {shoes.map((shoe) => (
         <li key={shoe.slug}>
           <Link
-            href={`/carrier-journal/footwear/${shoe.slug}`}
+            href={`/field-journal/footwear/${shoe.slug}`}
             className="block border border-[rgb(var(--neon)/0.25)] p-4 hover:border-[rgb(var(--neon)/0.55)] hover:bg-[rgb(var(--neon)/0.04)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))] transition-colors"
           >
             <p className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] text-[rgb(var(--neon))] mb-2">

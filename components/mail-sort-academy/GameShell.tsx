@@ -196,7 +196,7 @@ export function GameShell() {
       <header className="shrink-0 border-b border-[rgb(var(--neon)/0.18)] bg-[rgb(var(--border)/0.35)] backdrop-blur-sm px-4 py-2 flex items-center justify-between gap-3">
         <div className="flex items-center gap-2.5">
           <Link
-            href="/carrier-journal"
+            href="/field-journal"
             className="inline-flex items-center gap-1.5 text-[rgb(var(--neon)/0.6)] hover:text-[rgb(var(--neon))] font-[var(--font-ocr)] text-xs transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
@@ -303,7 +303,7 @@ export function GameShell() {
         </span>
         <span className="text-[rgb(var(--neon)/0.1)]">│</span>
         <span className="font-[var(--font-ocr)] text-[10px] text-[rgb(var(--text-meta))] whitespace-nowrap">
-          Unofficial study tool, not an official USPS product
+          Unofficial study tool, not an official product or credential
         </span>
         {state.mode && (
           <>

@@ -96,14 +96,14 @@ describe("classifyMailLoadForEntry", () => {
   });
 });
 
-describe("formatPublicMailLoadLine", () => {
-  it("formats a classified heavy day", () => {
+describe("formatPublicMailLoadLine (private daybook / auth surfaces only)", () => {
+  it("formats a classified heavy day for authenticated tooling", () => {
     expect(
       formatPublicMailLoadLine({ tier: "heavy", compositeRatio: 1.24 })
     ).toBe("Mail load: Heavy · 124% of baseline");
   });
 
-  it("shows calibrating when ratio exists but tier does not", () => {
+  it("returns null when unclassified", () => {
     expect(formatPublicMailLoadLine({ tier: null, compositeRatio: null })).toBeNull();
   });
 });

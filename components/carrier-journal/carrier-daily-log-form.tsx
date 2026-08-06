@@ -175,7 +175,7 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
           >
             Log Another Day
           </button>
-          <Link href="/carrier-journal" className="glitch-button">
+          <Link href="/field-journal" className="glitch-button">
             Back to Field Journal
           </Link>
         </div>

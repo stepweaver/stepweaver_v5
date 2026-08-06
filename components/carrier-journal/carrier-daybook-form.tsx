@@ -1195,7 +1195,7 @@ export function CarrierDaybookForm({
         >
           {submitStatus === "saving" ? "Saving..." : "Save Carrier Day"}
         </button>
-        <Link href="/carrier-journal" className="glitch-button">
+        <Link href="/field-journal" className="glitch-button">
           Back to Log
         </Link>
       </div>
@@ -1409,7 +1409,7 @@ function SuccessCard({
         <button type="button" onClick={onLogAnother} className="glitch-button glitch-button--primary">
           Log Another Day
         </button>
-        <Link href="/carrier-journal" className="glitch-button">
+        <Link href="/field-journal" className="glitch-button">
           Back to Carrier&apos;s Log
         </Link>
       </div>

@@ -53,10 +53,10 @@ const ICON_MAP: Record<string, LucideIcon> = {
 // ---------------------------------------------------------------------------
 
 const TIER_COLOR: Record<CarrierMilestoneTier, string> = {
-  basic:    "rgb(148 163 184)",    // slate-400 - entry qualification
-  field:    "rgb(var(--neon))",    // site neon - active field service
-  campaign: "rgb(234 179 8)",      // yellow-500 - sustained campaign record
-  veteran:  "rgb(167 139 250)",    // violet-400 - veteran record
+  basic:    "rgb(148 163 184)",    // slate-400 - foundation
+  field:    "rgb(var(--neon))",    // site neon - endurance
+  campaign: "rgb(234 179 8)",      // yellow-500 - long-haul
+  veteran:  "rgb(167 139 250)",    // violet-400 - lifetime
 };
 
 const TIER_BORDER: Record<CarrierMilestoneTier, string> = {
@@ -67,10 +67,10 @@ const TIER_BORDER: Record<CarrierMilestoneTier, string> = {
 };
 
 const TIER_LABEL: Record<CarrierMilestoneTier, string> = {
-  basic:    "BASIC QUALIFICATION",
-  field:    "FIELD QUALIFICATION",
-  campaign: "CAMPAIGN QUALIFICATION",
-  veteran:  "VETERAN RECORD",
+  basic:    "WALKING QUALIFICATION",
+  field:    "ENDURANCE QUALIFICATION",
+  campaign: "CAMPAIGN MILESTONE",
+  veteran:  "VETERAN WALKER",
 };
 
 // ---------------------------------------------------------------------------
@@ -147,7 +147,7 @@ function RankLadderHeader() {
         LVL
       </div>
       <div className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta))]">
-        RANK
+        TITLE
       </div>
       <div className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta))] text-right">
         AT
@@ -281,7 +281,7 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))] mb-1">
-            FIELD QUALIFICATIONS // CARRIER RECORD
+            WALKING MILESTONES // FIELD RECORD
           </div>
           <div className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--text-color))]">
             {level.title}
@@ -295,7 +295,7 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
             {unlockedCount}/{milestones.length}
           </div>
           <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">
-            QUALS
+            UNLOCKED
           </div>
         </div>
       </div>
@@ -318,7 +318,7 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
       {/* Rank ladder */}
       <div>
         <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] text-[rgb(var(--text-label))] mb-2">
-          RANK LADDER // {level.totalLevels} LEVELS
+          MILE LADDER // {level.totalLevels} LEVELS
         </div>
         <div className="border border-[rgb(var(--border)/0.2)] px-2 sm:px-3 py-0.5">
           <RankLadderHeader />
@@ -328,7 +328,7 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
         </div>
       </div>
 
-      {/* Qualification groups by tier */}
+      {/* Milestone groups by tier */}
       {tierOrder.map((tier) => {
         const badges = milestones.filter((m) => m.tier === tier);
         if (badges.length === 0) return null;
@@ -351,7 +351,7 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
 
       {/* Footer */}
       <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] pt-1 border-t border-[rgb(var(--border)/0.15)]">
-        QUALIFICATIONS COMPUTED FROM FIELD DATA
+        MILESTONES COMPUTED FROM WALKING DATA
       </div>
     </div>
   );

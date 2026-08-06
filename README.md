@@ -12,7 +12,7 @@
 | Projects | <https://stepweaver.dev/work> |
 | Terminal | <https://stepweaver.dev/terminal> |
 | Codex | <https://stepweaver.dev/codex> |
-| Field Journal | <https://stepweaver.dev/carrier-journal> |
+| Field Journal | <https://stepweaver.dev/field-journal> |
 | Resume | <https://stepweaver.dev/resume> |
 | Contact | <https://stepweaver.dev/contact> |
 | Repository | <https://github.com/stepweaver/stepweaver_v5> |
@@ -86,7 +86,7 @@ Important routes:
 | `/writing/[slug]` | Writing entry |
 | `/play` | Playground hub (terminal, field journal, toys) |
 | `/for-agents` | Recruiter/agent-oriented entry point |
-| `/carrier-journal` | Field log (also linked from Play) |
+| `/field-journal` | Field log (also linked from Play) |
 | `/terminal` | Interactive terminal |
 | `/privacy` | Privacy page |
 | `/theme-audit` | Theme/testing surface |
@@ -155,7 +155,7 @@ Supported command families include:
 | `weather [location] [--forecast]` | Fetch weather data through the site API |
 | `roll <notation>` | Roll RPG dice notation |
 | `contact` | Start contact wizard |
-| `carrier`, `mailwalker`, `fieldlog` | Open Carrier's Log |
+| `carrier`, `fieldlog`, `fieldlog` | Open Field Journal |
 | `zork`, `adventure` | Play the terminal adventure |
 | `blackjack`, `bj` | Play Blackjack |
 | `cd <destination>` | Navigate to supported routes |
@@ -276,9 +276,9 @@ The public field journal is temporarily offline while ethics, privacy, and publi
 Routes:
 
 ```txt
-/carrier-journal          # public review notice (noindex)
-/carrier-journal/footwear # 410 Gone
-/carrier-journal/log      # quick DPS log (session cookie)
+/field-journal          # public review notice (noindex)
+/field-journal/footwear # 410 Gone
+/field-journal/log      # quick DPS log (session cookie)
 /log                      # full daybook (POST login → HttpOnly cookie)
 /api/carrier-journal/session
 /api/carrier-journal/log
@@ -288,8 +288,8 @@ Routes:
 Primary files:
 
 ```txt
-app/(marketing)/carrier-journal/page.tsx
-app/(marketing)/carrier-journal/log/page.tsx
+app/(marketing)/field-journal/page.tsx
+app/(marketing)/field-journal/log/page.tsx
 app/log/page.tsx
 app/api/carrier-journal/session/route.ts
 components/carrier-journal/*
@@ -309,7 +309,7 @@ Public surface (current):
 
 Private logging features:
 
-- quick DPS log at `/carrier-journal/log` (requires prior `/log` session)
+- quick DPS log at `/field-journal/log` (requires prior `/log` session)
 - full daybook at `/log` after POST passphrase login
 - HttpOnly `carrier_session` cookie (not URL tokens or sessionStorage)
 - Notion upsert by date with **Publish Public = false by default**
@@ -363,7 +363,7 @@ Expected Field Journal Notion properties:
 
 ### 8. Mail Sort Academy
 
-Mail Sort Academy is an unofficial USPS learning game for mail classification and carrier training practice.
+Mail Sort Academy is an unofficial mail-classification study drill based on public educational material.
 
 Route:
 
@@ -425,7 +425,7 @@ app/
   (terminal)/              Console-style routes: terminal, games, tools
   (embed)/                 Minimal embed routes
   api/                     Internal API routes
-  log/                     Protected full Carrier's Log daybook
+  log/                     Protected full Field Journal daybook
   llms.txt/                Machine-readable text entry point
   operator-profile.json/   Machine-readable JSON profile
 
@@ -488,7 +488,7 @@ The app uses Next.js App Router route groups to keep UI chrome explicit:
 | `/api/rss` | `GET` | Small RSS proxy/normalizer for approved feed sources |
 | `/api/book-shower` | `GET`, `POST` | Google Apps Script proxy for the book shower embed |
 | `/api/carrier-journal/log` | `POST`, `PUT` | Quick DPS log save/preview |
-| `/api/carrier-journal/daybook` | `POST`, `PUT` | Full Carrier's Log daybook save/preview |
+| `/api/carrier-journal/daybook` | `POST`, `PUT` | Full Field Journal daybook save/preview |
 | `/api/debug/carrier-journal` | `GET` | Development-only Notion diagnostic endpoint |
 | `/llms.txt` | `GET` | Plain-text AI/recruiter entry point |
 | `/operator-profile.json` | `GET` | JSON operator profile for agents and task-routing systems |
@@ -545,7 +545,7 @@ The chat system:
 Notion integrations avoid broad public reads:
 
 - Codex and docs only read `Published` content.
-- Carrier's Log public reads only use `Publish Public = true`; daybook writes default to draft.
+- Field Journal public reads only use `Publish Public = true`; daybook writes default to draft.
 - `Private Note` is never read for public field-journal rendering.
 - Public path does not fall back to seed/demo narratives when Notion is empty.
 - `/api/notion-blocks` requires explicit page allowlisting.
@@ -578,7 +578,7 @@ cp .env.example .env.local
 | `NOTION_API_KEY` | Shared Notion integration token |
 | `NOTION_BLOG_DB_ID` | Codex database ID |
 | `NOTION_MESHTASTIC_DOCS_DB_ID` | Meshtastic docs database ID |
-| `NOTION_CARRIER_JOURNAL_DB_ID` | Carrier's Log database ID |
+| `NOTION_CARRIER_JOURNAL_DB_ID` | Field Journal database ID |
 | `NOTION_ACHIEVEMENT_UNLOCKS_DB_ID` | Achievement unlock database ID, when used |
 | `NOTION_BLOCKS_ALLOWED_PAGE_IDS` | Comma-separated allowlist for `/api/notion-blocks` |
 | `NOTION_IMAGE_TOKEN_SECRET` | HMAC secret for signed Notion image refresh tokens |
@@ -748,7 +748,7 @@ Good future test targets:
 - terminal command reducer behavior
 - project filter UI
 - contact form states
-- Carrier's Log daybook form states
+- Field Journal daybook form states
 - Codex/Notion block rendering edge cases
 - theme persistence and theme bootstrap behavior
 
@@ -784,9 +784,9 @@ Good future test targets:
 
 1. Ensure `NOTION_API_KEY`, `NOTION_CARRIER_JOURNAL_DB_ID`, `CARRIER_JOURNAL_LOG_SECRET`, and `CARRIER_SESSION_SIGNING_SECRET` are set.
 2. Open `/log`, enter the passphrase (POST login; cookie is HttpOnly).
-3. Use `/carrier-journal/log` for quick DPS count logging after you have a session.
+3. Use `/field-journal/log` for quick DPS count logging after you have a session.
 4. Confirm the Notion row is created or updated by date with **Publish Public unchecked**.
-5. Public `/carrier-journal` shows the review notice until ethics clearance — it must not show drafts or seed data.
+5. Public `/field-journal` shows the review notice until ethics clearance — it must not show drafts or seed data.
 
 ### Add a terminal command
 
@@ -809,7 +809,7 @@ Recommended deployment checklist:
 6. Configure email credentials for the contact form.
 7. Configure Vercel KV for production rate limiting.
 8. Redeploy after changing environment variables.
-9. Smoke test `/`, `/work`, `/terminal`, `/writing`, `/carrier-journal`, `/contact`, `/llms.txt`, and `/operator-profile.json`.
+9. Smoke test `/`, `/work`, `/terminal`, `/writing`, `/field-journal`, `/contact`, `/llms.txt`, and `/operator-profile.json`.
 
 ## Performance notes
 
@@ -834,7 +834,7 @@ The app includes:
 - command palette entry point
 - theme persistence
 - reduced-overhead route groups for different UI modes
-- mobile-first Carrier's Log forms
+- mobile-first Field Journal forms
 - semantic headings and metadata for project/Codex pages
 
 Future accessibility improvements should prioritize terminal keyboard flows, focus management inside modal/chat surfaces, and richer screen-reader labels for decorative console UI.

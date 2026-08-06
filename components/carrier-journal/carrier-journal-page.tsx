@@ -20,7 +20,6 @@ const TRACKING_ITEMS = [
   { category: "Hydration and fuel", detail: "Water, snacks, hunger and thirst adjustments" },
   { category: "Transformation", detail: "Weekly weight trend: pounds lost, not raw weight" },
   { category: "Environmental load", detail: "Heat index and weather from temp + field notes" },
-  { category: "Workload feel", detail: "Personal light / medium / heavy relative to your own baseline" },
   { category: "Published narrative", detail: "Day reflections that stay personal and non-operational" },
 ];
 
@@ -158,9 +157,9 @@ export function CarrierJournalPage({
               Field Journal
             </h1>
             <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
-              A personal walking and fitness journal: miles, hydration, soreness, weather, weight
-              lost, and what it takes to adapt to long walking days. Written off the clock from Apple
-              Health and private notes — not an employer log.
+              A personal walking and fitness journal from a high-mileage delivery worker: miles,
+              hydration, soreness, weather, weight lost, footwear, and what it takes to adapt to long
+              walking days. Written off the clock from Apple Health and private notes.
             </p>
           </div>
           <div className="lg:shrink-0">
@@ -172,12 +171,12 @@ export function CarrierJournalPage({
 
         <div className="surface-panel p-5 sm:p-6 border-[rgb(var(--border)/0.3)]">
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-2">
-            NOTICE // PERSONAL FITNESS LOG
+            NOTICE // PERSONAL FIELD JOURNAL
           </div>
           <p className="text-xs text-[rgb(var(--text-meta))] leading-relaxed">
-            This is an unofficial personal walking and fitness journal. It is not affiliated with,
-            endorsed by, or representative of any employer. Public entries omit workplace identity,
-            operational details, customer or coworker stories, and product-testing solicitation.
+            This is a personal journal documenting my walking, health, fitness, equipment, and
+            experiences as a high-mileage delivery worker. It is written off the clock and does not
+            represent, speak for, or imply the endorsement of any employer.
           </p>
         </div>
 
@@ -190,15 +189,15 @@ export function CarrierJournalPage({
                 SHOE LEDGER
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Personal equipment tracking for shoes you own: mileage and condition — not a review
-                service.
+                Independent personal footwear journal: brands, mileage, ratings, and honest
+                conclusions.
               </p>
             </div>
             <Link
-              href="/carrier-journal/footwear"
+              href="/field-journal/footwear"
               className="inline-flex shrink-0 border border-[rgb(var(--neon)/0.4)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)]"
             >
-              OPEN LEDGER
+              OPEN SHOE LEDGER
             </Link>
           </div>
         )}
@@ -235,9 +234,9 @@ export function CarrierJournalPage({
               the patterns, and adjust the levers that appear to matter.
             </p>
             <p>
-              I track miles, hydration, weather, heat index, how hard the day felt relative to my
-              own baseline, soreness, energy, mood, recovery notes, and weekly weight trend. The
-              point is to document what long walking days cost, what helps, and what doesn&apos;t.
+              I track miles, hydration, weather, heat index, soreness, energy, mood, recovery
+              notes, and weekly weight trend. The point is to document what long walking days cost,
+              what helps, and what doesn&apos;t.
             </p>
             <p>
               I am not weighing myself every day. Weight is a weekly trend marker. The day-to-day

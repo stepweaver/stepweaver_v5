@@ -25,7 +25,7 @@ export const briefData = {
       label: "Parcel Sweep",
       type: "Last-mile ops prototype",
       summary:
-        "Field-aware delivery workflow tooling grounded in real carrier constraints and sequencing pressure.",
+        "Field-aware last-mile delivery workflow tooling grounded in sequencing pressure and ops constraints.",
       tags: ["React", "Express", "SQLite", "Socket.io"] as const,
       href: "/work/parcel-sweep",
     },
@@ -49,10 +49,10 @@ export const briefData = {
     },
     {
       slug: "carrier-journal",
-      label: "Carrier's Log",
-      type: "Field-first data product",
+      label: "Field Journal",
+      type: "Personal fitness systems product",
       summary:
-        "Living field journal turned into KPI/dashboard artifact: proof of operational modeling under real constraints.",
+        "Walking and fitness journal with KPI/dashboard artifact: miles, hydration, weather, recovery.",
       tags: ["Next.js", "Notion API", "Zod", "TypeScript"] as const,
       href: "/work/carrier-journal",
     },

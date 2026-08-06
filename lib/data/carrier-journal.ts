@@ -505,11 +505,6 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
       value: String(t.weatherDays),
       detail: "Rain, storm, or snow (from temp + notes)",
     },
-    {
-      label: "Heavy Days",
-      value: String(t.heavyMailDays),
-      detail: "Days above 115% of your personal workload baseline",
-    },
     { label: "Avg Soreness", value: `${t.avgSoreness} / 10`, detail: "Physical load marker" },
     { label: "Avg Energy", value: `${t.avgEnergy} / 10`, detail: "Self-reported end-of-day" },
     { label: "Avg Mood", value: `${t.avgMood} / 10`, detail: "Morale signal" },

@@ -6,7 +6,7 @@ export const carrierJournal: Project = {
   description:
     "A personal walking and fitness journal with Notion-backed daybook logging, KPIs, milestones, and a hard draft-by-default publication boundary. Public entries stay personal; operational and employer identity stay private.",
   status: "live",
-  imageUrl: "/images/carrier_log.png",
+  imageUrl: "/images/field_journal_og.png",
   tags: ["Next.js", "Notion API", "Field Notes", "KPI Design", "Personal Systems", "Mobile UX"],
   keywords: ["field log", "walking", "fitness", "kpi", "personal systems", "portfolio"],
   builtFor: "personal fitness tracking and portfolio storytelling",
@@ -15,7 +15,7 @@ export const carrierJournal: Project = {
   delivered: [
     "Public Field Journal with KPIs, calendar, milestones, and sanitized notes",
     "Mobile daybook with session-cookie auth and draft-by-default Publish Public",
-    "Computed personal workload feel, weather, hydration, and milestone aggregates",
+    "Computed weather, hydration, and walking milestone aggregates",
     "Private notes never leave the logging layer",
   ],
   cardDescription:
@@ -27,7 +27,7 @@ export const carrierJournal: Project = {
     "Public KPI grid and field calendar from intentionally published entries",
     "Protected daybook API with private notes and optional public notes",
   ],
-  liveUrl: "/carrier-journal",
+  liveUrl: "/field-journal",
   sections: [
     {
       id: "overview",
@@ -66,8 +66,7 @@ export const carrierJournal: Project = {
         "Public Field Journal with KPIs, calendar, milestones, and field notes",
         "Private daybook at /log with HttpOnly session cookie auth",
         "Draft-by-default daybook upserts; explicit publish checkbox for public notes",
-        "Shoe Ledger as personal equipment tracking for shoes you own",
-        "Raw mail-volume figures stay private and off the public KPI grid",
+        "Shoe Ledger as personal footwear journal with brands, ratings, and conclusions",
       ],
     },
     {

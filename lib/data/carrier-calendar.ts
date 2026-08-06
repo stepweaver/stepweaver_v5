@@ -25,7 +25,6 @@ export type DaySummary = WeatherMarkers & {
   hasDispatch: boolean;
   totalMiles: number;
   totalSteps: number;
-  heavyMailDay: boolean;
   hydrationGoalMet: boolean;
   dispatchIds: string[];
   noteExcerpt: string;
@@ -203,7 +202,6 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
       heat90: false,
       freezing: false,
       belowZero: false,
-      heavyMailDay: false,
       hydrationGoalMet: false,
       dispatchIds: [],
       noteExcerpt: "",
@@ -221,7 +219,6 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
   let heat90 = false;
   let freezing = false;
   let belowZero = false;
-  let heavyMailDay = false;
 
   for (const d of dispatches) {
     const m = getWeatherMarkers(d);
@@ -232,7 +229,6 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
     heat90 = heat90 || m.heat90;
     freezing = freezing || m.freezing;
     belowZero = belowZero || m.belowZero;
-    heavyMailDay = heavyMailDay || d.mailLoadTier === "heavy";
   }
 
   // hydrationGoalMet: every dispatch with logged hydration data met its goal
@@ -257,7 +253,6 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
     heat90,
     freezing,
     belowZero,
-    heavyMailDay,
     hydrationGoalMet,
     dispatchIds: dispatches.map((d) => d.id),
     noteExcerpt,

@@ -24,11 +24,11 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: 'Content:', variant: 'lambda' },
       { content: '  resume: View resume (sections: summary, experience, …)', variant: 'default' },
       { content: '  codex: Browse blog (ls, cat, grep, exit)', variant: 'default' },
-      { content: '  carrier | mailwalker | fieldlog: Open Field Journal', variant: 'default' },
+      { content: '  carrier | fieldlog: Open Field Journal', variant: 'default' },
       { content: '  chat <message>: Ask Lambda about experience', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Navigation:', variant: 'lambda' },
-      { content: '  cd contact | writing | work | about | play | dice-roller | carrier-journal | github', variant: 'default' },
+      { content: '  cd contact | writing | work | about | play | dice-roller | field-journal | github', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Features:', variant: 'lambda' },
       { content: '  weather [location] [--forecast] - no location: browser location, else New York', variant: 'default' },
@@ -63,16 +63,16 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       about: '/about',
       play: '/play',
       'dice-roller': '/dice-roller',
-      'carrier-journal': '/carrier-journal',
-      fieldlog: '/carrier-journal',
-      mailwalker: '/carrier-journal',
+      'carrier-journal': '/field-journal',
+      'field-journal': '/field-journal',
+      fieldlog: '/field-journal',
       github: 'https://github.com/stephen',
     };
     if (!dest) {
       return {
         lines: [
           { content: 'Usage: cd <destination>', variant: 'warning' },
-          { content: 'Available: contact, writing, work, about, play, dice-roller, carrier-journal, github', variant: 'dimmed' },
+          { content: 'Available: contact, writing, work, about, play, dice-roller, field-journal, github', variant: 'dimmed' },
         ],
       };
     }
@@ -189,31 +189,21 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
   },
 
   carrier: (_args, ctx) => {
-    setTimeout(() => ctx.navigate('/carrier-journal'), 400);
+    setTimeout(() => ctx.navigate('/field-journal'), 400);
     return {
       lines: [
         { content: 'Field Journal: personal walking and fitness log.', variant: 'success' },
-        { content: 'Opening /carrier-journal...', variant: 'dimmed' },
-      ],
-    };
-  },
-
-  mailwalker: (_args, ctx) => {
-    setTimeout(() => ctx.navigate('/carrier-journal'), 400);
-    return {
-      lines: [
-        { content: 'Field Journal: personal walking and fitness log.', variant: 'success' },
-        { content: 'Opening /carrier-journal...', variant: 'dimmed' },
+        { content: 'Opening /field-journal...', variant: 'dimmed' },
       ],
     };
   },
 
   fieldlog: (_args, ctx) => {
-    setTimeout(() => ctx.navigate('/carrier-journal'), 400);
+    setTimeout(() => ctx.navigate('/field-journal'), 400);
     return {
       lines: [
         { content: 'Field Journal: personal walking and fitness log.', variant: 'success' },
-        { content: 'Opening /carrier-journal...', variant: 'dimmed' },
+        { content: 'Opening /field-journal...', variant: 'dimmed' },
       ],
     };
   },

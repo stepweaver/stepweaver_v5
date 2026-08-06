@@ -38,7 +38,9 @@ const nextConfig: NextConfig = {
       { source: "/services/web-intake", destination: "/services", permanent: true },
       { source: "/services/automation", destination: "/services", permanent: true },
       { source: "/services/lead-systems", destination: "/services", permanent: true },
-      { source: "/services/web-platforms", destination: "/services", permanent: true },
+      // Field Journal rename (ethics sanitization)
+      { source: "/carrier-journal", destination: "/field-journal", permanent: true },
+      { source: "/carrier-journal/:path*", destination: "/field-journal/:path*", permanent: true },
     ];
   },
   images: {

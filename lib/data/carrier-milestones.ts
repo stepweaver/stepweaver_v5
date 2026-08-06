@@ -14,7 +14,6 @@ export type CarrierMilestoneCategory =
   | "days"
   | "distance"
   | "weather"
-  | "load"
   | "safety"
   | "service"
   | "hydration";
@@ -237,7 +236,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
   const snowDays = enriched.filter((d) => deriveWeatherSignals(d).snow);
   const heatDays = enriched.filter(isDerivedHeatDay);
   const weatherDays = enriched.filter(isDerivedWeatherDay);
-  const heavyMailDays = enriched.filter((d) => d.mailLoadTier === "heavy");
+  const twelveMileDays = enriched.filter((d) => d.milesWalked >= 12);
   const hydrationGoalDays = enriched.filter(
     (d) =>
       d.waterOz !== undefined &&
@@ -283,7 +282,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
 
   return [
     // ===================================================================
-    // BASIC QUALIFICATION
+    // FOUNDATION
     // ===================================================================
 
     // --- Days ---
@@ -291,7 +290,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "day-one",
       "Day One",
       "Day 1",
-      "First dispatch logged. The field record starts here.",
+      "First walking day logged. The personal record starts here.",
       "days", "basic", "calendar",
       daysLogged, 1,
       dateAtNthMatch(sorted, () => true, 1),
@@ -301,7 +300,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "five-logged-days",
       "5 Logged Days",
       "5 Days",
-      "Five field days on the record. The soreness is real. So is the routine.",
+      "Five walking days on the record. The soreness is real. So is the routine.",
       "days", "basic", "calendar",
       daysLogged, 5,
       dateAtNthMatch(sorted, () => true, 5),
@@ -323,7 +322,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "first-mile",
       "First Mile",
       "1 mi",
-      "One mile on the record. Every field career starts somewhere.",
+      "One mile on the record. Every fitness arc starts somewhere.",
       "distance", "basic", "map-pin",
       totalMiles, 1,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 1),
@@ -333,11 +332,22 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "ten-miles",
       "10 Miles",
       "10 mi",
-      "Ten miles accumulated. The body is learning what this job costs.",
+      "Ten miles accumulated. The body is learning what long walking days cost.",
       "distance", "basic", "map-pin",
       totalMiles, 10,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 10),
       "mi"
+    ),
+    milestone(
+      "first-twelve-mile-day",
+      "First 12-Mile Day",
+      "12 mi day",
+      "First single day with twelve or more walking miles.",
+      "distance", "basic", "map-pin",
+      twelveMileDays.length, 1,
+      twelveMileDays.length >= 1
+        ? sortedChronologically(twelveMileDays)[0]?.date
+        : undefined
     ),
 
     // --- Weather ---
@@ -345,23 +355,10 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "first-rain",
       "First Rain",
       "Rain",
-      "First route completed in the rain. Gear tested.",
+      "First rainy walking day. Gear tested.",
       "weather", "basic", "cloud-rain",
       rainDays.length, 1,
       rainDays.length >= 1 ? sortedChronologically(rainDays)[0]?.date : undefined
-    ),
-
-    // --- Load ---
-    milestone(
-      "first-heavy-day",
-      "First Heavy Load Day",
-      "Heavy",
-      "First day above 115% of your personal workload baseline.",
-      "load", "basic", "package",
-      heavyMailDays.length, 1,
-      heavyMailDays.length >= 1
-        ? sortedChronologically(heavyMailDays)[0]?.date
-        : undefined
     ),
 
     // --- Hydration ---
@@ -369,7 +366,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "first-hydration-goal",
       "First Hydration Goal",
       "Goal",
-      "First day hitting the full hydration target. Discipline recorded.",
+      "First day hitting the full hydration target.",
       "hydration", "basic", "droplets",
       hydrationGoalDays.length, 1,
       hydrationGoalDays.length >= 1
@@ -390,7 +387,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     ),
 
     // ===================================================================
-    // FIELD QUALIFICATION
+    // ENDURANCE
     // ===================================================================
 
     // --- Days ---
@@ -398,7 +395,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "twenty-five-logged-days",
       "25 Logged Days",
       "25 Days",
-      "Twenty-five field days. A real track record is forming.",
+      "Twenty-five walking days. A real track record is forming.",
       "days", "field", "calendar",
       daysLogged, 25,
       dateAtNthMatch(sorted, () => true, 25),
@@ -410,7 +407,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "fifty-miles",
       "50 Miles",
       "50 mi",
-      "Fifty miles under your boots. The route is becoming yours.",
+      "Fifty walking miles under your boots.",
       "distance", "field", "map-pin",
       totalMiles, 50,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 50),
@@ -420,7 +417,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "hundred-miles",
       "100 Miles",
       "100 mi",
-      "One hundred miles on foot. A real carrier milestone.",
+      "One hundred walking miles on foot.",
       "distance", "field", "map-pin",
       totalMiles, 100,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 100),
@@ -445,32 +442,30 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       )
     ),
 
-    // --- Load ---
-    milestone(
-      "five-heavy-days",
-      "5 Heavy Load Days",
-      "5 Heavy",
-      "Five days above 115% of recent personal workload baseline.",
-      "load", "field", "package",
-      heavyMailDays.length, 5,
-      dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 5)
-    ),
-
     // --- Weather ---
     milestone(
       "first-heat-day",
       "First Heat Day",
       "Heat",
-      "First shift with peak heat index ≥ 90°F. Hydration becomes survival.",
+      "First walking day with peak heat index ≥ 90°F. Hydration becomes survival.",
       "weather", "field", "flame",
       heatDays.length, 1,
       heatDays.length >= 1 ? sortedChronologically(heatDays)[0]?.date : undefined
     ),
     milestone(
+      "five-heat-days",
+      "5 Heat Days",
+      "5 Heat",
+      "Five high-heat walking days logged.",
+      "weather", "field", "flame",
+      heatDays.length, 5,
+      dateAtNthMatch(sorted, isDerivedHeatDay, 5)
+    ),
+    milestone(
       "first-storm",
       "First Storm",
       "Storm",
-      "First route completed in storm conditions. Conditions were real.",
+      "First walking day completed in storm conditions.",
       "weather", "field", "zap",
       stormDays.length, 1,
       stormDays.length >= 1 ? sortedChronologically(stormDays)[0]?.date : undefined
@@ -489,7 +484,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     ),
 
     // ===================================================================
-    // CAMPAIGN QUALIFICATION
+    // LONG-HAUL
     // ===================================================================
 
     // --- Days ---
@@ -497,7 +492,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "fifty-logged-days",
       "50 Logged Days",
       "50 Days",
-      "Fifty field days. Not a rookie anymore.",
+      "Fifty walking days. The habit is sticking.",
       "days", "campaign", "calendar",
       daysLogged, 50,
       dateAtNthMatch(sorted, () => true, 50),
@@ -509,7 +504,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "two-fifty-miles",
       "250 Miles",
       "250 mi",
-      "Two hundred fifty miles of walking. Field-hardened.",
+      "Two hundred fifty walking miles. Endurance is compounding.",
       "distance", "campaign", "map-pin",
       totalMiles, 250,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 250),
@@ -519,7 +514,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "five-hundred-miles",
       "500 Miles",
       "500 mi",
-      "Five hundred miles on foot. The route is part of you now.",
+      "Five hundred walking miles on foot.",
       "distance", "campaign", "map-pin",
       totalMiles, 500,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 500),
@@ -531,7 +526,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "ten-heat-days",
       "10 Heat Days",
       "10 Heat",
-      "Ten heat days worked and logged. The body has adapted.",
+      "Ten heat days walked and logged. The body has adapted.",
       "weather", "campaign", "flame",
       heatDays.length, 10,
       dateAtNthMatch(sorted, isDerivedHeatDay, 10)
@@ -549,7 +544,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "first-snow",
       "First Snow",
       "Snow",
-      "First route completed in snow. A different kind of challenge.",
+      "First walking day completed in snow. A different kind of challenge.",
       "weather", "campaign", "snowflake",
       snowDays.length, 1,
       snowDays.length >= 1 ? sortedChronologically(snowDays)[0]?.date : undefined
@@ -573,17 +568,6 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       )
     ),
 
-    // --- Load ---
-    milestone(
-      "ten-heavy-days",
-      "10 Heavy Load Days",
-      "10 Heavy",
-      "Ten days above 115% of recent personal workload baseline. Character built.",
-      "load", "campaign", "package",
-      heavyMailDays.length, 10,
-      dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 10)
-    ),
-
     // --- Safety ---
     milestone(
       "fifty-clean-boots",
@@ -597,7 +581,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     ),
 
     // ===================================================================
-    // VETERAN RECORD
+    // LIFETIME RECORD
     // ===================================================================
 
     // --- Days ---
@@ -605,7 +589,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "hundred-logged-days",
       "100 Logged Days",
       "100 Days",
-      "One hundred logged dispatches. A genuine field service milestone.",
+      "One hundred logged walking days. A genuine personal milestone.",
       "days", "veteran", "calendar",
       daysLogged, 100,
       dateAtNthMatch(sorted, () => true, 100),
@@ -617,7 +601,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "thousand-miles",
       "1,000 Miles",
       "1K mi",
-      "One thousand miles on foot. Distance earned.",
+      "One thousand walking miles. Distance earned.",
       "distance", "veteran", "map-pin",
       totalMiles, 1000,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 1000),
@@ -627,7 +611,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "twenty-five-hundred-miles",
       "2,500 Miles",
       "2.5K mi",
-      "Twenty-five hundred miles. Relay Commander territory.",
+      "Twenty-five hundred walking miles. Long-haul territory.",
       "distance", "veteran", "map-pin",
       totalMiles, 2500,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 2500),
@@ -639,7 +623,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "hundred-hydration-goals",
       "100 Hydration Goals",
       "100x Goal",
-      "One hundred hydration goal days. A documented commitment to field safety.",
+      "One hundred hydration goal days. A documented commitment to recovery.",
       "hydration", "veteran", "droplets",
       hydrationGoalDays.length, 100,
       dateAtNthMatch(
@@ -657,7 +641,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "twenty-five-heat-days",
       "25 Heat Days",
       "25 Heat",
-      "Twenty-five heat days worked. Heat-tested and qualified.",
+      "Twenty-five heat days walked. Heat-tested.",
       "weather", "veteran", "flame",
       heatDays.length, 25,
       dateAtNthMatch(sorted, isDerivedHeatDay, 25)
@@ -670,17 +654,6 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "weather", "veteran", "cloud-rain",
       weatherDays.length, 25,
       dateAtNthMatch(sorted, isDerivedWeatherDay, 25)
-    ),
-
-    // --- Load ---
-    milestone(
-      "fifty-heavy-days",
-      "50 Heavy Load Days",
-      "50 Heavy",
-      "Fifty days above 115% of recent personal workload baseline. Field-hardened.",
-      "load", "veteran", "package",
-      heavyMailDays.length, 50,
-      dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 50)
     ),
 
     // --- Safety ---
