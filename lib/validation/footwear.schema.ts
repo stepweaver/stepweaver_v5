@@ -38,9 +38,8 @@ const nullableDateSchema = z.preprocess((val) => {
 const rating1to10 = z.number().int().min(1).max(10).optional();
 const wear0to5 = z.number().int().min(0).max(5).optional();
 
-export const footwearAuthSchema = z.object({
-  logSecret: z.string().min(1),
-});
+/** Auth is via HttpOnly session cookie; schemas no longer carry logSecret. */
+export const footwearAuthSchema = z.object({});
 
 export const createShoeSchema = footwearAuthSchema.extend({
   brand: z.string().trim().min(1).max(80),

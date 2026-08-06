@@ -1,41 +1,24 @@
 import type { Metadata } from "next";
 import { CarrierDaybookGate } from "@/components/carrier-journal/carrier-daybook-gate";
-import { CarrierDaybookUnauthorized } from "@/components/carrier-journal/carrier-daybook-unauthorized";
 import { CarrierDaybookForm } from "@/components/carrier-journal/carrier-daybook-form";
 import { CarrierPrivateNav } from "@/components/carrier-journal/carrier-private-nav";
-import {
-  verifyCarrierLogSecret,
-  fetchLatestWeightLbs,
-} from "@/lib/notion/carrier-journal.repo";
+import { isCarrierSessionAuthenticated } from "@/lib/carrier-journal/auth";
+import { fetchLatestWeightLbs } from "@/lib/notion/carrier-journal.repo";
 import { isFootwearDbConfigured } from "@/lib/db";
 import { getActiveShoe, listShoes } from "@/lib/footwear/queries";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Carrier Daybook",
+  title: "Field Daybook",
   robots: { index: false, follow: false },
 };
 
-type Props = {
-  searchParams: Promise<{ token?: string }>;
-};
-
-export default async function CarrierDaybookPage({ searchParams }: Props) {
-  const { token } = await searchParams;
-
-  if (!token) {
+export default async function CarrierDaybookPage() {
+  if (!(await isCarrierSessionAuthenticated())) {
     return (
       <main className="flex-1">
-        <CarrierDaybookGate />
-      </main>
-    );
-  }
-
-  if (!verifyCarrierLogSecret(token)) {
-    return (
-      <main className="flex-1">
-        <CarrierDaybookUnauthorized />
+        <CarrierDaybookGate redirectTo="/log" />
       </main>
     );
   }
@@ -49,9 +32,8 @@ export default async function CarrierDaybookPage({ searchParams }: Props) {
   return (
     <main className="flex-1 pt-12 pb-16">
       <div className="w-full max-w-2xl mx-auto px-4 sm:px-6">
-        <CarrierPrivateNav token={token} active="daybook" />
+        <CarrierPrivateNav active="daybook" />
         <CarrierDaybookForm
-          token={token}
           latestWeightLbs={latestWeightLbs}
           footwearOptions={allShoes
             .filter((s) => s.status !== "retired" && s.status !== "failed")

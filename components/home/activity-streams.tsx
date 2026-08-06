@@ -22,7 +22,11 @@ type Props = {
   carrierPreview: HomeCarrierPreviewPayload | null;
 };
 
-function CarrierStreamCard({ preview }: { preview: HomeCarrierPreviewPayload | null }) {
+function FieldJournalStreamCard({
+  preview,
+}: {
+  preview: HomeCarrierPreviewPayload | null;
+}) {
   const dispatchHref = preview
     ? `/carrier-journal#${preview.id}`
     : "/carrier-journal#field-dispatches";
@@ -30,27 +34,27 @@ function CarrierStreamCard({ preview }: { preview: HomeCarrierPreviewPayload | n
   return (
     <article
       className="relative flex flex-col h-full border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)] p-5 sm:p-7 min-w-0"
-      aria-labelledby="carrier-log-heading"
+      aria-labelledby="field-journal-heading"
     >
       <div className="pointer-events-none absolute left-0 top-0 h-5 w-5 border-l-2 border-t-2 border-[rgb(var(--cyan)/0.5)]" />
       <div className="pointer-events-none absolute bottom-0 right-0 h-5 w-5 border-b-2 border-r-2 border-[rgb(var(--cyan)/0.5)]" />
 
       <p
-        id="carrier-log-heading"
+        id="field-journal-heading"
         className="font-[var(--font-ocr)] text-xs uppercase tracking-[0.28em] text-[rgb(var(--cyan)/0.7)] mb-2"
       >
         Current chapter
       </p>
       <h2 className="font-[var(--font-ibm)] text-xl sm:text-2xl font-semibold text-[rgb(var(--text-color))] mb-3 leading-snug">
-        Mail routes, miles, and systems thinking in the field.
+        Long walking days, miles, and systems thinking in the field.
       </h2>
       <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-3 max-w-3xl">
-        I&apos;m currently working as a mail carrier and documenting the adaptation: walking distance, hydration,
-        soreness, weather, weight trend, recovery, and the daily reality of learning a physical route job.
+        I&apos;m documenting a personal fitness arc: walking distance, hydration,
+        soreness, weather, weight trend, and recovery from physically demanding days.
       </p>
       <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-5 max-w-3xl">
-        Carrier&apos;s Log is part field log, part transformation record, and part public proof that systems thinking
-        does not only happen behind a desk.
+        Field Journal is part fitness log, part transformation record, and part
+        public proof that systems thinking does not only happen behind a desk.
       </p>
 
       {preview ? (
@@ -89,17 +93,17 @@ function CarrierStreamCard({ preview }: { preview: HomeCarrierPreviewPayload | n
             href="/carrier-journal#field-dispatches"
             className="inline-flex font-[var(--font-ocr)] text-[10px] sm:text-xs uppercase tracking-wider text-[rgb(var(--text-meta))] hover:text-[rgb(var(--neon)/0.8)] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
           >
-            FIELD DISPATCHES
+            FIELD NOTES
           </Link>
         </div>
       ) : null}
 
-      <a
-        href="/carrier-journal#field-dispatches"
+      <Link
+        href="/carrier-journal"
         className="inline-flex items-center gap-2 border border-[rgb(var(--cyan)/0.35)] bg-[rgb(var(--window)/0.2)] px-4 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.1em] text-[rgb(var(--cyan))] transition-colors hover:border-[rgb(var(--cyan)/0.65)] hover:bg-[rgb(var(--cyan)/0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))] w-fit"
       >
-        Read Carrier&apos;s Log →
-      </a>
+        Read Field Journal →
+      </Link>
     </article>
   );
 }
@@ -108,7 +112,7 @@ export function ActivityStreams({ recentIntel, carrierPreview }: Props) {
   return (
     <section className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 xl:px-14 pb-8">
       <div className="grid grid-cols-1 min-[52rem]:grid-cols-2 gap-4 sm:gap-6 min-[52rem]:gap-8 items-stretch">
-        <CarrierStreamCard preview={carrierPreview} />
+        <FieldJournalStreamCard preview={carrierPreview} />
         <HeroRecentIntel intel={recentIntel} />
       </div>
     </section>

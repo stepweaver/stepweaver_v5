@@ -19,7 +19,7 @@ export function TerminalLinkStrip() {
         <span className="text-[rgb(var(--green))] text-lg sm:text-2xl md:text-3xl motion-safe:animate-pulse">→</span>
       </Link>
       <Link href="/carrier-journal" className={linkClass}>
-        <span className="font-bold whitespace-nowrap">Carrier&apos;s Log</span>
+        <span className="font-bold whitespace-nowrap">Field Journal</span>
         <span className="text-[rgb(var(--green))] text-lg sm:text-2xl md:text-3xl motion-safe:animate-pulse">→</span>
       </Link>
     </div>

@@ -210,10 +210,8 @@ export function isCarrierJournalLogEnabled(): boolean {
   return status.notionConfigured && status.logSecretConfigured;
 }
 
-export function verifyCarrierLogSecret(secret: string): boolean {
-  const expected = (process.env.CARRIER_JOURNAL_LOG_SECRET ?? "").trim();
-  return !!expected && secret === expected;
-}
+/** @deprecated Prefer session cookie auth via lib/carrier-journal/auth. */
+export { verifyCarrierPassphrase as verifyCarrierLogSecret } from "@/lib/carrier-journal/auth";
 
 async function findPageIdByDate(date: string): Promise<string | null> {
   const pages = await queryDatabasePages({
@@ -405,7 +403,7 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
       : null;
 
   const properties: Record<string, unknown> = {
-    "Publish Public": { checkbox: true },
+    "Publish Public": { checkbox: Boolean(input.published) },
   };
 
   if (input.miles !== undefined) {

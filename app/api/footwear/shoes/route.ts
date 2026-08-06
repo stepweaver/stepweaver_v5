@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import {
   createShoeSchema,
   updateShoeSchema,
@@ -22,10 +23,8 @@ import { listShoes } from "@/lib/footwear/queries";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(request: Request) {
-  const url = new URL(request.url);
-  const secret = url.searchParams.get("logSecret") ?? "";
-  const gate = assertFootwearReady(secret);
+export async function GET(request: NextRequest) {
+  const gate = assertFootwearReady(request);
   if (gate) return gate;
 
   const summaries = await listShoeSummaries();
@@ -44,7 +43,7 @@ export async function GET(request: Request) {
   });
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok) return parsedBody.response;
 
@@ -53,7 +52,7 @@ export async function POST(request: Request) {
     return footwearBadRequest("Validation failed", parsed.error.flatten());
   }
 
-  const gate = assertFootwearReady(parsed.data.logSecret);
+  const gate = assertFootwearReady(request);
   if (gate) return gate;
 
   const data = parsed.data;
@@ -113,7 +112,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok) return parsedBody.response;
 
@@ -123,7 +122,7 @@ export async function PUT(request: Request) {
     if (!parsed.success) {
       return footwearBadRequest("Validation failed", parsed.error.flatten());
     }
-    const gate = assertFootwearReady(parsed.data.logSecret);
+    const gate = assertFootwearReady(request);
     if (gate) return gate;
     const shoe = await setActiveShoe(parsed.data.id);
     if (!shoe) {
@@ -137,7 +136,7 @@ export async function PUT(request: Request) {
     return footwearBadRequest("Validation failed", parsed.error.flatten());
   }
 
-  const gate = assertFootwearReady(parsed.data.logSecret);
+  const gate = assertFootwearReady(request);
   if (gate) return gate;
 
   const existing = await getShoeById(parsed.data.id);
@@ -145,7 +144,7 @@ export async function PUT(request: Request) {
     return NextResponse.json({ error: "Shoe not found" }, { status: 404 });
   }
 
-  const { logSecret: _s, id, ...patch } = parsed.data;
+  const { id, ...patch } = parsed.data;
   const shoe = await updateShoe(id, {
     ...patch,
     retailPrice:

@@ -9,8 +9,6 @@ import {
 } from "@/lib/dps";
 import type { CarrierJournalLogStatus } from "@/lib/notion/carrier-journal.repo";
 
-const LOG_SECRET_STORAGE_KEY = "carrier-journal-log-secret";
-
 type Props = {
   logStatus: CarrierJournalLogStatus;
 };
@@ -26,19 +24,14 @@ function todayIsoDate(): string {
 export function CarrierDailyLogForm({ logStatus }: Props) {
   const logEnabled =
     logStatus.notionConfigured && logStatus.logSecretConfigured;
-  const [logSecret, setLogSecret] = useState("");
   const [date, setDate] = useState(todayIsoDate);
   const [dpsCount, setDpsCount] = useState("");
   const [mailDayContext, setMailDayContext] = useState<string[]>([]);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [preview, setPreview] = useState<DpsClassification | null>(null);
+  const [needsLogin, setNeedsLogin] = useState(false);
   const previewRequestId = useRef(0);
-
-  useEffect(() => {
-    const stored = sessionStorage.getItem(LOG_SECRET_STORAGE_KEY);
-    if (stored) setLogSecret(stored);
-  }, []);
 
   const parsedDpsCount = useMemo(() => {
     const trimmed = dpsCount.trim();
@@ -56,7 +49,7 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
   }, [parsedDpsCount, preview]);
 
   useEffect(() => {
-    if (!logEnabled || !logSecret || !parsedDpsCount) {
+    if (!logEnabled || !parsedDpsCount) {
       setPreview(null);
       return;
     }
@@ -66,17 +59,22 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
       try {
         const res = await fetch("/api/carrier-journal/log", {
           method: "PUT",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            logSecret,
             date,
             dpsCount: parsedDpsCount,
           }),
         });
+        if (res.status === 401) {
+          setNeedsLogin(true);
+          return;
+        }
         if (!res.ok) return;
         const data = (await res.json()) as { classification: DpsClassification };
         if (requestId === previewRequestId.current) {
           setPreview(data.classification);
+          setNeedsLogin(false);
         }
       } catch {
         if (requestId === previewRequestId.current) {
@@ -86,7 +84,7 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
     }, 300);
 
     return () => window.clearTimeout(timer);
-  }, [date, logEnabled, logSecret, parsedDpsCount]);
+  }, [date, logEnabled, parsedDpsCount]);
 
   const toggleContext = useCallback((tag: string) => {
     setMailDayContext((current) => (current.includes(tag) ? [] : [tag]));
@@ -98,14 +96,12 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
       setStatus("saving");
       setErrorMsg("");
 
-      sessionStorage.setItem(LOG_SECRET_STORAGE_KEY, logSecret);
-
       try {
         const res = await fetch("/api/carrier-journal/log", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            logSecret,
             date,
             ...(parsedDpsCount !== undefined && { dpsCount: parsedDpsCount }),
             ...(mailDayContext.length > 0 && { mailDayContext }),
@@ -113,18 +109,23 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
         });
 
         const data = await res.json();
+        if (res.status === 401) {
+          setNeedsLogin(true);
+          throw new Error("Sign in at /log first, then return here.");
+        }
         if (!res.ok) {
           throw new Error(data.error || "Failed to save log entry");
         }
 
         setPreview(data.classification ?? null);
         setStatus("saved");
+        setNeedsLogin(false);
       } catch (err) {
         setStatus("error");
         setErrorMsg(err instanceof Error ? err.message : "Failed to save log entry");
       }
     },
-    [date, logSecret, mailDayContext, parsedDpsCount]
+    [date, mailDayContext, parsedDpsCount]
   );
 
   if (!logEnabled) {
@@ -135,18 +136,20 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
         </div>
         {logStatus.notionConfigured ? (
           <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
-            Notion is connected for Carrier&apos;s Log. Add{" "}
-            <code className="text-[rgb(var(--neon))]">CARRIER_JOURNAL_LOG_SECRET</code> in Vercel
-            (Production), pick a private passphrase, redeploy, then enter that same value in the
-            Log Secret field here.
+            Notion is connected. Add{" "}
+            <code className="text-[rgb(var(--neon))]">CARRIER_JOURNAL_LOG_SECRET</code> and{" "}
+            <code className="text-[rgb(var(--neon))]">CARRIER_SESSION_SIGNING_SECRET</code> in
+            Vercel, redeploy, then sign in at{" "}
+            <Link href="/log" className="text-[rgb(var(--neon))] underline">
+              /log
+            </Link>
+            .
           </p>
         ) : (
           <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
             Configure <code className="text-[rgb(var(--neon))]">NOTION_API_KEY</code> and{" "}
-            <code className="text-[rgb(var(--neon))]">NOTION_CARRIER_JOURNAL_DB_ID</code> to connect
-            the Carrier&apos;s Log database, then add{" "}
-            <code className="text-[rgb(var(--neon))]">CARRIER_JOURNAL_LOG_SECRET</code> for private
-            mobile writes.
+            <code className="text-[rgb(var(--neon))]">NOTION_CARRIER_JOURNAL_DB_ID</code> to
+            connect the field journal database.
           </p>
         )}
       </div>
@@ -173,7 +176,7 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
             Log Another Day
           </button>
           <Link href="/carrier-journal" className="glitch-button">
-            Back to Carrier&apos;s Log
+            Back to Field Journal
           </Link>
         </div>
       </div>
@@ -182,21 +185,23 @@ export function CarrierDailyLogForm({ logStatus }: Props) {
 
   return (
     <form onSubmit={handleSubmit} className="surface-panel p-6 sm:p-8 space-y-6">
-      <div>
-        <label htmlFor="log-secret" className="text-label block mb-2">
-          Log Secret
-        </label>
-        <input
-          id="log-secret"
-          type="password"
-          value={logSecret}
-          onChange={(event) => setLogSecret(event.target.value)}
-          required
-          autoComplete="current-password"
-          className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-sm px-3 py-2 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
-          placeholder="Private logging secret"
-        />
-      </div>
+      {needsLogin ? (
+        <div className="border border-[rgb(var(--magenta)/0.4)] p-4 text-sm text-[rgb(var(--text-secondary))]">
+          Session required.{" "}
+          <Link href="/log" className="text-[rgb(var(--neon))] underline">
+            Sign in at /log
+          </Link>{" "}
+          first, then return here. Passphrases are no longer accepted in this form.
+        </div>
+      ) : (
+        <p className="text-xs text-[rgb(var(--text-meta))]">
+          Uses your HttpOnly session cookie from{" "}
+          <Link href="/log" className="text-[rgb(var(--neon))] underline">
+            /log
+          </Link>
+          . Entries save as private drafts.
+        </p>
+      )}
 
       <div>
         <label htmlFor="log-date" className="text-label block mb-2">

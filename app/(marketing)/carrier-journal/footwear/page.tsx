@@ -13,13 +13,13 @@ export const revalidate = 300;
 const SITE_URL = process.env.SITE_URL || "https://stepweaver.dev";
 
 export const metadata: Metadata = {
-  title: "Carrier Footwear Lab | Stephen Weaver",
+  title: "Shoe Ledger | Field Journal",
   description:
-    "Field equipment roster tracking every physical pair worn as a city letter carrier: mileage, checkpoints, and condition reports.",
+    "Personal footwear equipment ledger: mileage and condition for shoes you own. Not a review service or partnership program.",
   openGraph: {
-    title: "Carrier Footwear Lab",
+    title: "Shoe Ledger",
     description:
-      "Field equipment roster tracking every physical pair worn as a city letter carrier.",
+      "Personal footwear equipment ledger: mileage and condition for shoes you own.",
     url: `${SITE_URL}/carrier-journal/footwear`,
     type: "website",
   },

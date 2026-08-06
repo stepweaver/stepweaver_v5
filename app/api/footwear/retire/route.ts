@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { retireShoeSchema } from "@/lib/validation/footwear.schema";
 import {
   assertFootwearReady,
@@ -14,7 +15,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok) return parsedBody.response;
 
@@ -23,7 +24,7 @@ export async function POST(request: Request) {
     return footwearBadRequest("Validation failed", parsed.error.flatten());
   }
 
-  const gate = assertFootwearReady(parsed.data.logSecret);
+  const gate = assertFootwearReady(request);
   if (gate) return gate;
 
   const data = parsed.data;

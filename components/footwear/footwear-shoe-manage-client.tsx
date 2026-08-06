@@ -52,7 +52,6 @@ export type ManageMedia = {
 };
 
 type Props = {
-  token: string;
   shoe: {
     id: string;
     slug: string;
@@ -102,7 +101,6 @@ function numToField(v: number | null | undefined): string {
 }
 
 export function FootwearShoeManageClient({
-  token,
   shoe,
   totalMiles,
   pendingCheckpoints,
@@ -260,7 +258,6 @@ export function FootwearShoeManageClient({
     try {
       const isEdit = editingId != null;
       const body: Record<string, unknown> = {
-        logSecret: token,
         ...(isEdit
           ? { id: editingId }
           : { shoeId: shoe.id, entryType }),
@@ -275,6 +272,7 @@ export function FootwearShoeManageClient({
         body.checkpointMiles = parseInt(checkpointMiles, 10);
       }
       const res = await fetch("/api/footwear/observations", {
+        credentials: "include",
         method: isEdit ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
@@ -309,10 +307,10 @@ export function FootwearShoeManageClient({
     setError(null);
     try {
       const res = await fetch("/api/footwear/allocations", {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          logSecret: token,
           shoeId: shoe.id,
           date,
           miles: parseFloat(allocMiles),
@@ -338,10 +336,10 @@ export function FootwearShoeManageClient({
     setError(null);
     try {
       const res = await fetch("/api/footwear/retire", {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          logSecret: token,
           id: shoe.id,
           retirementDate: date,
           retirementReason: retireReason,
@@ -391,14 +389,14 @@ export function FootwearShoeManageClient({
       const blob = await upload(pathname, prepared, {
         access: "public",
         handleUploadUrl: "/api/footwear/media/upload",
-        clientPayload: JSON.stringify({ logSecret: token }),
+        clientPayload: JSON.stringify({}),
       });
 
       const res = await fetch("/api/footwear/media", {
+        credentials: "include",
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          logSecret: token,
           shoeId: shoe.id,
           imageUrl: blob.url,
           imageType: photoScope === "hero" ? "hero" : photoType,
@@ -465,9 +463,10 @@ export function FootwearShoeManageClient({
     setMessage(null);
     try {
       const res = await fetch("/api/footwear/media", {
+        credentials: "include",
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ logSecret: token, mediaId }),
+        body: JSON.stringify({ mediaId }),
       });
       let data: { error?: string } = {};
       try {
@@ -1136,15 +1135,7 @@ export function FootwearShoeManageClient({
             </ul>
           )}
           <p className="text-sm text-[rgb(var(--text-meta))]">
-            Public view:{" "}
-            <a
-              href={`/carrier-journal/footwear/${shoe.slug}`}
-              className="text-[rgb(var(--neon))] hover:underline"
-              target="_blank"
-              rel="noreferrer"
-            >
-              /carrier-journal/footwear/{shoe.slug}
-            </a>
+            Public footwear profiles are offline during ethics review.
           </p>
         </section>
       )}

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import {
   createObservationSchema,
   updateObservationSchema,
@@ -19,7 +20,7 @@ import {
 
 export const dynamic = "force-dynamic";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok) return parsedBody.response;
 
@@ -28,7 +29,7 @@ export async function POST(request: Request) {
     return footwearBadRequest("Validation failed", parsed.error.flatten());
   }
 
-  const gate = assertFootwearReady(parsed.data.logSecret);
+  const gate = assertFootwearReady(request);
   if (gate) return gate;
 
   const data = parsed.data;
@@ -56,7 +57,7 @@ export async function POST(request: Request) {
   const shoeMileageAtEntry = await getShoeMileageTotal(data.shoeId);
 
   try {
-    const { logSecret: _s, ...rest } = data;
+    const { ...rest } = data;
     const observation = await createObservation({
       ...rest,
       shoeMileageAtEntry: String(shoeMileageAtEntry),
@@ -74,7 +75,7 @@ export async function POST(request: Request) {
   }
 }
 
-export async function PUT(request: Request) {
+export async function PUT(request: NextRequest) {
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok) return parsedBody.response;
 
@@ -83,10 +84,10 @@ export async function PUT(request: Request) {
     return footwearBadRequest("Validation failed", parsed.error.flatten());
   }
 
-  const gate = assertFootwearReady(parsed.data.logSecret);
+  const gate = assertFootwearReady(request);
   if (gate) return gate;
 
-  const { logSecret: _s, id, ...patch } = parsed.data;
+  const { id, ...patch } = parsed.data;
   const existing = await getObservationById(id);
   if (!existing) {
     return NextResponse.json({ error: "Observation not found" }, { status: 404 });

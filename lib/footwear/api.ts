@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { verifyCarrierLogSecret } from "@/lib/notion/carrier-journal.repo";
+import { NextRequest, NextResponse } from "next/server";
+import { isCarrierSessionRequest } from "@/lib/carrier-journal/auth";
 import { isFootwearDbConfigured } from "@/lib/db";
 
 export function footwearUnauthorized() {
@@ -23,9 +23,9 @@ export function footwearBadRequest(error: string, details?: unknown) {
   return NextResponse.json({ error, details }, { status: 400 });
 }
 
-export function assertFootwearReady(logSecret: string): NextResponse | null {
+export function assertFootwearReady(request: NextRequest): NextResponse | null {
   if (!isFootwearDbConfigured()) return footwearUnavailable();
-  if (!verifyCarrierLogSecret(logSecret)) return footwearUnauthorized();
+  if (!isCarrierSessionRequest(request)) return footwearUnauthorized();
   return null;
 }
 

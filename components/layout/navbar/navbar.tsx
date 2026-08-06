@@ -11,7 +11,7 @@ const NAV_LINKS = [
   { label: "Work", href: "/work" },
   { label: "About", href: "/about" },
   { label: "Writing", href: "/writing" },
-  { label: "Carrier's Log", href: "/carrier-journal" },
+  { label: "Field Journal", href: "/carrier-journal" },
   { label: "Resume", href: "/resume" },
   { label: "Contact", href: "/contact" },
   { label: "Services", href: "/services" },

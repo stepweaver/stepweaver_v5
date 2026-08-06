@@ -3,80 +3,104 @@ import {
   isCarrierJournalLogEnabled,
   previewCarrierLogDps,
   upsertCarrierLogDps,
-  verifyCarrierLogSecret,
 } from "@/lib/notion/carrier-journal.repo";
+import {
+  applyNoStoreHeaders,
+  isCarrierSessionRequest,
+  isSameOriginRequest,
+} from "@/lib/carrier-journal/auth";
 import {
   carrierLogDpsPreviewSchema,
   carrierLogDpsSchema,
 } from "@/lib/validation/carrier-log.schema";
 
 function unauthorized() {
-  return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  return applyNoStoreHeaders(
+    NextResponse.json({ error: "Unauthorized" }, { status: 401 }),
+  );
 }
 
 function unavailable() {
-  return NextResponse.json({ error: "Carrier log API is not configured" }, { status: 503 });
+  return applyNoStoreHeaders(
+    NextResponse.json(
+      { error: "Carrier log API is not configured" },
+      { status: 503 },
+    ),
+  );
+}
+
+function gate(request: NextRequest): NextResponse | null {
+  if (!isCarrierJournalLogEnabled()) return unavailable();
+  if (!isSameOriginRequest(request)) {
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: "Request rejected." }, { status: 403 }),
+    );
+  }
+  if (!isCarrierSessionRequest(request)) return unauthorized();
+  return null;
 }
 
 export async function POST(request: NextRequest) {
-  if (!isCarrierJournalLogEnabled()) {
-    return unavailable();
-  }
+  const blocked = gate(request);
+  if (blocked) return blocked;
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: "Invalid JSON" }, { status: 400 }),
+    );
   }
 
   const parsed = carrierLogDpsSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Validation failed", details: parsed.error.flatten() },
-      { status: 400 }
+    return applyNoStoreHeaders(
+      NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 },
+      ),
     );
-  }
-
-  if (!verifyCarrierLogSecret(parsed.data.logSecret)) {
-    return unauthorized();
   }
 
   try {
     const result = await upsertCarrierLogDps(parsed.data);
-    return NextResponse.json({
-      ok: true,
-      pageId: result.pageId,
-      classification: result.classification,
-    });
+    return applyNoStoreHeaders(
+      NextResponse.json({
+        ok: true,
+        pageId: result.pageId,
+        classification: result.classification,
+      }),
+    );
   } catch (err) {
     const message = err instanceof Error ? err.message : "Failed to save carrier log";
-    return NextResponse.json({ error: message }, { status: 500 });
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: message }, { status: 500 }),
+    );
   }
 }
 
 export async function PUT(request: NextRequest) {
-  if (!isCarrierJournalLogEnabled()) {
-    return unavailable();
-  }
+  const blocked = gate(request);
+  if (blocked) return blocked;
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: "Invalid JSON" }, { status: 400 }),
+    );
   }
 
   const parsed = carrierLogDpsPreviewSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Validation failed", details: parsed.error.flatten() },
-      { status: 400 }
+    return applyNoStoreHeaders(
+      NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 },
+      ),
     );
-  }
-
-  if (!verifyCarrierLogSecret(parsed.data.logSecret)) {
-    return unauthorized();
   }
 
   try {
@@ -84,9 +108,12 @@ export async function PUT(request: NextRequest) {
       date: parsed.data.date,
       dpsCount: parsed.data.dpsCount,
     });
-    return NextResponse.json({ classification });
+    return applyNoStoreHeaders(NextResponse.json({ classification }));
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Failed to preview DPS classification";
-    return NextResponse.json({ error: message }, { status: 500 });
+    const message =
+      err instanceof Error ? err.message : "Failed to preview DPS classification";
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: message }, { status: 500 }),
+    );
   }
 }

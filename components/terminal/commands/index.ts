@@ -24,7 +24,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: 'Content:', variant: 'lambda' },
       { content: '  resume: View resume (sections: summary, experience, …)', variant: 'default' },
       { content: '  codex: Browse blog (ls, cat, grep, exit)', variant: 'default' },
-      { content: '  carrier | mailwalker | fieldlog: Open Carrier\'s Log', variant: 'default' },
+      { content: '  carrier | mailwalker | fieldlog: Open Field Journal', variant: 'default' },
       { content: '  chat <message>: Ask Lambda about experience', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Navigation:', variant: 'lambda' },
@@ -192,9 +192,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     setTimeout(() => ctx.navigate('/carrier-journal'), 400);
     return {
       lines: [
-        { content: 'Carrier\'s Log: field notes from becoming a letter carrier,', variant: 'success' },
-        { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
-        { content: '', variant: 'default' },
+        { content: 'Field Journal: personal walking and fitness log.', variant: 'success' },
         { content: 'Opening /carrier-journal...', variant: 'dimmed' },
       ],
     };
@@ -204,9 +202,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     setTimeout(() => ctx.navigate('/carrier-journal'), 400);
     return {
       lines: [
-        { content: 'Carrier\'s Log: field notes from becoming a letter carrier,', variant: 'success' },
-        { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
-        { content: '', variant: 'default' },
+        { content: 'Field Journal: personal walking and fitness log.', variant: 'success' },
         { content: 'Opening /carrier-journal...', variant: 'dimmed' },
       ],
     };
@@ -216,9 +212,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
     setTimeout(() => ctx.navigate('/carrier-journal'), 400);
     return {
       lines: [
-        { content: 'Carrier\'s Log: field notes from becoming a letter carrier,', variant: 'success' },
-        { content: 'miles, hydration, soreness, weather, recovery, and adaptation.', variant: 'default' },
-        { content: '', variant: 'default' },
+        { content: 'Field Journal: personal walking and fitness log.', variant: 'success' },
         { content: 'Opening /carrier-journal...', variant: 'dimmed' },
       ],
     };

@@ -15,7 +15,7 @@ export function FootwearActiveLoadoutCard({ summary }: Props) {
       className="border border-[rgb(var(--neon)/0.3)] bg-[rgb(var(--panel)/0.35)] p-5 sm:p-6"
     >
       <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))] mb-3">
-        FOOTWEAR LAB // ACTIVE LOADOUT
+        SHOE LEDGER // ACTIVE PAIR
       </p>
       <h2
         id="footwear-loadout-heading"
@@ -75,7 +75,7 @@ export function FootwearActiveLoadoutCard({ summary }: Props) {
           href="/carrier-journal/footwear"
           className="inline-flex border border-[rgb(var(--neon)/0.35)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--text-secondary))] hover:border-[rgb(var(--neon)/0.6)] hover:text-[rgb(var(--neon))] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
         >
-          ENTER FOOTWEAR LAB
+          OPEN SHOE LEDGER
         </Link>
       </div>
     </section>

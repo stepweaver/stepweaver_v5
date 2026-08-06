@@ -46,7 +46,6 @@ type SubmitResult = {
 };
 
 type Props = {
-  token: string;
   /** Most recent recorded weight from Notion. Used as the active weight on non-Monday days. */
   latestWeightLbs?: number | null;
   /** Shoes available for daily mileage assignment. */
@@ -61,7 +60,6 @@ function todayIsoDate(): string {
 }
 
 export function CarrierDaybookForm({
-  token,
   latestWeightLbs,
   footwearOptions = [],
   defaultFootwearShoeId = null,
@@ -107,6 +105,7 @@ export function CarrierDaybookForm({
 
   const [publicNote, setPublicNote] = useState("");
   const [privateNote, setPrivateNote] = useState("");
+  const [publishPublic, setPublishPublic] = useState(false);
 
   const [weather, setWeather] = useState<WeatherState>({ status: "idle" });
   const [weatherTemp, setWeatherTemp] = useState<number | null>(null);
@@ -263,9 +262,9 @@ export function CarrierDaybookForm({
       try {
         const res = await fetch("/api/carrier-journal/daybook", {
           method: "PUT",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            logSecret: token,
             date,
             ...(parsedDpsCount !== undefined && { dpsCount: parsedDpsCount }),
             ...(parsedParcels !== undefined && { parcels: parsedParcels }),
@@ -284,7 +283,7 @@ export function CarrierDaybookForm({
     }, 300);
 
     return () => window.clearTimeout(timer);
-  }, [date, parsedDpsCount, parsedParcels, token]);
+  }, [date, parsedDpsCount, parsedParcels]);
 
   const toggleContext = useCallback((tag: string) => {
     setMailDayContext((prev) => (prev.includes(tag) ? [] : [tag]));
@@ -304,7 +303,6 @@ export function CarrierDaybookForm({
       }
 
       const body: Record<string, unknown> = {
-        logSecret: token,
         date,
         ...(milesNum !== undefined && { miles: milesNum }),
       };
@@ -369,6 +367,7 @@ export function CarrierDaybookForm({
 
       if (publicNote.trim()) body.publicNote = publicNote.trim();
       if (privateNote.trim()) body.privateNote = privateNote.trim();
+      body.published = publishPublic && Boolean(publicNote.trim());
       if (fuelInput) body.fuel = fuelInput;
 
       if (footwearOptions.length > 0 && milesNum !== undefined) {
@@ -401,6 +400,7 @@ export function CarrierDaybookForm({
       try {
         const res = await fetch("/api/carrier-journal/daybook", {
           method: "POST",
+          credentials: "include",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
@@ -438,9 +438,9 @@ export function CarrierDaybookForm({
       }
     },
     [
-      token, date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
+      date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
-      mood, energy, soreness, publicNote, privateNote,
+      mood, energy, soreness, publicNote, privateNote, publishPublic,
       weatherTemp, weatherHeat, weatherAvgHeat, weatherPrecip, rainedOnRoute,
       steppedInDogPoop, fuelInput,
       footwearOptions, splitMode, splitRows, assignAllMiles, primaryShoeId,
@@ -1140,8 +1140,24 @@ export function CarrierDaybookForm({
             rows={3}
             maxLength={2000}
             className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-sm px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors resize-none"
-            placeholder="What do you want the public log to say?"
+            placeholder="Fitness framing only: miles, weather, recovery, how the day felt. No employer, routes, mail volume, customers, or coworkers."
           />
+          <label className="mt-3 flex items-start gap-3 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={publishPublic}
+              onChange={(e) => setPublishPublic(e.target.checked)}
+              className="mt-1 accent-[rgb(var(--neon))]"
+            />
+            <span className="text-xs text-[rgb(var(--text-secondary))] leading-relaxed">
+              <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
+                PUBLISH TO FIELD JOURNAL
+              </span>
+              <br />
+              Off by default. Only check this after the note is sanitized for a personal walking
+              journal. Leave unchecked to keep a private draft.
+            </span>
+          </label>
         </div>
 
         <div>

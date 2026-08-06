@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { del } from "@vercel/blob";
 import {
   mediaDeleteSchema,
@@ -25,7 +26,7 @@ export const dynamic = "force-dynamic";
  * Files go directly to Vercel Blob (client upload) to avoid the 4.5MB
  * Function body limit that caused HTTP 413 for phone JPEGs.
  */
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok) return parsedBody.response;
 
@@ -34,7 +35,7 @@ export async function POST(request: Request) {
     return footwearBadRequest("Validation failed", parsed.error.flatten());
   }
 
-  const gate = assertFootwearReady(parsed.data.logSecret);
+  const gate = assertFootwearReady(request);
   if (gate) return gate;
 
   if (!(process.env.BLOB_READ_WRITE_TOKEN ?? "").trim()) {
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
   return NextResponse.json({ ok: true, media }, { status: 201 });
 }
 
-export async function DELETE(request: Request) {
+export async function DELETE(request: NextRequest) {
   const parsedBody = await readJsonBody(request);
   if (!parsedBody.ok) return parsedBody.response;
 
@@ -100,7 +101,7 @@ export async function DELETE(request: Request) {
     return footwearBadRequest("Validation failed", parsed.error.flatten());
   }
 
-  const gate = assertFootwearReady(parsed.data.logSecret);
+  const gate = assertFootwearReady(request);
   if (gate) return gate;
 
   const existing = await getMediaById(parsed.data.mediaId);

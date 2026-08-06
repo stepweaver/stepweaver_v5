@@ -172,7 +172,7 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
             href="/carrier-journal/footwear"
             className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] hover:underline"
           >
-            ← Footwear Lab
+            ← Shoe Ledger
           </Link>
         </p>
         <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))]">

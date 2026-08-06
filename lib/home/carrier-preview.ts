@@ -25,7 +25,7 @@ function excerptPublicNote(note: string): string {
   return `${(lastSpace > 80 ? sliced.slice(0, lastSpace) : sliced).trimEnd()}…`;
 }
 
-/** Latest public feed-worthy Carrier’s Log dispatch for the homepage activity card. */
+/** Latest public feed-worthy Field Journal note for the homepage activity card. */
 export async function getHomeCarrierPreview(): Promise<HomeCarrierPreviewPayload | null> {
   try {
     const raw = await fetchCarrierDispatches();
@@ -40,7 +40,9 @@ export async function getHomeCarrierPreview(): Promise<HomeCarrierPreviewPayload
     if (!latest) return null;
 
     const weather = deriveWeatherSignals(latest);
-    const weatherFlags = (["heat", "rain", "storm", "snow"] as const).filter((key) => weather[key]);
+    const weatherFlags = (["heat", "rain", "storm", "snow"] as const).filter(
+      (key) => weather[key],
+    );
 
     return {
       id: latest.id,

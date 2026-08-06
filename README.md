@@ -12,7 +12,7 @@
 | Projects | <https://stepweaver.dev/work> |
 | Terminal | <https://stepweaver.dev/terminal> |
 | Codex | <https://stepweaver.dev/codex> |
-| Carrier's Log | <https://stepweaver.dev/carrier-journal> |
+| Field Journal | <https://stepweaver.dev/carrier-journal> |
 | Resume | <https://stepweaver.dev/resume> |
 | Contact | <https://stepweaver.dev/contact> |
 | Repository | <https://github.com/stepweaver/stepweaver_v5> |
@@ -27,7 +27,7 @@ The site combines a conventional portfolio with interactive technical surfaces:
 - a browser terminal for command-style exploration
 - a portfolio-native AI assistant named `λlambda`
 - a Notion-backed writing system called the Codex
-- a live Carrier's Log field journal with KPIs, milestones, and protected private logging
+- a field journal system with private daybook logging (public surface currently under review)
 - standalone utilities and experiments such as Mail Sort Academy, RPG Dice Roller, Meshtastic docs, and embedded booking tools
 
 The point of the repo is to make Stephen's work legible through the codebase itself: routes, data boundaries, security guardrails, content architecture, AI integration, and field-first UX.
@@ -84,7 +84,7 @@ Important routes:
 | `/services` | Selective consulting offers |
 | `/writing` | Writing archive (formerly Codex) |
 | `/writing/[slug]` | Writing entry |
-| `/play` | Playground hub (terminal, Carrier's Log, toys) |
+| `/play` | Playground hub (terminal, field journal, toys) |
 | `/for-agents` | Recruiter/agent-oriented entry point |
 | `/carrier-journal` | Field log (also linked from Play) |
 | `/terminal` | Interactive terminal |
@@ -269,16 +269,18 @@ Expected Notion docs properties:
 
 The docs renderer can also refresh expiring Notion image URLs through a signed token flow.
 
-### 7. Carrier's Log
+### 7. Field Journal (Carrier Log system — under review)
 
-Carrier's Log is a personal field log from life as a city letter carrier. It turns daily work into public KPIs, dispatches, weather signals, hydration tracking, mail-load trends, and milestone progression while preserving a strict privacy boundary.
+The public field journal is temporarily offline while ethics, privacy, and publication controls are remediated. Private daybook logging remains available behind session-cookie auth.
 
 Routes:
 
 ```txt
-/carrier-journal
-/carrier-journal/log
-/log?token=...
+/carrier-journal          # public review notice (noindex)
+/carrier-journal/footwear # 410 Gone
+/carrier-journal/log      # quick DPS log (session cookie)
+/log                      # full daybook (POST login → HttpOnly cookie)
+/api/carrier-journal/session
 /api/carrier-journal/log
 /api/carrier-journal/daybook
 ```
@@ -289,6 +291,7 @@ Primary files:
 app/(marketing)/carrier-journal/page.tsx
 app/(marketing)/carrier-journal/log/page.tsx
 app/log/page.tsx
+app/api/carrier-journal/session/route.ts
 components/carrier-journal/*
 lib/data/carrier-journal.ts
 lib/data/carrier-milestones.ts
@@ -299,36 +302,30 @@ lib/dps.ts
 lib/hydration.ts
 ```
 
-Public dashboard features:
+Public surface (current):
 
-- aggregate KPI grid
-- field calendar
-- mileage rank ladder
-- achievement/badge panel
-- dispatch cards with field notes and metrics
-- mail-load classification
-- heat/weather flags
-- hydration goal tracking
-- weekly weight trend display without exposing unnecessary raw detail
+- review notice only — no live dispatches, employer identity, or footwear product profiles
+- public footwear routes return HTTP 410 Gone
 
 Private logging features:
 
-- quick DPS log at `/carrier-journal/log`
-- full daybook at `/log?token=...`
-- shared secret gate through `CARRIER_JOURNAL_LOG_SECRET`
-- Notion upsert by date
+- quick DPS log at `/carrier-journal/log` (requires prior `/log` session)
+- full daybook at `/log` after POST passphrase login
+- HttpOnly `carrier_session` cookie (not URL tokens or sessionStorage)
+- Notion upsert by date with **Publish Public = false by default**
 - live mail-load preview
 - route fuel score
 - public note and private note separation
 
-Carrier's Log public/private rules:
+Publication / privacy rules:
 
+- Daybook writes default to draft (`Publish Public = false`). Do not rely on omitting the field to publish.
 - Public reads only use rows where `Publish Public = true`.
 - `Private Note` is written to Notion but never read for public rendering.
-- The public site avoids addresses, customer names, coworker names, route numbers, scanner data, and internal operational details.
-- Static seed data keeps the page deployable if Notion is not configured.
+- Seed/demo dispatches are **not** used as a public fallback when Notion returns empty.
+- After containment deploy: uncheck `Publish Public` on existing Notion rows, rotate secrets, purge caches.
 
-Expected Carrier's Log Notion properties:
+Expected Field Journal Notion properties:
 
 | Property | Type |
 | --- | --- |
@@ -548,8 +545,9 @@ The chat system:
 Notion integrations avoid broad public reads:
 
 - Codex and docs only read `Published` content.
-- Carrier's Log public reads only use `Publish Public = true`.
-- `Private Note` is never read for public Carrier's Log rendering.
+- Carrier's Log public reads only use `Publish Public = true`; daybook writes default to draft.
+- `Private Note` is never read for public field-journal rendering.
+- Public path does not fall back to seed/demo narratives when Notion is empty.
 - `/api/notion-blocks` requires explicit page allowlisting.
 - `/api/notion-image` uses signed HMAC tokens for refreshable image URLs.
 
@@ -585,11 +583,14 @@ cp .env.example .env.local
 | `NOTION_BLOCKS_ALLOWED_PAGE_IDS` | Comma-separated allowlist for `/api/notion-blocks` |
 | `NOTION_IMAGE_TOKEN_SECRET` | HMAC secret for signed Notion image refresh tokens |
 
-### Carrier's Log
+### Field Journal (private daybook)
 
 | Variable | Purpose |
 | --- | --- |
-| `CARRIER_JOURNAL_LOG_SECRET` | Shared secret for private Carrier's Log forms and APIs |
+| `CARRIER_JOURNAL_LOG_SECRET` | Passphrase for POST `/api/carrier-journal/session` login only (never put in URLs) |
+| `CARRIER_SESSION_SIGNING_SECRET` | HMAC key for the HttpOnly `carrier_session` cookie (rotate independently) |
+
+**Rotation:** set new passphrase + signing secret in Vercel → redeploy → old `/log?token=` URLs and sessionStorage secrets fail → sign in again at `/log`. Uncheck Notion `Publish Public` on all existing rows after containment.
 
 ### AI chat
 
@@ -779,13 +780,13 @@ Good future test targets:
 3. Visit `/meshtastic` and `/meshtastic/[slug]`.
 4. Verify sidebar grouping and previous/next navigation.
 
-### Log a Carrier's Log entry
+### Log a Field Journal daybook entry
 
-1. Ensure `NOTION_API_KEY`, `NOTION_CARRIER_JOURNAL_DB_ID`, and `CARRIER_JOURNAL_LOG_SECRET` are set.
-2. Open `/log?token=<secret>` for the full daybook.
-3. Use `/carrier-journal/log` for quick DPS count logging.
-4. Confirm the Notion row is created or updated by date.
-5. Confirm public output on `/carrier-journal` only shows intended public content.
+1. Ensure `NOTION_API_KEY`, `NOTION_CARRIER_JOURNAL_DB_ID`, `CARRIER_JOURNAL_LOG_SECRET`, and `CARRIER_SESSION_SIGNING_SECRET` are set.
+2. Open `/log`, enter the passphrase (POST login; cookie is HttpOnly).
+3. Use `/carrier-journal/log` for quick DPS count logging after you have a session.
+4. Confirm the Notion row is created or updated by date with **Publish Public unchecked**.
+5. Public `/carrier-journal` shows the review notice until ethics clearance — it must not show drafts or seed data.
 
 ### Add a terminal command
 
@@ -870,7 +871,7 @@ These files are useful context for agentic coding sessions and future cleanup wo
 - Test coverage is strongest around pure utilities and shared domain logic, not every rendered UI path.
 - Production behavior depends on correctly configured origins, hosts, Notion access, and optional KV.
 - Notion-backed content creates runtime integration complexity; static fallbacks reduce but do not remove that dependency.
-- Carrier's Log uses a shared-secret gate instead of a full auth system because it is a personal tool with low user-management needs.
+- Field Journal private APIs use an HttpOnly session cookie after POST passphrase login (not URL tokens).
 - Some routes are experiments or living artifacts, so not every page has the same level of polish or content density.
 
 ## Repository hygiene

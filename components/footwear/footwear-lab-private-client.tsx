@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import Link from "next/link";
 
 type Props = {
-  token: string;
   shoes: Array<{
     id: string;
     slug: string;
@@ -21,17 +20,17 @@ type Props = {
 };
 
 const emptyForm = {
-  brand: "HOKA",
-  model: "Bondi 9",
-  nickname: "The Rookie",
-  size: "10.5",
-  width: "2E",
-  status: "active",
+  brand: "",
+  model: "",
+  nickname: "",
+  size: "",
+  width: "",
+  status: "planned",
   acquisitionType: "purchased",
-  isLegacyRecord: true,
-  mileageConfidence: "estimated",
-  public: true,
-  estimatedWorkMiles: "250",
+  isLegacyRecord: false,
+  mileageConfidence: "exact",
+  public: false,
+  estimatedWorkMiles: "",
   amountPaid: "",
   purchaseDate: "",
   firstWearDate: "",
@@ -52,7 +51,7 @@ function formatValidationError(data: {
   return data.error ?? "Create failed";
 }
 
-export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
+export function FootwearLabPrivateClient({ shoes: initial }: Props) {
   const [shoes, setShoes] = useState(initial);
   const [form, setForm] = useState(emptyForm);
   const [busy, setBusy] = useState(false);
@@ -65,9 +64,7 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
   );
 
   async function refresh() {
-    const res = await fetch(
-      `/api/footwear/shoes?logSecret=${encodeURIComponent(token)}`
-    );
+    const res = await fetch("/api/footwear/shoes", { credentials: "include" });
     const data = await res.json();
     if (res.ok && data.shoes) setShoes(data.shoes);
   }
@@ -80,9 +77,9 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
     try {
       const res = await fetch("/api/footwear/shoes", {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          logSecret: token,
           brand: form.brand,
           model: form.model,
           nickname: form.nickname || undefined,
@@ -124,9 +121,9 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
     try {
       const res = await fetch("/api/footwear/shoes", {
         method: "PUT",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          logSecret: token,
           action: "setActive",
           id,
         }),
@@ -149,8 +146,9 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
     try {
       const res = await fetch("/api/footwear/shoes", {
         method: "PUT",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ logSecret: token, id, status }),
+        body: JSON.stringify({ id, status }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -256,7 +254,7 @@ export function FootwearLabPrivateClient({ token, shoes: initial }: Props) {
                     </button>
                   )}
                   <Link
-                    href={`/log/footwear/${shoe.slug}?token=${encodeURIComponent(token)}`}
+                    href={`/log/footwear/${shoe.slug}`}
                     className="border border-[rgb(var(--neon)/0.4)] px-3 py-2 font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)]"
                   >
                     Manage

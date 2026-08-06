@@ -32,14 +32,12 @@ export const fuelLogSchema = z.object({
 });
 
 export const carrierLogDpsSchema = z.object({
-  logSecret: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   dpsCount: z.number().finite().positive().optional(),
   mailDayContext: z.array(mailDayContextSchema).optional(),
 });
 
 export const carrierLogDpsPreviewSchema = z.object({
-  logSecret: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   dpsCount: z.number().finite().positive().optional(),
 });
@@ -47,7 +45,6 @@ export const carrierLogDpsPreviewSchema = z.object({
 export type CarrierLogDpsInput = z.infer<typeof carrierLogDpsSchema>;
 
 export const carrierDaybookSchema = z.object({
-  logSecret: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   miles: z.number().finite().min(0).optional(),
   dpsCount: z.number().finite().min(0).optional(),
@@ -72,7 +69,8 @@ export const carrierDaybookSchema = z.object({
   steppedInDogPoop: z.boolean().optional(),
   publicNote: z.string().trim().max(2000).optional(),
   privateNote: z.string().trim().max(2000).optional(),
-  published: z.boolean().default(true),
+  /** Draft by default — never auto-publish. */
+  published: z.boolean().default(false),
   fuel: fuelLogSchema.optional(),
   /** Work miles assigned to one or more shoes for this day. Sum must be ≤ miles. */
   footwearAllocations: z
@@ -88,7 +86,6 @@ export const carrierDaybookSchema = z.object({
 export type CarrierDaybookInput = z.infer<typeof carrierDaybookSchema>;
 
 export const carrierDaybookPreviewSchema = z.object({
-  logSecret: z.string().min(1),
   date: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   dpsCount: z.number().finite().min(0).optional(),
   parcels: z.number().finite().min(0).optional(),

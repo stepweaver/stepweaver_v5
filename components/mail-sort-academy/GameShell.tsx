@@ -200,7 +200,7 @@ export function GameShell() {
             className="inline-flex items-center gap-1.5 text-[rgb(var(--neon)/0.6)] hover:text-[rgb(var(--neon))] font-[var(--font-ocr)] text-xs transition-colors cursor-pointer"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Carrier Journal</span>
+            <span className="hidden sm:inline">Field Journal</span>
           </Link>
           <span className="text-[rgb(var(--neon)/0.15)] hidden sm:inline">
             │

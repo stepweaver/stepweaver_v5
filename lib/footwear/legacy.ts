@@ -9,7 +9,7 @@ export type TimelineEntry = {
 };
 
 export const LEGACY_PUBLIC_DISCLAIMER =
-  "The first pair inspired the Footwear Lab. Its mileage was already being captured through Carrier's Log, but standardized footwear checkpoints had not yet begun. The final portion of its lifecycle is documented prospectively. Earlier observations are retrospective and labeled accordingly.";
+  "Early pairs were logged before standardized shoe checkpoints existed. Mileage came from Field Journal walking days. Later checkpoints are documented prospectively; earlier notes may be retrospective and labeled accordingly.";
 
 export function labelCheckpointForTimeline(input: {
   isLegacyRecord: boolean;

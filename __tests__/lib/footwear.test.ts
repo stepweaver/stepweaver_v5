@@ -38,7 +38,6 @@ describe("footwear dates", () => {
 
   it("accepts MM/DD/YYYY on create shoe schema", () => {
     const parsed = createShoeSchema.safeParse({
-      logSecret: "test-secret",
       brand: "HOKA",
       model: "Bondi 9",
       size: "10.5",
@@ -295,7 +294,7 @@ describe("footwear stats", () => {
 
 describe("footwear legacy", () => {
   it("exposes public disclaimer copy", () => {
-    expect(LEGACY_PUBLIC_DISCLAIMER).toContain("Footwear Lab");
+    expect(LEGACY_PUBLIC_DISCLAIMER).toContain("Field Journal");
   });
 
   it("labels timeline entries correctly", () => {

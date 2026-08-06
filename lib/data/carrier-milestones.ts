@@ -63,16 +63,16 @@ export type CarrierRank = {
 // ---------------------------------------------------------------------------
 
 const LEVEL_THRESHOLDS: { miles: number; title: string; level: number }[] = [
-  { miles: 0,     title: "Recruit Walker",    level: 1 },
-  { miles: 25,    title: "First Loop",        level: 2 },
-  { miles: 50,    title: "Route Walker",      level: 3 },
-  { miles: 100,   title: "Foot Patrol",       level: 4 },
-  { miles: 250,   title: "Satchel Qualified", level: 5 },
-  { miles: 500,   title: "Mailwalker",        level: 6 },
-  { miles: 1000,  title: "Route Veteran",     level: 7 },
-  { miles: 2500,  title: "Relay Commander",   level: 8 },
-  { miles: 5000,  title: "Iron Route",        level: 9 },
-  { miles: 10000, title: "Carrier Legend",    level: 10 },
+  { miles: 0,     title: "Starting Miles",   level: 1 },
+  { miles: 25,    title: "First 25",         level: 2 },
+  { miles: 50,    title: "Steady Walker",    level: 3 },
+  { miles: 100,   title: "Road Legs",        level: 4 },
+  { miles: 250,   title: "Quarter Thousand", level: 5 },
+  { miles: 500,   title: "Half Thousand",    level: 6 },
+  { miles: 1000,  title: "Thousand Club",    level: 7 },
+  { miles: 2500,  title: "Long Haul",        level: 8 },
+  { miles: 5000,  title: "Iron Miles",       level: 9 },
+  { miles: 10000, title: "Ten Thousand",     level: 10 },
 ];
 
 // ---------------------------------------------------------------------------
@@ -311,7 +311,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "ten-logged-days",
       "10 Logged Days",
       "10 Days",
-      "Ten logged days. Route rhythm is starting to take shape.",
+      "Ten logged days. Walking rhythm is starting to take shape.",
       "days", "basic", "calendar",
       daysLogged, 10,
       dateAtNthMatch(sorted, () => true, 10),
@@ -354,9 +354,9 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     // --- Load ---
     milestone(
       "first-heavy-day",
-      "First Heavy DPS Day",
+      "First Heavy Load Day",
       "Heavy",
-      "First day above 115% of your DPS + parcel baseline.",
+      "First day above 115% of your personal workload baseline.",
       "load", "basic", "package",
       heavyMailDays.length, 1,
       heavyMailDays.length >= 1
@@ -448,9 +448,9 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     // --- Load ---
     milestone(
       "five-heavy-days",
-      "5 Heavy DPS Days",
+      "5 Heavy Load Days",
       "5 Heavy",
-      "Five days above 115% of recent DPS baseline.",
+      "Five days above 115% of recent personal workload baseline.",
       "load", "field", "package",
       heavyMailDays.length, 5,
       dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 5)
@@ -509,7 +509,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "two-fifty-miles",
       "250 Miles",
       "250 mi",
-      "Two hundred fifty miles of field work. Satchel-hardened.",
+      "Two hundred fifty miles of walking. Field-hardened.",
       "distance", "campaign", "map-pin",
       totalMiles, 250,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 250),
@@ -576,9 +576,9 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     // --- Load ---
     milestone(
       "ten-heavy-days",
-      "10 Heavy DPS Days",
+      "10 Heavy Load Days",
       "10 Heavy",
-      "Ten days above 115% of recent DPS baseline. Character built.",
+      "Ten days above 115% of recent personal workload baseline. Character built.",
       "load", "campaign", "package",
       heavyMailDays.length, 10,
       dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 10)
@@ -617,7 +617,7 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
       "thousand-miles",
       "1,000 Miles",
       "1K mi",
-      "One thousand miles on foot. Routebound.",
+      "One thousand miles on foot. Distance earned.",
       "distance", "veteran", "map-pin",
       totalMiles, 1000,
       dateAtCumulativeThreshold(sorted, (d) => d.milesWalked, 1000),
@@ -675,9 +675,9 @@ export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMile
     // --- Load ---
     milestone(
       "fifty-heavy-days",
-      "50 Heavy DPS Days",
+      "50 Heavy Load Days",
       "50 Heavy",
-      "Fifty days above 115% of recent DPS baseline. Field-hardened.",
+      "Fifty days above 115% of recent personal workload baseline. Field-hardened.",
       "load", "veteran", "package",
       heavyMailDays.length, 50,
       dateAtNthMatch(sorted, (d) => d.mailLoadTier === "heavy", 50)

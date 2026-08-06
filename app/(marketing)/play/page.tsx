@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export const metadata = {
   title: "Play",
-  description: "Playground lane: terminal, Carrier's Log, Meshtastic, and experiments. Personality without crowding the hiring path.",
+  description: "Playground lane: terminal, field journal, Meshtastic, and experiments. Personality without crowding the hiring path.",
 };
 
 const PLAY_ITEMS = [
@@ -13,8 +13,8 @@ const PLAY_ITEMS = [
   },
   {
     href: "/carrier-journal",
-    label: "Carrier's Log",
-    description: "Field journal with KPIs, milestones, and live operational thinking.",
+    label: "Field Journal",
+    description: "Personal walking and fitness log: miles, weather, recovery, milestones.",
   },
   {
     href: "/meshtastic",

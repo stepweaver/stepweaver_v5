@@ -107,41 +107,41 @@ describe("carrier's log totals", () => {
 });
 
 describe("getCarrierLevel", () => {
-  it("returns Recruit Walker at 0 miles", () => {
+  it("returns Starting Miles at 0 miles", () => {
     const level = getCarrierLevel([]);
-    expect(level.title).toBe("Recruit Walker");
+    expect(level.title).toBe("Starting Miles");
     expect(level.level).toBe(1);
   });
 
-  it("returns First Loop between 25 and 49 miles", () => {
+  it("returns First 25 between 25 and 49 miles", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 30 }),
     ]);
-    expect(level.title).toBe("First Loop");
+    expect(level.title).toBe("First 25");
     expect(level.level).toBe(2);
   });
 
-  it("returns Foot Patrol at exactly 100 miles", () => {
+  it("returns Road Legs at exactly 100 miles", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 100 }),
     ]);
-    expect(level.title).toBe("Foot Patrol");
+    expect(level.title).toBe("Road Legs");
     expect(level.level).toBe(4);
   });
 
-  it("returns Route Veteran at 1000+ miles with no next rank", () => {
+  it("returns Thousand Club at 1000+ miles with next rank", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 1200 }),
     ]);
-    expect(level.title).toBe("Route Veteran");
-    expect(level.nextTitle).toBe("Relay Commander");
+    expect(level.title).toBe("Thousand Club");
+    expect(level.nextTitle).toBe("Long Haul");
   });
 
-  it("returns Carrier Legend at max rank with no next rank", () => {
+  it("returns Ten Thousand at max rank with no next rank", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 10001 }),
     ]);
-    expect(level.title).toBe("Carrier Legend");
+    expect(level.title).toBe("Ten Thousand");
     expect(level.progressToNext).toBe(100);
     expect(level.nextTitle).toBeUndefined();
   });
@@ -150,8 +150,8 @@ describe("getCarrierLevel", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 37.5 }),
     ]);
-    // 37.5 miles → First Loop (25–50 range). Progress = (37.5-25)/(50-25)*100 = 50%
-    expect(level.title).toBe("First Loop");
+    // 37.5 miles → First 25 (25–50 range). Progress = (37.5-25)/(50-25)*100 = 50%
+    expect(level.title).toBe("First 25");
     expect(level.progressToNext).toBe(50);
   });
 });

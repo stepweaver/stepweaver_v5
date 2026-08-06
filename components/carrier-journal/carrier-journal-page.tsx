@@ -2,8 +2,6 @@ import Link from "next/link";
 import {
   CARRIER_KPI_EMPTY,
   enrichDispatchesFields,
-  getCarrierDispatches,
-  getCarrierKpis,
   computeTotalsFromDispatches,
   totalsToKpis,
   isDispatchFeedWorthy,
@@ -19,23 +17,23 @@ import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
 
 const TRACKING_ITEMS = [
   { category: "Physical load", detail: "Miles walked, soreness, energy, and mood" },
-  { category: "Hydration and fuel", detail: "Water, Gatorade, route snacks, hunger and thirst adjustments" },
+  { category: "Hydration and fuel", detail: "Water, snacks, hunger and thirst adjustments" },
   { category: "Transformation", detail: "Weekly weight trend: pounds lost, not raw weight" },
-  { category: "Environmental load", detail: "Heat index and weather derived from temp + field notes" },
-  { category: "Operational load", detail: "Mail load tier from DPS + parcels vs your baseline" },
-  { category: "Published narrative", detail: "Route-day reflections and field notes" },
+  { category: "Environmental load", detail: "Heat index and weather from temp + field notes" },
+  { category: "Workload feel", detail: "Personal light / medium / heavy relative to your own baseline" },
+  { category: "Published narrative", detail: "Day reflections that stay personal and non-operational" },
 ];
 
 const FIELD_METHOD_CARDS = [
   {
     label: "MOVEMENT LOAD",
     title: "Miles, not steps",
-    body: "Miles are the main movement signal because they map cleanly to route effort and are easier to compare across days.",
+    body: "Miles are the main movement signal because they map cleanly to effort and are easier to compare across days.",
   },
   {
     label: "FUEL + HYDRATION",
-    title: "Eat and drink by field demand",
-    body: "Food and water are adjusted around hunger, thirst, heat, soreness, and end-of-shift energy.",
+    title: "Eat and drink by demand",
+    body: "Food and water are adjusted around hunger, thirst, heat, soreness, and end-of-day energy.",
   },
   {
     label: "RECOVERY SIGNALS",
@@ -52,19 +50,19 @@ const FIELD_METHOD_CARDS = [
 const TRANSFORMATION_ARC = [
   {
     title: "Starting Point",
-    body: "Overweight, new to the job, and learning what a walking route actually costs. The first weeks are less about speed and more about showing up, finishing, and not pretending the body is already adapted.",
+    body: "Overweight and learning what long walking days actually cost. The first weeks are less about speed and more about showing up, finishing, and not pretending the body is already adapted.",
   },
   {
     title: "Break-In Period",
-    body: "Feet, hips, and hydration become the daily report card. Soreness is expected. Pacing beats panic. Heat days expose gaps fast, so water stops are not optional, and recovery starts the moment the satchel comes off.",
+    body: "Feet, hips, and hydration become the daily report card. Soreness is expected. Pacing beats panic. Heat days expose gaps fast, so water stops are not optional, and recovery starts the moment you get home.",
   },
   {
     title: "Adaptation",
-    body: "More miles feel less catastrophic. Recovery gets intentional. Route rhythm replaces constant guessing. The body is still changing, but the job stops feeling like a surprise attack every morning.",
+    body: "More miles feel less catastrophic. Recovery gets intentional. Rhythm replaces constant guessing. The body is still changing, but the day stops feeling like a surprise attack every morning.",
   },
   {
-    title: "Mailwalker Mode",
-    body: "A repeatable carrier body: systems for shoes, water, pacing, and post-route recovery. Field-tested. Confidence comes from repetition.",
+    title: "Long Walker Mode",
+    body: "A repeatable walking body: systems for shoes, water, pacing, and post-day recovery. Confidence comes from repetition.",
   },
 ];
 
@@ -79,42 +77,42 @@ const LESSONS = [
   },
   {
     title: "Pace beats panic",
-    body: "Rushing early costs you late. A steady walk with fewer stops often beats a frantic sprint that leaves you gassed on the last loop.",
+    body: "Rushing early costs you late. A steady walk with fewer stops often beats a frantic sprint that leaves you gassed at the end.",
   },
   {
-    title: "Recovery is part of the route",
-    body: "Stretching, sleep, food, and water after the shift are not extras. They are how you get back out there tomorrow.",
+    title: "Recovery is part of the day",
+    body: "Stretching, sleep, food, and water after you finish are not extras. They are how you get back out there tomorrow.",
   },
   {
-    title: "Weather changes the job",
-    body: "Rain, heat, and wind alter grip, gear, and energy. Same route, different demands, so plan for the day you actually have.",
+    title: "Weather changes everything",
+    body: "Rain, heat, and wind alter grip, gear, and energy. Same distance, different demands — plan for the day you actually have.",
   },
   {
-    title: "The satchel teaches posture",
-    body: "Bag position and stride matter. Small adjustments early prevent the kind of soreness that follows you home for a week.",
+    title: "Load and posture matter",
+    body: "How you carry weight and how you stride matter. Small adjustments early prevent the kind of soreness that follows you home for a week.",
   },
 ];
 
 const WHY_THIS_BELONGS = [
   "Low-friction field data capture: if logging takes more than 90 seconds, it will not get used consistently",
-  "Public/private data boundary: KPIs and narrative are shareable; everything operational stays private",
-  "KPI design around real behavior: these metrics emerged from the job, not from a dashboard template",
-  "Narrative reporting from operational data: aggregate numbers are one story; individual dispatches are another",
-  "Mobile-first UX constraint: the logging tool lives on a phone and must work before your legs give out",
+  "Public/private data boundary: KPIs and narrative are shareable; operational details stay private",
+  "KPI design around real behavior: these metrics emerged from physically demanding days, not a dashboard template",
+  "Narrative reporting from personal data: aggregate numbers are one story; individual entries are another",
+  "Mobile-first UX constraint: the logging tool lives on a phone and must work when you are tired",
 ];
 
 const SECTION_NAV = [
   { id: "aggregate-kpis", label: "AGGREGATE KPIs" },
   { id: "field-calendar", label: "FIELD CALENDAR" },
-  { id: "field-qualifications", label: "FIELD QUALIFICATIONS" },
+  { id: "field-qualifications", label: "MILESTONES" },
   { id: "field-method", label: "FIELD METHOD" },
-  { id: "field-dispatches", label: "FIELD DISPATCHES" },
+  { id: "field-dispatches", label: "FIELD NOTES" },
 ] as const;
 
-function CarrierSectionNav() {
+function FieldSectionNav() {
   return (
     <nav
-      aria-label="Carrier's Log sections"
+      aria-label="Field Journal sections"
       className="carrier-section-nav sticky top-14 z-20 -mx-1 px-1 py-2 border-b border-[rgb(var(--neon)/0.12)] bg-[rgb(var(--bg)/0.92)] backdrop-blur-sm [@media(max-height:32rem)]:static"
     >
       <ul className="flex flex-wrap gap-x-1 gap-y-2 sm:gap-x-2 overflow-x-auto">
@@ -142,32 +140,27 @@ export function CarrierJournalPage({
   dispatches: notionDispatches,
   footwearActive = null,
 }: Props = {}) {
-  // All published rows feed aggregates (KPIs, calendar, milestones).
-  // Only rows with authored content appear in the feed.
-  const dispatches = enrichDispatchesFields(notionDispatches ?? getCarrierDispatches());
+  // Fail closed: empty Notion must not fall back to seed/demo narratives.
+  const dispatches = enrichDispatchesFields(notionDispatches ?? []);
   const feedDispatches = dispatches.filter(isDispatchFeedWorthy);
   const totals = computeTotalsFromDispatches(dispatches);
-  const kpis =
-    notionDispatches && notionDispatches.length > 0
-      ? totalsToKpis(totals)
-      : getCarrierKpis();
+  const kpis = totalsToKpis(totals);
 
   return (
     <div className="min-h-screen pt-20 pb-16">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-
-        {/* Hero */}
         <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
           <div className="flex-1 min-w-0">
             <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
-              CARRIER&apos;S LOG // MAILWALKER
+              FIELD JOURNAL // THE LONG WALK
             </div>
             <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))] mb-4">
-              Carrier&apos;s Log
+              Field Journal
             </h1>
             <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
-              A personal field log from starting overweight and learning life as a city letter carrier:
-              miles, hydration, soreness, weight lost, and the operational lessons hiding inside a walking route.
+              A personal walking and fitness journal: miles, hydration, soreness, weather, weight
+              lost, and what it takes to adapt to long walking days. Written off the clock from Apple
+              Health and private notes — not an employer log.
             </p>
           </div>
           <div className="lg:shrink-0">
@@ -175,17 +168,16 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        <CarrierSectionNav />
+        <FieldSectionNav />
 
-        {/* Disclaimer */}
         <div className="surface-panel p-5 sm:p-6 border-[rgb(var(--border)/0.3)]">
           <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] mb-2">
-            NOTICE // UNOFFICIAL PERSONAL LOG
+            NOTICE // PERSONAL FITNESS LOG
           </div>
           <p className="text-xs text-[rgb(var(--text-meta))] leading-relaxed">
-            Carrier&apos;s Log is an unofficial personal field log. Not affiliated with, endorsed by, or representative
-            of the United States Postal Service or any other organization. This log does not include addresses, customer
-            names, coworker names, route numbers, scanner data, or internal USPS operational details.
+            This is an unofficial personal walking and fitness journal. It is not affiliated with,
+            endorsed by, or representative of any employer. Public entries omit workplace identity,
+            operational details, customer or coworker stories, and product-testing solicitation.
           </p>
         </div>
 
@@ -195,22 +187,22 @@ export function CarrierJournalPage({
           <div className="border border-[rgb(var(--neon)/0.2)] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-1">
-                FOOTWEAR LAB
+                SHOE LEDGER
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Equipment roster for route footwear: mileage, checkpoints, condition.
+                Personal equipment tracking for shoes you own: mileage and condition — not a review
+                service.
               </p>
             </div>
             <Link
               href="/carrier-journal/footwear"
               className="inline-flex shrink-0 border border-[rgb(var(--neon)/0.4)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)]"
             >
-              ENTER FOOTWEAR LAB
+              OPEN LEDGER
             </Link>
           </div>
         )}
 
-        {/* KPI Grid */}
         <div id="aggregate-kpis" className="scroll-mt-28">
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
             AGGREGATE KPIs
@@ -222,17 +214,14 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        {/* Field Calendar: logged days derived from dispatch data, no schedule claims */}
         <div id="field-calendar" className="scroll-mt-28">
           <CarrierFieldCalendar dispatches={dispatches} />
         </div>
 
-        {/* Field Badges: cumulative milestones computed from dispatch data */}
         <div id="field-qualifications" className="scroll-mt-28">
           <CarrierMilestonePanel dispatches={dispatches} />
         </div>
 
-        {/* Field Method */}
         <div id="field-method" className="surface-panel p-6 sm:p-8 scroll-mt-28">
           <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--neon))] mb-2">
             FIELD METHOD
@@ -242,28 +231,29 @@ export function CarrierJournalPage({
           </h2>
           <div className="space-y-4 text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-6">
             <p>
-              Carrier&apos;s Log is a personal field record.
-              The method is simple: log the work, watch the patterns, and adjust the levers that appear to matter.
+              Field Journal is a personal fitness record. The method is simple: log the day, watch
+              the patterns, and adjust the levers that appear to matter.
             </p>
             <p>
-              I am tracking miles, hydration, weather, heat index, mail-load, soreness, energy, mood, recovery
-              notes, and weekly weight trend. The point is to document what the work costs, what helps, and what
-              doesn&apos;t.
+              I track miles, hydration, weather, heat index, how hard the day felt relative to my
+              own baseline, soreness, energy, mood, recovery notes, and weekly weight trend. The
+              point is to document what long walking days cost, what helps, and what doesn&apos;t.
             </p>
             <p>
-              I am not weighing myself every day. Weight is a weekly trend marker. The
-              day-to-day signals are simpler: how far I walked, how much water I needed, how sore I felt, how much
-              energy I had left, and whether recovery helped me show up again.
+              I am not weighing myself every day. Weight is a weekly trend marker. The day-to-day
+              signals are simpler: how far I walked, how much water I needed, how sore I felt, how
+              much energy I had left, and whether recovery helped me show up again.
             </p>
             <p>
-              I am also not running a strict diet. I am letting the work create the signal. I eat when I&apos;m hungry
-              and drink when I&apos;m thirsty, then I adjust based on what the route teaches me. As the miles increased,
-              the food changed naturally: more trail mix, nuts, bananas, Gatorade, water, and a daily multivitamin.
-              The goal is not perfection. The goal is enough fuel, enough hydration, and enough recovery to keep adapting.
+              I am also not running a strict diet. I eat when I&apos;m hungry and drink when I&apos;m
+              thirsty, then I adjust based on what the miles teach me. As distance increased, the
+              food changed naturally: more trail mix, nuts, bananas, Gatorade, water, and a daily
+              multivitamin. The goal is not perfection — enough fuel, hydration, and recovery to keep
+              adapting.
             </p>
             <p>
-              Mountain Dew remains part of the story. I still drink it, because I love it, but I keep it at home after
-              shift instead of treating it like route fuel.
+              Mountain Dew remains part of the story. I still drink it because I love it, but I keep
+              it at home after the day instead of treating it like walking fuel.
             </p>
           </div>
 
@@ -275,9 +265,9 @@ export function CarrierJournalPage({
           </div>
 
           <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-6">
-            If weight drops, soreness changes, endurance improves, heat tolerance improves, or energy stabilizes, I will
-            pull harder on the levers that seem to be working. If something creates problems, I will back off. The system
-            is organic, but it is still documented.
+            If weight drops, soreness changes, endurance improves, heat tolerance improves, or energy
+            stabilizes, I pull harder on the levers that seem to be working. If something creates
+            problems, I back off. The system is organic, but it is still documented.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
@@ -295,17 +285,20 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        {/* Field Dispatches: only entries with authored content */}
         <div id="field-dispatches" className="scroll-mt-28">
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
-            FIELD DISPATCHES
+            FIELD NOTES
           </div>
           {feedDispatches.length > 0 ? (
             <CarrierDispatchFeed dispatches={feedDispatches} />
-          ) : null}
+          ) : (
+            <p className="text-sm text-[rgb(var(--text-secondary))]">
+              No published notes yet. New daybook saves stay private drafts until you intentionally
+              publish a sanitized public note.
+            </p>
+          )}
         </div>
 
-        {/* Transformation Arc */}
         <div>
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
             TRANSFORMATION ARC
@@ -322,7 +315,6 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        {/* Hydration Discipline */}
         <div className="surface-panel p-6 sm:p-8">
           <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--neon))] mb-4">
             HYDRATION DISCIPLINE
@@ -343,20 +335,19 @@ export function CarrierJournalPage({
           </div>
           <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-3">
             Hydration is tracked as a safety and performance signal. I am not trying to win a
-            water-drinking contest. I am learning how much fluid the work actually demands, especially when heat index,
-            mail load, and walking distance stack together.
+            water-drinking contest. I am learning how much fluid long walking days actually demand,
+            especially when heat index and distance stack together.
           </p>
           <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed mb-3">
-            On hotter days, thirst arrives late. If water intake is falling behind, energy drops, soreness climbs, and
-            decision-making gets worse near the end of the route. That makes hydration an operational risk.
+            On hotter days, thirst arrives late. If water intake is falling behind, energy drops,
+            soreness climbs, and decision-making gets worse near the end of the day.
           </p>
           <p className="text-xs text-[rgb(var(--warn))] font-[var(--font-ocr)] tracking-wide border border-[rgb(var(--warn)/0.3)] px-3 py-2">
-            HEAT-DAY NOTE: If the heat index is climbing and water intake is below goal by mid-route, treat it as an
-            operational risk. Slow down, drink, and adjust expectations for the rest of the shift.
+            HEAT-DAY NOTE: If the heat index is climbing and water intake is below goal by midday,
+            slow down, drink, and adjust expectations for the rest of the day.
           </p>
         </div>
 
-        {/* What I'm Tracking */}
         <div className="surface-panel p-6 sm:p-8">
           <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--neon))] mb-4">
             WHAT I AM TRACKING
@@ -376,10 +367,9 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        {/* Lessons for Future Carriers */}
         <div>
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
-            LESSONS FOR FUTURE CARRIERS
+            LESSONS FROM THE MILES
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
             {LESSONS.map((lesson) => (
@@ -393,84 +383,6 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        {/* Mail Sort Academy Promo */}
-        <div className="relative border border-[rgb(var(--neon)/0.35)] bg-[rgb(var(--panel))] overflow-hidden">
-          {/* Corner accent */}
-          <div className="absolute top-0 right-0 w-16 h-16 border-b border-l border-[rgb(var(--neon)/0.25)]" />
-
-          <div className="p-6 sm:p-8">
-            <div className="flex flex-col sm:flex-row sm:items-start gap-6">
-              <div className="flex-1 space-y-4">
-                <div>
-                  <div className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))] mb-2">
-                    TRAINING MODULE // ACTIVE
-                  </div>
-                  <h2 className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--neon))] mb-2">
-                    Mail Sort Academy
-                  </h2>
-                  <p className="text-sm text-[rgb(var(--text-secondary))] leading-relaxed max-w-lg">
-                    An unofficial study game built from inside the job. Practice mail classification, UBBM
-                    decisions, carrier endorsements, and accountable handling. The real decisions you face
-                    every dispatch, turned into a scored drill.
-                  </p>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
-                  {[
-                    { tag: "MODE-01", label: "Class Sort", note: "Rookie friendly" },
-                    { tag: "MODE-02", label: "UBBM or Not", note: "Regular carrier" },
-                    { tag: "MODE-03", label: "Endorsement Drill", note: "Regular carrier" },
-                    { tag: "MODE-04", label: "Accountable Chain", note: "Inspection level" },
-                    { tag: "MODE-05", label: "Route Case Simulation", note: "Mixed difficulty" },
-                  ].map((m) => (
-                    <div key={m.tag} className="flex items-baseline gap-2">
-                      <span className="font-[var(--font-ocr)] text-[9px] text-[rgb(var(--neon)/0.4)] shrink-0">
-                        {m.tag}
-                      </span>
-                      <span className="text-xs text-[rgb(var(--text-color))]">{m.label}</span>
-                      <span className="text-[10px] text-[rgb(var(--text-meta))] ml-auto hidden sm:block">
-                        {m.note}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="pt-2">
-                  <Link
-                    href="/mail-sort-academy"
-                    className="glitch-button glitch-button--primary inline-flex items-center gap-2"
-                  >
-                    Launch Training
-                    <span className="font-[var(--font-ocr)] text-[10px] tracking-widest opacity-70">▶</span>
-                  </Link>
-                </div>
-              </div>
-
-              {/* Right badge column */}
-              <div className="sm:shrink-0 flex sm:flex-col gap-3 sm:gap-2 flex-wrap">
-                {[
-                  { value: "5", label: "TRAINING MODES" },
-                  { value: "7", label: "STUDY RULES" },
-                  { value: "∞", label: "SCORED DRILLS" },
-                ].map((stat) => (
-                  <div
-                    key={stat.label}
-                    className="border border-[rgb(var(--neon)/0.2)] px-4 py-3 text-center min-w-[90px]"
-                  >
-                    <div className="font-[var(--font-ibm)] text-2xl text-[rgb(var(--neon))]">
-                      {stat.value}
-                    </div>
-                    <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))] mt-0.5">
-                      {stat.label}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Why This Belongs Here */}
         <div className="surface-panel p-6 sm:p-8">
           <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--neon))] mb-2">
             OPERATOR REFLECTION
@@ -479,8 +391,9 @@ export function CarrierJournalPage({
             Why this belongs on a developer portfolio
           </h2>
           <p className="text-[rgb(var(--text-secondary))] text-sm mb-5 max-w-3xl leading-relaxed">
-            This is not just route notes. It is a live business-systems artifact: a data pipeline from physical experience
-            to public KPIs, constrained by real-world conditions and a strict public/private boundary.
+            This is not just fitness notes. It is a live systems artifact: a data pipeline from
+            physical experience to public KPIs, constrained by real-world conditions and a hard
+            public/private boundary.
           </p>
           <div className="space-y-3">
             {WHY_THIS_BELONGS.map((item, i) => (
@@ -493,12 +406,25 @@ export function CarrierJournalPage({
             ))}
           </div>
 
-          {/* Evidence strip */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)] mt-8">
             {[
-              { signal: "Static → Notion", title: "Evolving data source", explanation: "Phase 1 is static; Phase 2 wires to a private Notion database with a public filter" },
-              { signal: "Public / Private", title: "Hard data boundary", explanation: "Only published entries and aggregate KPIs appear here; private notes never leave the logging tool" },
-              { signal: "Field-first UX", title: "Mobile constraint", explanation: "The logging tool runs on a phone mid-route; friction is the enemy" },
+              {
+                signal: "Draft → Publish",
+                title: "Intentional release",
+                explanation:
+                  "Daybook saves default to private draft; only sanitized public notes reach this page",
+              },
+              {
+                signal: "Public / Private",
+                title: "Hard data boundary",
+                explanation:
+                  "Only published entries and aggregate KPIs appear here; private notes never leave the logging tool",
+              },
+              {
+                signal: "Field-first UX",
+                title: "Mobile constraint",
+                explanation: "The logging tool runs on a phone when you are tired; friction is the enemy",
+              },
             ].map((s) => (
               <div key={s.title} className="bg-[rgb(var(--panel))] p-5">
                 <div className="text-[rgb(var(--neon))] font-[var(--font-ibm)] text-base mb-1">{s.signal}</div>
@@ -509,7 +435,6 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        {/* CTA */}
         <div className="surface-panel p-6 sm:p-8 text-center">
           <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--text-label))] mb-3">
             CONTINUE EXPLORING
@@ -518,12 +443,9 @@ export function CarrierJournalPage({
             More systems. More artifacts.
           </h2>
           <p className="text-[rgb(var(--text-secondary))] text-sm mb-6 max-w-xl mx-auto">
-            Carrier&apos;s Log is one proof of the approach. The project catalog and codex have the rest.
+            Field Journal is one proof of the approach. The project catalog and codex have the rest.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/mail-sort-academy" className="glitch-button glitch-button--primary">
-              Mail Sort Academy
-            </Link>
             <Link href="/work" className="glitch-button">
               View Projects
             </Link>
@@ -536,17 +458,15 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        {/* private access - not the security mechanism */}
         <div className="text-center py-2">
           <Link
             href="/log"
-            aria-label="Carrier daybook"
+            aria-label="Field daybook"
             className="text-[rgb(var(--text-meta)/0.18)] hover:text-[rgb(var(--text-meta)/0.45)] text-[10px] font-[var(--font-ocr)] tracking-widest transition-colors"
           >
             λ
           </Link>
         </div>
-
       </div>
     </div>
   );

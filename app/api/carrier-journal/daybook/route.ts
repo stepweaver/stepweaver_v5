@@ -3,8 +3,12 @@ import {
   isCarrierJournalLogEnabled,
   previewCarrierDaybookLoad,
   upsertCarrierDaybook,
-  verifyCarrierLogSecret,
 } from "@/lib/notion/carrier-journal.repo";
+import {
+  applyNoStoreHeaders,
+  isCarrierSessionRequest,
+  isSameOriginRequest,
+} from "@/lib/carrier-journal/auth";
 import {
   carrierDaybookPreviewSchema,
   carrierDaybookSchema,
@@ -17,20 +21,23 @@ import { isFootwearDbConfigured } from "@/lib/db";
 import { replaceWorkAllocationsForDate } from "@/lib/footwear/queries";
 
 function unauthorized() {
-  return NextResponse.json(
-    {
-      error: "403 // YOU SHALL NOT PASS",
-      message:
-        "Nice try, route goblin. No token. No entry. No DPS glory.",
-    },
-    { status: 401 }
+  return applyNoStoreHeaders(
+    NextResponse.json(
+      {
+        error: "403 // YOU SHALL NOT PASS",
+        message: "Nice try, route goblin. No token. No entry. No DPS glory.",
+      },
+      { status: 401 },
+    ),
   );
 }
 
 function unavailable() {
-  return NextResponse.json(
-    { error: "Carrier daybook API is not configured" },
-    { status: 503 }
+  return applyNoStoreHeaders(
+    NextResponse.json(
+      { error: "Carrier daybook API is not configured" },
+      { status: 503 },
+    ),
   );
 }
 
@@ -42,28 +49,38 @@ function notionErrorMessage(err: unknown): string {
   return err instanceof Error ? err.message : "Failed to save carrier daybook entry";
 }
 
-export async function POST(request: NextRequest) {
-  if (!isCarrierJournalLogEnabled()) {
-    return unavailable();
+function gate(request: NextRequest): NextResponse | null {
+  if (!isCarrierJournalLogEnabled()) return unavailable();
+  if (!isSameOriginRequest(request)) {
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: "Request rejected." }, { status: 403 }),
+    );
   }
+  if (!isCarrierSessionRequest(request)) return unauthorized();
+  return null;
+}
+
+export async function POST(request: NextRequest) {
+  const blocked = gate(request);
+  if (blocked) return blocked;
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: "Invalid JSON" }, { status: 400 }),
+    );
   }
 
   const parsed = carrierDaybookSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Validation failed", details: parsed.error.flatten() },
-      { status: 400 }
+    return applyNoStoreHeaders(
+      NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 },
+      ),
     );
-  }
-
-  if (!verifyCarrierLogSecret(parsed.data.logSecret)) {
-    return unauthorized();
   }
 
   const allocations = parsed.data.footwearAllocations;
@@ -74,7 +91,9 @@ export async function POST(request: NextRequest) {
       allocations,
     });
     if (!split.ok) {
-      return NextResponse.json({ error: split.error }, { status: 400 });
+      return applyNoStoreHeaders(
+        NextResponse.json({ error: split.error }, { status: 400 }),
+      );
     }
   }
 
@@ -116,50 +135,54 @@ export async function POST(request: NextRequest) {
 
     const fuelScore = parsed.data.fuel ? computeFuelScore(parsed.data.fuel) : null;
 
-    return NextResponse.json({
-      ok: true,
-      pageId,
-      dpsPerMile,
-      publicSummary,
-      mailLoadSummary: formatPublicMailLoadLine({
-        tier: mailLoad.tier,
-        compositeRatio: mailLoad.compositeRatio,
+    return applyNoStoreHeaders(
+      NextResponse.json({
+        ok: true,
+        pageId,
+        dpsPerMile,
+        publicSummary,
+        published: Boolean(parsed.data.published),
+        mailLoadSummary: formatPublicMailLoadLine({
+          tier: mailLoad.tier,
+          compositeRatio: mailLoad.compositeRatio,
+        }),
+        mailLoad,
+        ...(footwearWarning && { footwearWarning }),
+        ...(fuelScore && {
+          fuelScore: fuelScore.score,
+          fuelScoreLabel: formatFuelScore(fuelScore.score),
+          fuelIsWin: fuelScore.isWin,
+        }),
       }),
-      mailLoad,
-      ...(footwearWarning && { footwearWarning }),
-      ...(fuelScore && {
-        fuelScore: fuelScore.score,
-        fuelScoreLabel: formatFuelScore(fuelScore.score),
-        fuelIsWin: fuelScore.isWin,
-      }),
-    });
+    );
   } catch (err) {
-    return NextResponse.json({ error: notionErrorMessage(err) }, { status: 500 });
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: notionErrorMessage(err) }, { status: 500 }),
+    );
   }
 }
 
 export async function PUT(request: NextRequest) {
-  if (!isCarrierJournalLogEnabled()) {
-    return unavailable();
-  }
+  const blocked = gate(request);
+  if (blocked) return blocked;
 
   let body: unknown;
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: "Invalid JSON" }, { status: 400 }),
+    );
   }
 
   const parsed = carrierDaybookPreviewSchema.safeParse(body);
   if (!parsed.success) {
-    return NextResponse.json(
-      { error: "Validation failed", details: parsed.error.flatten() },
-      { status: 400 }
+    return applyNoStoreHeaders(
+      NextResponse.json(
+        { error: "Validation failed", details: parsed.error.flatten() },
+        { status: 400 },
+      ),
     );
-  }
-
-  if (!verifyCarrierLogSecret(parsed.data.logSecret)) {
-    return unauthorized();
   }
 
   try {
@@ -169,14 +192,18 @@ export async function PUT(request: NextRequest) {
       parcels: parsed.data.parcels,
     });
 
-    return NextResponse.json({
-      mailLoadSummary: formatPublicMailLoadLine({
-        tier: mailLoad.tier,
-        compositeRatio: mailLoad.compositeRatio,
+    return applyNoStoreHeaders(
+      NextResponse.json({
+        mailLoadSummary: formatPublicMailLoadLine({
+          tier: mailLoad.tier,
+          compositeRatio: mailLoad.compositeRatio,
+        }),
+        mailLoad,
       }),
-      mailLoad,
-    });
+    );
   } catch (err) {
-    return NextResponse.json({ error: notionErrorMessage(err) }, { status: 500 });
+    return applyNoStoreHeaders(
+      NextResponse.json({ error: notionErrorMessage(err) }, { status: 500 }),
+    );
   }
 }

@@ -481,9 +481,9 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
   const weightTrend = formatPublicWeightTrend(t);
 
   const kpis: CarrierKpi[] = [
-    { label: "Days Logged", value: String(t.daysLogged), detail: "Active field days" },
+    { label: "Days Logged", value: String(t.daysLogged), detail: "Active walking days" },
     { label: "Total Miles", value: `${t.totalMiles} mi`, detail: "Cumulative walking distance" },
-    { label: "Avg Miles / Day", value: `${t.avgMilesPerDay} mi`, detail: "Per logged shift" },
+    { label: "Avg Miles / Day", value: `${t.avgMilesPerDay} mi`, detail: "Per logged day" },
     {
       label: "Avg Water / Day",
       value: t.avgWaterOz > 0 ? `${t.avgWaterOz} oz` : CARRIER_KPI_EMPTY,
@@ -499,71 +499,23 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
       value: weightTrend.value,
       detail: weightTrend.detail,
     },
-    { label: "Heat Days", value: String(t.heatDays), detail: "Shift peak heat index ≥ 90°F" },
+    { label: "Heat Days", value: String(t.heatDays), detail: "Peak heat index ≥ 90°F" },
     {
       label: "Weather Days",
       value: String(t.weatherDays),
       detail: "Rain, storm, or snow (from temp + notes)",
     },
     {
-      label: "Heavy Mail Days",
+      label: "Heavy Days",
       value: String(t.heavyMailDays),
-      detail: "DPS + parcels above 115% of your baseline",
+      detail: "Days above 115% of your personal workload baseline",
     },
     { label: "Avg Soreness", value: `${t.avgSoreness} / 10`, detail: "Physical load marker" },
-    { label: "Avg Energy", value: `${t.avgEnergy} / 10`, detail: "Self-reported end-of-shift" },
+    { label: "Avg Energy", value: `${t.avgEnergy} / 10`, detail: "Self-reported end-of-day" },
     { label: "Avg Mood", value: `${t.avgMood} / 10`, detail: "Morale signal" },
   ];
 
-  if (t.avgDpsCount !== undefined) {
-    kpis.push(
-      {
-        label: "Avg DPS Count",
-        value: t.avgDpsCount.toLocaleString("en-US"),
-        detail: "Average logged DPS pieces per day",
-      },
-      {
-        label: "Median DPS Count",
-        value:
-          t.medianDpsCount !== undefined
-            ? t.medianDpsCount.toLocaleString("en-US")
-            : CARRIER_KPI_EMPTY,
-        detail: "Middle value across logged DPS days",
-      },
-      {
-        label: "Highest DPS Count",
-        value: (t.highestDpsCount ?? CARRIER_KPI_EMPTY).toLocaleString("en-US"),
-        detail: "Peak logged DPS day",
-      },
-      {
-        label: "Heavy DPS Days",
-        value: String(t.heavyDaysCount ?? 0),
-        detail: "Days above 115% of recent baseline",
-      },
-      {
-        label: "Very Heavy DPS Days",
-        value: String(t.veryHeavyDaysCount ?? 0),
-        detail: "Days above 140% of recent baseline",
-      },
-      {
-        label: "Latest DPS Ratio",
-        value:
-          t.latestDpsRatio != null
-            ? `${Math.round(t.latestDpsRatio * 100)}%`
-            : CARRIER_KPI_EMPTY,
-        detail: "Most recent day vs recent baseline",
-      }
-    );
-
-    if (t.latestDpsPerMile !== undefined) {
-      kpis.push({
-        label: "Latest DPS / Mile",
-        value: String(t.latestDpsPerMile),
-        detail: "DPS count divided by miles walked",
-      });
-    }
-  }
-
+  // Raw DPS / mail-volume figures stay private — not shown on the public journal.
   return kpis;
 }
 

@@ -102,7 +102,7 @@ export function CarrierDispatchFeed({ dispatches }: Props) {
             );
           })}
           <span className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta)/0.6)] ml-1">
-            VS YOUR DPS + PARCEL BASELINE
+            VS YOUR PERSONAL BASELINE
           </span>
         </div>
 
