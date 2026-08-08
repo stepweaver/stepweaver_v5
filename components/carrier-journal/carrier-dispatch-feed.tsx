@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import type { PublicFieldDispatch } from "@/lib/data/carrier-journal";
 import { deriveWeatherSignals } from "@/lib/carrier-journal/weather-signals";
 import { CarrierDispatchCard } from "./carrier-dispatch-card";
 
@@ -15,7 +15,7 @@ const WEATHER_OPTIONS: { key: WeatherFilter; label: string }[] = [
 ];
 
 type Props = {
-  dispatches: CarrierDispatch[];
+  dispatches: PublicFieldDispatch[];
 };
 
 export function CarrierDispatchFeed({ dispatches }: Props) {

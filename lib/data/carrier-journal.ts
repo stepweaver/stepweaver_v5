@@ -1,4 +1,4 @@
-/** Letter carrier field log data. No addresses, route numbers, coworker/customer names, scanner data, or official mail volume. */
+/** Field Journal personal fitness data. Operational volume and raw biometrics stay private. */
 
 import {
   classifyDpsForEntry,
@@ -28,13 +28,39 @@ export type CarrierPhase = "break-in" | "adapting" | "building" | "regular";
 /** Private sentiment toward a worked route. Never rendered in public display. */
 export type RoutePreference = "prefer" | "like" | "dislike";
 
-export type CarrierDispatch = {
+/**
+ * Keys that must never cross the RSC → client boundary on the public Field Journal.
+ * Used by toPublicFieldDispatch and regression tests.
+ */
+export const PRIVATE_FIELD_DISPATCH_KEYS = [
+  "weightLbs",
+  "weightPublicMode",
+  "dpsCount",
+  "dpsRatio",
+  "parcels",
+  "parcelRatio",
+  "mailDayContext",
+  "mailLoad",
+  "mailLoadTier",
+  "mailLoadCompositeRatio",
+  "routeCode",
+  "routePreference",
+  "steps",
+  "bodyNote",
+  "recoveryNote",
+  "phase",
+  "tags",
+  "goodSamaritanAct",
+] as const;
+
+export type PrivateFieldDispatchKey = (typeof PRIVATE_FIELD_DISPATCH_KEYS)[number];
+
+/** Public fitness projection safe to serialize into client components. */
+export type PublicFieldDispatch = {
   id: string;
   date: string;
   title: string;
   milesWalked: number;
-  /** Steps are logged internally but not surfaced in public UI or KPIs. */
-  steps?: number;
   soreness: number; // 1–10
   energy: number; // 1–10
   mood: number; // 1–10
@@ -47,22 +73,27 @@ export type CarrierDispatch = {
   avgHeatIndexF?: number;
   /** Precipitation inches during shift window (informational; does not set rain flag). */
   precipitationIn?: number;
-  /** @deprecated Legacy seed mail-load only; no longer stored in Notion. */
-  mailLoad?: MailLoad;
   heatDay?: boolean;
-  /** Manual checkbox: got rained on during the route. */
+  /** Manual checkbox: got rained on during the walking day. */
   rain?: boolean;
   storm?: boolean;
   snow?: boolean;
   dogEncounter?: boolean;
   /**
-   * Manual incident only: stepped in dog poop on this route.
+   * Manual incident only: stepped in dog poop on this day.
    * Leave unset/false on clean days — clean-streak badges count logged days without this flag.
    */
   steppedInDogPoop?: boolean;
   publicNote: string;
   waterOz?: number;
   hydrationGoalOz?: number;
+};
+
+export type CarrierDispatch = PublicFieldDispatch & {
+  /** Steps are logged internally but not surfaced in public UI or KPIs. */
+  steps?: number;
+  /** @deprecated Legacy internal mail-load label; not stored for public reads. */
+  mailLoad?: MailLoad;
   weightLbs?: number;
   weightPublicMode?: WeightPublicMode;
   bodyNote?: string;
@@ -72,25 +103,67 @@ export type CarrierDispatch = {
   tags?: string[];
   /** Optional flag for a Good Samaritan act logged during the dispatch. */
   goodSamaritanAct?: boolean;
-  /** Compact route identifier, e.g. "SB-013" or "CW-015". Shown as a bare code, no label. */
+  /** Compact route identifier. Private — never sent to public clients. */
   routeCode?: string;
   /** Private sentiment toward this route. Never rendered in public-facing UI. */
   routePreference?: RoutePreference;
-  /** Manually entered DPS piece count for the day. */
+  /** Manually entered DPS piece count for the day. Private. */
   dpsCount?: number;
-  /** App-calculated ratio vs recent DPS baseline. Never manually entered. */
+  /** App-calculated ratio vs recent DPS baseline. Private. */
   dpsRatio?: number;
-  /** Manually entered parcel count for the day. */
+  /** Manually entered parcel count for the day. Private. */
   parcels?: number;
-  /** App-calculated ratio vs recent parcel baseline. */
+  /** App-calculated ratio vs recent parcel baseline. Private. */
   parcelRatio?: number;
-  /** Computed from DPS + parcel volume vs personal baseline. */
+  /** Computed from DPS + parcel volume vs personal baseline. Private. */
   mailLoadTier?: MailLoadTier;
-  /** Blended DPS/parcel ratio used for mailLoadTier. */
+  /** Blended DPS/parcel ratio used for mailLoadTier. Private. */
   mailLoadCompositeRatio?: number;
-  /** Optional tags explaining why a day felt heavier or lighter. */
+  /** Optional tags explaining why a day felt heavier or lighter. Private. */
   mailDayContext?: string[];
 };
+
+/**
+ * Allowlist projection: only expressly public fitness fields survive.
+ * Call this before any Field Journal payload reaches a client component.
+ */
+export function toPublicFieldDispatch(dispatch: CarrierDispatch): PublicFieldDispatch {
+  return {
+    id: dispatch.id,
+    date: dispatch.date,
+    title: dispatch.title,
+    milesWalked: dispatch.milesWalked,
+    soreness: dispatch.soreness,
+    energy: dispatch.energy,
+    mood: dispatch.mood,
+    ...(dispatch.weather !== undefined && { weather: dispatch.weather }),
+    ...(dispatch.temperatureF !== undefined && { temperatureF: dispatch.temperatureF }),
+    ...(dispatch.heatIndexF !== undefined && { heatIndexF: dispatch.heatIndexF }),
+    ...(dispatch.avgHeatIndexF !== undefined && { avgHeatIndexF: dispatch.avgHeatIndexF }),
+    ...(dispatch.precipitationIn !== undefined && {
+      precipitationIn: dispatch.precipitationIn,
+    }),
+    ...(dispatch.heatDay !== undefined && { heatDay: dispatch.heatDay }),
+    ...(dispatch.rain !== undefined && { rain: dispatch.rain }),
+    ...(dispatch.storm !== undefined && { storm: dispatch.storm }),
+    ...(dispatch.snow !== undefined && { snow: dispatch.snow }),
+    ...(dispatch.dogEncounter !== undefined && { dogEncounter: dispatch.dogEncounter }),
+    ...(dispatch.steppedInDogPoop !== undefined && {
+      steppedInDogPoop: dispatch.steppedInDogPoop,
+    }),
+    publicNote: dispatch.publicNote,
+    ...(dispatch.waterOz !== undefined && { waterOz: dispatch.waterOz }),
+    ...(dispatch.hydrationGoalOz !== undefined && {
+      hydrationGoalOz: dispatch.hydrationGoalOz,
+    }),
+  };
+}
+
+export function toPublicFieldDispatches(
+  dispatches: CarrierDispatch[]
+): PublicFieldDispatch[] {
+  return dispatches.map(toPublicFieldDispatch);
+}
 
 export type CarrierKpi = {
   label: string;
@@ -129,130 +202,6 @@ export type PublicWeightTrend = {
   value: string;
   detail?: string;
 };
-
-
-// Legacy seed data - static fallbacks when Notion is not configured.
-const DISPATCHES: CarrierDispatch[] = [
-  {
-    id: "cj-001",
-    date: "2026-05-20",
-    title: "First full solo day",
-    milesWalked: 9.2,
-    steps: 19800,
-    soreness: 6,
-    energy: 7,
-    mood: 8,
-    weather: "Partly cloudy",
-    temperatureF: 68,
-    mailLoad: "heavy",
-    waterOz: 72,
-    hydrationGoalOz: 80,
-    weightLbs: 248,
-    weightPublicMode: "change-only",
-    phase: "break-in",
-    bodyNote: "Feet and hips doing most of the talking.",
-    recoveryNote: "Elevated legs, early sleep.",
-    publicNote:
-      "First day running a full route without a trainer. Longer than expected. Feet held up better than anticipated. Learned that pacing matters more than rushing.",
-  },
-  {
-    id: "cj-002",
-    date: "2026-05-21",
-    title: "Rain day, gear test",
-    milesWalked: 8.6,
-    steps: 18400,
-    soreness: 5,
-    energy: 6,
-    mood: 7,
-    weather: "Light rain",
-    temperatureF: 58,
-    mailLoad: "normal",
-    rain: true,
-    waterOz: 64,
-    hydrationGoalOz: 80,
-    phase: "break-in",
-    bodyNote: "Left ankle tight but not worse.",
-    publicNote:
-      "Light rain most of the morning. Rain gear worked. Wet shoes by hour three, and that is the weak point. Route rhythm felt more natural today.",
-  },
-  {
-    id: "cj-003",
-    date: "2026-05-22",
-    title: "Hot load day, hydration check",
-    milesWalked: 10.1,
-    steps: 21600,
-    soreness: 7,
-    energy: 5,
-    mood: 6,
-    weather: "Clear, humid",
-    temperatureF: 82,
-    heatIndexF: 89,
-    mailLoad: "brutal",
-    heatDay: true,
-    dogEncounter: true,
-    waterOz: 96,
-    hydrationGoalOz: 96,
-    phase: "break-in",
-    bodyNote: "Quads and lower back carrying the load.",
-    recoveryNote: "Extra water at home, no heroics.",
-    publicNote:
-      "Heaviest load so far. Heat index climbed through the afternoon. Drank more water than I thought I needed, but still felt low by the last stretch. Dog encounter on a residential block; no contact, redirected cleanly.",
-  },
-  {
-    id: "cj-004",
-    date: "2026-05-23",
-    title: "Recovery pace, lighter load",
-    milesWalked: 7.8,
-    steps: 16700,
-    soreness: 4,
-    energy: 7,
-    mood: 8,
-    weather: "Overcast, cool",
-    temperatureF: 63,
-    mailLoad: "light",
-    waterOz: 80,
-    hydrationGoalOz: 80,
-    weightLbs: 246,
-    weightPublicMode: "change-only",
-    phase: "adapting",
-    bodyNote: "Ankle soreness tracking down, not up.",
-    recoveryNote: "Stretching before bed.",
-    publicNote:
-      "Lighter day. Used it to work on technique: posture, bag position, walking economy. Noticed the soreness in the left ankle from earlier days is tracking down, not up.",
-  },
-  {
-    id: "cj-005",
-    date: "2026-05-24",
-    title: "Saturday volume, the long one",
-    milesWalked: 11.3,
-    steps: 24100,
-    soreness: 8,
-    energy: 4,
-    mood: 6,
-    weather: "Sunny, warm",
-    temperatureF: 76,
-    mailLoad: "heavy",
-    waterOz: 88,
-    hydrationGoalOz: 88,
-    weightLbs: 244,
-    weightPublicMode: "current-and-change",
-    phase: "adapting",
-    bodyNote: "Cumulative week showing up in the legs.",
-    recoveryNote: "Ice on feet, protein-heavy dinner.",
-    publicNote:
-      "Saturdays have more volume. This one ran long. Body felt the cumulative week by hour five. Took every water stop seriously. Route completion felt like a real win.",
-  },
-];
-
-export function getCarrierDispatches(): CarrierDispatch[] {
-  return [...DISPATCHES].sort(
-    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-  );
-}
-
-export function getCarrierJournalTotals(): CarrierTotals {
-  return computeTotalsFromDispatches(DISPATCHES);
-}
 
 export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): CarrierTotals {
   const count = dispatches.length;
@@ -514,27 +463,12 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
   return kpis;
 }
 
-export function getCarrierKpis(): CarrierKpi[] {
-  return totalsToKpis(getCarrierJournalTotals());
-}
-
-export function getMailLoadSummary(): Record<MailLoad, number> {
-  const summary: Record<MailLoad, number> = {
-    light: 0,
-    normal: 0,
-    heavy: 0,
-    brutal: 0,
-  };
-  for (const d of DISPATCHES) {
-    summary[d.mailLoad ?? "normal"]++;
-  }
-  return summary;
-}
-
 export function dispatchHasPublicKpiData(d: CarrierDispatch): boolean {
   return d.milesWalked > 0 || d.waterOz !== undefined || d.weightLbs !== undefined;
 }
 
-export function isDispatchFeedWorthy(d: CarrierDispatch): boolean {
+export function isDispatchFeedWorthy(
+  d: Pick<PublicFieldDispatch, "publicNote">
+): boolean {
   return !!d.publicNote?.trim();
 }

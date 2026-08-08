@@ -1,7 +1,6 @@
-import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import type { PublicFieldDispatch } from "@/lib/data/carrier-journal";
 import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
 import { deriveWeatherSignals } from "@/lib/carrier-journal/weather-signals";
-import { formatPrivateDpsLine } from "@/lib/dps";
 
 const WEATHER_FLAG_LABEL: Record<"heat" | "rain" | "storm" | "snow", string> = {
   heat: "HEAT",
@@ -11,12 +10,10 @@ const WEATHER_FLAG_LABEL: Record<"heat" | "rain" | "storm" | "snow", string> = {
 };
 
 type Props = {
-  dispatch: CarrierDispatch;
-  /** Show private DPS line with count and ratio. Default false for public feed. */
-  showPrivateDps?: boolean;
+  dispatch: PublicFieldDispatch;
 };
 
-export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Props) {
+export function CarrierDispatchCard({ dispatch: d }: Props) {
   const weather = deriveWeatherSignals(d);
   const weatherFlags = (["heat", "rain", "storm", "snow"] as const).filter((key) => weather[key]);
 
@@ -28,13 +25,6 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
       color: goal && d.waterOz >= goal ? "rgb(var(--green))" : "rgb(var(--neon))",
     });
   }
-
-  const privateDpsLine = showPrivateDps
-    ? formatPrivateDpsLine({
-        dpsCount: d.dpsCount,
-        dpsRatio: d.dpsRatio,
-      })
-    : null;
 
   return (
     <div id={d.id} className="surface-panel p-5 sm:p-6 space-y-3 scroll-mt-28">
@@ -59,14 +49,6 @@ export function CarrierDispatchCard({ dispatch: d, showPrivateDps = false }: Pro
               {paragraph}
             </p>
           ))}
-        </div>
-      )}
-
-      {privateDpsLine && (
-        <div className="text-xs text-[rgb(var(--text-secondary))] space-y-1">
-          <div className="font-[var(--font-ibm)] text-sm text-[rgb(var(--neon))]">
-            {privateDpsLine}
-          </div>
         </div>
       )}
 

@@ -1,8 +1,5 @@
 import { fetchCarrierDispatches } from "@/lib/notion/carrier-journal.repo";
-import {
-  enrichDispatchesFields,
-  isDispatchFeedWorthy,
-} from "@/lib/data/carrier-journal";
+import { isDispatchFeedWorthy } from "@/lib/data/carrier-journal";
 import { deriveWeatherSignals } from "@/lib/carrier-journal/weather-signals";
 
 export type HomeCarrierPreviewPayload = {
@@ -29,8 +26,7 @@ export async function getHomeCarrierPreview(): Promise<HomeCarrierPreviewPayload
     const raw = await fetchCarrierDispatches();
     if (raw.length === 0) return null;
 
-    const enriched = enrichDispatchesFields(raw);
-    const feed = enriched
+    const feed = raw
       .filter(isDispatchFeedWorthy)
       .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 

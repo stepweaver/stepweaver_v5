@@ -1,10 +1,10 @@
 import Link from "next/link";
 import {
   CARRIER_KPI_EMPTY,
-  enrichDispatchesFields,
   computeTotalsFromDispatches,
   totalsToKpis,
   isDispatchFeedWorthy,
+  toPublicFieldDispatches,
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
 import { CarrierKpiCard } from "./carrier-kpi-card";
@@ -139,11 +139,14 @@ export function CarrierJournalPage({
   dispatches: notionDispatches,
   footwearActive = null,
 }: Props = {}) {
-  // Fail closed: empty Notion must not fall back to seed/demo narratives.
-  const dispatches = enrichDispatchesFields(notionDispatches ?? []);
-  const feedDispatches = dispatches.filter(isDispatchFeedWorthy);
-  const totals = computeTotalsFromDispatches(dispatches);
+  // Fail closed: empty Notion must not fall back to demo narratives.
+  // Aggregates (including weight-lost) are computed server-side from full records;
+  // only the public DTO crosses into client components.
+  const serverDispatches = notionDispatches ?? [];
+  const totals = computeTotalsFromDispatches(serverDispatches);
   const kpis = totalsToKpis(totals);
+  const dispatches = toPublicFieldDispatches(serverDispatches);
+  const feedDispatches = dispatches.filter(isDispatchFeedWorthy);
 
   return (
     <div className="min-h-screen pt-20 pb-16">

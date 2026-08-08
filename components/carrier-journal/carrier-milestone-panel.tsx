@@ -17,7 +17,7 @@ import {
   Zap,
   type LucideIcon,
 } from "lucide-react";
-import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import type { PublicFieldDispatch } from "@/lib/data/carrier-journal";
 import {
   getCarrierLevel,
   getCarrierMilestones,
@@ -260,7 +260,7 @@ function RankLadderRow({ rank }: { rank: CarrierRank }) {
 // ---------------------------------------------------------------------------
 
 type Props = {
-  dispatches: CarrierDispatch[];
+  dispatches: PublicFieldDispatch[];
 };
 
 export function CarrierMilestonePanel({ dispatches }: Props) {

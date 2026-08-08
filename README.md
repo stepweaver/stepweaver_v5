@@ -269,17 +269,19 @@ Expected Notion docs properties:
 
 The docs renderer can also refresh expiring Notion image URLs through a signed token flow.
 
-### 7. Field Journal (Carrier Log system — under review)
+### 7. Field Journal
 
-The public field journal is temporarily offline while ethics, privacy, and publication controls are remediated. Private daybook logging remains available behind session-cookie auth.
+Personal walking and fitness journal for a high-mileage delivery worker: miles, hydration, weather, recovery, weight-lost trend, and sanitized day notes. Public pages are fitness-first and employer-agnostic. Private daybook logging stays behind session-cookie auth.
 
 Routes:
 
 ```txt
-/field-journal          # public review notice (noindex)
-/field-journal/footwear # 410 Gone
-/field-journal/log      # quick DPS log (session cookie)
-/log                      # full daybook (POST login → HttpOnly cookie)
+/field-journal              # public Field Journal
+/field-journal/footwear     # Shoe Ledger (personal consumer footwear journal)
+/field-journal/footwear/[slug]
+/field-journal/log          # quick private log (session cookie)
+/log                        # full daybook (POST login → HttpOnly cookie)
+/carrier-journal            # permanent redirect → /field-journal
 /api/carrier-journal/session
 /api/carrier-journal/log
 /api/carrier-journal/daybook
@@ -289,32 +291,34 @@ Primary files:
 
 ```txt
 app/(marketing)/field-journal/page.tsx
+app/(marketing)/field-journal/footwear/*
 app/(marketing)/field-journal/log/page.tsx
 app/log/page.tsx
 app/api/carrier-journal/session/route.ts
 components/carrier-journal/*
+components/footwear/*
 lib/data/carrier-journal.ts
 lib/data/carrier-milestones.ts
 lib/notion/carrier-journal.repo.ts
 lib/carrier-journal/*
 lib/validation/carrier-log.schema.ts
-lib/dps.ts
 lib/hydration.ts
 ```
 
-Public surface (current):
+Public surface:
 
-- review notice only — no live dispatches, employer identity, or footwear product profiles
-- public footwear routes return HTTP 410 Gone
+- KPIs, field calendar, milestones, and published day notes
+- Shoe Ledger with per-shoe disclaimers next to reviews
+- Server-side public DTO projection before any data reaches client components
+- Aggregate "pounds lost" only — raw weight never enters the browser payload
+- Operational volume fields and private notes stay off the public surface
 
 Private logging features:
 
-- quick DPS log at `/field-journal/log` (requires prior `/log` session)
+- quick log at `/field-journal/log` (requires prior `/log` session)
 - full daybook at `/log` after POST passphrase login
 - HttpOnly `carrier_session` cookie (not URL tokens or sessionStorage)
 - Notion upsert by date with **Publish Public = false by default**
-- live mail-load preview
-- route fuel score
 - public note and private note separation
 
 Publication / privacy rules:
@@ -322,44 +326,32 @@ Publication / privacy rules:
 - Daybook writes default to draft (`Publish Public = false`). Do not rely on omitting the field to publish.
 - Public reads only use rows where `Publish Public = true`.
 - `Private Note` is written to Notion but never read for public rendering.
-- Seed/demo dispatches are **not** used as a public fallback when Notion returns empty.
-- After containment deploy: uncheck `Publish Public` on existing Notion rows, rotate secrets, purge caches.
+- Empty Notion responses fail closed (no demo/fallback narratives).
+- Before client components render, `toPublicFieldDispatch` strips private keys (`weightLbs`, volume counters, route identifiers, and related fields).
 
-Expected Field Journal Notion properties:
+Expected Field Journal Notion properties (public fitness + private daybook):
 
-| Property | Type |
-| --- | --- |
-| `Title` | title |
-| `Date` | date |
-| `Publish Public` | checkbox |
-| `Miles Walked` | number |
-| `Water Oz` | number |
-| `Hydration Goal Oz` | number |
-| `Weight Lbs` | number |
-| `Soreness (1-10)` | number |
-| `Energy (1-10)` | number |
-| `Mood (1-10)` | number |
-| `Temperature F` | number | Peak air temp °F during shift (9 AM–7 PM), max of 46613/46614 |
-| `Heat Index F` | number | Peak heat index °F during shift (9 AM–7 PM) |
-| `Average Heat Index F` | number | Average heat index °F across shift hours |
-| `Precipitation In` | number | Area precip inches during shift (informational; does not set rain) |
-| `Rain` | checkbox | Manual: got rained on during the route |
-| `Stepped In Dog Poop` | checkbox | Manual incident only; leave unchecked on clean days (streak is automatic) |
-| `DPS Count` | number |
-| `DPS Ratio` | number |
-| `Parcels` | number |
-| `Mail Day Context` | select |
-| `Public Note` | rich text |
-| `Private Note` | rich text |
-| `Breakfast Protein` | checkbox |
-| `Route Food Packed` | checkbox |
-| `Route Food Eaten` | select |
-| `Protein Anchors` | number |
-| `Fruit Veg Servings` | number |
-| `Gatorade Count` | number |
-| `Mountain Dew Oz` | number |
-| `Post Shift Meal Quality` | select |
-| `Fuel Score` | number |
+| Property | Type | Public browser payload? |
+| --- | --- | --- |
+| `Title` | title | yes |
+| `Date` | date | yes |
+| `Publish Public` | checkbox | filter only |
+| `Miles Walked` | number | yes |
+| `Water Oz` | number | yes |
+| `Hydration Goal Oz` | number | yes |
+| `Weight Lbs` | number | no (server aggregate "lbs lost" only) |
+| `Soreness (1-10)` | number | yes |
+| `Energy (1-10)` | number | yes |
+| `Mood (1-10)` | number | yes |
+| `Temperature F` | number | yes |
+| `Heat Index F` | number | yes |
+| `Average Heat Index F` | number | yes |
+| `Precipitation In` | number | yes |
+| `Rain` | checkbox | yes |
+| `Stepped In Dog Poop` | checkbox | yes |
+| `Public Note` | rich text | yes |
+| `Private Note` | rich text | never read publicly |
+| Private operational / fuel fields | various | no — daybook only |
 
 ### 8. Mail Sort Academy
 
@@ -430,7 +422,8 @@ app/
   operator-profile.json/   Machine-readable JSON profile
 
 components/
-  carrier-journal/         Carrier dashboard, forms, calendar, milestones
+  carrier-journal/         Field Journal dashboard, forms, calendar, milestones
+  footwear/                Shoe Ledger UI
   chat/                    Chat widget, messages, citations
   codex/                   Notion block rendering and Codex UI
   command-palette/         Global command palette
@@ -447,9 +440,9 @@ components/
   ui/                      Shared UI primitives
 
 lib/
-  carrier-journal/         Fuel, weather, mail-load, and public summary logic
+  carrier-journal/         Weather, hydration helpers, and public summary logic
   chat/                    Prompt, provider, citation, request, and normalization logic
-  data/                    Structured page/project/resume/carrier data
+  data/                    Structured page/project/resume/field-journal data
   email/                   Contact email rendering and HTML escaping
   notion/                  Notion clients and repository adapters
   security/                Protected route and rate limit primitives
@@ -487,7 +480,7 @@ The app uses Next.js App Router route groups to keep UI chrome explicit:
 | `/api/notion-image` | `GET` | Signed Notion image URL refresh endpoint |
 | `/api/rss` | `GET` | Small RSS proxy/normalizer for approved feed sources |
 | `/api/book-shower` | `GET`, `POST` | Google Apps Script proxy for the book shower embed |
-| `/api/carrier-journal/log` | `POST`, `PUT` | Quick DPS log save/preview |
+| `/api/carrier-journal/log` | `POST`, `PUT` | Private quick Field Journal log save/preview |
 | `/api/carrier-journal/daybook` | `POST`, `PUT` | Full Field Journal daybook save/preview |
 | `/api/debug/carrier-journal` | `GET` | Development-only Notion diagnostic endpoint |
 | `/llms.txt` | `GET` | Plain-text AI/recruiter entry point |
@@ -547,7 +540,8 @@ Notion integrations avoid broad public reads:
 - Codex and docs only read `Published` content.
 - Field Journal public reads only use `Publish Public = true`; daybook writes default to draft.
 - `Private Note` is never read for public field-journal rendering.
-- Public path does not fall back to seed/demo narratives when Notion is empty.
+- Public Field Journal payloads are projected through `toPublicFieldDispatch` before client components.
+- Public path fails closed when Notion is empty (no demo narratives).
 - `/api/notion-blocks` requires explicit page allowlisting.
 - `/api/notion-image` uses signed HMAC tokens for refreshable image URLs.
 
@@ -784,9 +778,9 @@ Good future test targets:
 
 1. Ensure `NOTION_API_KEY`, `NOTION_CARRIER_JOURNAL_DB_ID`, `CARRIER_JOURNAL_LOG_SECRET`, and `CARRIER_SESSION_SIGNING_SECRET` are set.
 2. Open `/log`, enter the passphrase (POST login; cookie is HttpOnly).
-3. Use `/field-journal/log` for quick DPS count logging after you have a session.
+3. Use `/field-journal/log` for a quicker private log after you have a session.
 4. Confirm the Notion row is created or updated by date with **Publish Public unchecked**.
-5. Public `/field-journal` shows the review notice until ethics clearance — it must not show drafts or seed data.
+5. Public `/field-journal` only shows rows with `Publish Public = true`, and never receives private operational fields in the browser payload.
 
 ### Add a terminal command
 

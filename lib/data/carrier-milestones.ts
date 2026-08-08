@@ -1,10 +1,12 @@
-import type { CarrierDispatch } from "./carrier-journal";
+import type { CarrierDispatch, PublicFieldDispatch } from "./carrier-journal";
 import { enrichDispatchesFields } from "./carrier-journal";
 import {
   deriveWeatherSignals,
   isDerivedHeatDay,
   isDerivedWeatherDay,
 } from "@/lib/carrier-journal/weather-signals";
+
+type MilestoneDispatch = PublicFieldDispatch | CarrierDispatch;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -78,7 +80,7 @@ const LEVEL_THRESHOLDS: { miles: number; title: string; level: number }[] = [
 // Helpers
 // ---------------------------------------------------------------------------
 
-function sortedChronologically(dispatches: CarrierDispatch[]): CarrierDispatch[] {
+function sortedChronologically(dispatches: MilestoneDispatch[]): MilestoneDispatch[] {
   return [...dispatches].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
   );
@@ -86,8 +88,8 @@ function sortedChronologically(dispatches: CarrierDispatch[]): CarrierDispatch[]
 
 /** Find the date of the Nth dispatch matching a predicate (1-indexed). */
 function dateAtNthMatch(
-  sorted: CarrierDispatch[],
-  predicate: (dispatch: CarrierDispatch) => boolean,
+  sorted: MilestoneDispatch[],
+  predicate: (dispatch: MilestoneDispatch) => boolean,
   n: number
 ): string | undefined {
   let count = 0;
@@ -102,8 +104,8 @@ function dateAtNthMatch(
 
 /** Find the date at which the cumulative sum of getValue() first hits threshold. */
 function dateAtCumulativeThreshold(
-  sorted: CarrierDispatch[],
-  getValue: (dispatch: CarrierDispatch) => number,
+  sorted: MilestoneDispatch[],
+  getValue: (dispatch: MilestoneDispatch) => number,
   threshold: number
 ): string | undefined {
   let cumulative = 0;
@@ -115,7 +117,7 @@ function dateAtCumulativeThreshold(
 }
 
 /** Consecutive logged days without a dog-poop incident, ending at the latest dispatch. */
-export function currentDogPoopCleanStreak(dispatches: CarrierDispatch[]): number {
+export function currentDogPoopCleanStreak(dispatches: MilestoneDispatch[]): number {
   const sorted = sortedChronologically(dispatches);
   let streak = 0;
   for (let i = sorted.length - 1; i >= 0; i--) {
@@ -126,7 +128,7 @@ export function currentDogPoopCleanStreak(dispatches: CarrierDispatch[]): number
 }
 
 /** Longest run of logged days without stepping in dog poop. */
-export function bestDogPoopCleanStreak(dispatches: CarrierDispatch[]): number {
+export function bestDogPoopCleanStreak(dispatches: MilestoneDispatch[]): number {
   const sorted = sortedChronologically(dispatches);
   let best = 0;
   let current = 0;
@@ -143,7 +145,7 @@ export function bestDogPoopCleanStreak(dispatches: CarrierDispatch[]): number {
 
 /** Date when a clean streak first reached `target` consecutive logged days. */
 function dateAtCleanStreak(
-  sorted: CarrierDispatch[],
+  sorted: MilestoneDispatch[],
   target: number
 ): string | undefined {
   let current = 0;
@@ -162,7 +164,7 @@ function dateAtCleanStreak(
 // Exported functions
 // ---------------------------------------------------------------------------
 
-export function getCarrierLevel(dispatches: CarrierDispatch[]): CarrierLevel {
+export function getCarrierLevel(dispatches: MilestoneDispatch[]): CarrierLevel {
   const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
   const rounded = Math.round(totalMiles * 10) / 10;
 
@@ -225,8 +227,9 @@ export function getCarrierRankLadder(totalMiles: number): CarrierRank[] {
   });
 }
 
-export function getCarrierMilestones(dispatches: CarrierDispatch[]): CarrierMilestone[] {
-  const enriched = enrichDispatchesFields(dispatches);
+export function getCarrierMilestones(dispatches: MilestoneDispatch[]): CarrierMilestone[] {
+  // Public DTOs have no operational volume fields; enrich is a no-op for them.
+  const enriched = enrichDispatchesFields(dispatches as CarrierDispatch[]);
   const sorted = sortedChronologically(enriched);
   const totalMiles = enriched.reduce((s, d) => s + d.milesWalked, 0);
   const daysLogged = enriched.length;

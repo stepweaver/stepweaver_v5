@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, type CSSProperties } from "react";
-import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import type { PublicFieldDispatch } from "@/lib/data/carrier-journal";
 import {
   buildCalendarGrid,
   getCalendarIntensity,
@@ -353,7 +353,7 @@ function CalendarLegend() {
 // ---------------------------------------------------------------------------
 
 type Props = {
-  dispatches: CarrierDispatch[];
+  dispatches: PublicFieldDispatch[];
 };
 
 export function CarrierFieldCalendar({ dispatches }: Props) {

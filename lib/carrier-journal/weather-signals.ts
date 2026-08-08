@@ -1,4 +1,4 @@
-import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import type { CarrierDispatch, PublicFieldDispatch } from "@/lib/data/carrier-journal";
 
 /** Effective peak heat (°F) from logged shift weather. */
 export const HEAT_DAY_THRESHOLD_F = 90;
@@ -11,7 +11,9 @@ export type DerivedWeatherSignals = {
   snow: boolean;
 };
 
-export function effectiveHeatF(dispatch: CarrierDispatch): number {
+type WeatherDispatchInput = PublicFieldDispatch | CarrierDispatch;
+
+export function effectiveHeatF(dispatch: WeatherDispatchInput): number {
   return Math.max(
     dispatch.temperatureF ?? -Infinity,
     dispatch.heatIndexF ?? -Infinity,
@@ -19,7 +21,7 @@ export function effectiveHeatF(dispatch: CarrierDispatch): number {
   );
 }
 
-function narrativeText(dispatch: CarrierDispatch): string {
+function narrativeText(dispatch: WeatherDispatchInput): string {
   return [dispatch.weather, dispatch.publicNote].filter(Boolean).join(" ");
 }
 
@@ -39,7 +41,7 @@ const SNOW_PATTERN =
  * Storm/snow can still be inferred from notes; heat from temps.
  * Grid precipitation is informational and does not set the rain flag.
  */
-export function deriveWeatherSignals(dispatch: CarrierDispatch): DerivedWeatherSignals {
+export function deriveWeatherSignals(dispatch: WeatherDispatchInput): DerivedWeatherSignals {
   const text = narrativeText(dispatch);
 
   const stormFromText = STORM_PATTERN.test(textForStormMatch(text));
@@ -56,11 +58,11 @@ export function deriveWeatherSignals(dispatch: CarrierDispatch): DerivedWeatherS
   };
 }
 
-export function isDerivedWeatherDay(dispatch: CarrierDispatch): boolean {
+export function isDerivedWeatherDay(dispatch: WeatherDispatchInput): boolean {
   const signals = deriveWeatherSignals(dispatch);
   return signals.rain || signals.storm || signals.snow || signals.heat;
 }
 
-export function isDerivedHeatDay(dispatch: CarrierDispatch): boolean {
+export function isDerivedHeatDay(dispatch: WeatherDispatchInput): boolean {
   return deriveWeatherSignals(dispatch).heat;
 }

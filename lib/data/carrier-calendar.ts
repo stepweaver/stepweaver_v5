@@ -1,10 +1,12 @@
 /**
- * Calendar helpers for the Carrier Field Calendar.
- * Derives logged field days from CarrierDispatch entries. No schedule claims.
+ * Calendar helpers for the Field Journal calendar.
+ * Derives logged walking days from public field dispatch entries.
  */
 
-import type { CarrierDispatch } from "./carrier-journal";
+import type { CarrierDispatch, PublicFieldDispatch } from "./carrier-journal";
 import { deriveWeatherSignals, effectiveHeatF } from "@/lib/carrier-journal/weather-signals";
+
+type CalendarDispatch = PublicFieldDispatch | CarrierDispatch;
 
 export type WeatherMarkers = {
   rain: boolean;
@@ -48,9 +50,9 @@ export type CalendarGrid = {
  * Multiple dispatches on the same date are collected together.
  */
 export function groupDispatchesByDate(
-  dispatches: CarrierDispatch[]
-): Map<string, CarrierDispatch[]> {
-  const map = new Map<string, CarrierDispatch[]>();
+  dispatches: CalendarDispatch[]
+): Map<string, CalendarDispatch[]> {
+  const map = new Map<string, CalendarDispatch[]>();
   for (const d of dispatches) {
     const bucket = map.get(d.date) ?? [];
     bucket.push(d);
@@ -137,11 +139,11 @@ export function getSecondaryConditions(day: DaySummary): CalendarCondition[] {
 }
 
 /**
- * Derives weather/condition markers from a single CarrierDispatch.
+ * Derives weather/condition markers from a single field dispatch.
  * Heat is detected from temperatureF or heatIndexF (whichever is higher).
  * Freezing/belowZero use temperatureF only.
  */
-export function getWeatherMarkers(d: CarrierDispatch): WeatherMarkers {
+export function getWeatherMarkers(d: CalendarDispatch): WeatherMarkers {
   const temp = d.temperatureF;
   const derived = deriveWeatherSignals(d);
   const effective = effectiveHeatF(d);
@@ -188,7 +190,7 @@ function dateKey(d: Date): string {
   return `${y}-${m}-${day}`;
 }
 
-function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummary {
+function buildDaySummary(date: string, dispatches: CalendarDispatch[]): DaySummary {
   if (dispatches.length === 0) {
     return {
       date,
@@ -209,8 +211,11 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
   }
 
   const totalMiles = Math.round(dispatches.reduce((s, d) => s + d.milesWalked, 0) * 10) / 10;
-  // Steps are retained internally but not surfaced in public UI.
-  const totalSteps = dispatches.reduce((s, d) => s + (d.steps ?? 0), 0);
+  // Steps stay off the public DTO; keep the field for internal DaySummary shape.
+  const totalSteps = dispatches.reduce(
+    (s, d) => s + ("steps" in d ? (d.steps ?? 0) : 0),
+    0
+  );
 
   let rain = false;
   let storm = false;
@@ -264,7 +269,7 @@ function buildDaySummary(date: string, dispatches: CarrierDispatch[]): DaySummar
  * Weeks run Sunday–Saturday. The grid spans from the Sunday of the first
  * dispatch's week to the Saturday of today's week (minimum 4 weeks shown).
  */
-export function buildCalendarGrid(dispatches: CarrierDispatch[]): CalendarGrid {
+export function buildCalendarGrid(dispatches: CalendarDispatch[]): CalendarGrid {
   const byDate = groupDispatchesByDate(dispatches);
 
   const today = new Date();

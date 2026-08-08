@@ -1,5 +1,7 @@
 // Field Journal Notion DB (NOTION_CARRIER_JOURNAL_DB_ID).
 // Public reads only return pages with Publish Public = true; Private Note is never read.
+// formatPage may still hydrate private daybook fields for server-side aggregates;
+// toPublicFieldDispatch must run before any payload reaches a client component.
 import { revalidateTag, unstable_cache } from "next/cache";
 import type { PageObjectResponse, PartialPageObjectResponse } from "@notionhq/client/build/src/api-endpoints";
 import { getNotion } from "./client";
