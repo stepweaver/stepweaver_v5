@@ -13,13 +13,13 @@ export const revalidate = 300;
 const SITE_URL = process.env.SITE_URL || "https://stepweaver.dev";
 
 export const metadata: Metadata = {
-  title: "Shoe Ledger | Field Journal",
+  title: "Equipment Roster | Field Journal",
   description:
-    "Independent personal footwear journal: brands, mileage, ratings, and honest conclusions for shoes on high-mileage walking days.",
+    "Equipment Roster // Footwear: brands, odometers, condition, and honest conclusions from high-mileage walking.",
   openGraph: {
-    title: "Shoe Ledger",
+    title: "Equipment Roster // Footwear",
     description:
-      "Independent personal footwear journal: brands, mileage, ratings, and honest conclusions.",
+      "Footwear under real-world mileage testing: brands, odometers, condition, and field notes.",
     url: `${SITE_URL}/field-journal/footwear`,
     type: "website",
   },

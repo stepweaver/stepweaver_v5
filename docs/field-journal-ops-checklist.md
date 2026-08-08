@@ -1,4 +1,4 @@
-# Field Journal — post-deploy ops checklist
+# Field Journal: post-deploy ops checklist
 
 Complete after shipping the containment + session-auth changes.
 

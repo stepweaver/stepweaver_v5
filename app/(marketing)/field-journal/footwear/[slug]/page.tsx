@@ -28,13 +28,13 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   if (!isFootwearDbConfigured()) {
-    return { title: "Shoe Profile | Shoe Ledger" };
+    return { title: "Shoe Profile | Equipment Roster" };
   }
   const summary = await getShoeSummaryBySlug(slug, { publicOnly: true });
   if (!summary) return { title: "Shoe not found" };
   const title = `${summary.shoe.brand} ${summary.shoe.model}${
     summary.shoe.nickname ? ` “${summary.shoe.nickname}”` : ""
-  } | Shoe Ledger`;
+  } | Equipment Roster`;
   return {
     title,
     description: `Independent personal profile for ${summary.shoe.brand} ${summary.shoe.model}: ${summary.mileage.totalMiles} mi, ${summary.level.title}.`,

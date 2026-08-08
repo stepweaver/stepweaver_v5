@@ -172,7 +172,7 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
             href="/field-journal/footwear"
             className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] hover:underline"
           >
-            ← Shoe Ledger
+            ← Equipment Roster
           </Link>
         </p>
         <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))]">
@@ -187,11 +187,6 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
             “{shoe.nickname.toUpperCase()}”
           </p>
         )}
-        <aside className="max-w-2xl border border-[rgb(var(--border)/0.35)] bg-[rgb(var(--panel)/0.25)] p-4 text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
-          Independent personal footwear journal. The observations and opinions
-          are my own. No employer participates in, reviews, approves, sponsors,
-          or endorses this content.
-        </aside>
       </header>
 
       {summary.heroImageUrl && (

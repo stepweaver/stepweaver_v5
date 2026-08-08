@@ -36,18 +36,17 @@ function FieldJournalStreamCard({
         id="field-journal-heading"
         className="font-[var(--font-ocr)] text-xs uppercase tracking-[0.28em] text-[rgb(var(--cyan)/0.7)] mb-2"
       >
-        Current chapter
+        Field Journal // The Long Walk
       </p>
       <h2 className="font-[var(--font-ibm)] text-xl sm:text-2xl font-semibold text-[rgb(var(--text-color))] mb-3 leading-snug">
-        Long walking days from high-mileage delivery work, miles, and systems thinking in the field.
+        Rebuilding the machine by putting miles through it.
       </h2>
       <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-3 max-w-3xl">
-        I&apos;m documenting a personal fitness arc from physically demanding delivery work:
-        walking distance, hydration, soreness, weather, weight trend, footwear, and recovery.
+        The body is the system. The miles are the test environment. The journal is the telemetry:
+        gait, heat, recovery, footwear, and what the chassis does under load.
       </p>
       <p className="font-[var(--font-ibm)] text-sm sm:text-base text-[rgb(var(--text-secondary))] leading-relaxed mb-5 max-w-3xl">
-        Field Journal is part fitness log, part transformation record, and part
-        public proof that systems thinking does not only happen behind a desk.
+        A personal human-machine field notebook, not a fitness app and not an achievement board.
       </p>
 
       {preview ? (

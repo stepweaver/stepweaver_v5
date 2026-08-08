@@ -69,7 +69,7 @@ export const carrierDaybookSchema = z.object({
   steppedInDogPoop: z.boolean().optional(),
   publicNote: z.string().trim().max(2000).optional(),
   privateNote: z.string().trim().max(2000).optional(),
-  /** Draft by default — never auto-publish. */
+  /** Draft by default; never auto-publish. */
   published: z.boolean().default(false),
   fuel: fuelLogSchema.optional(),
   /** Work miles assigned to one or more shoes for this day. Sum must be ≤ miles. */

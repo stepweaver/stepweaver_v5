@@ -7,10 +7,7 @@ import {
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
 import {
-  bestDogPoopCleanStreak,
-  currentDogPoopCleanStreak,
   getCarrierLevel,
-  getCarrierMilestones,
 } from "@/lib/data/carrier-milestones";
 import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
 
@@ -107,41 +104,41 @@ describe("carrier's log totals", () => {
 });
 
 describe("getCarrierLevel", () => {
-  it("returns Starting Miles at 0 miles", () => {
+  it("returns BOOT SEQUENCE at 0 miles", () => {
     const level = getCarrierLevel([]);
-    expect(level.title).toBe("Starting Miles");
+    expect(level.title).toBe("BOOT SEQUENCE");
     expect(level.level).toBe(1);
   });
 
-  it("returns First 25 between 25 and 49 miles", () => {
+  it("returns CALIBRATION between 25 and 49 miles", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 30 }),
     ]);
-    expect(level.title).toBe("First 25");
+    expect(level.title).toBe("CALIBRATION");
     expect(level.level).toBe(2);
   });
 
-  it("returns Road Legs at exactly 100 miles", () => {
+  it("returns FIELD UNIT at exactly 100 miles", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 100 }),
     ]);
-    expect(level.title).toBe("Road Legs");
+    expect(level.title).toBe("FIELD UNIT");
     expect(level.level).toBe(4);
   });
 
-  it("returns Thousand Club at 1000+ miles with next rank", () => {
+  it("returns DISTANCE PROVEN at 1000+ miles with next rank", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 1200 }),
     ]);
-    expect(level.title).toBe("Thousand Club");
-    expect(level.nextTitle).toBe("Long Haul");
+    expect(level.title).toBe("DISTANCE PROVEN");
+    expect(level.nextTitle).toBe("HARDENED");
   });
 
-  it("returns Ten Thousand at max rank with no next rank", () => {
+  it("returns ENDURANCE CLASS at max rank with no next rank", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 10001 }),
     ]);
-    expect(level.title).toBe("Ten Thousand");
+    expect(level.title).toBe("ENDURANCE CLASS");
     expect(level.progressToNext).toBe(100);
     expect(level.nextTitle).toBeUndefined();
   });
@@ -150,153 +147,9 @@ describe("getCarrierLevel", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 37.5 }),
     ]);
-    // 37.5 miles → First 25 (25–50 range). Progress = (37.5-25)/(50-25)*100 = 50%
-    expect(level.title).toBe("First 25");
+    // 37.5 miles → CALIBRATION (25–50 range). Progress = (37.5-25)/(50-25)*100 = 50%
+    expect(level.title).toBe("CALIBRATION");
     expect(level.progressToNext).toBe(50);
-  });
-});
-
-describe("getCarrierMilestones", () => {
-  it("unlocks day-one when one dispatch exists", () => {
-    const milestones = getCarrierMilestones([
-      dispatch({ id: "a", date: "2026-05-01", title: "A" }),
-    ]);
-    const badge = milestones.find((m) => m.id === "day-one");
-    expect(badge?.unlocked).toBe(true);
-    expect(badge?.unlockedAt).toBe("2026-05-01");
-  });
-
-  it("does not unlock five-logged-days with only 3 dispatches", () => {
-    const dispatches = [
-      dispatch({ id: "a", date: "2026-05-01", title: "A" }),
-      dispatch({ id: "b", date: "2026-05-02", title: "B" }),
-      dispatch({ id: "c", date: "2026-05-03", title: "C" }),
-    ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "five-logged-days");
-    expect(badge?.unlocked).toBe(false);
-    expect(badge?.progress).toBe(3);
-  });
-
-  it("unlocks hundred-miles badge when total miles >= 100", () => {
-    const dispatches = [
-      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 60 }),
-      dispatch({ id: "b", date: "2026-05-02", title: "B", milesWalked: 50 }),
-    ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "hundred-miles");
-    expect(badge?.unlocked).toBe(true);
-  });
-
-  it("unlocks first-heat-day badge via heatDay flag", () => {
-    const dispatches = [
-      dispatch({
-        id: "a",
-        date: "2026-05-01",
-        title: "A",
-        heatDay: true,
-      }),
-    ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-day");
-    expect(badge?.unlocked).toBe(true);
-  });
-
-  it("unlocks first-heat-day badge when heatIndexF >= 90", () => {
-    const dispatches = [
-      dispatch({
-        id: "a",
-        date: "2026-05-01",
-        title: "A",
-        temperatureF: 85,
-        heatIndexF: 92,
-      }),
-    ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-day");
-    expect(badge?.unlocked).toBe(true);
-  });
-
-  it("does not unlock first-heat-day when heatDay is false and temp/heatIndex below 90", () => {
-    const dispatches = [
-      dispatch({ id: "a", date: "2026-05-01", title: "A", temperatureF: 85, heatIndexF: 88 }),
-    ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "first-heat-day");
-    expect(badge?.unlocked).toBe(false);
-  });
-
-  it("unlocks Good Samaritan badge from tags", () => {
-    const dispatches = [
-      dispatch({
-        id: "a",
-        date: "2026-05-01",
-        title: "A",
-        tags: ["good-samaritan"],
-      }),
-    ];
-    const badge = getCarrierMilestones(dispatches).find(
-      (m) => m.id === "first-good-samaritan"
-    );
-    expect(badge).toBeUndefined();
-  });
-
-  it("unlocks Good Samaritan badge from goodSamaritanAct flag", () => {
-    const dispatches = [
-      dispatch({
-        id: "a",
-        date: "2026-05-01",
-        title: "A",
-        goodSamaritanAct: true,
-      }),
-    ];
-    const badge = getCarrierMilestones(dispatches).find(
-      (m) => m.id === "first-good-samaritan"
-    );
-    expect(badge).toBeUndefined();
-  });
-
-  it("counts clean-boot streak and unlocks at 7 days without dog-poop incidents", () => {
-    const dispatches = Array.from({ length: 7 }, (_, i) =>
-      dispatch({
-        id: String(i),
-        date: `2026-05-${String(i + 1).padStart(2, "0")}`,
-        title: `D${i}`,
-        milesWalked: 1,
-      })
-    );
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "seven-clean-boots");
-    expect(badge?.unlocked).toBe(true);
-    expect(badge?.unlockedAt).toBe("2026-05-07");
-    expect(badge?.progress).toBe(7);
-  });
-
-  it("resets clean-boot streak progress after a dog-poop incident", () => {
-    const dispatches = [
-      ...Array.from({ length: 5 }, (_, i) =>
-        dispatch({
-          id: `c${i}`,
-          date: `2026-05-${String(i + 1).padStart(2, "0")}`,
-          title: `C${i}`,
-          milesWalked: 1,
-        })
-      ),
-      dispatch({
-        id: "poop",
-        date: "2026-05-06",
-        title: "Incident",
-        milesWalked: 1,
-        steppedInDogPoop: true,
-      }),
-      ...Array.from({ length: 3 }, (_, i) =>
-        dispatch({
-          id: `a${i}`,
-          date: `2026-05-${String(i + 7).padStart(2, "0")}`,
-          title: `A${i}`,
-          milesWalked: 1,
-        })
-      ),
-    ];
-    const badge = getCarrierMilestones(dispatches).find((m) => m.id === "seven-clean-boots");
-    expect(badge?.unlocked).toBe(false);
-    expect(badge?.progress).toBe(5);
-    expect(currentDogPoopCleanStreak(dispatches)).toBe(3);
-    expect(bestDogPoopCleanStreak(dispatches)).toBe(5);
   });
 });
 

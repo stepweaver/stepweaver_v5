@@ -17,7 +17,7 @@ export async function compressImageForUpload(file: File): Promise<File> {
   const isHeic =
     /image\/hei[cf]/i.test(file.type) || /\.hei[cf]$/i.test(file.name);
 
-  // Already small enough and not HEIC — keep original.
+  // Already small enough and not HEIC; keep original.
   // HEIC must be re-encoded so blob storage / browsers can display it.
   if (!isHeic && file.size <= 1.5 * 1024 * 1024) {
     return file;

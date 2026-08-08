@@ -25,12 +25,7 @@ const METHOD_POINTS = [
   "Brand, model, photos, ratings, and personal conclusions stay on the public ledger.",
   "One primary pair can be marked active at a time.",
   "Checkpoint notes occur at personal mileage thresholds.",
-  "No sponsorships, free-product solicitations, or employer-linked testing pitches.",
-  "Opinions are Stephen’s alone — no employer participates in or endorses this content.",
 ];
-
-const FOOTWEAR_DISCLAIMER =
-  "Independent personal footwear journal. Products discussed here were selected for personal use, and the opinions are solely my own. No employer participates in, reviews, sponsors, approves, or endorses this content.";
 
 export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
   const activeList = roster.filter((s) => s.shoe.status === "active");
@@ -48,19 +43,15 @@ export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
     <div className="space-y-12">
       <header className="space-y-3">
         <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))]">
-          FIELD JOURNAL // SHOE LEDGER
+          EQUIPMENT ROSTER // FOOTWEAR
         </p>
         <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))]">
-          Shoe Ledger
+          Equipment Roster
         </h1>
         <p className="max-w-2xl text-[rgb(var(--text-secondary))] leading-relaxed">
-          Personal equipment roster for footwear on high-mileage walking days.
-          Brand, model, photos, ratings, and honest conclusions stay public —
-          this is Stephen&apos;s consumer journal, not a partnership pitch.
+          Footwear under real-world mileage testing. Brand, model, odometer, condition, and honest
+          conclusions.
         </p>
-        <aside className="max-w-2xl border border-[rgb(var(--border)/0.35)] bg-[rgb(var(--panel)/0.25)] p-4 text-sm text-[rgb(var(--text-secondary))] leading-relaxed">
-          {FOOTWEAR_DISCLAIMER}
-        </aside>
         <p>
           <Link
             href="/field-journal"

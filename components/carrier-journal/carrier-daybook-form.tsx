@@ -78,7 +78,7 @@ export function CarrierDaybookForm({
 
   const [directSun, setDirectSun] = useState(false);
   const [rainedOnRoute, setRainedOnRoute] = useState(false);
-  /** Rare incident — leave off; only flip when it happens. Clean streak is automatic. */
+  /** Rare incident: leave off; only flip when it happens. Clean streak is automatic. */
   const [steppedInDogPoop, setSteppedInDogPoop] = useState(false);
   const [hydrationGoalOverride, setHydrationGoalOverride] = useState("");
   const [showGoalOverride, setShowGoalOverride] = useState(false);
@@ -850,7 +850,7 @@ export function CarrierDaybookForm({
             </span>
             {weatherPrecip !== null && weatherPrecip > 0 && !rainedOnRoute && (
               <span className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--neon)/0.75)]">
-                Area precip detected — flip if you got wet
+                Area precip detected: flip if you got wet
               </span>
             )}
           </span>
@@ -1086,7 +1086,7 @@ export function CarrierDaybookForm({
         />
       </div>
 
-      {/* Rare field incident — clean streak is automatic unless this is flipped */}
+      {/* Rare field incident: clean streak is automatic unless this is flipped */}
       <div className="surface-panel p-5 space-y-3">
         <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
           FIELD INCIDENT

@@ -81,7 +81,7 @@ export type PublicFieldDispatch = {
   dogEncounter?: boolean;
   /**
    * Manual incident only: stepped in dog poop on this day.
-   * Leave unset/false on clean days — clean-streak badges count logged days without this flag.
+   * Leave unset/false on clean days. Clean-streak badges count logged days without this flag.
    */
   steppedInDogPoop?: boolean;
   publicNote: string;
@@ -103,7 +103,7 @@ export type CarrierDispatch = PublicFieldDispatch & {
   tags?: string[];
   /** Optional flag for a Good Samaritan act logged during the dispatch. */
   goodSamaritanAct?: boolean;
-  /** Compact route identifier. Private — never sent to public clients. */
+  /** Compact route identifier. Private; never sent to public clients. */
   routeCode?: string;
   /** Private sentiment toward this route. Never rendered in public-facing UI. */
   routePreference?: RoutePreference;
@@ -166,6 +166,7 @@ export function toPublicFieldDispatches(
 }
 
 export type CarrierKpi = {
+  systemLabel: string;
   label: string;
   value: string;
   detail?: string;
@@ -430,36 +431,69 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
   const weightTrend = formatPublicWeightTrend(t);
 
   const kpis: CarrierKpi[] = [
-    { label: "Days Logged", value: String(t.daysLogged), detail: "Active walking days" },
-    { label: "Total Miles", value: `${t.totalMiles} mi`, detail: "Cumulative walking distance" },
-    { label: "Avg Miles / Day", value: `${t.avgMilesPerDay} mi`, detail: "Per logged day" },
     {
-      label: "Avg Water / Day",
+      systemLabel: "ODOMETER",
+      label: "Total miles",
+      value: `${t.totalMiles} mi`,
+      detail: "Cumulative walking distance",
+    },
+    {
+      systemLabel: "DAILY RANGE",
+      label: "Avg miles / day",
+      value: `${t.avgMilesPerDay} mi`,
+      detail: "Per logged day",
+    },
+    {
+      systemLabel: "COOLANT",
+      label: "Avg water / day",
       value: t.avgWaterOz > 0 ? `${t.avgWaterOz} oz` : CARRIER_KPI_EMPTY,
       detail: "Average intake on logged hydration days",
     },
     {
-      label: "Hydration Goal Hit Rate",
-      value: t.hydrationGoalHitRate > 0 ? `${t.hydrationGoalHitRate}%` : CARRIER_KPI_EMPTY,
-      detail: `${t.hydrationGoalHitDays} of ${t.daysLogged} days met goal`,
-    },
-    {
-      label: "Weight Lost",
+      systemLabel: "MASS DELTA",
+      label: "Weight lost",
       value: weightTrend.value,
       detail: weightTrend.detail,
     },
-    { label: "Heat Days", value: String(t.heatDays), detail: "Peak heat index ≥ 90°F" },
     {
-      label: "Weather Days",
-      value: String(t.weatherDays),
-      detail: "Rain, storm, or snow (from temp + notes)",
+      systemLabel: "SYSTEM LOAD",
+      label: "Avg soreness",
+      value: `${t.avgSoreness} / 10`,
+      detail: "Physical load marker",
     },
-    { label: "Avg Soreness", value: `${t.avgSoreness} / 10`, detail: "Physical load marker" },
-    { label: "Avg Energy", value: `${t.avgEnergy} / 10`, detail: "Self-reported end-of-day" },
-    { label: "Avg Mood", value: `${t.avgMood} / 10`, detail: "Morale signal" },
+    {
+      systemLabel: "POWER",
+      label: "Avg energy",
+      value: `${t.avgEnergy} / 10`,
+      detail: "Self-reported end-of-day",
+    },
+    {
+      systemLabel: "MORALE",
+      label: "Avg mood",
+      value: `${t.avgMood} / 10`,
+      detail: "Morale signal",
+    },
+    {
+      systemLabel: "ENVIRONMENT",
+      label: "Heat days",
+      value: String(t.heatDays),
+      detail: `Peak HI ≥ 90°F · ${t.weatherDays} weather days`,
+    },
+    {
+      systemLabel: "LOG DAYS",
+      label: "Days logged",
+      value: String(t.daysLogged),
+      detail: "Active walking days",
+    },
+    {
+      systemLabel: "COOLANT HIT RATE",
+      label: "Hydration goal hit rate",
+      value: t.hydrationGoalHitRate > 0 ? `${t.hydrationGoalHitRate}%` : CARRIER_KPI_EMPTY,
+      detail: `${t.hydrationGoalHitDays} of ${t.daysLogged} days met goal`,
+    },
   ];
 
-  // Raw DPS / mail-volume figures stay private — not shown on the public journal.
+  // Raw DPS / mail-volume figures stay private; not shown on the public journal.
   return kpis;
 }
 

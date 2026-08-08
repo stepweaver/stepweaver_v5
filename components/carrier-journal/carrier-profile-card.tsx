@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const PROFILE_TAGS = ["Long Walker", "Fitness Arc", "Field Notes"];
+const PROFILE_TAGS = ["Long Walker", "Machine Mode", "Field Notes"];
 
 export function CarrierProfileCard() {
   return (
@@ -15,7 +15,7 @@ export function CarrierProfileCard() {
       <header className="relative z-10 mb-4 flex items-start justify-between gap-4 pb-1">
         <div>
           <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] sm:text-sm font-[var(--font-ocr)] uppercase">
-            Field Profile
+            Operator // WALK-01
           </p>
           <h2 className="text-xl font-semibold text-[rgb(var(--text-color))] font-[var(--font-ibm)]">
             Stephen Weaver
@@ -50,10 +50,10 @@ export function CarrierProfileCard() {
 
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Current chapter
+                Field Load
               </p>
               <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                High-mileage delivery work + building after hours
+                High-mileage walking
               </p>
             </div>
           </div>
@@ -61,20 +61,11 @@ export function CarrierProfileCard() {
           <div className="min-w-0 space-y-3">
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Framing
-              </p>
-              <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Personal walking &amp; fitness field journal
-              </p>
-            </div>
-
-            <div>
-              <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
                 Status
               </p>
               <div className="mt-1 flex items-center gap-2">
                 <p className="text-sm text-[rgb(var(--cyan))] font-[var(--font-ibm)] whitespace-normal leading-snug">
-                  Logging off the clock
+                  Operational
                 </p>
                 <span className="relative flex h-4 w-4 flex-shrink-0 items-center justify-center" aria-hidden>
                   <span className="absolute inline-flex h-full w-full rounded-full bg-[rgb(var(--cyan)/0.35)] motion-safe:animate-ping" />
@@ -85,10 +76,28 @@ export function CarrierProfileCard() {
 
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Focus
+                Current Mode
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Miles, hydration, soreness, weight lost
+                The Long Walk
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
+                Objective
+              </p>
+              <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
+                Rebuild the machine
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
+                Current Focus
+              </p>
+              <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
+                Endurance // Gait // Recovery // Loadout
               </p>
             </div>
           </div>
@@ -96,8 +105,9 @@ export function CarrierProfileCard() {
 
         <div className="pt-1">
           <p className="font-[var(--font-ibm)] text-[rgb(var(--text-color))] text-sm leading-relaxed">
-            Started overweight and learning what 10–13 mile walking days actually cost: feet,
-            hydration, heat, and the quiet math of showing up and recovering.
+            I started this heavier, slower, and far less conditioned than I wanted to be. Now I
+            spend my working days putting miles through the machine and documenting what happens.
+            Feet. Legs. Core. Hydration. Heat. Recovery. Equipment. The good days and the ugly ones.
           </p>
         </div>
 
