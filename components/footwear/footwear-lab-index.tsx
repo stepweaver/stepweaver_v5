@@ -21,10 +21,10 @@ type Props = {
 };
 
 const METHOD_POINTS = [
-  "Mileage comes from Field Journal daily logs for shoes you personally use.",
-  "Brand, model, photos, ratings, and personal conclusions stay on the public ledger.",
+  "Mileage comes from Field Journal daily logs for platforms you personally use.",
+  "Brand, model, photos, ratings, and conclusions stay on the public roster.",
   "One primary pair can be marked active at a time.",
-  "Checkpoint notes occur at personal mileage thresholds.",
+  "Inspection notes occur at personal mileage thresholds.",
 ];
 
 export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
@@ -67,17 +67,17 @@ export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
       ) : (
         <section className="border border-[rgb(var(--neon)/0.2)] p-5">
           <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--text-meta))]">
-            ACTIVE PAIR
+            ACTIVE LOADOUT
           </p>
           <p className="mt-2 text-sm text-[rgb(var(--text-secondary))]">
-            No public active shoe yet. Profiles appear here once published.
+            No public active unit yet. Profiles appear here once published.
           </p>
         </section>
       )}
 
       <section className="space-y-3">
         <h2 className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))]">
-          METHOD
+          OPERATING DOCTRINE
         </h2>
         <ul className="space-y-2 text-sm text-[rgb(var(--text-secondary))]">
           {METHOD_POINTS.map((point) => (
@@ -105,6 +105,7 @@ export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
               totalMiles: s.mileage.totalMiles,
               levelTitle: s.level.title,
               conditionLabel: s.conditionLabel,
+              unitNumber: s.unitNumber,
             }))}
           />
           {active && (
@@ -129,6 +130,7 @@ export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
               totalMiles: s.mileage.totalMiles,
               levelTitle: s.level.title,
               conditionLabel: s.conditionLabel,
+              unitNumber: s.unitNumber,
             }))}
           />
         </section>
@@ -150,6 +152,7 @@ export function FootwearLabIndex({ active, roster, recentNotes }: Props) {
               totalMiles: s.mileage.totalMiles,
               levelTitle: s.level.title,
               conditionLabel: s.conditionLabel,
+              unitNumber: s.unitNumber,
             }))}
           />
         </section>

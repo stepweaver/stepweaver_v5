@@ -12,11 +12,11 @@ const absoluteImageUrl = `${SITE_URL}/images/field_journal_og.png`;
 export const metadata: Metadata = {
   title: "Field Journal | Stephen Weaver",
   description:
-    "FIELD JOURNAL // THE LONG WALK: a personal human-machine field notebook with body telemetry, distance class, equipment roster, and field notes from high-mileage walking.",
+    "FIELD JOURNAL // THE LONG WALK: a human performance log — body telemetry, distance qualification, equipment roster, and field notes from high-mileage walking.",
   openGraph: {
     title: "Field Journal // The Long Walk",
     description:
-      "The body is the system. The miles are the test environment. The journal is the telemetry.",
+      "Miles, environmental load, hydration, recovery, body mechanics, equipment wear — human performance under field conditions.",
     type: "website",
     url: `${SITE_URL}/field-journal`,
     images: [{ url: absoluteImageUrl, width: 1200, height: 630, alt: "Field Journal" }],
@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Field Journal // The Long Walk",
     description:
-      "The body is the system. The miles are the test environment. The journal is the telemetry.",
+      "Miles, environmental load, hydration, recovery, body mechanics, equipment wear — human performance under field conditions.",
     images: [absoluteImageUrl],
   },
 };

@@ -104,33 +104,33 @@ describe("carrier's log totals", () => {
 });
 
 describe("getCarrierLevel", () => {
-  it("returns BOOT SEQUENCE at 0 miles", () => {
+  it("returns INITIAL ISSUE at 0 miles", () => {
     const level = getCarrierLevel([]);
-    expect(level.title).toBe("BOOT SEQUENCE");
+    expect(level.title).toBe("INITIAL ISSUE");
     expect(level.level).toBe(1);
   });
 
-  it("returns CALIBRATION between 25 and 49 miles", () => {
+  it("returns SHAKEDOWN between 25 and 49 miles", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 30 }),
     ]);
-    expect(level.title).toBe("CALIBRATION");
+    expect(level.title).toBe("SHAKEDOWN");
     expect(level.level).toBe(2);
   });
 
-  it("returns FIELD UNIT at exactly 100 miles", () => {
+  it("returns ROAD CONDITIONED at exactly 100 miles", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 100 }),
     ]);
-    expect(level.title).toBe("FIELD UNIT");
+    expect(level.title).toBe("ROAD CONDITIONED");
     expect(level.level).toBe(4);
   });
 
-  it("returns DISTANCE PROVEN at 1000+ miles with next rank", () => {
+  it("returns DISTANCE VETERAN at 1000+ miles with next rank", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 1200 }),
     ]);
-    expect(level.title).toBe("DISTANCE PROVEN");
+    expect(level.title).toBe("DISTANCE VETERAN");
     expect(level.nextTitle).toBe("HARDENED");
   });
 
@@ -147,8 +147,8 @@ describe("getCarrierLevel", () => {
     const level = getCarrierLevel([
       dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 37.5 }),
     ]);
-    // 37.5 miles → CALIBRATION (25–50 range). Progress = (37.5-25)/(50-25)*100 = 50%
-    expect(level.title).toBe("CALIBRATION");
+    // 37.5 miles → SHAKEDOWN (25–50 range). Progress = (37.5-25)/(50-25)*100 = 50%
+    expect(level.title).toBe("SHAKEDOWN");
     expect(level.progressToNext).toBe(50);
   });
 });

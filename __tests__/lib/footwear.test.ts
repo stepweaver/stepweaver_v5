@@ -351,3 +351,67 @@ describe("footwear id", () => {
     );
   });
 });
+
+describe("unit numbers", () => {
+  it("assigns UNIT order by commission date", async () => {
+    const { assignUnitNumbers, formatUnitId } = await import("@/lib/footwear/unit");
+    const base = {
+      nickname: null,
+      colorway: null,
+      size: "10",
+      width: null,
+      retirementDate: null,
+      status: "retired" as const,
+      acquisitionType: "purchased" as const,
+      retailPrice: null,
+      amountPaid: null,
+      provider: null,
+      intendedUse: null,
+      baselineNotes: null,
+      isLegacyRecord: false,
+      mileageConfidence: "exact" as const,
+      public: true,
+      retirementReason: null,
+      retiredFromWorkOnly: null,
+      failureLocation: null,
+      wouldBuyAgain: null,
+      idealUser: null,
+      whoShouldAvoid: null,
+      finalVerdict: null,
+      finalReview: null,
+      postWorkStatus: null,
+      updatedAt: new Date("2026-01-01"),
+    };
+    const ranked = assignUnitNumbers([
+      {
+        shoe: {
+          ...base,
+          id: "b",
+          slug: "keen",
+          brand: "Keen",
+          model: "Targhee",
+          purchaseDate: "2026-08-01",
+          firstWearDate: null,
+          createdAt: new Date("2026-08-01"),
+        },
+      },
+      {
+        shoe: {
+          ...base,
+          id: "a",
+          slug: "hoka",
+          brand: "Hoka",
+          model: "Bondi",
+          purchaseDate: "2026-05-01",
+          firstWearDate: "2026-05-18",
+          createdAt: new Date("2026-05-01"),
+          status: "active" as const,
+        },
+      },
+    ]);
+    const bySlug = Object.fromEntries(ranked.map((s) => [s.shoe.slug, s.unitNumber]));
+    expect(bySlug.hoka).toBe(1);
+    expect(bySlug.keen).toBe(2);
+    expect(formatUnitId(1)).toBe("UNIT 001");
+  });
+});

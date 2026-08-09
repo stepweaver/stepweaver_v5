@@ -38,6 +38,7 @@ import {
   type CheckpointObservation,
 } from "@/lib/footwear/stats";
 import { LEGACY_PUBLIC_DISCLAIMER } from "@/lib/footwear/legacy";
+import { assignUnitNumbers } from "@/lib/footwear/unit";
 import { fetchCarrierDispatches } from "@/lib/notion/carrier-journal.repo";
 
 export type ShoeDerivedSummary = {
@@ -57,6 +58,8 @@ export type ShoeDerivedSummary = {
   milesBeforeDecline: number | null;
   heroImageUrl: string | null;
   legacyDisclaimer: string | null;
+  /** Roster position (UNIT 001…N), assigned when listing or resolving active unit. */
+  unitNumber?: number;
 };
 
 function amountPaidNumber(shoe: Shoe): number | null {
@@ -267,30 +270,15 @@ export async function getShoeSummaryBySlug(
   slug: string,
   opts?: { publicOnly?: boolean }
 ): Promise<ShoeDerivedSummary | null> {
-  const shoe = await getShoeBySlug(slug, opts);
-  if (!shoe) return null;
-  const [allocations, observations, media, carrierDays] = await Promise.all([
-    getAllocationsForShoe(shoe.id),
-    getObservationsForShoe(shoe.id, opts),
-    getMediaForShoe(shoe.id, opts),
-    loadCarrierDaysForFootwear(),
-  ]);
-  return deriveShoeSummary(shoe, allocations, observations, media, carrierDays);
+  const roster = await listShoeSummaries(opts);
+  return roster.find((s) => s.shoe.slug === slug) ?? null;
 }
 
 export async function getActiveShoeSummary(opts?: {
   publicOnly?: boolean;
 }): Promise<ShoeDerivedSummary | null> {
-  const shoe = await getActiveShoe();
-  if (!shoe) return null;
-  if (opts?.publicOnly && !shoe.public) return null;
-  const [allocations, observations, media, carrierDays] = await Promise.all([
-    getAllocationsForShoe(shoe.id),
-    getObservationsForShoe(shoe.id, opts),
-    getMediaForShoe(shoe.id, opts),
-    loadCarrierDaysForFootwear(),
-  ]);
-  return deriveShoeSummary(shoe, allocations, observations, media, carrierDays);
+  const roster = await listShoeSummaries(opts);
+  return roster.find((s) => s.shoe.status === "active") ?? null;
 }
 
 export async function listShoeSummaries(opts?: {
@@ -309,7 +297,7 @@ export async function listShoeSummaries(opts?: {
       deriveShoeSummary(shoe, allocations, observations, media, carrierDays)
     );
   }
-  return results;
+  return assignUnitNumbers(results);
 }
 
 export async function createShoe(

@@ -105,7 +105,7 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Current chapter</p>
               <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Field systems + high-mileage delivery work
+                Field systems + the Long Walk
               </p>
             </div>
           </div>

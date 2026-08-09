@@ -176,15 +176,19 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
           </Link>
         </p>
         <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))]">
-          FOOTWEAR PROFILE // {shoe.status.toUpperCase()}
+          EQUIPMENT ROSTER //{" "}
+          {summary.unitNumber != null
+            ? `UNIT ${String(summary.unitNumber).padStart(3, "0")}`
+            : "FOOTWEAR"}
+          {shoe.status === "active" ? " // ACTIVE LOADOUT" : ` // ${shoe.status.toUpperCase()}`}
           {shoe.isLegacyRecord ? " // LEGACY RECORD" : ""}
         </p>
         <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))]">
           {shoe.brand.toUpperCase()} {shoe.model.toUpperCase()}
         </h1>
         {shoe.nickname && (
-          <p className="text-xl text-[rgb(var(--text-secondary))]">
-            “{shoe.nickname.toUpperCase()}”
+          <p className="font-[var(--font-ocr)] text-[12px] tracking-widest text-[rgb(var(--text-secondary))]">
+            CALLSIGN: <span className="text-[rgb(var(--neon))]">{shoe.nickname.toUpperCase()}</span>
           </p>
         )}
       </header>
@@ -219,18 +223,18 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
           <h2 className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-3">
             EQUIPMENT DATA
           </h2>
-          <StatRow label="STATUS" value={shoe.status.toUpperCase()} />
+          <StatRow label="READINESS" value={shoe.status.toUpperCase()} />
           <StatRow label="LEVEL" value={level.title.toUpperCase()} />
-          <StatRow label="MILEAGE" value={`${mileage.totalMiles} MI`} />
+          <StatRow label="ODOMETER" value={`${mileage.totalMiles} MI`} />
           {mileage.adjustmentMiles !== 0 && (
             <StatRow label="ADJUSTMENT" value={mileage.adjustmentMiles} />
           )}
           <StatRow label="DAYS WORN" value={mileage.daysWorn} />
-          <StatRow label="CONDITION" value={conditionLabel} />
+          <StatRow label="SERVICEABILITY" value={conditionLabel} />
           <StatRow label="SIZE" value={`${shoe.size}${shoe.width ? ` ${shoe.width}` : ""}`} />
           <StatRow label="ACQUISITION" value={shoe.acquisitionType.replace(/_/g, " ")} />
           {shoe.firstWearDate && (
-            <StatRow label="STARTED" value={shoe.firstWearDate} />
+            <StatRow label="COMMISSIONED" value={shoe.firstWearDate} />
           )}
           {summary.amountPaid != null && (
             <StatRow
@@ -250,7 +254,7 @@ export function FootwearShoeProfile({ summary, observations, media }: Props) {
         {condition && (
           <div className="border border-[rgb(var(--neon)/0.2)] p-4">
             <h2 className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-3">
-              CURRENT CONDITION // {condition.checkpointMiles} MI
+              CURRENT SERVICEABILITY // {condition.checkpointMiles} MI
             </h2>
             <StatRow label="CUSHIONING" value={condition.performance.cushioning} />
             <StatRow label="STABILITY" value={condition.performance.stability} />

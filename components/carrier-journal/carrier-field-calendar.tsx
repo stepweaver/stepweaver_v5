@@ -389,7 +389,7 @@ export function CarrierFieldCalendar({ dispatches }: Props) {
       {/* Section header */}
       <div className="flex items-baseline justify-between mb-1">
         <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest">
-          ACTIVITY RECORD
+          OPERATIONAL LOG
         </div>
         {totalLogged > 0 && (
           <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-meta))]">

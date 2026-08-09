@@ -32,13 +32,18 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
     chips.push(WEATHER_FLAG_LABEL[key]);
   }
 
+  const dateStamp = d.date.replace(/-/g, ".");
+
   return (
     <article id={d.id} className="border-b border-[rgb(var(--border)/0.2)] py-6 sm:py-8 scroll-mt-28 first:pt-0">
+      <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.22em] text-[rgb(var(--text-meta))] mb-1">
+        SYSTEM
+      </div>
       <time
         dateTime={d.date}
         className="font-[var(--font-ocr)] text-[10px] tracking-[0.22em] text-[rgb(var(--neon))]"
       >
-        {d.date.replace(/-/g, ".")}
+        FIELD LOG // {dateStamp}
       </time>
       {d.title ? (
         <h3 className="mt-2 font-[var(--font-ibm)] text-lg sm:text-xl text-[rgb(var(--text-color))] leading-snug">
@@ -48,6 +53,9 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
 
       {d.publicNote.trim() && (
         <div className="mt-4 space-y-3 max-w-3xl">
+          <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.22em] text-[rgb(var(--text-meta))]">
+            OPERATOR
+          </div>
           {splitPublicNoteParagraphs(d.publicNote).map((paragraph, index) => (
             <p
               key={index}

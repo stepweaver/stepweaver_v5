@@ -1,18 +1,48 @@
 import Link from "next/link";
 import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
+import { formatUnitId } from "@/lib/footwear/unit";
 
 type Props = {
   summary: ShoeDerivedSummary;
 };
 
+function readinessLabel(status: string): string {
+  switch (status) {
+    case "active":
+      return "ACTIVE";
+    case "retired":
+      return "RETIRED";
+    case "failed":
+      return "FAILED";
+    case "paused":
+      return "PAUSED";
+    default:
+      return status.toUpperCase();
+  }
+}
+
+function dispositionLabel(
+  status: string,
+  conditionLabel: string
+): string | null {
+  if (status === "retired") return "RETIRED";
+  if (status === "failed") return "FAILED";
+  if (conditionLabel === "CRITICAL") return "PENDING RETIREMENT";
+  if (conditionLabel === "DECLINING") return "MONITOR";
+  if (status === "active") return "IN SERVICE";
+  return null;
+}
+
 export function FootwearActiveLoadoutCard({ summary }: Props) {
-  const { shoe, mileage, level, nextCheckpoint, milesRemaining, conditionLabel } =
+  const { shoe, mileage, level, nextCheckpoint, milesRemaining, conditionLabel, unitNumber } =
     summary;
 
   const commissioned = shoe.firstWearDate ?? shoe.purchaseDate;
   const commissionedLabel = commissioned
     ? commissioned.replace(/-/g, ".")
     : null;
+  const disposition = dispositionLabel(shoe.status, conditionLabel);
+  const unitLabel = formatUnitId(unitNumber ?? 1);
 
   return (
     <section
@@ -20,10 +50,10 @@ export function FootwearActiveLoadoutCard({ summary }: Props) {
       className="border border-[rgb(var(--neon)/0.3)] bg-[rgb(var(--panel)/0.35)] p-5 sm:p-6"
     >
       <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))] mb-3">
-        EQUIPMENT ROSTER // ACTIVE LOADOUT
+        EQUIPMENT ROSTER // FOOTWEAR
       </p>
       <p className="font-[var(--font-ocr)] text-[9px] tracking-[0.2em] text-[rgb(var(--text-meta))] mb-1">
-        FOOTWEAR
+        {unitLabel}
       </p>
       <h2
         id="footwear-loadout-heading"
@@ -32,21 +62,19 @@ export function FootwearActiveLoadoutCard({ summary }: Props) {
         {shoe.brand.toUpperCase()} {shoe.model.toUpperCase()}
       </h2>
       {shoe.nickname && (
-        <p className="mt-1 text-[rgb(var(--text-secondary))]">
-          “{shoe.nickname.toUpperCase()}”
+        <p className="mt-1 font-[var(--font-ocr)] text-[11px] tracking-widest text-[rgb(var(--text-secondary))]">
+          CALLSIGN: <span className="text-[rgb(var(--neon))]">{shoe.nickname.toUpperCase()}</span>
         </p>
       )}
 
       <dl className="mt-5 grid grid-cols-2 sm:grid-cols-3 gap-3 font-[var(--font-ocr)] text-[10px] tracking-widest">
         <div>
-          <dt className="text-[rgb(var(--text-meta))]">UNIT</dt>
-          <dd className="mt-1 text-[rgb(var(--text-color))]">
-            {shoe.brand.toUpperCase()} {shoe.model.toUpperCase()}
-          </dd>
-        </div>
-        <div>
           <dt className="text-[rgb(var(--text-meta))]">ROLE</dt>
           <dd className="mt-1 text-[rgb(var(--neon))]">PRIMARY WALKING PLATFORM</dd>
+        </div>
+        <div>
+          <dt className="text-[rgb(var(--text-meta))]">READINESS</dt>
+          <dd className="mt-1 text-[rgb(var(--text-color))]">{readinessLabel(shoe.status)}</dd>
         </div>
         {commissionedLabel ? (
           <div>
@@ -61,11 +89,11 @@ export function FootwearActiveLoadoutCard({ summary }: Props) {
           </dd>
         </div>
         <div>
-          <dt className="text-[rgb(var(--text-meta))]">CONDITION</dt>
+          <dt className="text-[rgb(var(--text-meta))]">SERVICEABILITY</dt>
           <dd className="mt-1 text-[rgb(var(--text-color))]">{conditionLabel}</dd>
         </div>
         <div>
-          <dt className="text-[rgb(var(--text-meta))]">NEXT SCAN</dt>
+          <dt className="text-[rgb(var(--text-meta))]">INSPECTION</dt>
           <dd className="mt-1 text-[rgb(var(--text-color))]">
             {nextCheckpoint
               ? `${nextCheckpoint.miles} MI${milesRemaining != null ? ` // ${milesRemaining} LEFT` : ""}`
@@ -76,6 +104,20 @@ export function FootwearActiveLoadoutCard({ summary }: Props) {
           <dt className="text-[rgb(var(--text-meta))]">CHECKPOINT</dt>
           <dd className="mt-1 text-[rgb(var(--text-color))]">{level.title.toUpperCase()}</dd>
         </div>
+        {disposition ? (
+          <div>
+            <dt className="text-[rgb(var(--text-meta))]">DISPOSITION</dt>
+            <dd
+              className={`mt-1 ${
+                disposition === "PENDING RETIREMENT" || disposition === "FAILED"
+                  ? "text-[rgb(var(--warn))]"
+                  : "text-[rgb(var(--text-color))]"
+              }`}
+            >
+              {disposition}
+            </dd>
+          </div>
+        ) : null}
         {shoe.isLegacyRecord && (
           <div>
             <dt className="text-[rgb(var(--text-meta))]">RECORD</dt>

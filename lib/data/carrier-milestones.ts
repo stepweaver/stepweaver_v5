@@ -29,13 +29,13 @@ export type CarrierRank = {
 // ---------------------------------------------------------------------------
 
 const LEVEL_THRESHOLDS: { miles: number; title: string; level: number }[] = [
-  { miles: 0, title: "BOOT SEQUENCE", level: 1 },
-  { miles: 25, title: "CALIBRATION", level: 2 },
-  { miles: 50, title: "WALK CYCLE", level: 3 },
-  { miles: 100, title: "FIELD UNIT", level: 4 },
-  { miles: 250, title: "LOAD-BEARING", level: 5 },
+  { miles: 0, title: "INITIAL ISSUE", level: 1 },
+  { miles: 25, title: "SHAKEDOWN", level: 2 },
+  { miles: 50, title: "FIELD QUALIFIED", level: 3 },
+  { miles: 100, title: "ROAD CONDITIONED", level: 4 },
+  { miles: 250, title: "LOAD BEARING", level: 5 },
   { miles: 500, title: "LONG WALKER", level: 6 },
-  { miles: 1000, title: "DISTANCE PROVEN", level: 7 },
+  { miles: 1000, title: "DISTANCE VETERAN", level: 7 },
   { miles: 2500, title: "HARDENED", level: 8 },
   { miles: 5000, title: "IRON FRAME", level: 9 },
   { miles: 10000, title: "ENDURANCE CLASS", level: 10 },

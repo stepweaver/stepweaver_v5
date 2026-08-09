@@ -9,7 +9,13 @@ import {
 
 function ProgressBar({ value }: { value: number }) {
   return (
-    <div className="relative h-1.5 w-full bg-[rgb(var(--border)/0.2)] overflow-hidden">
+    <div
+      className="relative h-2 w-full bg-[rgb(var(--border)/0.25)] overflow-hidden"
+      role="progressbar"
+      aria-valuenow={value}
+      aria-valuemin={0}
+      aria-valuemax={100}
+    >
       <div
         className="absolute inset-y-0 left-0 bg-[rgb(var(--neon))] transition-all"
         style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
@@ -25,7 +31,7 @@ function RankLadderHeader() {
         LVL
       </div>
       <div className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta))]">
-        CLASS
+        QUALIFICATION
       </div>
       <div className="font-[var(--font-ocr)] text-[8px] tracking-widest text-[rgb(var(--text-meta))] text-right">
         AT
@@ -145,31 +151,40 @@ export function CarrierMilestonePanel({ dispatches }: Props) {
     <div className="surface-panel p-5 sm:p-6 space-y-5">
       <div>
         <div className="font-[var(--font-ocr)] text-[10px] tracking-[0.3em] text-[rgb(var(--neon))] mb-1">
-          DISTANCE CLASS // LEVEL {String(level.level).padStart(2, "0")}
+          DISTANCE QUALIFICATION // LEVEL {String(level.level).padStart(2, "0")}
         </div>
         <div className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--text-color))]">
           {level.title}
         </div>
         <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] text-[rgb(var(--text-meta))] mt-1">
-          {level.totalMiles} MI
+          {level.totalMiles} MI RECORDED
         </div>
       </div>
 
-      <div className="space-y-1.5">
-        <div className="flex justify-between text-[10px] font-[var(--font-ocr)] tracking-widest">
-          <span className="text-[rgb(var(--text-label))]">{level.totalMiles} MI</span>
-          {level.nextTitle && milesUntilNext != null && (
-            <span className="text-[rgb(var(--text-meta))]">
-              {milesUntilNext} MI TO NEXT CLASS
-            </span>
-          )}
-        </div>
+      <div className="space-y-2">
         <ProgressBar value={level.progressToNext} />
+        {level.nextTitle && milesUntilNext != null && level.nextMiles != null ? (
+          <div className="space-y-1 pt-1">
+            <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] text-[rgb(var(--text-label))]">
+              NEXT QUALIFICATION
+            </div>
+            <div className="font-[var(--font-ocr)] text-[11px] tracking-widest text-[rgb(var(--text-color))]">
+              {level.nextTitle} // {level.nextMiles.toLocaleString()} MI
+            </div>
+            <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))]">
+              {milesUntilNext} MI REMAINING
+            </div>
+          </div>
+        ) : (
+          <div className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))] pt-1">
+            MAX QUALIFICATION REACHED
+          </div>
+        )}
       </div>
 
       <div>
         <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] text-[rgb(var(--text-label))] mb-2">
-          CLASS LADDER // {level.totalLevels} LEVELS
+          SERVICE RECORD // {level.totalLevels} QUALIFICATIONS
         </div>
         <div className="border border-[rgb(var(--border)/0.2)] px-2 sm:px-3 py-0.5">
           <RankLadderHeader />

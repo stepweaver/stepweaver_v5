@@ -4,7 +4,7 @@ export const carrierJournal: Project = {
   slug: "carrier-journal",
   title: "Field Journal",
   description:
-    "A personal human-machine field journal: Notion-backed daybook logging, body telemetry, distance class, equipment roster, and a hard draft-by-default publication boundary.",
+    "A human performance log: Notion-backed daybook, body telemetry, distance qualification, equipment roster, and a hard draft-by-default publication boundary.",
   status: "live",
   imageUrl: "/images/field_journal_og.png",
   tags: ["Next.js", "Notion API", "Field Notes", "Telemetry", "Personal Systems", "Mobile UX"],
@@ -13,7 +13,7 @@ export const carrierJournal: Project = {
   solved:
     "turning high-mileage walking days into structured public telemetry without leaking workplace identity or operational detail",
   delivered: [
-    "Public Field Journal with body telemetry, distance class, calendar, and sanitized notes",
+    "Public Field Journal with body telemetry, distance qualification, calendar, and sanitized notes",
     "Mobile daybook with session-cookie auth and draft-by-default Publish Public",
     "Computed weather, hydration, and equipment mileage aggregates",
     "Private notes never leave the logging layer",
@@ -63,7 +63,7 @@ export const carrierJournal: Project = {
       title: "Key Features",
       type: "key-features",
       bullets: [
-        "Public Field Journal with body telemetry, distance class, calendar, and field notes",
+        "Public Field Journal with body telemetry, distance qualification, calendar, and field notes",
         "Private daybook at /log with HttpOnly session cookie auth",
         "Draft-by-default daybook upserts; explicit publish checkbox for public notes",
         "Equipment Roster as footwear telemetry with brands, ratings, and conclusions",

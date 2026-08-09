@@ -11,17 +11,17 @@ import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
 import { CarrierFieldCalendar } from "./carrier-field-calendar";
 import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 import { CarrierProfileCard } from "./carrier-profile-card";
-import { MachineNotes } from "./machine-notes";
+import { SystemsCheck } from "./systems-check";
 import { WalkingProtocol } from "./walking-protocol";
 import { FootwearActiveLoadoutCard } from "@/components/footwear/footwear-active-loadout-card";
 import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
 
 const SECTION_NAV = [
   { id: "body-telemetry", label: "TELEMETRY" },
-  { id: "distance-class", label: "DISTANCE" },
+  { id: "distance-qualification", label: "DISTANCE" },
   { id: "active-loadout", label: "LOADOUT" },
-  { id: "field-dispatches", label: "FIELD NOTES" },
-  { id: "machine-notes", label: "MACHINE NOTES" },
+  { id: "field-log", label: "FIELD LOG" },
+  { id: "systems-check", label: "SYSTEMS" },
 ] as const;
 
 function FieldSectionNav() {
@@ -72,13 +72,13 @@ export function CarrierJournalPage({
             <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
               FIELD JOURNAL // THE LONG WALK
             </div>
-            <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))] mb-4">
-              Field Journal
+            <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))] mb-3">
+              A Human Performance Log
             </h1>
             <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
-              I&apos;m rebuilding the machine by using it. The body is the system. The miles are the
-              test environment. This journal is the telemetry: feet, gait, heat, recovery,
-              equipment, and what the chassis does under load.
+              Miles, environmental load, hydration, recovery, body mechanics, equipment wear,
+              and the accumulated effects of putting a human frame through high-mileage walking
+              days.
             </p>
           </div>
           <div className="lg:shrink-0">
@@ -99,11 +99,11 @@ export function CarrierJournalPage({
           </div>
         </div>
 
-        <div id="activity-record" className="scroll-mt-28">
+        <div id="operational-log" className="scroll-mt-28">
           <CarrierFieldCalendar dispatches={dispatches} />
         </div>
 
-        <div id="distance-class" className="scroll-mt-28">
+        <div id="distance-qualification" className="scroll-mt-28">
           <CarrierMilestonePanel dispatches={dispatches} />
         </div>
 
@@ -114,10 +114,10 @@ export function CarrierJournalPage({
             <div className="border border-[rgb(var(--neon)/0.2)] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
                 <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-1">
-                  EQUIPMENT ROSTER // ACTIVE LOADOUT
+                  EQUIPMENT ROSTER // FOOTWEAR
                 </p>
                 <p className="text-sm text-[rgb(var(--text-secondary))]">
-                  Footwear under real-world mileage testing. Brands, odometers, condition, and
+                  Walking platforms under field testing. Brands, odometers, serviceability, and
                   field notes.
                 </p>
               </div>
@@ -131,9 +131,9 @@ export function CarrierJournalPage({
           )}
         </div>
 
-        <div id="field-dispatches" className="scroll-mt-28">
+        <div id="field-log" className="scroll-mt-28">
           <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
-            FIELD NOTES // RECENT TRANSMISSIONS
+            FIELD LOG // RECENT TRANSMISSIONS
           </div>
           {feedDispatches.length > 0 ? (
             <CarrierDispatchFeed dispatches={feedDispatches} />
@@ -145,7 +145,7 @@ export function CarrierJournalPage({
           )}
         </div>
 
-        <MachineNotes />
+        <SystemsCheck />
 
         <WalkingProtocol />
 
@@ -156,7 +156,7 @@ export function CarrierJournalPage({
                 EQUIPMENT ROSTER
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Full footwear ledger: retired platforms, checkpoint path, and field notes.
+                Full footwear ledger: retired units, inspection path, and field notes.
               </p>
             </div>
             <Link

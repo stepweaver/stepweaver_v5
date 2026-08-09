@@ -64,6 +64,7 @@ type RosterProps = {
     totalMiles: number;
     levelTitle: string;
     conditionLabel: string;
+    unitNumber?: number;
   }[];
 };
 
@@ -85,21 +86,25 @@ export function FootwearRosterGrid({ shoes }: RosterProps) {
             className="block border border-[rgb(var(--neon)/0.25)] p-4 hover:border-[rgb(var(--neon)/0.55)] hover:bg-[rgb(var(--neon)/0.04)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))] transition-colors"
           >
             <p className="font-[var(--font-ocr)] text-[9px] tracking-[0.25em] text-[rgb(var(--neon))] mb-2">
+              {shoe.unitNumber != null
+                ? `UNIT ${String(shoe.unitNumber).padStart(3, "0")}`
+                : "EQUIPMENT"}
+              {" // "}
               {shoe.status === "active"
                 ? "ACTIVE LOADOUT"
                 : shoe.status === "retired" || shoe.status === "failed"
                   ? "RETIRED UNIT"
                   : shoe.status === "paused"
                     ? "PAUSED"
-                    : "EQUIPMENT ROSTER"}
-              {shoe.isLegacyRecord ? " // LEGACY RECORD" : ""}
+                    : "ROSTER"}
+              {shoe.isLegacyRecord ? " // LEGACY" : ""}
             </p>
             <h3 className="font-[var(--font-ibm)] text-xl text-[rgb(var(--text-color))]">
               {shoe.brand} {shoe.model}
             </h3>
             {shoe.nickname && (
-              <p className="text-sm text-[rgb(var(--text-secondary))]">
-                “{shoe.nickname}”
+              <p className="mt-1 font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-secondary))]">
+                CALLSIGN: {shoe.nickname.toUpperCase()}
               </p>
             )}
             <p className="mt-3 font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-meta))]">

@@ -15,11 +15,11 @@ const SITE_URL = process.env.SITE_URL || "https://stepweaver.dev";
 export const metadata: Metadata = {
   title: "Equipment Roster | Field Journal",
   description:
-    "Equipment Roster // Footwear: brands, odometers, condition, and honest conclusions from high-mileage walking.",
+    "Equipment Roster // Footwear: units, callsigns, odometers, serviceability, and field conclusions from high-mileage walking.",
   openGraph: {
     title: "Equipment Roster // Footwear",
     description:
-      "Footwear under real-world mileage testing: brands, odometers, condition, and field notes.",
+      "Walking platforms under field testing: units, callsigns, odometers, serviceability, and field notes.",
     url: `${SITE_URL}/field-journal/footwear`,
     type: "website",
   },

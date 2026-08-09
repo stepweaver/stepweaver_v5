@@ -1,11 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
 
-const PROFILE_TAGS = ["Long Walker", "Machine Mode", "Field Notes"];
+const PROFILE_TAGS = ["Long Walker", "Machine Mode", "Field Log"];
 
 export function CarrierProfileCard() {
   return (
-    <section className="relative w-full max-w-[390px] flex flex-col border border-[rgb(var(--neon)/0.2)] bg-[rgb(var(--panel)/0.25)] p-5">
+    <section
+      aria-labelledby="operator-record-heading"
+      className="relative w-full max-w-[390px] flex flex-col border border-[rgb(var(--neon)/0.2)] bg-[rgb(var(--panel)/0.25)] p-5"
+    >
       <div className="pointer-events-none absolute left-0 top-0 h-6 w-6 border-l-2 border-t-2 border-[rgb(var(--cyan)/0.6)]" />
       <div className="pointer-events-none absolute right-0 top-0 h-6 w-6 border-r-2 border-t-2 border-[rgb(var(--cyan)/0.25)]" />
       <div className="pointer-events-none absolute bottom-0 left-0 h-6 w-6 border-b-2 border-l-2 border-[rgb(var(--cyan)/0.25)]" />
@@ -15,10 +18,13 @@ export function CarrierProfileCard() {
       <header className="relative z-10 mb-4 flex items-start justify-between gap-4 pb-1">
         <div>
           <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] sm:text-sm font-[var(--font-ocr)] uppercase">
-            Operator // WALK-01
+            Operator Record
           </p>
-          <h2 className="text-xl font-semibold text-[rgb(var(--text-color))] font-[var(--font-ibm)]">
-            Stephen Weaver
+          <h2
+            id="operator-record-heading"
+            className="text-xl font-semibold text-[rgb(var(--text-color))] font-[var(--font-ibm)]"
+          >
+            WALK-01 // Stephen Weaver
           </h2>
         </div>
         <div className="text-right text-xs text-[rgb(var(--muted-color))] font-mono shrink-0">
@@ -50,10 +56,10 @@ export function CarrierProfileCard() {
 
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Field Load
+                Name
               </p>
               <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                High-mileage walking
+                Stephen Weaver
               </p>
             </div>
           </div>
@@ -61,7 +67,16 @@ export function CarrierProfileCard() {
           <div className="min-w-0 space-y-3">
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Status
+                Callsign / Log ID
+              </p>
+              <p className="mt-1 text-sm text-[rgb(var(--cyan))] font-[var(--font-ibm)] leading-snug">
+                WALK-01
+              </p>
+            </div>
+
+            <div>
+              <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
+                Readiness
               </p>
               <div className="mt-1 flex items-center gap-2">
                 <p className="text-sm text-[rgb(var(--cyan))] font-[var(--font-ibm)] whitespace-normal leading-snug">
@@ -76,7 +91,7 @@ export function CarrierProfileCard() {
 
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Current Mode
+                Current Phase
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
                 The Long Walk
@@ -85,7 +100,7 @@ export function CarrierProfileCard() {
 
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Objective
+                Mission
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
                 Rebuild the machine
@@ -94,10 +109,10 @@ export function CarrierProfileCard() {
 
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">
-                Current Focus
+                Systems Under Observation
               </p>
               <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Endurance // Gait // Recovery // Loadout
+                Frame // Drive // Contact // Thermal // Recovery
               </p>
             </div>
           </div>
@@ -106,8 +121,8 @@ export function CarrierProfileCard() {
         <div className="pt-1">
           <p className="font-[var(--font-ibm)] text-[rgb(var(--text-color))] text-sm leading-relaxed">
             I started this heavier, slower, and far less conditioned than I wanted to be. Now I
-            spend my working days putting miles through the machine and documenting what happens.
-            Feet. Legs. Core. Hydration. Heat. Recovery. Equipment. The good days and the ugly ones.
+            put miles through the machine and document what happens. Feet. Legs. Core. Heat.
+            Recovery. Equipment. The good days and the ugly ones.
           </p>
         </div>
 
