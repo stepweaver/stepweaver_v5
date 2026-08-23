@@ -24,7 +24,7 @@ In Vercel (Production + Preview) and local `.env.local`:
 - [ ] `/carrier-journal` permanently redirects to `/field-journal`.
 - [ ] `/log?token=anything` does **not** authenticate (no query-token gate).
 - [ ] POST login at `/log` sets HttpOnly `carrier_session`.
-- [ ] Daybook save leaves Notion **Publish Public** unchecked.
+- [ ] Daybook save sets Notion **Publish Public** checked.
 - [ ] Empty Notion does not show seed/demo narratives on any public path.
 - [ ] Old passphrase fails; new passphrase works.
 

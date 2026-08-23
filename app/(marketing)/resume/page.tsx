@@ -3,7 +3,8 @@ import { resumeData } from "@/lib/data/resume-data";
 
 export const metadata = {
   title: "Resume",
-  description: "Professional background: systems, automation, and business-facing software.",
+  description:
+    "Software developer and business systems developer: 9+ years across development, analysis, data, and operations. Currently building in SvelteKit.",
 };
 
 export default function ResumePage() {
@@ -21,6 +22,17 @@ export default function ResumePage() {
             <p className="text-[rgb(var(--text-meta))] text-sm font-[var(--font-ibm)] mt-2">
               {resumeData.identity.subtitle}
             </p>
+            <p className="text-[rgb(var(--text-meta))] text-xs font-mono mt-2">
+              <a href={`mailto:${resumeData.identity.email}`} className="hover:text-[rgb(var(--neon))]">
+                {resumeData.identity.email}
+              </a>
+              {" · "}
+              <a href={resumeData.identity.siteUrl} className="hover:text-[rgb(var(--neon))]">
+                {resumeData.identity.site}
+              </a>
+              {" · "}
+              {resumeData.identity.location}
+            </p>
           </div>
           <div className="flex flex-wrap gap-2">
             <a href="/weaver_resume.pdf" className="glitch-button glitch-button--primary text-xs">
@@ -28,6 +40,9 @@ export default function ResumePage() {
             </a>
             <Link href="/about" className="glitch-button text-xs">
               About
+            </Link>
+            <Link href="/lab" className="glitch-button text-xs">
+              Lab
             </Link>
             <Link href="/contact?intent=hire" className="glitch-button text-xs">
               Contact
@@ -75,6 +90,30 @@ export default function ResumePage() {
                   </div>
                 </div>
               ))}
+            </div>
+            <div className="mt-4 border border-[rgb(var(--neon)/0.28)] p-4 bg-[rgb(var(--panel)/0.15)]">
+              <p className="font-[var(--font-ocr)] text-[10px] uppercase tracking-[0.18em] text-[rgb(var(--neon)/0.7)] mb-3">
+                {resumeData.currentlyBuilding.label}
+              </p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {resumeData.currentlyBuilding.items.map((s) => (
+                  <span
+                    key={s}
+                    className="text-xs px-2 py-1 border border-[rgb(var(--neon)/0.35)] text-[rgb(var(--text-color))]"
+                  >
+                    {s}
+                  </span>
+                ))}
+              </div>
+              <p className="text-[rgb(var(--text-secondary))] text-xs leading-relaxed mb-2">
+                {resumeData.currentlyBuilding.note}
+              </p>
+              <Link
+                href={resumeData.currentlyBuilding.href}
+                className="text-xs text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))]"
+              >
+                Lab notes →
+              </Link>
             </div>
           </section>
 

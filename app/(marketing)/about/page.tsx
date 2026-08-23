@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { BackgroundBio } from "@/components/brief/background-bio";
+import { LearningLabPanel } from "@/components/brief/learning-lab-panel";
 import { briefData } from "@/lib/data/brief-data";
 
 export const metadata = {
   title: "About",
   description:
-    "Where Stephen Weaver fits: product-minded systems builder for operations, internal tools, and AI-assisted workflows. Selective consulting when the fit is right.",
+    "Where Stephen Weaver fits: product-minded systems builder who learns the domain and stack the problem requires, then ships working software.",
 };
 
 export default function AboutPage() {
@@ -27,6 +28,8 @@ export default function AboutPage() {
             <div className="text-label mb-2">STATEMENT</div>
             <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed">{briefData.identity.statement}</p>
           </div>
+
+          <LearningLabPanel />
 
           <div>
             <div className="text-label mb-3">{briefData.roleFit.title}</div>

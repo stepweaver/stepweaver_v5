@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { TRAJECTORY } from "@/lib/data/identity";
 
 /** Bio block from Brief / Background (BIO-01); shared with the home hero. */
 export function BackgroundBio() {
@@ -15,15 +16,14 @@ export function BackgroundBio() {
           background still defines how I build. I start with workflows, handoffs, data, integrations, and risk, then
           turn them into systems people can use, maintain, and trust.
         </p>
+        <p>{TRAJECTORY.framing}</p>
         <p className="text-[rgb(var(--text-color))] text-xs uppercase tracking-wider font-[var(--font-ocr)]">
           Trajectory
         </p>
         <ul className="list-disc pl-5 space-y-2">
-          <li>U.S. Air Force veteran; Airborne Cryptologic Linguist</li>
-          <li>Restaurant operations and management</li>
-          <li>Business analysis</li>
-          <li>Self-taught developer</li>
-          <li>Current focus: DevOps and infrastructure</li>
+          {TRAJECTORY.items.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
         </ul>
       </div>
 

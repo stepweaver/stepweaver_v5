@@ -318,12 +318,12 @@ Private logging features:
 - quick log at `/field-journal/log` (requires prior `/log` session)
 - full daybook at `/log` after POST passphrase login
 - HttpOnly `carrier_session` cookie (not URL tokens or sessionStorage)
-- Notion upsert by date with **Publish Public = false by default**
+- Notion upsert by date with **Publish Public = true** on daybook save
 - public note and private note separation
 
 Publication / privacy rules:
 
-- Daybook writes default to draft (`Publish Public = false`). Do not rely on omitting the field to publish.
+- Daybook writes publish automatically (`Publish Public = true`) unless `published` is explicitly false.
 - Public reads only use rows where `Publish Public = true`.
 - `Private Note` is written to Notion but never read for public rendering.
 - Empty Notion responses fail closed (no demo/fallback narratives).
@@ -538,7 +538,7 @@ The chat system:
 Notion integrations avoid broad public reads:
 
 - Codex and docs only read `Published` content.
-- Field Journal public reads only use `Publish Public = true`; daybook writes default to draft.
+- Field Journal public reads only use `Publish Public = true`; daybook writes publish on save.
 - `Private Note` is never read for public field-journal rendering.
 - Public Field Journal payloads are projected through `toPublicFieldDispatch` before client components.
 - Public path fails closed when Notion is empty (no demo narratives).
@@ -779,7 +779,7 @@ Good future test targets:
 1. Ensure `NOTION_API_KEY`, `NOTION_CARRIER_JOURNAL_DB_ID`, `CARRIER_JOURNAL_LOG_SECRET`, and `CARRIER_SESSION_SIGNING_SECRET` are set.
 2. Open `/log`, enter the passphrase (POST login; cookie is HttpOnly).
 3. Use `/field-journal/log` for a quicker private log after you have a session.
-4. Confirm the Notion row is created or updated by date with **Publish Public unchecked**.
+4. Confirm the Notion row is created or updated by date with **Publish Public checked**.
 5. Public `/field-journal` only shows rows with `Publish Public = true`, and never receives private operational fields in the browser payload.
 
 ### Add a terminal command

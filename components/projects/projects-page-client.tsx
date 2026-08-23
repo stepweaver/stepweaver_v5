@@ -5,6 +5,7 @@ import { useMemo, useCallback, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { Project } from "@/lib/data/projects.schema";
 import { FEATURED_SLUGS } from "@/lib/data/projects";
+import { LearningLabPanel } from "@/components/brief/learning-lab-panel";
 
 function ProjectsPageInner({ projects, tags }: { projects: Project[]; tags: string[] }) {
   const router = useRouter();
@@ -56,6 +57,10 @@ function ProjectsPageInner({ projects, tags }: { projects: Project[]; tags: stri
           <p className="text-[rgb(var(--text-secondary))] text-sm max-w-2xl">
             Flagship case studies first: operations systems, internal tools, and AI-assisted workflows, then the full archive.
           </p>
+        </div>
+
+        <div className="mb-8">
+          <LearningLabPanel compact />
         </div>
 
         <div className="mb-6 flex flex-col sm:flex-row sm:items-end gap-4">

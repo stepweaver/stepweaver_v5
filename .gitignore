@@ -53,5 +53,8 @@ credentials.txt
 # Agent session exports
 session-*.md
 
+# Generated resume print source
+scripts/.resume-print.html
+
 .vercel
 .env*.local

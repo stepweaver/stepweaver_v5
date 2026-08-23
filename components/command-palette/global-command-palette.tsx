@@ -19,6 +19,7 @@ import {
   Mail,
   FolderOpen,
   ChevronRight,
+  FlaskConical,
 } from "lucide-react";
 import { getAllProjects } from "@/lib/data/projects";
 
@@ -38,6 +39,7 @@ const STATIC_GROUPS: { group: string; items: CmdItem[] }[] = [
       { id: "work", label: "Work", href: "/work", icon: FolderOpen },
       { id: "about", label: "About", href: "/about", icon: FileText },
       { id: "resume", label: "Resume", href: "/resume", icon: FileText },
+      { id: "lab", label: "Learning Lab", href: "/lab", icon: FlaskConical, meta: "SvelteKit rebuild" },
       { id: "contact", label: "Contact", href: "/contact", icon: Mail },
       { id: "services", label: "Services", href: "/services", icon: Zap },
       { id: "writing", label: "Writing", href: "/writing", icon: BookOpen },

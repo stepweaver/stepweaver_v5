@@ -139,8 +139,7 @@ export function CarrierJournalPage({
             <CarrierDispatchFeed dispatches={feedDispatches} />
           ) : (
             <p className="text-sm text-[rgb(var(--text-secondary))]">
-              No published notes yet. New daybook saves stay private drafts until you intentionally
-              publish a sanitized public note.
+              No published notes yet. Logged carrier days publish to Field Journal automatically.
             </p>
           )}
         </div>

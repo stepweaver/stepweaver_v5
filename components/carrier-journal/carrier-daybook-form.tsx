@@ -105,7 +105,6 @@ export function CarrierDaybookForm({
 
   const [publicNote, setPublicNote] = useState("");
   const [privateNote, setPrivateNote] = useState("");
-  const [publishPublic, setPublishPublic] = useState(false);
 
   const [weather, setWeather] = useState<WeatherState>({ status: "idle" });
   const [weatherTemp, setWeatherTemp] = useState<number | null>(null);
@@ -367,7 +366,7 @@ export function CarrierDaybookForm({
 
       if (publicNote.trim()) body.publicNote = publicNote.trim();
       if (privateNote.trim()) body.privateNote = privateNote.trim();
-      body.published = publishPublic && Boolean(publicNote.trim());
+      body.published = true;
       if (fuelInput) body.fuel = fuelInput;
 
       if (footwearOptions.length > 0 && milesNum !== undefined) {
@@ -440,7 +439,7 @@ export function CarrierDaybookForm({
     [
       date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
-      mood, energy, soreness, publicNote, privateNote, publishPublic,
+      mood, energy, soreness, publicNote, privateNote,
       weatherTemp, weatherHeat, weatherAvgHeat, weatherPrecip, rainedOnRoute,
       steppedInDogPoop, fuelInput,
       footwearOptions, splitMode, splitRows, assignAllMiles, primaryShoeId,
@@ -1142,22 +1141,10 @@ export function CarrierDaybookForm({
             className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-sm px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors resize-none"
             placeholder="Fitness framing only: miles, weather, recovery, how the day felt. No employer, routes, mail volume, customers, or coworkers."
           />
-          <label className="mt-3 flex items-start gap-3 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={publishPublic}
-              onChange={(e) => setPublishPublic(e.target.checked)}
-              className="mt-1 accent-[rgb(var(--neon))]"
-            />
-            <span className="text-xs text-[rgb(var(--text-secondary))] leading-relaxed">
-              <span className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--neon))]">
-                PUBLISH TO FIELD JOURNAL
-              </span>
-              <br />
-              Off by default. Only check this after the note is sanitized for a personal walking
-              journal. Leave unchecked to keep a private draft.
-            </span>
-          </label>
+          <p className="mt-2 text-xs text-[rgb(var(--text-secondary))] leading-relaxed">
+            Saving this day publishes it to Field Journal automatically. Keep this note
+            sanitized; private notes stay off the public surface.
+          </p>
         </div>
 
         <div>

@@ -1,20 +1,29 @@
+import {
+  CONTACT,
+  CURRENTLY_BUILDING,
+  IDENTITY_STATEMENT,
+  PROFESSIONAL_SUMMARY,
+  ROLE_LINE,
+  ROLE_LINE_PDF,
+} from "./identity";
+
 export const resumeData = {
   identity: {
     eyebrow: "λstepweaver // resume",
     title: "Stephen Weaver",
-    subtitle: "Full-Stack Engineer · Systems Builder · Automation & AI Integration",
-    statement:
-      "Business-facing developer and systems builder. I translate messy workflows into working software, dashboards, automation, and AI-assisted tools.",
+    subtitle: ROLE_LINE,
+    subtitlePdf: ROLE_LINE_PDF,
+    statement: IDENTITY_STATEMENT,
+    email: CONTACT.email,
+    site: CONTACT.site,
+    siteUrl: CONTACT.siteUrl,
+    location: CONTACT.location,
   },
   summary: {
     title: "Professional Summary",
-    body: [
-      "Full-stack and DevOps engineer with 9+ years’ experience spanning software development, data analysis, and operations.",
-      "Former Air Force linguist and business analyst who builds AI-enabled web apps, real-time systems, and automation workflows that reduce friction and improve operations.",
-      "Specializes in Next.js, Supabase, PostgreSQL, LLM integrations, and pragmatic DevOps pipelines.",
-      "Adept at translating business requirements into scalable systems and communicating across technical and non-technical teams.",
-    ] as const,
+    body: PROFESSIONAL_SUMMARY,
   },
+  currentlyBuilding: CURRENTLY_BUILDING,
   skills: {
     title: "Skills",
     groups: [

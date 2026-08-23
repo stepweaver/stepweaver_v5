@@ -1,3 +1,5 @@
+import { ROLE_LINE } from "@/lib/data/identity";
+
 const DEFAULT_BASE = "https://stepweaver.dev";
 
 export function siteBaseUrl(): string {
@@ -34,9 +36,9 @@ export function generateStructuredData() {
     "@type": "Person",
     name: "Stephen Weaver",
     alternateName: "Yankee Samurai",
-    jobTitle: "Full-Stack / Automation / AI",
+    jobTitle: ROLE_LINE,
     description:
-      "Business-minded builder and former U.S. Air Force linguist (Airborne Cryptologic Linguist) focused on web apps, automation, and AI-enabled tools that turn messy workflows into usable systems.",
+      "Software developer and business systems developer. Former U.S. Air Force linguist who turns messy workflows into usable systems, and learns the domain or stack the problem requires.",
     url: baseUrl,
     image: `${baseUrl}/images/pixarMe.png`,
     sameAs: ["https://github.com/stepweaver", "https://bsky.app/profile/stepweaver.dev"],
@@ -48,20 +50,23 @@ export function generateStructuredData() {
       "Systems design",
       "Operational tooling",
       "Business analysis",
-      "DevOps",
-      "Next.js",
-      "React",
+      "Business systems",
+      "TypeScript",
       "JavaScript",
+      "Python",
+      "SQL",
+      "React",
+      "Next.js",
       "PostgreSQL",
     ],
     hasOccupation: {
       "@type": "Occupation",
-      name: "Full-Stack Developer",
+      name: "Software Developer",
       occupationLocation: {
         "@type": "Country",
         name: "United States",
       },
-      skills: "Business analysis, systems thinking, web applications, automation, AI workflows",
+      skills: "Business systems, systems thinking, web applications, automation, AI workflows",
     },
   };
 

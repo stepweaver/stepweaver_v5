@@ -1,21 +1,24 @@
 /** About / operator dossier content. */
 
+import { ABOUT_STATEMENT, LEARNING_LAB, ROLES } from "./identity";
+
 export const briefData = {
   identity: {
     eyebrow: "λstepweaver // about",
     name: "Stephen Weaver",
-    roles: ["Full-Stack Developer", "Systems Builder", "Automation & AI Integration"] as const,
-    statement:
-      "I came into software through operations, analysis, and real-world process work. My edge is not just shipping code. It is understanding how work moves through a team, where it breaks, and how to turn that into dependable software, automation, and AI-assisted tools.",
+    roles: ROLES,
+    statement: ABOUT_STATEMENT,
   },
+  learningLab: LEARNING_LAB,
   roleFit: {
     title: "Where I fit",
     items: [
-      "Full-stack engineering and implementation (Next.js, React, Node.js)",
+      "Full-stack implementation across TypeScript, JavaScript, React, Node.js, and the stack the problem requires",
       "Custom data workflows, automation, and tool integration (n8n, APIs, webhooks)",
       "AI-assisted systems with explicit guardrails",
       "Internal tools, dashboards, and operational consoles",
       "Product-minded roles on operations-heavy or logistics-adjacent teams",
+      "Work that requires entering an unfamiliar domain or technology and shipping a working system",
       "Contract, sprint, and project-based engagements when the fit is clear",
     ] as const,
   },

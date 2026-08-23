@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "@/components/theme-provider";
 import { MatrixSync } from "@/components/ui/matrix-sync";
+import { ROLE_LINE } from "@/lib/data/identity";
 
 const HERO_PORTRAIT_FADE_MS = 400;
 const HERO_PORTRAIT_GLITCH_BURST_MS = 480;
@@ -114,7 +115,7 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Role</p>
               <p className="text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Systems Builder · Full-Stack Developer · Automation &amp; AI Integration
+                {ROLE_LINE}
               </p>
             </div>
 

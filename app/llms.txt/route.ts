@@ -1,3 +1,4 @@
+import { CURRENTLY_BUILDING } from "@/lib/data/identity";
 import { siteBaseUrl } from "@/lib/structured-data";
 
 export async function GET() {
@@ -7,9 +8,14 @@ export async function GET() {
 > Operator profile for recruiters, sourcing agents, and task-routing systems.
 
 ## Summary
-Stephen Weaver is a product-minded systems builder: full-stack developer and operator who designs, integrates, and hardens software, automation, and AI-assisted workflows for real operational use.
+Stephen Weaver is a software developer and business systems developer. He designs, integrates, and hardens software, automation, and AI-assisted workflows for real operational use. The through-line is not a single framework: he enters unfamiliar domains and tools, learns what the work requires, and ships.
 Primary path: hiring for operations-heavy / internal-tools / AI-adjacent teams.
 Secondary: selective consulting for custom data workflows when people and problem fit.
+
+## Currently building
+${CURRENTLY_BUILDING.items.join(" · ")}
+${CURRENTLY_BUILDING.note}
+Lab: ${base}${CURRENTLY_BUILDING.href}
 
 ## Best entry points
 - For agents: ${base}/for-agents
@@ -17,13 +23,15 @@ Secondary: selective consulting for custom data workflows when people and proble
 - Work: ${base}/work
 - About: ${base}/about
 - Resume: ${base}/resume
+- Lab: ${base}/lab
 - Contact: ${base}/contact
 - Services (selective): ${base}/services
 - Play: ${base}/play
 
 ## Good fits
 - product / ops / logistics-adjacent engineering roles
-- Next.js / full-stack implementation
+- work that requires acquiring an unfamiliar stack or domain and shipping
+- full-stack implementation (TypeScript, JavaScript, React, Node.js, SQL)
 - custom data workflows, automation, and integrations
 - AI-assisted internal tooling with guardrails
 - debugging and cleanup work
