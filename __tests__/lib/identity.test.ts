@@ -1,4 +1,4 @@
-import { ABOUT_STATEMENT, CURRENTLY_BUILDING, LINKEDIN, PROFESSIONAL_SUMMARY, ROLE_LINE, ROLE_LINE_PDF, TRAJECTORY } from "@/lib/data/identity";
+import { ABOUT_STATEMENT, CURRENTLY_BUILDING, LINKEDIN, PROFESSIONAL_SUMMARY, RESUME_PDF, ROLE_LINE, ROLE_LINE_PDF, TRAJECTORY } from "@/lib/data/identity";
 import { briefData } from "@/lib/data/brief-data";
 import { buildResumeHtml } from "@/lib/data/resume-html";
 import { resumeData } from "@/lib/data/resume-data";
@@ -37,6 +37,8 @@ describe("career identity", () => {
     expect(ROLE_LINE).toContain("Software Developer");
     expect(ROLE_LINE).toContain("Business Systems Developer");
     expect(ROLE_LINE).not.toContain("AI-Native");
+    expect(RESUME_PDF.href).toBe("/weaver_resume.pdf");
+    expect(RESUME_PDF.downloadName).toBe("Stephen_Weaver_Resume.pdf");
     expect(briefData.identity.roles).toEqual(expect.arrayContaining(["Software Developer", "Business Systems Developer"]));
   });
 

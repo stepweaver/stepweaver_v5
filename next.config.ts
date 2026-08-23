@@ -6,6 +6,20 @@ const nextConfig: NextConfig = {
     // trips over ESLint option differences across versions.
     ignoreDuringBuilds: true,
   },
+  async headers() {
+    return [
+      {
+        source: "/weaver_resume.pdf",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=0, must-revalidate" },
+          {
+            key: "Content-Disposition",
+            value: 'attachment; filename="Stephen_Weaver_Resume.pdf"',
+          },
+        ],
+      },
+    ];
+  },
   async redirects() {
     return [
       // Legacy project slug aliases (before catch-all)

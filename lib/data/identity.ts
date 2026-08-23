@@ -20,6 +20,12 @@ export const CONTACT = {
   location: "Granger, IN",
 } as const;
 
+/** Hand-authored file in public/. Do not regenerate over this path. */
+export const RESUME_PDF = {
+  href: "/weaver_resume.pdf",
+  downloadName: "Stephen_Weaver_Resume.pdf",
+} as const;
+
 export const PROFESSIONAL_SUMMARY = [
   "Product-minded software developer and systems builder with 9+ years across development, business analysis, data, and operations.",
   "Repeatedly enters unfamiliar domains and tools, learns what the work requires, and ships working applications, automation, and integrations.",

@@ -1,4 +1,5 @@
 import type { LineVariant } from "@/components/terminal/types";
+import { RESUME_PDF } from "@/lib/data/identity";
 
 function line(content: string, variant: LineVariant = "default") {
   return { content, variant };
@@ -73,16 +74,16 @@ export function handleResumeCommand(raw: string): { lines: { content: string; va
     case "pdf":
       if (typeof window !== "undefined") {
         const a = document.createElement("a");
-        a.href = "/weaver_resume.pdf";
-        a.download = "Stephen_Weaver_Resume.pdf";
+        a.href = RESUME_PDF.href;
+        a.download = RESUME_PDF.downloadName;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
       }
       return {
         lines: [
-          line("Downloading Stephen_Weaver_Resume.pdf …", "success"),
-          line("(If nothing happens, open /weaver_resume.pdf)", "dimmed"),
+          line(`Downloading ${RESUME_PDF.downloadName} …`, "success"),
+          line(`(If nothing happens, open ${RESUME_PDF.href})`, "dimmed"),
         ],
       };
     default:

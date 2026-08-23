@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { RESUME_PDF } from "@/lib/data/identity";
 import { resumeData } from "@/lib/data/resume-data";
 
 export const metadata = {
@@ -35,7 +36,11 @@ export default function ResumePage() {
             </p>
           </div>
           <div className="flex flex-wrap gap-2">
-            <a href="/weaver_resume.pdf" className="glitch-button glitch-button--primary text-xs">
+            <a
+              href={RESUME_PDF.href}
+              download={RESUME_PDF.downloadName}
+              className="glitch-button glitch-button--primary text-xs"
+            >
               Download PDF
             </a>
             <Link href="/about" className="glitch-button text-xs">
