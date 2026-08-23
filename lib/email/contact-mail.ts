@@ -1,13 +1,15 @@
 import { escapeHtmlForEmail } from "@/lib/email/escape-html-for-email";
+import { stripHeaderUnsafe } from "@/lib/email/strip-header-unsafe";
 
 export function renderContactEmail(formData: { name: string; email: string; message: string }) {
   const { name, email, message } = formData;
   const safeName = escapeHtmlForEmail(name);
   const safeEmail = escapeHtmlForEmail(email);
   const safeMessage = escapeHtmlForEmail(message);
+  const subjectName = stripHeaderUnsafe(name).slice(0, 200);
 
   return {
-    subject: `New Contact Form Submission from ${name}`,
+    subject: `New Contact Form Submission from ${subjectName}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
         <h2 style="color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px;">

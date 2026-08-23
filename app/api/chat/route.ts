@@ -3,6 +3,7 @@ import { chatBodySchema } from "@/lib/validation/chat.schema";
 import { withProtectedRoute } from "@/lib/security/with-protected-route";
 import { rateLimit } from "@/lib/security/rate-limit";
 import { buildSystemPrompt } from "@/lib/chat/system-prompt";
+import { resolveProjectCaseStudy } from "@/lib/chat/resolve-case-study";
 import { normalizeIncomingMessages } from "@/lib/chat/normalize-messages";
 import {
   extractCitations,
@@ -162,7 +163,10 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const systemPrompt = buildSystemPrompt(channel, parsed.data.projectCaseStudy);
+    const systemPrompt = buildSystemPrompt(
+      channel,
+      resolveProjectCaseStudy(parsed.data.projectCaseStudy?.slug)
+    );
     const apiMessages: ApiChatMessage[] = [
       { role: "system", content: systemPrompt },
       ...sanitizedMessages,

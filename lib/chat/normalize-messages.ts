@@ -3,8 +3,8 @@ import { PROMPT_INJECTION_PATTERN } from "@/lib/chat/citations";
 
 const MAX_MESSAGE_LENGTH = 2000;
 const MAX_MESSAGES = 12;
-const MAX_IMAGES_PER_MESSAGE = 5;
-const GROQ_VISION_MAX_URL = 6 * 1024 * 1024;
+const MAX_IMAGES_PER_MESSAGE = 3;
+const GROQ_VISION_MAX_URL = 3 * 1024 * 1024;
 
 export type NormalizedChatMessage =
   | { role: "user" | "assistant"; content: string }

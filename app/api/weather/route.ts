@@ -4,9 +4,12 @@ import {
   heatIndexF,
   localToday,
 } from "@/lib/carrier-journal/shift-weather";
+import { rateLimit } from "@/lib/security/rate-limit";
+import { jsonSecurityHeaders } from "@/lib/json-security-headers";
+import { getOpenWeatherApiKey, isValidLatLon } from "@/lib/weather/openweather";
 
-/** Same env name as v3 (`components/Terminal/data/weather.js`). */
-const API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY?.trim();
+/** Prefer OPENWEATHER_API_KEY; NEXT_PUBLIC_ remains a deploy fallback. */
+const API_KEY = getOpenWeatherApiKey();
 const GEO_URL = "https://api.openweathermap.org/geo/1.0/direct";
 const WEATHER_URL = "https://api.openweathermap.org/data/2.5/weather";
 const FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast";
@@ -89,7 +92,33 @@ function isValidDateParam(value: string | null): value is string {
   return !!value && /^\d{4}-\d{2}-\d{2}$/.test(value);
 }
 
+function clientIp(request: NextRequest): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
+function json(body: unknown, init: { status?: number; headers?: Record<string, string> } = {}) {
+  return NextResponse.json(body, {
+    ...init,
+    headers: { ...jsonSecurityHeaders(), ...init.headers },
+  });
+}
+
 export async function GET(request: NextRequest) {
+  const rl = await rateLimit(`weather:${clientIp(request)}`, 30, 60_000);
+  if (!rl.allowed) {
+    return json(
+      { error: "Rate limit exceeded" },
+      {
+        status: 429,
+        headers: { "Retry-After": String(Math.ceil((rl.reset - Date.now()) / 1000)) },
+      }
+    );
+  }
+
   const { searchParams } = new URL(request.url);
   const includeForecast = searchParams.get("forecast") === "true";
   const includePeak = searchParams.get("peak") === "true";
@@ -102,8 +131,8 @@ export async function GET(request: NextRequest) {
   if (includePeak && latStr !== null && lonStr !== null && !includeForecast) {
     const lat = Number(latStr);
     const lon = Number(lonStr);
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
-      return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
+    if (!isValidLatLon(lat, lon)) {
+      return json({ error: "Invalid coordinates" }, { status: 400 });
     }
     try {
       const peak = await fetchShiftWeatherForDate(lat, lon, peakDate);
@@ -141,7 +170,7 @@ export async function GET(request: NextRequest) {
   if (latStr !== null && lonStr !== null) {
     const lat = Number(latStr);
     const lon = Number(lonStr);
-    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+    if (!isValidLatLon(lat, lon)) {
       return NextResponse.json({ error: "Invalid coordinates" }, { status: 400 });
     }
     try {

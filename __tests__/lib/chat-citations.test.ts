@@ -19,6 +19,24 @@ describe("extractCitations", () => {
     const { citations } = extractCitations("[[CITE:weird|Label|/path]]");
     expect(citations[0]?.type).toBe("page");
   });
+
+  it("drops javascript and off-site citation hrefs", () => {
+    const { citations, cleanText } = extractCitations(
+      "x [[CITE:page|Bad|javascript:alert(1)]] y [[CITE:page|Phish|https://evil.example/login]] z"
+    );
+    expect(citations).toHaveLength(0);
+    expect(cleanText).toContain("x");
+    expect(cleanText).toContain("z");
+  });
+
+  it("keeps same-site and relative citation hrefs", () => {
+    const { citations } = extractCitations(
+      "[[CITE:page|About|/about]] [[CITE:page|Home|https://stepweaver.dev/]]"
+    );
+    expect(citations).toHaveLength(2);
+    expect(citations[0]?.href).toBe("/about");
+    expect(citations[1]?.href).toMatch(/^https:\/\/stepweaver\.dev\/?$/);
+  });
 });
 
 describe("redactIfPromptLeak", () => {

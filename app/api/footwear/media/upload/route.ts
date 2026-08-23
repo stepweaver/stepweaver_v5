@@ -28,7 +28,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         return {
           allowedContentTypes: ["image/jpeg", "image/png", "image/webp"],
           maximumSizeInBytes: MAX_BYTES,
-          addRandomSuffix: false,
+          addRandomSuffix: true,
           tokenPayload: JSON.stringify({ ok: true }),
         };
       },

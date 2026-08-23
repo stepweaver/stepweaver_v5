@@ -28,6 +28,7 @@ import {
 import { slugifyShoe } from "@/lib/footwear/id";
 import { normalizeFootwearDate } from "@/lib/footwear/dates";
 import { createShoeSchema } from "@/lib/validation/footwear.schema";
+import { isFootwearBlobUrl } from "@/lib/footwear/blob-url";
 
 describe("footwear dates", () => {
   it("normalizes MM/DD/YYYY to ISO", () => {
@@ -413,5 +414,25 @@ describe("unit numbers", () => {
     expect(bySlug.hoka).toBe(1);
     expect(bySlug.keen).toBe(2);
     expect(formatUnitId(1)).toBe("UNIT 001");
+  });
+});
+
+describe("footwear blob URLs", () => {
+  it("accepts a real Vercel Blob object URL", () => {
+    expect(
+      isFootwearBlobUrl(
+        "https://abc123.public.blob.vercel-storage.com/footwear/hoka-bondi-9/img.jpg",
+        "hoka-bondi-9"
+      )
+    ).toBe(true);
+  });
+
+  it("rejects query-string decoys", () => {
+    expect(
+      isFootwearBlobUrl(
+        "https://evil.example/footwear/hoka-bondi-9/x?q=blob.vercel-storage.com/foo",
+        "hoka-bondi-9"
+      )
+    ).toBe(false);
   });
 });

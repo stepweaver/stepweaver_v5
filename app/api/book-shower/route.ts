@@ -44,9 +44,10 @@ export async function GET(request: NextRequest) {
     }
 
     const { searchParams } = new URL(request.url);
-    const queryString = searchParams.toString();
+    const action = searchParams.get("action");
     const base = scriptUrl();
-    const url = queryString ? `${base}?${queryString}` : base;
+    const url =
+      action && /^[a-zA-Z0-9_-]{1,64}$/.test(action) ? `${base}?action=${encodeURIComponent(action)}` : base;
 
     const response = await fetch(url, {
       method: "GET",
@@ -81,6 +82,13 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json().catch(() => ({}));
+    if (!body || typeof body !== "object" || Array.isArray(body)) {
+      return json({ error: "Invalid JSON" }, 400);
+    }
+    const serialized = JSON.stringify(body);
+    if (serialized.length > 16_384) {
+      return json({ error: "Payload too large" }, 413);
+    }
 
     const response = await fetch(scriptUrl(), {
       method: "POST",
@@ -88,7 +96,7 @@ export async function POST(request: NextRequest) {
         "Content-Type": "application/json",
         "User-Agent": "Mozilla/5.0 (compatible; BookShower/1.0)",
       },
-      body: JSON.stringify(body),
+      body: serialized,
     });
 
     if (!response.ok) {

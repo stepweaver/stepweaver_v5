@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { FileText, FolderOpen, BookOpen, FileCode } from "lucide-react";
+import { safeHref } from "@/lib/safe-href";
 
 export type Citation = {
   type: string;
@@ -25,12 +26,14 @@ export function SourceCitations({ citations }: { citations: Citation[] }) {
       <div className="flex flex-wrap gap-1.5">
         {citations.map((cite, i) => {
           const Icon = TYPE_ICONS[cite.type] || FileCode;
-          const isExternal = cite.href?.startsWith("http");
+          const resolved = safeHref(cite.href);
+          if (!resolved.ok) return null;
+          const isExternal = resolved.isExternal;
 
           return (
             <Link
               key={i}
-              href={cite.href || "#"}
+              href={resolved.href}
               target={isExternal ? "_blank" : undefined}
               rel={isExternal ? "noopener noreferrer" : undefined}
               className="inline-flex items-center gap-1 font-[var(--font-ocr)] text-[10px] text-[rgb(var(--neon)/0.5)] border border-[rgb(var(--neon)/0.15)] px-1.5 py-0.5 uppercase tracking-[0.1em] hover:text-[rgb(var(--neon)/0.8)] hover:border-[rgb(var(--neon)/0.35)] transition-colors"

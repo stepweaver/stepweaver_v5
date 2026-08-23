@@ -68,7 +68,7 @@ export async function POST(request: NextRequest) {
 
     if (!pageId || !process.env.NOTION_API_KEY) {
       return NextResponse.json(
-        { error: "Missing page ID or API key" },
+        { error: "Bad request" },
         { status: 400, headers: jsonSecurityHeaders() }
       );
     }

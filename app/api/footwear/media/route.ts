@@ -18,6 +18,7 @@ import {
   getShoeById,
   getShoeMileageTotal,
 } from "@/lib/footwear/queries";
+import { isFootwearBlobUrl } from "@/lib/footwear/blob-url";
 
 export const dynamic = "force-dynamic";
 
@@ -51,10 +52,7 @@ export async function POST(request: NextRequest) {
   }
 
   const imageUrl = parsed.data.imageUrl;
-  if (
-    !imageUrl.includes("blob.vercel-storage.com/") ||
-    !imageUrl.includes(`/footwear/${shoe.slug}/`)
-  ) {
+  if (!isFootwearBlobUrl(imageUrl, shoe.slug)) {
     return footwearBadRequest("Image URL is not a valid Footwear Lab blob.");
   }
 

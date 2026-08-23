@@ -26,17 +26,31 @@ function checkOrigin(request: NextRequest): string | null {
     if (process.env.NODE_ENV !== "production") return null;
     return "missing-origin";
   }
-  if (ALLOWED_ORIGINS.length > 0 && !ALLOWED_ORIGINS.includes(origin)) {
+
+  try {
+    const originUrl = new URL(origin);
+    if (originUrl.origin === request.nextUrl.origin) return null;
+
+    const originHost = originUrl.host.replace(/^www\./, "").toLowerCase();
+    const requestHost = request.nextUrl.host.replace(/^www\./, "").toLowerCase();
+    if (originHost === requestHost) return null;
+
+    if (ALLOWED_ORIGINS.length > 0 && ALLOWED_ORIGINS.includes(origin)) {
+      return null;
+    }
+
+    if (host && ALLOWED_HOSTS.length > 0) {
+      const normalizedHost = host.replace(/^www\./, "").toLowerCase();
+      if (ALLOWED_HOSTS.map((h) => h.replace(/^www\./, "").toLowerCase()).includes(originHost)) {
+        return null;
+      }
+      if (originHost === normalizedHost) return null;
+    }
+  } catch {
     return "disallowed-origin";
   }
-  if (host && ALLOWED_HOSTS.length > 0) {
-    const originHost = new URL(origin).host.replace(/^www\./, "");
-    const normalizedHost = host.replace(/^www\./, "");
-    if (!ALLOWED_HOSTS.includes(originHost) && originHost !== normalizedHost) {
-      return "disallowed-origin";
-    }
-  }
-  return null;
+
+  return "disallowed-origin";
 }
 
 /** Matches v3 `botProtection` timing: page-age via `_d`, or flow duration from anchor `_t`. */

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { isCarrierSessionRequest } from "@/lib/carrier-journal/auth";
+import { isCarrierSessionRequest, isSameOriginRequest } from "@/lib/carrier-journal/auth";
 import { isFootwearDbConfigured } from "@/lib/db";
 
 export function footwearUnauthorized() {
@@ -25,6 +25,10 @@ export function footwearBadRequest(error: string, details?: unknown) {
 
 export function assertFootwearReady(request: NextRequest): NextResponse | null {
   if (!isFootwearDbConfigured()) return footwearUnavailable();
+  const mutating = request.method !== "GET" && request.method !== "HEAD";
+  if (mutating && !isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Request rejected." }, { status: 403 });
+  }
   if (!isCarrierSessionRequest(request)) return footwearUnauthorized();
   return null;
 }

@@ -1,3 +1,5 @@
+import { safeHref } from "@/lib/safe-href";
+
 export type ChatCitation = {
   type: string;
   label: string;
@@ -7,6 +9,21 @@ export type ChatCitation = {
 
 const CITE_PATTERN =
   /\[\[CITE:([^|]+)\|([^|]+)\|([^\]|]+)(?:\|([^\]]+))?\]\]/g;
+
+const SITE_HOSTS = new Set(["stepweaver.dev", "www.stepweaver.dev"]);
+
+function sanitizeCitationHref(raw: string): string | null {
+  const resolved = safeHref(raw.trim().slice(0, 200));
+  if (!resolved.ok) return null;
+  if (!resolved.isExternal) return resolved.href;
+  try {
+    const host = new URL(resolved.href).hostname.toLowerCase();
+    if (SITE_HOSTS.has(host)) return resolved.href;
+  } catch {
+    return null;
+  }
+  return null;
+}
 
 export function extractCitations(text: string): { cleanText: string; citations: ChatCitation[] } {
   if (!text || typeof text !== "string") {
@@ -19,15 +36,17 @@ export function extractCitations(text: string): { cleanText: string; citations: 
       const allowedTypes = new Set(["project", "resume", "codex", "page"]);
       const safeType = allowedTypes.has(type.trim()) ? type.trim() : "page";
       const safeLabel = label.trim().slice(0, 80);
-      const safeHref = href.trim().slice(0, 200);
+      const safeHrefValue = sanitizeCitationHref(href);
       const safeSection = section ? section.trim().slice(0, 60) : undefined;
 
-      citations.push({
-        type: safeType,
-        label: safeLabel,
-        href: safeHref,
-        ...(safeSection ? { section: safeSection } : {}),
-      });
+      if (safeHrefValue) {
+        citations.push({
+          type: safeType,
+          label: safeLabel,
+          href: safeHrefValue,
+          ...(safeSection ? { section: safeSection } : {}),
+        });
+      }
 
       return "";
     })

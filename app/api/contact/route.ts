@@ -11,8 +11,8 @@ async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
   try {
     const res = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ secret, response: token, remoteip: ip }),
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: new URLSearchParams({ secret, response: token, remoteip: ip }).toString(),
     });
     const data = (await res.json()) as { success: boolean };
     return data.success === true;
@@ -52,7 +52,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Rate limit exceeded" }, { status: 429 });
     }
 
-    if (process.env.TURNSTILE_SECRET_KEY) {
+    const turnstileSecret = process.env.TURNSTILE_SECRET_KEY?.trim();
+    const turnstileSiteKey = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY?.trim();
+    if (process.env.NODE_ENV === "production" && turnstileSiteKey && !turnstileSecret) {
+      return NextResponse.json({ error: "Bot check is misconfigured." }, { status: 503 });
+    }
+
+    if (turnstileSecret) {
       const token = typeof body.cf_turnstile_response === "string" ? body.cf_turnstile_response : "";
       if (!token) {
         return NextResponse.json({ error: "Bot check required" }, { status: 403 });

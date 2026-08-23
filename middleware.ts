@@ -24,12 +24,12 @@ export function middleware(request: NextRequest) {
     const isProd = process.env.NODE_ENV === "production";
     const csp = [
       "default-src 'self'",
-      `script-src 'self' 'nonce-${nonce}' https://assets.calendly.com https://calendly.com https://va.vercel-scripts.com${isProd ? "" : " 'unsafe-eval'"}`,
+      `script-src 'self' 'nonce-${nonce}' https://assets.calendly.com https://calendly.com https://challenges.cloudflare.com https://va.vercel-scripts.com${isProd ? "" : " 'unsafe-eval'"}`,
       "style-src 'self' 'unsafe-inline' https://assets.calendly.com https://calendly.com",
       "img-src 'self' data: https: blob:",
       "font-src 'self' data: https:",
-      "connect-src 'self' https://calendly.com https://api.calendly.com https://api.openweathermap.org https://va.vercel-scripts.com https://script.google.com https://www.notion.so https://api.notion.so https://vercel.com https://*.blob.vercel-storage.com",
-      "frame-src 'self' https://calendly.com https://script.google.com",
+      "connect-src 'self' https://calendly.com https://api.calendly.com https://challenges.cloudflare.com https://va.vercel-scripts.com https://script.google.com https://www.notion.so https://api.notion.so https://vercel.com https://*.blob.vercel-storage.com",
+      "frame-src 'self' https://calendly.com https://challenges.cloudflare.com https://script.google.com",
       "object-src 'none'",
       "base-uri 'self'",
       "form-action 'self' https://calendly.com",
