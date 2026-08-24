@@ -1,6 +1,6 @@
 import type { Project } from "../projects.schema";
 
-const WORKFLOW_DIAGRAM = `Sunday Hub (supervisor)
+const WORKFLOW_DIAGRAM = `Supervisor Hub
        ↓
 Import manifest → validate → plan & split routes → assign drivers
        ↓
@@ -8,7 +8,7 @@ Loading dock (scan, ghost detect, load order) → route plan (export, nav handof
        ↓
 Start delivery → driver view (GPS, proximity, stop completion)
        ↓
-Sunday Hub / admin (fleet view, readiness clocks, exceptions)`;
+Supervisor Hub / admin (fleet view, readiness clocks, exceptions)`;
 
 const ROUTE_ENGINE_DIAGRAM = `Depot geocode (Google or Nominatim)
        ↓
@@ -31,13 +31,13 @@ DriverView ── proximity zones (300m / 120m / 40m)
 Express API ──► gps_pings table
   │ emit gps:update + alert:proximity
   ▼
-Socket.io route room ──► Sunday Hub / Admin / Route viewers`;
+Socket.io route room ──► Supervisor Hub / Admin / Route viewers`;
 
 export const parcelSweep: Project = {
   slug: "parcel-sweep",
   title: "Parcel Sweep",
   description:
-    "A full-stack last-mile delivery operations prototype built around one question: what would a modern Sunday parcel workflow look like if manifest intake, route planning, loading, dispatch, and driver execution were one continuous system?",
+    "A full-stack last-mile delivery operations prototype built around one question: what would a modern parcel workflow look like if manifest intake, route planning, loading, dispatch, and driver execution were one continuous system?",
   status: "demo",
   imageUrl: "/images/parcel_sweep.png",
   tags: [
@@ -53,24 +53,24 @@ export const parcelSweep: Project = {
     "parcel sweep",
     "last mile",
     "route optimization",
-    "sunday delivery",
+    "parcel delivery",
     "loading dock",
     "driver gps",
     "logistics",
     "operations",
   ],
-  builtFor: "Sunday parcel operations and portfolio-grade logistics workflow storytelling",
+  builtFor: "Last-mile parcel operations and portfolio-grade logistics workflow storytelling",
   solved: "routing demos that stop at stop optimization instead of covering manifest-to-delivery operations",
   delivered: [
     "End-to-end workflow: manifest → plan/split → load → export → drive → supervise",
     "Composable route engine: clustering, OSRM matrix, 2-opt, cross-route proximity alerts",
     "Driver execution layer: wake lock, tiered proximity alerts, speech, vibration, demo simulation",
-    "Sunday Hub supervisor view with KPI strip, readiness clocks, and exception lanes",
+    "Supervisor Hub with KPI strip, readiness clocks, and exception lanes",
     "Single-service deploy on Railway with Docker, health checks, and GPX/KML/CSV export",
   ],
   cardDescription:
-    "Last-mile ops prototype: manifest intake, route planning, dock scanning, live driver mode, and a Sunday supervisor hub - from manifest to last stop.",
-  cardBuiltFor: "Sunday parcel operations and logistics portfolio demos",
+    "Last-mile ops prototype: manifest intake, route planning, dock scanning, live driver mode, and a Supervisor Hub - from manifest to last stop.",
+  cardBuiltFor: "Last-mile parcel operations and logistics portfolio demos",
   cardSolved: "routing tools that ignore manifest, loading, dispatch, and supervisor visibility",
   cardDelivered: [
     "Full manifest-to-delivery workflow in one SPA",
@@ -85,7 +85,7 @@ export const parcelSweep: Project = {
       title: "Overview",
       type: "overview",
       content:
-        "Parcel Sweep is not affiliated with any postal operator. It is a full-stack prototype I built to answer a narrow operational question: what would a modern Sunday delivery workflow look like if manifest intake, route planning, loading, dispatch, and driver execution were designed as one continuous system?\n\nMost routing demos stop at \"optimize these stops.\" Parcel Sweep follows the parcel all the way through: CSV or synthetic manifest intake, validation and hold review, multi-driver route proposals, loading-dock scanning with ghost detection, route book export, live driver mode with proximity alerts, and a Sunday Hub supervisor control tower. Each screen has a concrete place in the operational story. That through-line is the product.\n\nThe codebase is intentionally inspectable. Frontend and backend are cleanly separated, data shapes are typed, SQLite initializes predictably, API routes are organized by domain, and route planning is decomposed into clustering, matrix construction, optimization, alert generation, and export services. For a portfolio case study, that readability matters as much as the demo flow.",
+        "Parcel Sweep is not affiliated with any postal operator. It is a full-stack prototype I built to answer a narrow operational question: what would a modern last-mile delivery workflow look like if manifest intake, route planning, loading, dispatch, and driver execution were designed as one continuous system?\n\nMost routing demos stop at \"optimize these stops.\" Parcel Sweep follows the parcel all the way through: CSV or synthetic manifest intake, validation and hold review, multi-driver route proposals, loading-dock scanning with ghost detection, route book export, live driver mode with proximity alerts, and a Supervisor Hub control tower. Each screen has a concrete place in the operational story. That through-line is the product.\n\nThe codebase is intentionally inspectable. Frontend and backend are cleanly separated, data shapes are typed, SQLite initializes predictably, API routes are organized by domain, and route planning is decomposed into clustering, matrix construction, optimization, alert generation, and export services. For a portfolio case study, that readability matters as much as the demo flow.",
     },
     {
       id: "problem",
@@ -93,7 +93,7 @@ export const parcelSweep: Project = {
       type: "problem",
       bullets: [
         "Most routing demos optimize stops in isolation and ignore manifest intake, loading, dispatch readiness, and supervisor visibility",
-        "Sunday parcel operations need a supervisor-to-driver through-line, not a spreadsheet plus a map",
+        "Last-mile parcel operations need a supervisor-to-driver through-line, not a spreadsheet plus a map",
         "Real delivery execution requires proximity ergonomics - wake lock, alerts, arrival gating - not just pins on a map",
         "Enterprise last-mile suites (Onfleet, Routific) are broad but opaque; portfolio projects often hide domain logic behind SaaS wrappers",
         "Bulk manifest import and multi-driver splitting are usually treated as separate products from driver execution",
@@ -105,7 +105,7 @@ export const parcelSweep: Project = {
       title: "The Solution",
       type: "solution",
       bullets: [
-        "Workflow stepper and Sunday Hub frame the entire shift as one narrative: import → validate → plan → load → dispatch → monitor",
+        "Workflow stepper and Supervisor Hub frame the entire shift as one narrative: import → validate → plan → load → dispatch → monitor",
         "Manifest review combines validation results, route proposals, driver assignment, and unassigned-package handling on one page",
         "Loading dock supports scanner input, ghost package detection, load-order preview, and re-optimization after scans",
         "Route plan view offers stop lists, map themes, GPX/KML/CSV export, and external navigation handoff to Google Maps, Waze, or Apple Maps",
@@ -131,7 +131,7 @@ export const parcelSweep: Project = {
         "Load-order calculation so the first delivery is loaded last on the truck",
         "Ghost package detection for scans that do not match the manifest",
         "Realtime fleet visibility via Socket.io route rooms - GPS, proximity alerts, stop completion",
-        "Sunday Hub KPI strip: imported, validated, routed, loaded, delivered, route count, active routes",
+        "Supervisor Hub KPI strip: imported, validated, routed, loaded, delivered, route count, active routes",
         "Readiness clocks and exception lanes for supervisor scan-and-act workflows",
         "Admin fleet view with driver, status, progress, ETA, and remaining stops (15 s auto-refresh)",
       ],
