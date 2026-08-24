@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { Hero } from "@/components/hero/hero";
-import { ProjectCarousel } from "@/components/hero/project-carousel";
-import { ActivityStreams } from "@/components/home/activity-streams";
+import { FeaturedSystems } from "@/components/home/featured-systems";
+import { HowIWork } from "@/components/home/how-i-work";
+import { ExperienceStrip } from "@/components/home/experience-strip";
+import { WritingStrip } from "@/components/home/writing-strip";
+import { CloseCta } from "@/components/home/close-cta";
+import { LoadoutSection } from "@/components/capabilities/loadout-section";
 import { InkDivider } from "@/components/ui/ink-divider";
-import { TerminalLinkStrip } from "@/components/home/terminal-link-strip";
-import { getHomeCarrierPreview } from "@/lib/home/carrier-preview";
-import { getHomeRecentIntel } from "@/lib/home/recent-intel";
+import { getHomeWritingPosts } from "@/lib/home/recent-intel";
 import { generateStructuredData } from "@/lib/structured-data";
+import { PRIMARY_TITLE, SUPPORTING_LINE } from "@/lib/data/identity";
 
 const SITE_URL = process.env.SITE_URL || "https://stepweaver.dev";
-const HOME_TITLE = "Stephen Weaver | Systems Builder for Operations & AI";
-const HOME_DESCRIPTION =
-  "Product-minded systems builder for operations-heavy teams. Internal tools, workflow automations, and AI-assisted systems. Hiring-first, with selective consulting when the fit is right.";
+const HOME_TITLE = `Stephen Weaver | ${PRIMARY_TITLE}`;
+const HOME_DESCRIPTION = `${PRIMARY_TITLE}. ${SUPPORTING_LINE}. I ship internal tools, workflow systems, and AI-assisted applications for operations-heavy teams.`;
 const HOME_SHARE_IMAGE = `${SITE_URL}/images/stepweaver-dev.png`;
 
 export function generateMetadata(): Metadata {
@@ -41,10 +43,7 @@ export function generateMetadata(): Metadata {
 export default async function HomePage() {
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   const structuredData = generateStructuredData();
-  const [recentIntel, carrierPreview] = await Promise.all([
-    getHomeRecentIntel(),
-    getHomeCarrierPreview(),
-  ]);
+  const writingPosts = await getHomeWritingPosts();
 
   return (
     <>
@@ -70,51 +69,20 @@ export default async function HomePage() {
         <div className="relative z-10">
           <Hero />
           <InkDivider showSeal className="py-0.5 sm:py-1" />
-          <ActivityStreams recentIntel={recentIntel} carrierPreview={carrierPreview} />
-          <div className="relative z-30 w-full max-w-[1920px] mx-auto px-3 sm:px-5 md:px-6 lg:px-10 xl:px-14 2xl:px-16 pb-8">
-            <ProjectCarousel />
+          <FeaturedSystems />
+          <InkDivider />
+          <HowIWork />
+          <InkDivider />
+          <ExperienceStrip />
+          <InkDivider />
+          <div className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 xl:px-14 py-10">
+            <LoadoutSection />
           </div>
           <InkDivider />
-          <div className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 xl:px-14">
-            <TerminalLinkStrip />
-          </div>
-          <InkDivider />
-          <QuickEntry />
+          <WritingStrip posts={writingPosts} />
+          <CloseCta />
         </div>
       </div>
     </>
-  );
-}
-
-function QuickEntry() {
-  const links = [
-    { label: "Work", href: "/work", desc: "Flagship case studies" },
-    { label: "About", href: "/about", desc: "Where I fit" },
-    { label: "Resume", href: "/resume", desc: "Hiring surface" },
-    { label: "Play", href: "/play", desc: "Terminal & experiments" },
-  ];
-
-  return (
-    <section className="relative z-30 w-full px-3 sm:px-6 md:px-8 lg:px-12 xl:px-14 pb-10">
-      <div className="max-w-none border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--panel)/0.2)] p-4 sm:p-5">
-        <p className="font-[var(--font-ocr)] text-xs uppercase tracking-[0.28em] text-[rgb(var(--text-label))] mb-3">
-          Quick entry
-        </p>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
-          {links.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="bg-[rgb(var(--panel))] p-4 sm:p-5 hover:bg-[rgb(var(--neon)/0.06)] transition-colors group border border-transparent hover:border-[rgb(var(--neon)/0.25)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
-            >
-              <div className="text-[rgb(var(--neon))] font-[var(--font-ibm)] text-sm group-hover:text-[rgb(var(--accent))] transition-colors">
-                {link.label} →
-              </div>
-              <div className="text-[rgb(var(--text-meta))] text-xs mt-1">{link.desc}</div>
-            </a>
-          ))}
-        </div>
-      </div>
-    </section>
   );
 }

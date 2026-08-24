@@ -1,4 +1,4 @@
-import { ROLE_LINE } from "@/lib/data/identity";
+import { PRIMARY_TITLE, ROLE_LINE, SUPPORTING_LINE } from "@/lib/data/identity";
 
 const DEFAULT_BASE = "https://stepweaver.dev";
 
@@ -16,7 +16,7 @@ export function generateStructuredData() {
     name: "Stephen Weaver - λstepweaver",
     url: baseUrl,
     description:
-      "Business-minded builder focused on web apps, automation, and AI-enabled tools that reduce friction and improve operations.",
+      "Business Systems Developer. Full-stack development, internal tools, automation, and operational software.",
     author: {
       "@type": "Person",
       name: "Stephen Weaver",
@@ -38,7 +38,7 @@ export function generateStructuredData() {
     alternateName: "Yankee Samurai",
     jobTitle: ROLE_LINE,
     description:
-      "Software developer and business systems developer. Former U.S. Air Force linguist who turns messy workflows into usable systems, and learns the domain or stack the problem requires.",
+      `${PRIMARY_TITLE}. ${SUPPORTING_LINE}. Former U.S. Air Force linguist who writes production software that turns messy workflows into usable systems.`,
     url: baseUrl,
     image: `${baseUrl}/images/pixarMe.png`,
     sameAs: ["https://github.com/stepweaver", "https://bsky.app/profile/stepweaver.dev"],
@@ -61,7 +61,7 @@ export function generateStructuredData() {
     ],
     hasOccupation: {
       "@type": "Occupation",
-      name: "Software Developer",
+      name: PRIMARY_TITLE,
       occupationLocation: {
         "@type": "Country",
         name: "United States",

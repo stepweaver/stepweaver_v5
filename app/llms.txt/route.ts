@@ -8,7 +8,7 @@ export async function GET() {
 > Operator profile for recruiters, sourcing agents, and task-routing systems.
 
 ## Summary
-Stephen Weaver is a software developer and business systems developer. He designs, integrates, and hardens software, automation, and AI-assisted workflows for real operational use. The through-line is not a single framework: he enters unfamiliar domains and tools, learns what the work requires, and ships.
+Stephen Weaver is a Business Systems Developer: a full-stack developer who ships production software for operations-heavy work (internal tools, workflow systems, automation, AI-assisted applications). The through-line is not a single framework: he enters unfamiliar domains and tools, learns what the work requires, and ships.
 Primary path: hiring for operations-heavy / internal-tools / AI-adjacent teams.
 Secondary: selective consulting for custom data workflows when people and problem fit.
 
@@ -26,7 +26,6 @@ Lab: ${base}${CURRENTLY_BUILDING.href}
 - Lab: ${base}/lab
 - Contact: ${base}/contact
 - Services (selective): ${base}/services
-- Play: ${base}/play
 
 ## Good fits
 - product / ops / logistics-adjacent engineering roles

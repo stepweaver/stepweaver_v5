@@ -2,10 +2,48 @@ import Link from "next/link";
 import { CURRENTLY_BUILDING, LEARNING_LAB } from "@/lib/data/identity";
 
 export const metadata = {
-  title: "Learning Lab",
+  title: "Lab",
   description:
-    "Instructional rebuild of λstepweaver in SvelteKit: learning the framework from first principles, then Cloudflare, D1, and Drizzle.",
+    "Experiments, field systems, and the SvelteKit instructional rebuild. Curiosity without crowding the hiring path.",
 };
+
+const LAB_ITEMS = [
+  {
+    href: "/terminal",
+    label: "Terminal",
+    description: "Command-style portfolio shell: resume, chat, writing, weather, games.",
+  },
+  {
+    href: "/field-journal",
+    label: "Field Journal",
+    description: "Walking and fitness log: miles, weather, recovery, milestones.",
+  },
+  {
+    href: "/meshtastic",
+    label: "Meshtastic",
+    description: "Field-guide docs and notes for mesh radio tinkering.",
+  },
+  {
+    href: "/dice-roller",
+    label: "Dice Roller",
+    description: "RPG dice utility with local persistence.",
+  },
+  {
+    href: "/yankee-samurai",
+    label: "Yankee Samurai",
+    description: "Identity / experiment surface.",
+  },
+  {
+    href: "/mail-sort-academy",
+    label: "Mail Sort Academy",
+    description: "Unofficial mail-classification study drill from public educational material.",
+  },
+  {
+    href: "/work/llambda-llm-agent",
+    label: "λlambda",
+    description: "Shared LLM agent behind the site and terminal, with guardrails and provider fallback.",
+  },
+] as const;
 
 const LADDER = [
   {
@@ -33,37 +71,39 @@ const LADDER = [
 export default function LabPage() {
   return (
     <div className="min-h-screen pt-20 pb-16">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6">
         <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
           {"// LAB"}
         </div>
+        <h1 className="font-[var(--font-ibm)] text-3xl sm:text-4xl text-[rgb(var(--text-color))] mb-4">
+          Lab
+        </h1>
+        <p className="text-[rgb(var(--text-secondary))] text-sm max-w-2xl mb-10">
+          Experiments, field systems, and a current instructional rebuild. The hiring path is Work, About, Resume, and Contact. This lane is for curiosity.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)] mb-12">
+          {LAB_ITEMS.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="bg-[rgb(var(--panel))] p-6 hover:bg-[rgb(var(--neon)/0.03)] transition-colors group block"
+            >
+              <h2 className="font-[var(--font-ibm)] text-lg text-[rgb(var(--text-color))] group-hover:text-[rgb(var(--neon))] transition-colors mb-2">
+                {item.label}
+              </h2>
+              <p className="text-[rgb(var(--text-secondary))] text-sm">{item.description}</p>
+            </Link>
+          ))}
+        </div>
+
         <p className="text-[10px] font-[var(--font-ocr)] uppercase tracking-[0.2em] text-[rgb(var(--neon)/0.6)] mb-3">
           {LEARNING_LAB.eyebrow}
         </p>
-        <h1 className="font-[var(--font-ibm)] text-3xl sm:text-4xl text-[rgb(var(--text-color))] mb-4">
-          {LEARNING_LAB.title}
-        </h1>
-        <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base leading-relaxed mb-8">
-          {LEARNING_LAB.body}
-        </p>
+        <h2 className="font-[var(--font-ibm)] text-2xl text-[rgb(var(--text-color))] mb-4">{LEARNING_LAB.title}</h2>
+        <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed mb-8">{LEARNING_LAB.body}</p>
 
         <div className="surface-panel p-6 sm:p-8 space-y-8">
-          <section>
-            <div className="text-label mb-3">WHY THIS EXISTS</div>
-            <div className="space-y-3 text-[rgb(var(--text-secondary))] text-sm leading-relaxed">
-              <p>
-                The live site remains a Next.js application. This lab is not a secret rewrite in production and not an
-                AI-autopilot port of that codebase. I am rebuilding each system only after I understand the SvelteKit
-                equivalent.
-              </p>
-              <p>
-                The point is the pattern, not the framework: encounter an unfamiliar stack, learn the actual primitives,
-                then ship something real. The portfolio is the artifact because hiring managers can watch the work
-                instead of taking a slogan about learning at face value.
-              </p>
-            </div>
-          </section>
-
           <section>
             <div className="text-label mb-3">STACK IN MOTION</div>
             <div className="flex flex-wrap gap-2 mb-3">
@@ -95,34 +135,6 @@ export default function LabPage() {
               ))}
             </ol>
           </section>
-
-          <section>
-            <div className="text-label mb-3">WHAT THIS IS NOT</div>
-            <ul className="space-y-2">
-              {[
-                "Not five years of professional SvelteKit experience quietly added to Skills",
-                "Not a claim that the production site has already moved off Next.js",
-                "Not a mechanical translation of an existing React tree",
-              ].map((item) => (
-                <li key={item} className="flex gap-2 text-[rgb(var(--text-secondary))] text-sm leading-relaxed">
-                  <span className="text-[rgb(var(--neon)/0.5)] shrink-0">·</span>
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
-          </section>
-
-          <div className="pt-4 border-t border-[rgb(var(--border)/0.2)] flex flex-wrap gap-3">
-            <Link href="/resume" className="glitch-button glitch-button--primary">
-              Resume
-            </Link>
-            <Link href="/about" className="glitch-button">
-              About
-            </Link>
-            <Link href="/work" className="glitch-button">
-              Work
-            </Link>
-          </div>
         </div>
       </div>
     </div>

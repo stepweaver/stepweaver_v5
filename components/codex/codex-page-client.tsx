@@ -10,6 +10,7 @@ import {
   filterPostsByTags,
   formatCodexDate,
   normalizeTag,
+  partitionProfessionalPosts,
   type CodexPost,
 } from "@/lib/codex/selectors";
 
@@ -118,6 +119,13 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
     () => filterPostsByTags(allPosts, activeHashtags),
     [allPosts, activeHashtags]
   );
+  const { professional, other } = useMemo(
+    () =>
+      activeHashtags.length > 0
+        ? { professional: filteredPosts, other: [] as CodexPost[] }
+        : partitionProfessionalPosts(allPosts),
+    [activeHashtags.length, allPosts, filteredPosts]
+  );
 
   const handleHashtagClick = (tag: string) => {
     const n = normalizeTag(tag);
@@ -141,10 +149,10 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
                 Writing
               </p>
               <h1 className="font-[var(--font-ibm)] text-4xl sm:text-5xl md:text-6xl font-bold text-[rgb(var(--text-color))] leading-tight">
-                Notes and build logs.
+                Systems, requirements, architecture.
               </h1>
               <p className="font-[var(--font-ibm)] text-base sm:text-lg text-[rgb(var(--text-secondary))] leading-relaxed max-w-3xl">
-                Developer notes, essays, and community thoughts.
+                Professional and technical writing first. Other notes stay published below — including the ladybugs.
               </p>
             </div>
             <div className="w-full h-px bg-gradient-to-r from-[rgb(var(--neon)/0.4)] via-[rgb(var(--neon)/0.1)] to-transparent" />
@@ -214,15 +222,48 @@ function CodexContent({ initialPosts = [] }: { initialPosts?: CodexPost[] }) {
                 </div>
 
                 <div>
-                  {filteredPosts.map((post, index) => (
-                    <PostItem
-                      key={`${post.slug}-${index}`}
-                      post={post}
-                      index={index}
-                      formatDate={formatCodexDate}
-                      onHashtagClick={handleHashtagClick}
-                    />
-                  ))}
+                  {activeHashtags.length === 0 && professional.length > 0 ? (
+                    <>
+                      <p className="text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.5)] font-[var(--font-ocr)] uppercase mb-3">
+                        Professional / technical
+                      </p>
+                      {professional.map((post, index) => (
+                        <PostItem
+                          key={`${post.slug}-${index}`}
+                          post={post}
+                          index={index}
+                          formatDate={formatCodexDate}
+                          onHashtagClick={handleHashtagClick}
+                        />
+                      ))}
+                      {other.length > 0 ? (
+                        <>
+                          <p className="text-[10px] tracking-[0.25em] text-[rgb(var(--neon)/0.5)] font-[var(--font-ocr)] uppercase mt-10 mb-3">
+                            Other notes
+                          </p>
+                          {other.map((post, index) => (
+                            <PostItem
+                              key={`${post.slug}-other-${index}`}
+                              post={post}
+                              index={index}
+                              formatDate={formatCodexDate}
+                              onHashtagClick={handleHashtagClick}
+                            />
+                          ))}
+                        </>
+                      ) : null}
+                    </>
+                  ) : (
+                    filteredPosts.map((post, index) => (
+                      <PostItem
+                        key={`${post.slug}-${index}`}
+                        post={post}
+                        index={index}
+                        formatDate={formatCodexDate}
+                        onHashtagClick={handleHashtagClick}
+                      />
+                    ))
+                  )}
                   {filteredPosts.length === 0 && (
                     <div className="text-center py-16 border border-[rgb(var(--neon)/0.1)] bg-[rgb(var(--border)/0.2)]">
                       <p className="font-[var(--font-ocr)] text-[rgb(var(--text-secondary))] text-sm tracking-wide uppercase mb-3">

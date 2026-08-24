@@ -11,6 +11,9 @@ export function HeroHeadline() {
       <p className="mt-4 max-w-2xl text-[rgb(var(--text-secondary))] text-sm sm:text-base leading-relaxed font-[var(--font-ibm)]">
         I design and ship internal tools, workflow automations, and AI-assisted systems that turn messy business processes into dependable software.
       </p>
+      <p className="mt-3 max-w-2xl text-[rgb(var(--text-meta))] text-xs sm:text-sm font-[var(--font-ibm)]">
+        Business Systems Developer · Full-stack development · internal tools · automation · operational software
+      </p>
       <div className="mt-6 flex flex-wrap gap-3">
         <a href="/work" className="glitch-button glitch-button--primary">
           View Work
@@ -22,12 +25,6 @@ export function HeroHeadline() {
           Contact
         </a>
       </div>
-      <p className="mt-4 text-xs text-[rgb(var(--text-meta))] font-[var(--font-ocr)] tracking-wide">
-        Selective consulting:{" "}
-        <a href="/services" className="text-[rgb(var(--neon)/0.8)] hover:text-[rgb(var(--neon))] underline underline-offset-2">
-          custom workflows when the fit is right
-        </a>
-      </p>
     </div>
   );
 }

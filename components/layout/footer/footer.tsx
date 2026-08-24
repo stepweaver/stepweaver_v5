@@ -22,8 +22,8 @@ export function Footer() {
           <Link href="/work" className="hover:text-[rgb(var(--neon))] transition-colors">
             Work
           </Link>
-          <Link href="/play" className="hover:text-[rgb(var(--neon))] transition-colors">
-            Play
+          <Link href="/lab" className="hover:text-[rgb(var(--neon))] transition-colors">
+            Lab
           </Link>
           <Link href="/privacy" className="hover:text-[rgb(var(--neon))] transition-colors">
             Privacy

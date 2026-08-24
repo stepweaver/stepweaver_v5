@@ -1,7 +1,7 @@
 import { getInitialBlogEntries } from "@/lib/blog";
 import { getAllProjects } from "@/lib/data/projects";
 import type { Project } from "@/lib/data/projects.schema";
-import { normalizePostFromBlogEntry, sortPosts, type CodexPost } from "@/lib/codex/selectors";
+import { normalizePostFromBlogEntry, partitionProfessionalPosts, sortPosts, type CodexPost } from "@/lib/codex/selectors";
 
 export type HomeIntelPayload = {
   post: CodexPost;
@@ -55,5 +55,18 @@ export async function getHomeRecentIntel(): Promise<HomeIntelPayload | null> {
     };
   } catch {
     return null;
+  }
+}
+
+/** Professional/technical posts first; falls back to latest if none are tagged. */
+export async function getHomeWritingPosts(): Promise<CodexPost[]> {
+  if (!process.env.NOTION_BLOG_DB_ID || !process.env.NOTION_API_KEY) return [];
+  try {
+    const entries = await getInitialBlogEntries(80);
+    const sorted = sortPosts(entries.map(normalizePostFromBlogEntry));
+    const { professional } = partitionProfessionalPosts(sorted);
+    return (professional.length > 0 ? professional : sorted).slice(0, 3);
+  } catch {
+    return [];
   }
 }

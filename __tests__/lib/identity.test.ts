@@ -1,4 +1,16 @@
-import { ABOUT_STATEMENT, CURRENTLY_BUILDING, LINKEDIN, PROFESSIONAL_SUMMARY, RESUME_PDF, ROLE_LINE, ROLE_LINE_PDF, TRAJECTORY } from "@/lib/data/identity";
+import {
+  ABOUT_STATEMENT,
+  CURRENTLY_BUILDING,
+  IDENTITY_STATEMENT,
+  LINKEDIN,
+  PRIMARY_TITLE,
+  PROFESSIONAL_SUMMARY,
+  RESUME_PDF,
+  ROLE_LINE,
+  ROLE_LINE_PDF,
+  SUPPORTING_LINE,
+  TRAJECTORY,
+} from "@/lib/data/identity";
 import { briefData } from "@/lib/data/brief-data";
 import { buildResumeHtml } from "@/lib/data/resume-html";
 import { resumeData } from "@/lib/data/resume-data";
@@ -13,9 +25,12 @@ const FORBIDDEN = [
 
 function blob() {
   return [
+    PRIMARY_TITLE,
+    SUPPORTING_LINE,
     ROLE_LINE,
     ROLE_LINE_PDF,
     PROFESSIONAL_SUMMARY.join(" "),
+    IDENTITY_STATEMENT,
     ABOUT_STATEMENT,
     CURRENTLY_BUILDING.note,
     TRAJECTORY.framing,
@@ -31,15 +46,25 @@ function blob() {
 }
 
 describe("career identity", () => {
-  it("uses the business-systems developer line on web and PDF", () => {
-    expect(resumeData.identity.subtitle).toBe(ROLE_LINE);
+  it("locks Business Systems Developer without a synonym pile", () => {
+    expect(PRIMARY_TITLE).toBe("Business Systems Developer");
+    expect(ROLE_LINE).toBe(PRIMARY_TITLE);
+    expect(resumeData.identity.subtitle).toBe(PRIMARY_TITLE);
     expect(resumeData.identity.subtitlePdf).toBe(ROLE_LINE_PDF);
-    expect(ROLE_LINE).toContain("Software Developer");
-    expect(ROLE_LINE).toContain("Business Systems Developer");
+    expect(ROLE_LINE).not.toContain("Software Developer ·");
     expect(ROLE_LINE).not.toContain("AI-Native");
+    expect(SUPPORTING_LINE).toContain("Full-stack development");
+    expect(SUPPORTING_LINE).toContain("internal tools");
     expect(RESUME_PDF.href).toBe("/weaver_resume.pdf");
     expect(RESUME_PDF.downloadName).toBe("Stephen_Weaver_Resume.pdf");
-    expect(briefData.identity.roles).toEqual(expect.arrayContaining(["Software Developer", "Business Systems Developer"]));
+    expect(briefData.identity.roles).toEqual(["Business Systems Developer"]);
+  });
+
+  it("shows production software in the hiring argument, not BA-who-scripts", () => {
+    const text = blob();
+    expect(text).toMatch(/production software/i);
+    expect(IDENTITY_STATEMENT).toMatch(/write production software/i);
+    expect(PROFESSIONAL_SUMMARY.join(" ")).toMatch(/Full-stack developer/i);
   });
 
   it("does not sell a single framework or a learner slogan", () => {

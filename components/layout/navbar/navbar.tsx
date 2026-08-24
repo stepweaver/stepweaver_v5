@@ -11,11 +11,9 @@ const NAV_LINKS = [
   { label: "Work", href: "/work" },
   { label: "About", href: "/about" },
   { label: "Writing", href: "/writing" },
-  { label: "Field Journal", href: "/field-journal" },
   { label: "Resume", href: "/resume" },
   { label: "Contact", href: "/contact" },
-  { label: "Services", href: "/services" },
-  { label: "Play", href: "/play" },
+  { label: "Lab", href: "/lab" },
 ];
 
 function isActiveNavHref(pathname: string, href: string) {

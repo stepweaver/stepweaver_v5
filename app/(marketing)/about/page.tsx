@@ -2,11 +2,12 @@ import Link from "next/link";
 import { BackgroundBio } from "@/components/brief/background-bio";
 import { LearningLabPanel } from "@/components/brief/learning-lab-panel";
 import { briefData } from "@/lib/data/brief-data";
+import { CAREER_TRANSITION, SUPPORTING_LINE } from "@/lib/data/identity";
 
 export const metadata = {
   title: "About",
   description:
-    "Where Stephen Weaver fits: product-minded systems builder who learns the domain and stack the problem requires, then ships working software.",
+    "Business Systems Developer: full-stack development, internal tools, automation, and operational software. Hiring-first, with selective consulting when the fit is right.",
 };
 
 export default function AboutPage() {
@@ -19,14 +20,22 @@ export default function AboutPage() {
         <h1 className="font-[var(--font-ibm)] text-3xl sm:text-4xl text-[rgb(var(--text-color))] mb-2">
           {briefData.identity.name}
         </h1>
-        <p className="text-[rgb(var(--text-meta))] text-sm font-[var(--font-ibm)] mb-8">
+        <p className="text-[rgb(var(--text-meta))] text-sm font-[var(--font-ibm)] mb-1">
           {briefData.identity.roles.join(" · ")}
+        </p>
+        <p className="text-[rgb(var(--text-secondary))] text-sm font-[var(--font-ibm)] mb-8">
+          {SUPPORTING_LINE}
         </p>
 
         <div className="surface-panel p-6 sm:p-8 space-y-8 mb-8">
           <div>
             <div className="text-label mb-2">STATEMENT</div>
             <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed">{briefData.identity.statement}</p>
+          </div>
+
+          <div>
+            <div className="text-label mb-2">TRAJECTORY</div>
+            <p className="text-[rgb(var(--text-secondary))] text-sm leading-relaxed">{CAREER_TRANSITION}</p>
           </div>
 
           <LearningLabPanel />

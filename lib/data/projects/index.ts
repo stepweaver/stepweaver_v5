@@ -23,29 +23,38 @@ import { parcelSweep } from "./parcel-sweep";
 import { stepweaverDev } from "./stepweaver-dev";
 import { websiteRefreshes } from "./website-refreshes";
 
-/** Homepage / Work flagships: ops, realtime, AI, field systems. */
+/** Homepage / Work flagships: production software proofs for hiring. */
 export const FEATURED_SLUGS = [
   "parcel-sweep",
   "silent-auction",
-  "ai-integrations",
-  "carrier-journal",
+  "lsigil-setup",
+  "bill-planner",
+  "mishawaka-shower-booking",
+  "portfolio-terminal",
 ] as const;
+
+export const FEATURED_PROOFS: Record<(typeof FEATURED_SLUGS)[number], string> = {
+  "parcel-sweep": "Operational workflow modeling + full-stack architecture",
+  "silent-auction": "Production app + realtime + users + business rules",
+  "lsigil-setup": "Business automation + deterministic systems + AI boundaries",
+  "bill-planner": "Product thinking + data modeling + application UX",
+  "mishawaka-shower-booking": "Process analysis → practical internal tool",
+  "portfolio-terminal": "Technical creativity + AI integration + frontend systems",
+};
 
 /** Full catalog sort: featured block first, then remaining order. */
 const CATALOG_ORDER = [
   ...FEATURED_SLUGS,
+  "llambda-llm-agent",
+  "ai-integrations",
+  "carrier-journal",
   "mail-sort-academy",
   "stepweaver-dev",
-  "portfolio-terminal",
-  "lsigil-setup",
-  "llambda-llm-agent",
-  "bill-planner",
   "iam-resist",
   "lcerebro",
   "lambda-orthodontics",
   "service-business-demo",
   "n8n-automations",
-  "mishawaka-shower-booking",
   "it-consulting",
   "orthodontic-tracker",
   "soap-stache",
@@ -118,6 +127,18 @@ export function getHomepageCarouselProjects(): Project[] {
 
 export function isFeaturedSlug(slug: string): boolean {
   return (FEATURED_SLUGS as readonly string[]).includes(slug);
+}
+
+export function getArchiveProjects(): Project[] {
+  const featured = new Set<string>(FEATURED_SLUGS);
+  return ALL_PROJECTS.filter((p) => !featured.has(p.slug));
+}
+
+export function getProjectProof(slug: string): string | undefined {
+  if ((FEATURED_SLUGS as readonly string[]).includes(slug)) {
+    return FEATURED_PROOFS[slug as (typeof FEATURED_SLUGS)[number]];
+  }
+  return undefined;
 }
 
 export function getProjectsByTag(tag: string): Project[] {

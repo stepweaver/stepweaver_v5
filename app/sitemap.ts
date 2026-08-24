@@ -13,7 +13,7 @@ const STATIC_ROUTES = [
   "/contact",
   "/services",
   "/writing",
-  "/play",
+  "/work/archive",
   "/for-agents",
   "/field-journal",
   "/meshtastic",
@@ -29,9 +29,8 @@ const STATIC_ROUTES = [
 function staticPriority(route: string): number {
   if (route === "/") return 1;
   if (route === "/work" || route === "/about" || route === "/resume" || route === "/contact") return 0.9;
-  if (route === "/lab") return 0.8;
-  if (route === "/services" || route === "/writing") return 0.75;
-  if (route === "/play") return 0.55;
+  if (route === "/lab" || route === "/writing") return 0.8;
+  if (route === "/services" || route === "/work/archive") return 0.55;
   return 0.6;
 }
 

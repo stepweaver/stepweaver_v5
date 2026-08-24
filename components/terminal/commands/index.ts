@@ -28,7 +28,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       { content: '  chat <message>: Ask Lambda about experience', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Navigation:', variant: 'lambda' },
-      { content: '  cd contact | writing | work | about | play | dice-roller | field-journal | github', variant: 'default' },
+      { content: '  cd contact | writing | work | about | lab | play | dice-roller | field-journal | github', variant: 'default' },
       { content: '', variant: 'default' },
       { content: 'Features:', variant: 'lambda' },
       { content: '  weather [location] [--forecast] - no location: browser location, else New York', variant: 'default' },
@@ -61,7 +61,8 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       codex: '/writing',
       work: '/work',
       about: '/about',
-      play: '/play',
+      lab: '/lab',
+      play: '/lab',
       'dice-roller': '/dice-roller',
       'carrier-journal': '/field-journal',
       'field-journal': '/field-journal',
@@ -72,7 +73,7 @@ const COMMANDS: Record<string, (_args: string[], _ctx: CommandContext) => Comman
       return {
         lines: [
           { content: 'Usage: cd <destination>', variant: 'warning' },
-          { content: 'Available: contact, writing, work, about, play, dice-roller, field-journal, github', variant: 'dimmed' },
+          { content: 'Available: contact, writing, work, about, lab, play, dice-roller, field-journal, github', variant: 'dimmed' },
         ],
       };
     }

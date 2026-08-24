@@ -16,7 +16,7 @@ export async function GET() {
       consulting_focus: "custom data workflows, ops systems, guarded AI tools",
     },
     summary:
-      "Product-minded software developer and business systems developer. Designs and ships internal tools, workflow automations, and AI-assisted systems. Learns the domain and stack the problem requires, then ships. Consulting is selective and relationship-gated.",
+      "Business Systems Developer. Full-stack developer who ships production internal tools, workflow automations, and AI-assisted systems. Learns the domain and stack the problem requires, then ships. Consulting is selective and relationship-gated.",
     statement: IDENTITY_STATEMENT,
     location: "Indiana, USA",
     work_modes: ["full-time hire", "contract", "sprint", "part-time", "selective project"],
@@ -66,7 +66,6 @@ export async function GET() {
       resume: `${base}/resume`,
       lab: `${base}/lab`,
       services: `${base}/services`,
-      play: `${base}/play`,
       github: "https://github.com/stepweaver",
       contact: `${base}/contact`,
     },

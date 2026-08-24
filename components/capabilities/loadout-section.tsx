@@ -106,9 +106,9 @@ export function LoadoutSection() {
   return (
     <div className="space-y-10">
       <div className="space-y-2">
-        <p className="font-[var(--font-ocr)] text-xs tracking-[0.18em] text-[rgb(var(--text-label))] uppercase sm:text-sm">Loadout</p>
+        <p className="font-[var(--font-ocr)] text-xs tracking-[0.18em] text-[rgb(var(--text-label))] uppercase sm:text-sm">Skills</p>
         <h2 className="font-[var(--font-ibm)] text-xl sm:text-2xl text-[rgb(var(--text-color))] leading-tight">
-          Tools that support the system.
+          Tools that show up in real builds.
         </h2>
         <p className="text-[rgb(var(--text-secondary))] text-sm max-w-2xl leading-relaxed">
           After 8+ years across operations and software, the stack below is what shows up in real builds.

@@ -5,7 +5,7 @@ import { resumeData } from "@/lib/data/resume-data";
 export const metadata = {
   title: "Resume",
   description:
-    "Software developer and business systems developer: 9+ years across development, analysis, data, and operations. Currently building in SvelteKit.",
+    "Business Systems Developer. Full-stack development, internal tools, automation, and operational software. 9+ years across development, analysis, data, and operations.",
 };
 
 export default function ResumePage() {

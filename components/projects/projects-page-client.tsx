@@ -1,48 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useCallback, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 import type { Project } from "@/lib/data/projects.schema";
-import { FEATURED_SLUGS } from "@/lib/data/projects";
-import { LearningLabPanel } from "@/components/brief/learning-lab-panel";
+import { FEATURED_SLUGS, getProjectProof } from "@/lib/data/projects";
 
-function ProjectsPageInner({ projects, tags }: { projects: Project[]; tags: string[] }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const activeTag = searchParams.get("tag")?.trim() ?? "";
-
-  const sortedTags = useMemo(() => [...tags].sort((a, b) => a.localeCompare(b)), [tags]);
-
-  const featured = useMemo(() => {
-    const map = new Map(projects.map((p) => [p.slug, p]));
-    return FEATURED_SLUGS.map((slug) => map.get(slug)).filter((p): p is Project => p !== undefined);
-  }, [projects]);
-
-  const featuredSlugSet = useMemo(() => new Set(FEATURED_SLUGS as readonly string[]), []);
-
-  const archive = useMemo(() => {
-    const rest = projects.filter((p) => !featuredSlugSet.has(p.slug));
-    return activeTag ? rest.filter((p) => p.tags.includes(activeTag)) : rest;
-  }, [projects, activeTag, featuredSlugSet]);
-
-  const filteredFeatured = useMemo(
-    () => (activeTag ? featured.filter((p) => p.tags.includes(activeTag)) : featured),
-    [featured, activeTag]
-  );
-
-  const setTag = useCallback(
-    (tag: string) => {
-      const q = new URLSearchParams(searchParams.toString());
-      if (tag) q.set("tag", tag);
-      else q.delete("tag");
-      const query = q.toString();
-      router.replace(query ? `/work?${query}` : "/work", { scroll: false });
-    },
-    [router, searchParams]
-  );
-
-  const shownCount = filteredFeatured.length + archive.length;
+function ProjectsPageInner({ projects }: { projects: Project[] }) {
+  const map = new Map(projects.map((p) => [p.slug, p]));
+  const featured = FEATURED_SLUGS.map((slug) => map.get(slug)).filter((p): p is Project => p !== undefined);
 
   return (
     <div className="min-h-screen pt-20 pb-16">
@@ -55,81 +20,33 @@ function ProjectsPageInner({ projects, tags }: { projects: Project[]; tags: stri
             Selected Work
           </h1>
           <p className="text-[rgb(var(--text-secondary))] text-sm max-w-2xl">
-            Flagship case studies first: operations systems, internal tools, and AI-assisted workflows, then the full archive.
+            Six production systems that show how I turn operational problems into working software. Frontend, backend, data, and the messy middle.
           </p>
         </div>
 
-        <div className="mb-8">
-          <LearningLabPanel compact />
-        </div>
-
-        <div className="mb-6 flex flex-col sm:flex-row sm:items-end gap-4">
-          <div className="flex-1 min-w-0">
-            <label htmlFor="project-tag-filter" className="text-label block mb-2">
-              FILTER BY TAG
-            </label>
-            <select
-              id="project-tag-filter"
-              value={activeTag}
-              onChange={(e) => setTag(e.target.value)}
-              className="w-full max-w-md bg-[rgb(var(--window))] border border-[rgb(var(--neon)/0.35)] text-[rgb(var(--text-color))] font-[var(--font-ocr)] text-sm px-3 py-2 rounded-sm focus:border-[rgb(var(--neon))] focus:outline-none focus:ring-1 focus:ring-[rgb(var(--neon)/0.4)]"
-            >
-              <option value="">All work ({projects.length})</option>
-              {sortedTags.map((tag) => {
-                const count = projects.filter((p) => p.tags.includes(tag)).length;
-                return (
-                  <option key={tag} value={tag}>
-                    {tag} ({count})
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-          {activeTag ? (
-            <button
-              type="button"
-              onClick={() => setTag("")}
-              className="text-xs font-[var(--font-ocr)] text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))] underline underline-offset-2 self-start sm:self-auto"
-            >
-              Clear filter
-            </button>
-          ) : null}
-        </div>
-
-        <p className="text-[rgb(var(--text-meta))] text-xs font-mono mb-4">
-          Showing {shownCount} of {projects.length}
-          {activeTag ? ` · tag “${activeTag}”` : ""}
-        </p>
-
-        {filteredFeatured.length > 0 ? (
-          <section className="mb-10">
-            <div className="text-label mb-3">FLAGSHIP</div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
-              {filteredFeatured.map((project) => (
-                <ProjectCard key={project.slug} project={project} featured />
-              ))}
-            </div>
-          </section>
-        ) : null}
-
-        <section>
-          <div className="text-label mb-3">ARCHIVE</div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
-            {archive.map((project) => (
-              <ProjectCard key={project.slug} project={project} />
+        <section className="mb-10">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
+            {featured.map((project) => (
+              <ProjectCard key={project.slug} project={project} featured />
             ))}
           </div>
         </section>
 
-        {shownCount === 0 ? (
-          <p className="text-[rgb(var(--text-secondary))] text-sm mt-8">No projects match this tag.</p>
-        ) : null}
+        <p className="text-sm text-[rgb(var(--text-secondary))]">
+          Additional case studies live in the{" "}
+          <Link href="/work/archive" className="text-[rgb(var(--neon))] hover:text-[rgb(var(--accent))]">
+            archive
+          </Link>
+          .
+        </p>
       </div>
     </div>
   );
 }
 
-function ProjectCard({ project, featured = false }: { project: Project; featured?: boolean }) {
+export function ProjectCard({ project, featured = false }: { project: Project; featured?: boolean }) {
+  const proof = getProjectProof(project.slug);
+
   return (
     <Link
       href={`/work/${project.slug}`}
@@ -142,14 +59,12 @@ function ProjectCard({ project, featured = false }: { project: Project; featured
       <h2 className="font-[var(--font-ibm)] text-lg text-[rgb(var(--text-color))] group-hover:text-[rgb(var(--neon))] transition-colors mb-2">
         {project.title}
       </h2>
+      {proof ? (
+        <p className="text-xs font-[var(--font-ocr)] tracking-wide text-[rgb(var(--neon)/0.75)] mb-3">{proof}</p>
+      ) : null}
       <p className={`text-[rgb(var(--text-secondary))] text-sm mb-4 ${featured ? "" : "line-clamp-2"}`}>
         {project.description}
       </p>
-      {featured && (project.builtFor || project.solved) ? (
-        <p className="text-[rgb(var(--text-meta))] text-xs mb-4 line-clamp-2">
-          {[project.builtFor, project.solved].filter(Boolean).join(" · ")}
-        </p>
-      ) : null}
       <div className="flex flex-wrap gap-1.5">
         {project.tags.slice(0, 6).map((tag) => (
           <span
@@ -159,9 +74,6 @@ function ProjectCard({ project, featured = false }: { project: Project; featured
             {tag}
           </span>
         ))}
-        {project.tags.length > 6 ? (
-          <span className="text-xs px-1.5 py-0.5 text-[rgb(var(--muted-color))]">+{project.tags.length - 6}</span>
-        ) : null}
       </div>
     </Link>
   );
@@ -181,10 +93,10 @@ function StatusBadge({ status }: { status: Project["status"] }) {
   );
 }
 
-export function ProjectsPageClient(props: { projects: Project[]; tags: string[] }) {
+export function ProjectsPageClient(props: { projects: Project[]; tags?: string[] }) {
   return (
     <Suspense fallback={<div className="min-h-screen pt-20" />}>
-      <ProjectsPageInner {...props} />
+      <ProjectsPageInner projects={props.projects} />
     </Suspense>
   );
 }

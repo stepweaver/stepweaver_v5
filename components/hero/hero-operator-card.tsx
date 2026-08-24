@@ -106,7 +106,7 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
             <div>
               <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Current chapter</p>
               <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Field systems + the Long Walk
+                Shipping production software
               </p>
             </div>
           </div>
@@ -163,43 +163,23 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
             Contact
           </Link>
           <Link
-            href="/play"
+            href="/lab"
             className="inline-flex cursor-pointer items-center justify-center border border-[rgb(var(--neon)/0.15)] bg-[rgb(var(--window)/0.2)] px-3 py-2 text-xs font-[var(--font-ibm)] uppercase tracking-[0.08em] text-[rgb(var(--text-meta))] transition-colors hover:border-[rgb(var(--neon)/0.4)] hover:bg-[rgb(var(--neon)/0.1)] hover:text-[rgb(var(--neon))]"
           >
-            Play
+            Lab
           </Link>
         </div>
 
         <div className="pt-3 space-y-3">
-          <div className="grid gap-2">
-            <div className="flex flex-wrap items-center gap-2">
-              {["Veteran", "Business Analyst", "Developer"].map((label) => (
-                <span
-                  key={label}
-                  className="border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.15)] px-2 py-1 text-xs font-[var(--font-ibm)] text-[rgb(var(--text-secondary))]"
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <Link
-                href="/yankee-samurai"
-                className="inline-flex cursor-pointer items-center gap-1.5 border-l-2 border border-[rgb(var(--identity)/0.3)] border-l-[rgb(var(--identity)/0.7)] bg-[rgb(var(--window)/0.1)] px-2 py-1 text-xs font-[var(--font-ibm)] text-[rgb(var(--identity)/0.85)] hover:border-[rgb(var(--identity)/0.55)] hover:bg-[rgb(var(--identity)/0.1)] transition-colors"
+          <div className="flex flex-wrap items-center gap-2">
+            {["Veteran", "Business Analyst", "Developer"].map((label) => (
+              <span
+                key={label}
+                className="border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.15)] px-2 py-1 text-xs font-[var(--font-ibm)] text-[rgb(var(--text-secondary))]"
               >
-                <span className="opacity-50" aria-hidden>
-                  &gt;
-                </span>
-                YANKEE SAMURAI
-              </Link>
-              <span className="inline-flex items-center gap-1.5 border-l-2 border border-[rgb(var(--identity)/0.2)] border-l-[rgb(var(--identity)/0.5)] bg-[rgb(var(--window)/0.1)] px-2 py-1 text-xs font-[var(--font-ibm)] text-[rgb(var(--identity)/0.65)]">
-                <span className="opacity-40" aria-hidden>
-                  &gt;
-                </span>
-                REBEL
+                {label}
               </span>
-            </div>
+            ))}
           </div>
 
           <MatrixSync />

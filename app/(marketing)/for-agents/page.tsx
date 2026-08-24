@@ -16,7 +16,7 @@ export default function ForAgentsPage() {
           </div>
           <div>
             <div className="text-label mb-2">ROLE</div>
-            <div className="text-[rgb(var(--text-color))] text-sm">Software Developer · Business Systems Developer · Automation & AI Integration</div>
+            <div className="text-[rgb(var(--text-color))] text-sm">Business Systems Developer · Full-stack development · internal tools · automation · operational software</div>
           </div>
           <div>
             <div className="text-label mb-2">STATUS</div>
@@ -46,7 +46,7 @@ export default function ForAgentsPage() {
             <div className="text-label mb-2">ENTRY POINTS</div>
             <div className="text-xs text-[rgb(var(--text-meta))] font-mono space-y-1">
               <div>Work: /work · About: /about · Resume: /resume · Lab: /lab · Contact: /contact</div>
-              <div>Services (selective): /services · Play: /play</div>
+              <div>Services (selective): /services · Lab: /lab</div>
             </div>
           </div>
           <div>

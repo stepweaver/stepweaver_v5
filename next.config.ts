@@ -37,6 +37,8 @@ const nextConfig: NextConfig = {
       { source: "/codex/:slug", destination: "/writing/:slug", permanent: true },
       { source: "/start-here", destination: "/", permanent: true },
       { source: "/capabilities", destination: "/about", permanent: true },
+      { source: "/play", destination: "/lab", permanent: true },
+      { source: "/play/:path*", destination: "/lab", permanent: true },
 
       // Legacy aliases under new /work path (in case old redirects were bookmarked after partial migrate)
       { source: "/work/cerebro", destination: "/work/lcerebro", permanent: true },

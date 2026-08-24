@@ -4,7 +4,8 @@ import { normalizePostFromBlogEntry, sortPosts, type CodexPost } from "@/lib/cod
 
 export const metadata = {
   title: "Writing",
-  description: "Developer notes, build logs, and community thoughts.",
+  description:
+    "Notes on systems, requirements, and architecture — plus the rest of the notebook underneath.",
 };
 
 export default async function CodexPage() {

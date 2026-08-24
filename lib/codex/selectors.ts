@@ -1,3 +1,5 @@
+import { PINNED_WRITING_SLUGS, PROFESSIONAL_WRITING_TAGS } from "@/lib/data/writing";
+
 export type CodexPost = {
   title: string;
   slug: string;
@@ -84,4 +86,24 @@ export function formatCodexDate(dateStr: string): string {
   } catch {
     return dateStr;
   }
+}
+
+const PROFESSIONAL_TAG_SET = new Set<string>(PROFESSIONAL_WRITING_TAGS);
+
+export function isProfessionalPost(post: CodexPost): boolean {
+  if ((PINNED_WRITING_SLUGS as readonly string[]).includes(post.slug)) return true;
+  return (post.hashtags || []).some((tag) => PROFESSIONAL_TAG_SET.has(normalizeTag(tag)));
+}
+
+export function partitionProfessionalPosts(posts: CodexPost[]): {
+  professional: CodexPost[];
+  other: CodexPost[];
+} {
+  const sorted = sortPosts(posts);
+  const pinnedOrder = new Map((PINNED_WRITING_SLUGS as readonly string[]).map((slug, i) => [slug, i]));
+  const professional = sorted
+    .filter(isProfessionalPost)
+    .sort((a, b) => (pinnedOrder.get(a.slug) ?? 99) - (pinnedOrder.get(b.slug) ?? 99));
+  const other = sorted.filter((p) => !isProfessionalPost(p));
+  return { professional, other };
 }

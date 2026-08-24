@@ -26,38 +26,56 @@ export const briefData = {
     {
       slug: "parcel-sweep",
       label: "Parcel Sweep",
-      type: "Last-mile ops prototype",
+      type: "Full-stack ops system",
       summary:
-        "Field-aware last-mile delivery workflow tooling grounded in sequencing pressure and ops constraints.",
+        "Operational workflow modeling + full-stack architecture. Last-mile delivery tooling from intake through dispatch.",
       tags: ["React", "Express", "SQLite", "Socket.io"] as const,
       href: "/work/parcel-sweep",
     },
     {
       slug: "silent-auction",
       label: "Silent Auction Platform",
-      type: "Real-time operational app",
+      type: "Production realtime app",
       summary:
-        "Fundraising platform with real-time bidding state, Supabase Realtime, role-based access, and live event operations under pressure.",
+        "Production app + realtime + users + business rules. Live fundraising operations under event pressure.",
       tags: ["Next.js", "Supabase", "Realtime", "Auth", "PostgreSQL"] as const,
       href: "/work/silent-auction",
     },
     {
-      slug: "ai-integrations",
-      label: "AI Integrations",
-      type: "Guarded AI systems",
+      slug: "lsigil-setup",
+      label: "λsigil",
+      type: "Guarded automation runtime",
       summary:
-        "Portfolio-native AI with shared protected backends, rate limits, sanitization, and explicit trust boundaries.",
-      tags: ["Next.js", "Groq", "OpenAI", "Vercel KV"] as const,
-      href: "/work/ai-integrations",
+        "Business automation + deterministic systems + AI boundaries. Evidence, qualification, and human approval gates.",
+      tags: ["TypeScript", "Next.js", "Lead ops"] as const,
+      href: "/work/lsigil-setup",
     },
     {
-      slug: "carrier-journal",
-      label: "Field Journal",
-      type: "Personal fitness systems product",
+      slug: "bill-planner",
+      label: "λledger",
+      type: "Product / data application",
       summary:
-        "Walking and fitness journal with KPI/dashboard artifact: miles, hydration, weather, recovery.",
-      tags: ["Next.js", "Notion API", "Zod", "TypeScript"] as const,
-      href: "/work/carrier-journal",
+        "Product thinking + data modeling + application UX. Paycheck-window cashflow as a structured app.",
+      tags: ["Next.js", "PostgreSQL", "Drizzle", "Auth.js"] as const,
+      href: "/work/bill-planner",
+    },
+    {
+      slug: "mishawaka-shower-booking",
+      label: "Mishawaka Shower Booking",
+      type: "Internal process tool",
+      summary:
+        "Process analysis → practical internal tool. An informal real-world process turned into a booking system.",
+      tags: ["Next.js", "TypeScript"] as const,
+      href: "/work/mishawaka-shower-booking",
+    },
+    {
+      slug: "portfolio-terminal",
+      label: "Terminal",
+      type: "Interface + AI systems",
+      summary:
+        "Technical creativity + AI integration + frontend systems. Command router, APIs, and a shared AI backend.",
+      tags: ["Next.js", "TypeScript", "LLM"] as const,
+      href: "/work/portfolio-terminal",
     },
   ] as const,
   stackSnapshot: {

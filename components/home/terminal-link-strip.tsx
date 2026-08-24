@@ -9,9 +9,9 @@ const linkClass =
 export function TerminalLinkStrip() {
   return (
     <div className="mb-6 sm:mb-10 flex flex-wrap gap-4 sm:gap-6">
-      <Link href="/play" className={linkClass}>
+      <Link href="/lab" className={linkClass}>
         <GlitchLambda className="text-[rgb(var(--green))] text-lg sm:text-2xl md:text-3xl" />
-        <span className="font-bold whitespace-nowrap">Explore the playground</span>
+        <span className="font-bold whitespace-nowrap">Explore the lab</span>
         <span className="text-[rgb(var(--green))] text-lg sm:text-2xl md:text-3xl motion-safe:animate-pulse">→</span>
       </Link>
       <Link href="/terminal" className={linkClass}>

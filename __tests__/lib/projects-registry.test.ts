@@ -1,4 +1,14 @@
-import { getAllProjects, getProjectBySlug, getHomepageCarouselProjects, getAllTags, getProjectsByTag, getProjectSlugs } from "@/lib/data/projects";
+import {
+  FEATURED_SLUGS,
+  getAllProjects,
+  getArchiveProjects,
+  getFeaturedProjects,
+  getProjectBySlug,
+  getHomepageCarouselProjects,
+  getAllTags,
+  getProjectsByTag,
+  getProjectSlugs,
+} from "@/lib/data/projects";
 
 describe("projects registry", () => {
   it("returns all projects", () => {
@@ -17,15 +27,18 @@ describe("projects registry", () => {
     expect(project).toBeUndefined();
   });
 
-  it("returns carousel projects", () => {
+  it("returns featured hiring proofs", () => {
+    const featured = getFeaturedProjects();
     const carousel = getHomepageCarouselProjects();
-    expect(carousel.length).toBe(4);
-    expect(carousel.map((p) => p.slug)).toEqual([
-      "parcel-sweep",
-      "silent-auction",
-      "ai-integrations",
-      "carrier-journal",
-    ]);
+    expect(featured.map((p) => p.slug)).toEqual([...FEATURED_SLUGS]);
+    expect(carousel.map((p) => p.slug)).toEqual([...FEATURED_SLUGS]);
+  });
+
+  it("keeps archive projects off the hiring six", () => {
+    const featured = new Set<string>(FEATURED_SLUGS);
+    const archive = getArchiveProjects();
+    expect(archive.length).toBe(getAllProjects().length - FEATURED_SLUGS.length);
+    archive.forEach((p) => expect(featured.has(p.slug)).toBe(false));
   });
 
   it("returns all unique tags", () => {
