@@ -5,6 +5,8 @@ import {
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
 import { buildPublicSummary } from "@/lib/carrier-journal/helpers";
+import { computePublicDerivedTelemetry } from "@/lib/data/carrier-derived-telemetry.server";
+import { toPublicMassDeltaSeries } from "@/lib/data/carrier-mass-delta.server";
 
 function fullPrivateDispatch(): CarrierDispatch {
   return {
@@ -121,5 +123,30 @@ describe("toPublicFieldDispatch", () => {
     expect(serialized).not.toContain("SB-013");
     expect(serialized).not.toContain("Amazon Day");
     expect(serialized).not.toContain("private body");
+  });
+});
+
+describe("public mass-delta and derived telemetry payloads", () => {
+  it("serialize relative deltas without absolute weight literals", () => {
+    const start = fullPrivateDispatch();
+    start.date = "2026-06-01";
+    start.weightLbs = 248;
+    start.id = "week-0";
+
+    const latest = fullPrivateDispatch();
+    latest.date = "2026-07-06";
+    latest.weightLbs = 241.2;
+    latest.id = "week-5";
+
+    const mass = toPublicMassDeltaSeries([start, latest]);
+    const derived = computePublicDerivedTelemetry([start, latest], mass);
+    const serialized = JSON.stringify({ mass, derived });
+
+    expect(serialized).not.toContain("248");
+    expect(serialized).not.toContain("241.2");
+    expect(serialized).not.toMatch(/percent/i);
+    expect(serialized).not.toContain("weightLbs");
+    expect(mass.points.every((p) => !("weight" in p) && !("weightLbs" in p))).toBe(true);
+    expect(mass.currentDelta).toBe(-6.8);
   });
 });

@@ -1,23 +1,34 @@
 import Link from "next/link";
 import {
-  computeTotalsFromDispatches,
-  totalsToKpis,
   isDispatchFeedWorthy,
-  toPublicFieldDispatches,
-  type CarrierDispatch,
+  type CarrierKpi,
+  type PublicFieldDispatch,
 } from "@/lib/data/carrier-journal";
 import { CarrierKpiCard } from "./carrier-kpi-card";
 import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
 import { CarrierFieldCalendar } from "./carrier-field-calendar";
 import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 import { CarrierProfileCard } from "./carrier-profile-card";
+import { DerivedTelemetryPanel } from "./derived-telemetry-panel";
+import { FieldRecordsPanel } from "./field-records-panel";
+import { MassDeltaTrend } from "./mass-delta-trend";
 import { SystemsCheck } from "./systems-check";
 import { WalkingProtocol } from "./walking-protocol";
 import { FootwearActiveLoadoutCard } from "@/components/footwear/footwear-active-loadout-card";
 import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
+import {
+  EMPTY_DERIVED_TELEMETRY,
+  EMPTY_MASS_DELTA_SERIES,
+  type PublicDerivedTelemetry,
+  type PublicFieldRecords,
+  type PublicMassDeltaSeries,
+} from "@/lib/types/carrier-public-telemetry";
 
 const SECTION_NAV = [
   { id: "body-telemetry", label: "TELEMETRY" },
+  { id: "mass-trend", label: "MASS" },
+  { id: "derived-telemetry", label: "DERIVED" },
+  { id: "field-records", label: "RECORDS" },
   { id: "distance-qualification", label: "DISTANCE" },
   { id: "active-loadout", label: "LOADOUT" },
   { id: "field-log", label: "FIELD LOG" },
@@ -47,21 +58,23 @@ function FieldSectionNav() {
 }
 
 type Props = {
-  dispatches?: CarrierDispatch[];
+  kpis?: CarrierKpi[];
+  dispatches?: PublicFieldDispatch[];
+  massDelta?: PublicMassDeltaSeries;
+  derived?: PublicDerivedTelemetry;
+  records?: PublicFieldRecords;
   footwearActive?: ShoeDerivedSummary | null;
 };
 
 export function CarrierJournalPage({
-  dispatches: notionDispatches,
+  kpis = [],
+  dispatches = [],
+  massDelta = EMPTY_MASS_DELTA_SERIES,
+  derived = EMPTY_DERIVED_TELEMETRY,
+  records = [],
   footwearActive = null,
 }: Props = {}) {
-  // Fail closed: empty Notion must not fall back to demo narratives.
-  // Aggregates (including weight-lost) are computed server-side from full records;
-  // only the public DTO crosses into client components.
-  const serverDispatches = notionDispatches ?? [];
-  const totals = computeTotalsFromDispatches(serverDispatches);
-  const kpis = totalsToKpis(totals);
-  const dispatches = toPublicFieldDispatches(serverDispatches);
+  // Public DTOs only. Absolute weight never enters this component.
   const feedDispatches = dispatches.filter(isDispatchFeedWorthy);
 
   return (
@@ -98,6 +111,12 @@ export function CarrierJournalPage({
             ))}
           </div>
         </div>
+
+        <MassDeltaTrend series={massDelta} />
+
+        <DerivedTelemetryPanel derived={derived} />
+
+        <FieldRecordsPanel records={records} />
 
         <div id="operational-log" className="scroll-mt-28">
           <CarrierFieldCalendar dispatches={dispatches} />

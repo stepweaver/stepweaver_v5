@@ -3,6 +3,14 @@ import { fetchCarrierDispatches } from "@/lib/notion/carrier-journal.repo";
 import { CarrierJournalPage } from "@/components/carrier-journal/carrier-journal-page";
 import { isFootwearDbConfigured } from "@/lib/db";
 import { getActiveShoeSummary } from "@/lib/footwear/queries";
+import {
+  computeTotalsFromDispatches,
+  toPublicFieldDispatches,
+  totalsToKpis,
+} from "@/lib/data/carrier-journal";
+import { computePublicDerivedTelemetry } from "@/lib/data/carrier-derived-telemetry.server";
+import { computePublicFieldRecords } from "@/lib/data/carrier-field-records";
+import { toPublicMassDeltaSeries } from "@/lib/data/carrier-mass-delta.server";
 
 export const revalidate = 300;
 
@@ -31,14 +39,25 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const notionDispatches = await fetchCarrierDispatches();
+  const serverDispatches = await fetchCarrierDispatches();
   const footwearActive = isFootwearDbConfigured()
     ? await getActiveShoeSummary({ publicOnly: true }).catch(() => null)
     : null;
 
+  const totals = computeTotalsFromDispatches(serverDispatches);
+  const kpis = totalsToKpis(totals);
+  const dispatches = toPublicFieldDispatches(serverDispatches);
+  const massDelta = toPublicMassDeltaSeries(serverDispatches);
+  const derived = computePublicDerivedTelemetry(serverDispatches, massDelta);
+  const records = computePublicFieldRecords(dispatches);
+
   return (
     <CarrierJournalPage
-      dispatches={notionDispatches}
+      kpis={kpis}
+      dispatches={dispatches}
+      massDelta={massDelta}
+      derived={derived}
+      records={records}
       footwearActive={footwearActive}
     />
   );
