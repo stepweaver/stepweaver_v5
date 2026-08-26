@@ -3,7 +3,11 @@
  * Derives logged walking days from public field dispatch entries.
  */
 
-import type { CarrierDispatch, PublicFieldDispatch } from "./carrier-journal";
+import {
+  isDispatchFeedWorthy,
+  type CarrierDispatch,
+  type PublicFieldDispatch,
+} from "./carrier-journal";
 import { deriveWeatherSignals, effectiveHeatF } from "@/lib/carrier-journal/weather-signals";
 
 type CalendarDispatch = PublicFieldDispatch | CarrierDispatch;
@@ -29,6 +33,8 @@ export type DaySummary = WeatherMarkers & {
   totalSteps: number;
   hydrationGoalMet: boolean;
   dispatchIds: string[];
+  /** IDs of dispatches with a public written note (feed-worthy). */
+  writtenDispatchIds: string[];
   noteExcerpt: string;
 };
 
@@ -206,6 +212,7 @@ function buildDaySummary(date: string, dispatches: CalendarDispatch[]): DaySumma
       belowZero: false,
       hydrationGoalMet: false,
       dispatchIds: [],
+      writtenDispatchIds: [],
       noteExcerpt: "",
     };
   }
@@ -260,6 +267,7 @@ function buildDaySummary(date: string, dispatches: CalendarDispatch[]): DaySumma
     belowZero,
     hydrationGoalMet,
     dispatchIds: dispatches.map((d) => d.id),
+    writtenDispatchIds: dispatches.filter(isDispatchFeedWorthy).map((d) => d.id),
     noteExcerpt,
   };
 }

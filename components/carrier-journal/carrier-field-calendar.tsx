@@ -248,10 +248,10 @@ function SelectedDayPanel({ day, onClose }: { day: DaySummary; onClose: () => vo
             </p>
           )}
 
-          {/* Dispatch links */}
-          {day.dispatchIds.length > 0 && (
+          {/* Dispatch links — only when a written public note exists in the feed */}
+          {day.writtenDispatchIds.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {day.dispatchIds.map((id) => (
+              {day.writtenDispatchIds.map((id) => (
                 <a
                   key={id}
                   href={`#${id}`}

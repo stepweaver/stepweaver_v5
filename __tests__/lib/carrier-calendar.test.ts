@@ -41,6 +41,7 @@ function emptyDay(date: string): DaySummary {
     belowZero: false,
     hydrationGoalMet: false,
     dispatchIds: [],
+    writtenDispatchIds: [],
     noteExcerpt: "",
   };
 }
@@ -341,6 +342,33 @@ describe("buildCalendarGrid", () => {
     expect(noLogDay?.totalMiles).toBe(0);
     expect(noLogDay?.totalSteps).toBe(0);
     expect(noLogDay?.dispatchIds).toHaveLength(0);
+    expect(noLogDay?.writtenDispatchIds).toHaveLength(0);
+  });
+
+  it("omits writtenDispatchIds when a logged day has no public note", () => {
+    const dispatches = [dispatch({ id: "a", date: "2026-05-20", title: "A", milesWalked: 13.5 })];
+    const { weeks } = buildCalendarGrid(dispatches);
+    const day = weeks.flat().find((d) => d.date === "2026-05-20");
+    expect(day?.hasDispatch).toBe(true);
+    expect(day?.dispatchIds).toEqual(["a"]);
+    expect(day?.writtenDispatchIds).toEqual([]);
+  });
+
+  it("includes only feed-worthy notes in writtenDispatchIds", () => {
+    const dispatches = [
+      dispatch({ id: "a", date: "2026-05-20", title: "A", milesWalked: 5.0, publicNote: "   " }),
+      dispatch({
+        id: "b",
+        date: "2026-05-20",
+        title: "B",
+        milesWalked: 4.5,
+        publicNote: "Heat hung on after the last loop.",
+      }),
+    ];
+    const { weeks } = buildCalendarGrid(dispatches);
+    const day = weeks.flat().find((d) => d.date === "2026-05-20");
+    expect(day?.dispatchIds).toEqual(expect.arrayContaining(["a", "b"]));
+    expect(day?.writtenDispatchIds).toEqual(["b"]);
   });
 
   it("does not depend on a fixed five-day workweek; logs on any day pattern are valid", () => {
