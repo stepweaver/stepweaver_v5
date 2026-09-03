@@ -31,6 +31,7 @@ export type DaySummary = WeatherMarkers & {
   hasDispatch: boolean;
   totalMiles: number;
   totalSteps: number;
+  estLocomotionKcal: number | null;
   hydrationGoalMet: boolean;
   dispatchIds: string[];
   /** IDs of dispatches with a public written note (feed-worthy). */
@@ -214,6 +215,7 @@ function buildDaySummary(date: string, dispatches: CalendarDispatch[]): DaySumma
       dispatchIds: [],
       writtenDispatchIds: [],
       noteExcerpt: "",
+      estLocomotionKcal: null,
     };
   }
 
@@ -253,11 +255,18 @@ function buildDaySummary(date: string, dispatches: CalendarDispatch[]): DaySumma
 
   const noteExcerpt = dispatches[0]?.publicNote?.slice(0, 120) ?? "";
 
+  const kcalValues = dispatches
+    .map((d) => ("estLocomotionKcal" in d ? d.estLocomotionKcal : undefined))
+    .filter((value): value is number => typeof value === "number" && Number.isFinite(value));
+  const estLocomotionKcal =
+    kcalValues.length > 0 ? kcalValues.reduce((sum, value) => sum + value, 0) : null;
+
   return {
     date,
     hasDispatch: true,
     totalMiles,
     totalSteps,
+    estLocomotionKcal,
     rain,
     storm,
     snow,

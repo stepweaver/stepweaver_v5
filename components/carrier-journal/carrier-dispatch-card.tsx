@@ -19,10 +19,15 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
 
   const chips: string[] = [
     `${d.milesWalked} MI`,
+  ];
+  if (d.estLocomotionKcal !== undefined) {
+    chips.push(`${d.estLocomotionKcal.toLocaleString("en-US")} KCAL`);
+  }
+  chips.push(
     `ENERGY ${d.energy}`,
     `LOAD ${d.soreness}`,
     `MORALE ${d.mood}`,
-  ];
+  );
   if (d.temperatureF !== undefined) chips.push(`${d.temperatureF}°F`);
   if (d.waterOz !== undefined) {
     const goal = d.hydrationGoalOz;

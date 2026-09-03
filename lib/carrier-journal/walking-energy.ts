@@ -89,6 +89,30 @@ export function estimateWalkingEnergy({
   };
 }
 
+export function kgFromLbs(weightLbs: number): number {
+  return weightLbs / LB_PER_KG;
+}
+
+export function estimateLocomotionEnergyForDispatch(
+  series: WeightDated[],
+  day: WeightDated
+): WalkingEnergyEstimate | null {
+  if (day.milesWalked <= 0) return null;
+  const weightLbs = weightLbsAsOf(series, day.date);
+  if (weightLbs === undefined || weightLbs <= 0) return null;
+
+  const estimate = estimateWalkingEnergy({
+    weightKg: kgFromLbs(weightLbs),
+    distanceMiles: day.milesWalked,
+    movingMinutes: day.movingMinutes,
+    loadKg: day.loadKg,
+    gradePercent: day.gradePercent,
+    terrainFactor: day.terrainFactor,
+  });
+
+  return estimate.kcal > 0 ? estimate : null;
+}
+
 export function estimateLocomotionEnergyFromDispatches(
   dispatches: WeightDated[]
 ): LocomotionEnergySeries {
@@ -103,19 +127,8 @@ export function estimateLocomotionEnergyFromDispatches(
   let fallbackDays = 0;
 
   for (const day of walkingDays) {
-    const weightLbs = weightLbsAsOf(dispatches, day.date);
-    if (weightLbs === undefined || weightLbs <= 0) continue;
-
-    const estimate = estimateWalkingEnergy({
-      weightKg: weightLbs / LB_PER_KG,
-      distanceMiles: day.milesWalked,
-      movingMinutes: day.movingMinutes,
-      loadKg: day.loadKg,
-      gradePercent: day.gradePercent,
-      terrainFactor: day.terrainFactor,
-    });
-
-    if (estimate.kcal <= 0) continue;
+    const estimate = estimateLocomotionEnergyForDispatch(dispatches, day);
+    if (!estimate) continue;
 
     totalKcal += estimate.kcal;
     contributing += 1;

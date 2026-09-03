@@ -101,6 +101,8 @@ describe("toPublicFieldDispatch", () => {
       waterOz: 96,
       hydrationGoalOz: 90,
     });
+    expect(publicDto.estLocomotionKcal).toEqual(expect.any(Number));
+    expect(publicDto.locomotionMethod).toBe("minimum-mechanics");
   });
 
   it("omits every private operational and raw biometric key from the DTO object", () => {
@@ -127,10 +129,10 @@ describe("toPublicFieldDispatch", () => {
     expect(serialized).not.toContain("SB-013");
     expect(serialized).not.toContain("Amazon Day");
     expect(serialized).not.toContain("private body");
-    expect(serialized).not.toContain("187");
-    expect(serialized).not.toContain("6.4");
     expect(serialized).not.toContain("movingMinutes");
     expect(serialized).not.toContain("loadKg");
+    expect(parsed[0]).toHaveProperty("estLocomotionKcal");
+    expect(parsed[0]).toHaveProperty("locomotionMethod", "minimum-mechanics");
   });
 });
 

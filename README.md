@@ -327,7 +327,7 @@ Publication / privacy rules:
 - Public reads only use rows where `Publish Public = true`.
 - `Private Note` is written to Notion but never read for public rendering.
 - Empty Notion responses fail closed (no demo/fallback narratives).
-- Before client components render, `toPublicFieldDispatch` strips private keys (`weightLbs`, volume counters, route identifiers, and related fields).
+- Before client components render, `toPublicFieldDispatch` strips private keys (`weightLbs`, volume counters, route identifiers, and related fields) and attaches a derived daily locomotion-energy estimate.
 
 Expected Field Journal Notion properties (public fitness + private daybook):
 

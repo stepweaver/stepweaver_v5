@@ -11,9 +11,15 @@ import {
   type MailLoadTier,
 } from "@/lib/carrier-journal/mail-load";
 import {
+  estimateLocomotionEnergyForDispatch,
+  type WalkingEnergyMethod,
+} from "@/lib/carrier-journal/walking-energy";
+import {
   isDerivedHeatDay,
   isDerivedWeatherDay,
 } from "@/lib/carrier-journal/weather-signals";
+
+export type { WalkingEnergyMethod };
 
 export const CARRIER_KPI_EMPTY = "n/a";
 
@@ -91,6 +97,9 @@ export type PublicFieldDispatch = {
   publicNote: string;
   waterOz?: number;
   hydrationGoalOz?: number;
+  /** Estimated walking energy for this day. Derived server-side; mass stays private. */
+  estLocomotionKcal?: number;
+  locomotionMethod?: WalkingEnergyMethod;
 };
 
 export type CarrierDispatch = PublicFieldDispatch & {
@@ -139,7 +148,12 @@ export type CarrierDispatch = PublicFieldDispatch & {
  * Allowlist projection: only expressly public fitness fields survive.
  * Call this before any Field Journal payload reaches a client component.
  */
-export function toPublicFieldDispatch(dispatch: CarrierDispatch): PublicFieldDispatch {
+export function toPublicFieldDispatch(
+  dispatch: CarrierDispatch,
+  series: CarrierDispatch[] = [dispatch]
+): PublicFieldDispatch {
+  const locomotion = estimateLocomotionEnergyForDispatch(series, dispatch);
+
   return {
     id: dispatch.id,
     date: dispatch.date,
@@ -168,13 +182,17 @@ export function toPublicFieldDispatch(dispatch: CarrierDispatch): PublicFieldDis
     ...(dispatch.hydrationGoalOz !== undefined && {
       hydrationGoalOz: dispatch.hydrationGoalOz,
     }),
+    ...(locomotion && {
+      estLocomotionKcal: locomotion.kcal,
+      locomotionMethod: locomotion.method,
+    }),
   };
 }
 
 export function toPublicFieldDispatches(
   dispatches: CarrierDispatch[]
 ): PublicFieldDispatch[] {
-  return dispatches.map(toPublicFieldDispatch);
+  return dispatches.map((dispatch) => toPublicFieldDispatch(dispatch, dispatches));
 }
 
 export type CarrierKpi = {

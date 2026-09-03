@@ -43,6 +43,7 @@ function emptyDay(date: string): DaySummary {
     dispatchIds: [],
     writtenDispatchIds: [],
     noteExcerpt: "",
+    estLocomotionKcal: null,
   };
 }
 
@@ -315,6 +316,7 @@ describe("buildCalendarGrid", () => {
     const loggedDay = allDays.find((d) => d.date === "2026-05-20");
     expect(loggedDay?.hasDispatch).toBe(true);
     expect(loggedDay?.totalMiles).toBe(9.2);
+    expect(loggedDay?.estLocomotionKcal).toBeNull();
     // Confirm a non-dispatch date in the grid has no dispatch
     const emptyDays = allDays.filter((d) => d.date !== "2026-05-20");
     expect(emptyDays.every((d) => !d.hasDispatch)).toBe(true);
@@ -322,8 +324,22 @@ describe("buildCalendarGrid", () => {
 
   it("aggregates multiple dispatches on the same date", () => {
     const dispatches = [
-      dispatch({ id: "a", date: "2026-05-20", title: "A", milesWalked: 5.0, steps: 10000 }),
-      dispatch({ id: "b", date: "2026-05-20", title: "B", milesWalked: 4.5, steps: 9000 }),
+      dispatch({
+        id: "a",
+        date: "2026-05-20",
+        title: "A",
+        milesWalked: 5.0,
+        steps: 10000,
+        estLocomotionKcal: 500,
+      }),
+      dispatch({
+        id: "b",
+        date: "2026-05-20",
+        title: "B",
+        milesWalked: 4.5,
+        steps: 9000,
+        estLocomotionKcal: 400,
+      }),
     ];
     const { weeks } = buildCalendarGrid(dispatches);
     const day = weeks.flat().find((d) => d.date === "2026-05-20");
@@ -331,6 +347,7 @@ describe("buildCalendarGrid", () => {
     expect(day?.totalMiles).toBe(9.5);
     expect(day?.totalSteps).toBe(19000);
     expect(day?.dispatchIds).toEqual(expect.arrayContaining(["a", "b"]));
+    expect(day?.estLocomotionKcal).toBe(900);
   });
 
   it("returns an empty day when no dispatches exist for a grid cell", () => {

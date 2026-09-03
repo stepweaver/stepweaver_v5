@@ -1,5 +1,6 @@
 import {
   estimateLocomotionEnergyFromDispatches,
+  estimateLocomotionEnergyForDispatch,
   estimateWalkingEnergy,
   formatLocomotionKcal,
   locomotionMethodDetail,
@@ -260,6 +261,26 @@ describe("estimateLocomotionEnergyFromDispatches", () => {
       }),
     ]);
     expect(result.method).toBe("minimum-mechanics");
+  });
+
+  it("estimates a single day using carried-forward mass", () => {
+    const series = [
+      dispatch({
+        id: "mon",
+        date: "2026-05-04",
+        title: "Mon",
+        milesWalked: 10,
+        weightLbs: 200,
+      }),
+      dispatch({
+        id: "tue",
+        date: "2026-05-05",
+        title: "Tue",
+        milesWalked: 8,
+      }),
+    ];
+    const tuesday = estimateLocomotionEnergyForDispatch(series, series[1]);
+    expect(tuesday).toEqual({ kcal: 800, method: "distance-fallback" });
   });
 });
 

@@ -11,6 +11,10 @@ import {
   type HydrationRecommendation,
 } from "@/lib/hydration";
 import {
+  estimateWalkingEnergy,
+  kgFromLbs,
+} from "@/lib/carrier-journal/walking-energy";
+import {
   computeFuelScore,
   FUEL_SCORE_WIN,
   formatFuelScore,
@@ -456,16 +460,34 @@ export function CarrierDaybookForm({
     ]
   );
 
-  if (result) {
-    const milesNum = miles.trim() ? parseFloat(miles) : undefined;
-    const dpsNum = dpsCount.trim() ? Number(dpsCount.replace(/,/g, "")) : undefined;
-    return (
-      <SuccessCard
-        result={result}
-        date={date}
-        miles={milesNum}
-        dpsCount={dpsNum}
-        temperatureF={weatherTemp ?? undefined}
+    if (result) {
+      const milesNum = miles.trim() ? parseFloat(miles) : undefined;
+      const dpsNum = dpsCount.trim() ? Number(dpsCount.replace(/,/g, "")) : undefined;
+      const movingMinutesNum = movingMinutes.trim() ? Number(movingMinutes) : undefined;
+      const weightNum = weightLbs.trim() ? parseFloat(weightLbs) : NaN;
+      const activeWeight =
+        Number.isFinite(weightNum) && weightNum > 0 ? weightNum : (latestWeightLbs ?? undefined);
+      const locomotion =
+        milesNum && milesNum > 0 && activeWeight && activeWeight > 0
+          ? estimateWalkingEnergy({
+              weightKg: kgFromLbs(activeWeight),
+              distanceMiles: milesNum,
+              movingMinutes:
+                movingMinutesNum !== undefined &&
+                Number.isFinite(movingMinutesNum) &&
+                movingMinutesNum > 0
+                  ? movingMinutesNum
+                  : undefined,
+            })
+          : null;
+      return (
+        <SuccessCard
+          result={result}
+          date={date}
+          miles={milesNum}
+          locomotionKcal={locomotion?.kcal}
+          dpsCount={dpsNum}
+          temperatureF={weatherTemp ?? undefined}
         heatIndexF={weatherHeat ?? undefined}
         avgHeatIndexF={weatherAvgHeat ?? undefined}
         precipitationIn={weatherPrecip ?? undefined}
@@ -473,6 +495,7 @@ export function CarrierDaybookForm({
           setResult(null);
           setSubmitStatus("idle");
           setMiles("");
+          setMovingMinutes("");
           setDpsCount("");
           setMailDayContext([]);
           setParcels("");
@@ -1355,6 +1378,7 @@ type SuccessCardProps = {
   result: SubmitResult;
   date: string;
   miles?: number;
+  locomotionKcal?: number;
   dpsCount?: number;
   temperatureF?: number;
   heatIndexF?: number;
@@ -1367,6 +1391,7 @@ function SuccessCard({
   result,
   date,
   miles,
+  locomotionKcal,
   dpsCount,
   temperatureF,
   heatIndexF,
@@ -1384,6 +1409,9 @@ function SuccessCard({
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
           <StatCell label="DATE" value={date} />
           {miles !== undefined && <StatCell label="MILES" value={formatMileage(miles)} />}
+          {locomotionKcal !== undefined && (
+            <StatCell label="EST. LOCOMOTION" value={`${locomotionKcal.toLocaleString("en-US")} kcal`} />
+          )}
           {temperatureF !== undefined && (
             <StatCell label="PEAK TEMP" value={formatTemperature(temperatureF)} />
           )}

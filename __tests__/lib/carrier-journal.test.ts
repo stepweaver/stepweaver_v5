@@ -4,6 +4,7 @@ import {
   computeDpsStats,
   enrichDispatchesDpsFields,
   formatPublicWeightTrend,
+  toPublicFieldDispatches,
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
 import {
@@ -213,6 +214,31 @@ describe("formatPublicWeightTrend", () => {
     const trend = formatPublicWeightTrend(totals);
     expect(trend.value).toBe("4.2 lbs lost");
     expect(trend.value).not.toMatch(/243/);
+  });
+});
+
+describe("toPublicFieldDispatches locomotion energy", () => {
+  it("attaches a daily kcal estimate using carried-forward mass", () => {
+    const publicDays = toPublicFieldDispatches([
+      dispatch({
+        id: "a",
+        date: "2026-05-04",
+        title: "Mon",
+        milesWalked: 10,
+        weightLbs: 200,
+      }),
+      dispatch({
+        id: "b",
+        date: "2026-05-05",
+        title: "Tue",
+        milesWalked: 8,
+      }),
+    ]);
+    expect(publicDays[0].estLocomotionKcal).toBe(1000);
+    expect(publicDays[0].locomotionMethod).toBe("distance-fallback");
+    expect(publicDays[1].estLocomotionKcal).toBe(800);
+    expect(publicDays[0]).not.toHaveProperty("weightLbs");
+    expect(publicDays[1]).not.toHaveProperty("weightLbs");
   });
 });
 
