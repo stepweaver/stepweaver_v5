@@ -223,7 +223,7 @@ function SelectedDayPanel({ day, onClose }: { day: DaySummary; onClose: () => vo
             {day.estLocomotionKcal !== null && (
               <div>
                 <div className="font-[var(--font-ibm)] text-lg text-[rgb(var(--neon))] tabular-nums">
-                  {day.estLocomotionKcal.toLocaleString("en-US")} kcal
+                  {day.estLocomotionKcal.toLocaleString("en-US")} Calories
                 </div>
                 <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))]">
                   EST. LOCOMOTION

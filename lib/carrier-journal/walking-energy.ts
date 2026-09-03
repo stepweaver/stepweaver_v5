@@ -155,7 +155,7 @@ export function estimateLocomotionEnergyFromDispatches(
 
 export function formatLocomotionKcal(kcal: number | null): string {
   if (kcal === null) return "n/a";
-  return `${kcal.toLocaleString("en-US")} kcal`;
+  return `${kcal.toLocaleString("en-US")} Calories`;
 }
 
 export function locomotionMethodDetail(

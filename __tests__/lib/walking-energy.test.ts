@@ -285,8 +285,8 @@ describe("estimateLocomotionEnergyFromDispatches", () => {
 });
 
 describe("locomotion display helpers", () => {
-  it("formats public kcal with grouping and a unit", () => {
-    expect(formatLocomotionKcal(1842)).toBe("1,842 kcal");
+  it("formats public Calories with grouping and a unit", () => {
+    expect(formatLocomotionKcal(1842)).toBe("1,842 Calories");
     expect(formatLocomotionKcal(null)).toBe("n/a");
   });
 

@@ -21,7 +21,7 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
     `${d.milesWalked} MI`,
   ];
   if (d.estLocomotionKcal !== undefined) {
-    chips.push(`${d.estLocomotionKcal.toLocaleString("en-US")} KCAL`);
+    chips.push(`${d.estLocomotionKcal.toLocaleString("en-US")} CALORIES`);
   }
   chips.push(
     `ENERGY ${d.energy}`,

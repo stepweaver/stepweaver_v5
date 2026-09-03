@@ -1410,7 +1410,7 @@ function SuccessCard({
           <StatCell label="DATE" value={date} />
           {miles !== undefined && <StatCell label="MILES" value={formatMileage(miles)} />}
           {locomotionKcal !== undefined && (
-            <StatCell label="EST. LOCOMOTION" value={`${locomotionKcal.toLocaleString("en-US")} kcal`} />
+            <StatCell label="EST. LOCOMOTION" value={`${locomotionKcal.toLocaleString("en-US")} Calories`} />
           )}
           {temperatureF !== undefined && (
             <StatCell label="PEAK TEMP" value={formatTemperature(temperatureF)} />
