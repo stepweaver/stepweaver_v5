@@ -10,8 +10,10 @@ describe("carrier daybook publication defaults", () => {
     const parsed = carrierDaybookSchema.parse({
       date: "2026-08-05",
       miles: 8,
+      movingMinutes: 165,
     });
     expect(parsed.published).toBe(true);
+    expect(parsed.movingMinutes).toBe(165);
   });
 
   it("respects explicit published false", () => {

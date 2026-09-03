@@ -339,7 +339,11 @@ Expected Field Journal Notion properties (public fitness + private daybook):
 | `Miles Walked` | number | yes |
 | `Water Oz` | number | yes |
 | `Hydration Goal Oz` | number | yes |
-| `Weight Lbs` | number | no (server aggregate "lbs lost" only) |
+| `Weight Lbs` | number | no (server aggregate "lbs lost" + locomotion energy only) |
+| `Moving Minutes` | number | no (server locomotion model input; written from daybook when present) |
+| `Load Kg` | number | no (optional; read if present, not in daybook yet) |
+| `Grade Percent` | number | no (optional; read if present, not in daybook yet) |
+| `Terrain Factor` | number | no (optional; read if present, not in daybook yet) |
 | `Soreness (1-10)` | number | yes |
 | `Energy (1-10)` | number | yes |
 | `Mood (1-10)` | number | yes |

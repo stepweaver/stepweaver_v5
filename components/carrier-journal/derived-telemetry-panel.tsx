@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import {
+  formatLocomotionKcal,
+  locomotionMethodDetail,
+} from "@/lib/carrier-journal/walking-energy";
 import { CARRIER_KPI_EMPTY } from "@/lib/data/carrier-journal";
 import type { PublicDerivedTelemetry } from "@/lib/types/carrier-public-telemetry";
 
@@ -64,6 +68,17 @@ export function DerivedTelemetryPanel({ derived }: Props) {
     <section id="derived-telemetry" className="scroll-mt-28 space-y-4">
       <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest">
         DERIVED TELEMETRY
+      </div>
+      <div className="border border-[rgb(var(--border)/0.2)] bg-[rgb(var(--panel))] p-4 sm:p-5">
+        <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.18em] text-[rgb(var(--neon))]">
+          EST. LOCOMOTION ENERGY
+        </div>
+        <div className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--text-color))] leading-none tabular-nums mt-1">
+          {formatLocomotionKcal(derived.estLocomotionKcal)}
+        </div>
+        <div className="text-[rgb(var(--text-meta))] text-[10px] font-[var(--font-ocr)] tracking-wide mt-2">
+          {locomotionMethodDetail(derived.locomotionMethod)}
+        </div>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
         {tiles.map((tile) => (

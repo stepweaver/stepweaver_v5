@@ -35,6 +35,10 @@ function fullPrivateDispatch(): CarrierDispatch {
     hydrationGoalOz: 90,
     weightLbs: 241.2,
     weightPublicMode: "change-only",
+    movingMinutes: 187,
+    loadKg: 6.4,
+    gradePercent: 2.5,
+    terrainFactor: 1.1,
     bodyNote: "private body",
     recoveryNote: "private recovery",
     phase: "building",
@@ -123,6 +127,10 @@ describe("toPublicFieldDispatch", () => {
     expect(serialized).not.toContain("SB-013");
     expect(serialized).not.toContain("Amazon Day");
     expect(serialized).not.toContain("private body");
+    expect(serialized).not.toContain("187");
+    expect(serialized).not.toContain("6.4");
+    expect(serialized).not.toContain("movingMinutes");
+    expect(serialized).not.toContain("loadKg");
   });
 });
 
@@ -148,5 +156,8 @@ describe("public mass-delta and derived telemetry payloads", () => {
     expect(serialized).not.toContain("weightLbs");
     expect(mass.points.every((p) => !("weight" in p) && !("weightLbs" in p))).toBe(true);
     expect(mass.currentDelta).toBe(-6.8);
+    expect(derived.estLocomotionKcal).not.toBeNull();
+    expect(derived.locomotionMethod).toBe("minimum-mechanics");
+    expect(typeof derived.estLocomotionKcal).toBe("number");
   });
 });

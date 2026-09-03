@@ -1,5 +1,6 @@
 import "server-only";
 
+import { estimateLocomotionEnergyFromDispatches } from "@/lib/carrier-journal/walking-energy";
 import { isDerivedHeatDay } from "@/lib/carrier-journal/weather-signals";
 import type { CarrierDispatch } from "@/lib/data/carrier-journal";
 import { round1 } from "@/lib/data/carrier-journal-dates";
@@ -60,6 +61,8 @@ export function computePublicDerivedTelemetry(
   const marathonEquivalents = totalMiles > 0 ? round1(totalMiles / MARATHON_MILES) : null;
   const fiveKEquivalents = totalMiles > 0 ? round1(totalMiles / FIVE_K_MILES) : null;
 
+  const locomotion = estimateLocomotionEnergyFromDispatches(dispatches);
+
   return {
     milesPerLbDelta,
     lbDeltaPer100Mi,
@@ -70,5 +73,7 @@ export function computePublicDerivedTelemetry(
     highHeatMiles,
     marathonEquivalents,
     fiveKEquivalents,
+    estLocomotionKcal: locomotion.kcal,
+    locomotionMethod: locomotion.method,
   };
 }

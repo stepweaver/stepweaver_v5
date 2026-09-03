@@ -113,4 +113,30 @@ describe("computePublicDerivedTelemetry", () => {
     expect(derived.marathonEquivalents).toBe(24.4);
     expect(derived.fiveKEquivalents).toBe(205.7);
   });
+
+  it("estimates locomotion energy from carried-forward mass without exposing it", () => {
+    const dispatches = [
+      dispatch({ id: "a", date: "2026-05-04", title: "A", milesWalked: 10, weightLbs: 200 }),
+      dispatch({ id: "b", date: "2026-05-05", title: "B", milesWalked: 10 }),
+    ];
+    const derived = computePublicDerivedTelemetry(dispatches, emptyMass);
+    expect(derived.estLocomotionKcal).toBe(2000);
+    expect(derived.locomotionMethod).toBe("distance-fallback");
+  });
+
+  it("promotes to Minimum Mechanics when moving time is logged", () => {
+    const dispatches = [
+      dispatch({
+        id: "a",
+        date: "2026-05-04",
+        title: "A",
+        milesWalked: 3,
+        weightLbs: 200,
+        movingMinutes: 60,
+      }),
+    ];
+    const derived = computePublicDerivedTelemetry(dispatches, emptyMass);
+    expect(derived.locomotionMethod).toBe("minimum-mechanics");
+    expect(derived.estLocomotionKcal).toBeGreaterThan(0);
+  });
 });

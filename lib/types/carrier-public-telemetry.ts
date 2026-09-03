@@ -1,5 +1,9 @@
 /** Public Field Journal telemetry DTOs. Safe to serialize into client components. */
 
+import type { LocomotionEnergyMethod } from "@/lib/carrier-journal/walking-energy";
+
+export type { LocomotionEnergyMethod };
+
 export type PublicMassPoint = {
   date: string;
   deltaFromBaseline: number;
@@ -30,6 +34,9 @@ export type PublicDerivedTelemetry = {
   highHeatMiles: number;
   marathonEquivalents: number | null;
   fiveKEquivalents: number | null;
+  /** Estimated walking energy. Absolute body mass never leaves the server. */
+  estLocomotionKcal: number | null;
+  locomotionMethod: LocomotionEnergyMethod | null;
 };
 
 export const EMPTY_DERIVED_TELEMETRY: PublicDerivedTelemetry = {
@@ -42,6 +49,8 @@ export const EMPTY_DERIVED_TELEMETRY: PublicDerivedTelemetry = {
   highHeatMiles: 0,
   marathonEquivalents: null,
   fiveKEquivalents: null,
+  estLocomotionKcal: null,
+  locomotionMethod: null,
 };
 
 export type PublicFieldRecordKey =

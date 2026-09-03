@@ -53,6 +53,8 @@ export const carrierDaybookSchema = z.object({
   waterOz: z.number().finite().min(0).optional(),
   hydrationGoalOz: z.number().finite().min(0).optional(),
   weightLbs: z.number().finite().min(0).optional(),
+  /** Walking/moving minutes on route, not the whole shift. */
+  movingMinutes: z.number().finite().min(0).optional(),
   mood: z.number().int().min(1).max(10).optional(),
   energy: z.number().int().min(1).max(10).optional(),
   soreness: z.number().int().min(1).max(10).optional(),

@@ -110,6 +110,10 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
   const waterOz = num(p["Water Oz"] as Props);
   const hydrationGoalOz = num(p["Hydration Goal Oz"] as Props);
   const weightLbs = num(p["Weight Lbs"] as Props);
+  const movingMinutes = num(p["Moving Minutes"] as Props);
+  const loadKg = num(p["Load Kg"] as Props);
+  const gradePercent = num(p["Grade Percent"] as Props);
+  const terrainFactor = num(p["Terrain Factor"] as Props);
   const dpsCount = num(p["DPS Count"] as Props);
   const dpsRatio = num(p["DPS Ratio"] as Props);
   const parcels = num(p.Parcels as Props);
@@ -133,6 +137,10 @@ function formatPage(page: PageObjectResponse): CarrierDispatch | null {
     ...(waterOz !== undefined && { waterOz }),
     ...(hydrationGoalOz !== undefined && { hydrationGoalOz }),
     ...(weightLbs !== undefined && { weightLbs }),
+    ...(movingMinutes !== undefined && { movingMinutes }),
+    ...(loadKg !== undefined && { loadKg }),
+    ...(gradePercent !== undefined && { gradePercent }),
+    ...(terrainFactor !== undefined && { terrainFactor }),
     ...(dpsCount !== undefined && { dpsCount }),
     ...(dpsRatio !== undefined && { dpsRatio }),
     ...(parcels !== undefined && { parcels }),
@@ -456,6 +464,10 @@ export async function upsertCarrierDaybook(input: CarrierDaybookInput): Promise<
 
   if (input.weightLbs !== undefined) {
     properties["Weight Lbs"] = { number: input.weightLbs };
+  }
+
+  if (input.movingMinutes !== undefined) {
+    properties["Moving Minutes"] = { number: input.movingMinutes };
   }
 
   if (input.soreness !== undefined) {

@@ -68,6 +68,7 @@ export function CarrierDaybookForm({
 
   const [date, setDate] = useState(today);
   const [miles, setMiles] = useState("");
+  const [movingMinutes, setMovingMinutes] = useState("");
   const [dpsCount, setDpsCount] = useState("");
   const [mailDayContext, setMailDayContext] = useState<string[]>([]);
   const [parcels, setParcels] = useState("");
@@ -306,6 +307,15 @@ export function CarrierDaybookForm({
         ...(milesNum !== undefined && { miles: milesNum }),
       };
 
+      const movingMinutesNum = movingMinutes.trim() ? Number(movingMinutes) : undefined;
+      if (
+        movingMinutesNum !== undefined &&
+        Number.isFinite(movingMinutesNum) &&
+        movingMinutesNum >= 0
+      ) {
+        body.movingMinutes = movingMinutesNum;
+      }
+
       const dpsNum = dpsCount.trim() ? Number(dpsCount.replace(/,/g, "")) : undefined;
       if (dpsNum !== undefined && Number.isFinite(dpsNum) && dpsNum >= 0) {
         body.dpsCount = dpsNum;
@@ -437,7 +447,7 @@ export function CarrierDaybookForm({
       }
     },
     [
-      date, dateIsMonday, miles, dpsCount, mailDayContext, parcels, waterOz,
+      date, dateIsMonday, miles, movingMinutes, dpsCount, mailDayContext, parcels, waterOz,
       weightLbs, hydrationGoalOverride, computedHydration,
       mood, energy, soreness, publicNote, privateNote,
       weatherTemp, weatherHeat, weatherAvgHeat, weatherPrecip, rainedOnRoute,
@@ -552,6 +562,26 @@ export function CarrierDaybookForm({
               className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
               placeholder="9.4"
             />
+          </div>
+
+          <div>
+            <label htmlFor="db-moving-min" className="font-[var(--font-ocr)] text-[10px] tracking-widest text-[rgb(var(--text-label))] block mb-2">
+              MOVING TIME (min)
+            </label>
+            <input
+              id="db-moving-min"
+              type="number"
+              inputMode="numeric"
+              step="1"
+              min="0"
+              value={movingMinutes}
+              onChange={(e) => setMovingMinutes(e.target.value)}
+              className="w-full bg-[rgb(var(--window))] border border-[rgb(var(--border)/0.3)] text-[rgb(var(--text-color))] font-[var(--font-ibm)] text-xl px-4 py-3 focus:border-[rgb(var(--neon))] focus:outline-none transition-colors"
+              placeholder="180"
+            />
+            <p className="mt-1 text-[10px] text-[rgb(var(--text-meta))] font-[var(--font-ocr)] tracking-wide">
+              Optional. Walking time on route, not the whole shift.
+            </p>
           </div>
 
           <div>

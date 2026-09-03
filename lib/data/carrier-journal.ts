@@ -51,6 +51,10 @@ export const PRIVATE_FIELD_DISPATCH_KEYS = [
   "phase",
   "tags",
   "goodSamaritanAct",
+  "movingMinutes",
+  "loadKg",
+  "gradePercent",
+  "terrainFactor",
 ] as const;
 
 export type PrivateFieldDispatchKey = (typeof PRIVATE_FIELD_DISPATCH_KEYS)[number];
@@ -121,6 +125,14 @@ export type CarrierDispatch = PublicFieldDispatch & {
   mailLoadCompositeRatio?: number;
   /** Optional tags explaining why a day felt heavier or lighter. Private. */
   mailDayContext?: string[];
+  /** Walking/moving minutes on route, not the whole shift. Private model input. */
+  movingMinutes?: number;
+  /** External carried load in kg. Private model input. */
+  loadKg?: number;
+  /** Average route grade in percent. Negative is downhill. Private model input. */
+  gradePercent?: number;
+  /** Terrain factor; 1.0 = hard surface. Private model input. */
+  terrainFactor?: number;
 };
 
 /**
