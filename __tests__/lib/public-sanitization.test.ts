@@ -5,6 +5,7 @@ import {
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
 import { buildPublicSummary } from "@/lib/carrier-journal/helpers";
+import { computePublicAdaptationTelemetry } from "@/lib/data/carrier-adaptation";
 import { computePublicDerivedTelemetry } from "@/lib/data/carrier-derived-telemetry.server";
 import { toPublicMassDeltaSeries } from "@/lib/data/carrier-mass-delta.server";
 
@@ -150,7 +151,10 @@ describe("public mass-delta and derived telemetry payloads", () => {
 
     const mass = toPublicMassDeltaSeries([start, latest]);
     const derived = computePublicDerivedTelemetry([start, latest], mass);
-    const serialized = JSON.stringify({ mass, derived });
+    const adaptation = computePublicAdaptationTelemetry(
+      toPublicFieldDispatches([start, latest])
+    );
+    const serialized = JSON.stringify({ mass, derived, adaptation });
 
     expect(serialized).not.toContain("248");
     expect(serialized).not.toContain("241.2");
@@ -161,5 +165,10 @@ describe("public mass-delta and derived telemetry payloads", () => {
     expect(derived.estLocomotionKcal).not.toBeNull();
     expect(derived.locomotionMethod).toBe("minimum-mechanics");
     expect(typeof derived.estLocomotionKcal).toBe("number");
+    expect(serialized).not.toContain("movingMinutes");
+    expect(adaptation.conditioning).toBeNull();
+    expect(derived.totalMassDistanceLbMi).not.toBeNull();
+    expect(typeof mass.last30DayDeltaPct).toBe("number");
+    expect(typeof mass.averageWeeklyDeltaPct).toBe("number");
   });
 });

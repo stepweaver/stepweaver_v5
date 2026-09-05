@@ -9,6 +9,8 @@ import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
 import { CarrierFieldCalendar } from "./carrier-field-calendar";
 import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 import { CarrierProfileCard } from "./carrier-profile-card";
+import { AdaptationTelemetryPanel } from "./adaptation-telemetry-panel";
+import { ConditioningDeltaPanel } from "./conditioning-delta-panel";
 import { DerivedTelemetryPanel } from "./derived-telemetry-panel";
 import { FieldRecordsPanel } from "./field-records-panel";
 import { MassDeltaTrend } from "./mass-delta-trend";
@@ -17,8 +19,10 @@ import { WalkingProtocol } from "./walking-protocol";
 import { FootwearActiveLoadoutCard } from "@/components/footwear/footwear-active-loadout-card";
 import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
 import {
+  EMPTY_ADAPTATION_TELEMETRY,
   EMPTY_DERIVED_TELEMETRY,
   EMPTY_MASS_DELTA_SERIES,
+  type PublicAdaptationTelemetry,
   type PublicDerivedTelemetry,
   type PublicFieldRecords,
   type PublicMassDeltaSeries,
@@ -27,6 +31,7 @@ import {
 const SECTION_NAV = [
   { id: "body-telemetry", label: "TELEMETRY" },
   { id: "mass-trend", label: "MASS" },
+  { id: "adaptation", label: "ADAPTATION" },
   { id: "derived-telemetry", label: "DERIVED" },
   { id: "field-records", label: "RECORDS" },
   { id: "distance-qualification", label: "DISTANCE" },
@@ -62,6 +67,7 @@ type Props = {
   dispatches?: PublicFieldDispatch[];
   massDelta?: PublicMassDeltaSeries;
   derived?: PublicDerivedTelemetry;
+  adaptation?: PublicAdaptationTelemetry;
   records?: PublicFieldRecords;
   footwearActive?: ShoeDerivedSummary | null;
 };
@@ -71,6 +77,7 @@ export function CarrierJournalPage({
   dispatches = [],
   massDelta = EMPTY_MASS_DELTA_SERIES,
   derived = EMPTY_DERIVED_TELEMETRY,
+  adaptation = EMPTY_ADAPTATION_TELEMETRY,
   records = [],
   footwearActive = null,
 }: Props = {}) {
@@ -90,7 +97,7 @@ export function CarrierJournalPage({
             </h1>
             <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
               Miles, environmental load, hydration, recovery, body mechanics, equipment wear,
-              and the accumulated effects of putting a human frame through high-mileage walking
+              and measurable evidence that the machine is adapting under high-mileage walking
               days.
             </p>
           </div>
@@ -113,6 +120,11 @@ export function CarrierJournalPage({
         </div>
 
         <MassDeltaTrend series={massDelta} />
+
+        <section id="adaptation" className="scroll-mt-28 space-y-10">
+          <ConditioningDeltaPanel data={adaptation.conditioning} />
+          <AdaptationTelemetryPanel adaptation={adaptation} />
+        </section>
 
         <DerivedTelemetryPanel derived={derived} />
 

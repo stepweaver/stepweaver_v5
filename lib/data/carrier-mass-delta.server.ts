@@ -36,18 +36,24 @@ function averageWeeklyDelta(
   return round1(currentDelta / elapsedWeeks);
 }
 
-function last30DayDelta(points: PublicMassPoint[]): number | null {
-  if (points.length < 2) return null;
+function last30DayChange(entries: { date: string; weightLbs: number }[]): {
+  lb: number;
+  pct: number;
+} | null {
+  if (entries.length < 2) return null;
 
-  const latest = points[points.length - 1];
+  const latest = entries[entries.length - 1];
   const cutoff = addCalendarDays(latest.date, -LAST_30D_WINDOW_DAYS);
-  const comparison = [...points].reverse().find((p) => p.date <= cutoff);
-  if (!comparison) return null;
+  const comparison = [...entries].reverse().find((entry) => entry.date <= cutoff);
+  if (!comparison || comparison.weightLbs <= 0) return null;
 
   const proximity = differenceInCalendarDays(cutoff, comparison.date);
   if (proximity > LAST_30D_PROXIMITY_DAYS) return null;
 
-  return round1(latest.deltaFromBaseline - comparison.deltaFromBaseline);
+  return {
+    lb: round1(latest.weightLbs - comparison.weightLbs),
+    pct: round1(((latest.weightLbs - comparison.weightLbs) / comparison.weightLbs) * 100),
+  };
 }
 
 /**
@@ -73,12 +79,18 @@ export function toPublicMassDeltaSeries(
   const currentDelta = points[points.length - 1].deltaFromBaseline;
   const firstDate = points[0].date;
   const lastDate = points[points.length - 1].date;
+  const weeklyLbs =
+    points.length >= 2 ? averageWeeklyDelta(firstDate, lastDate, currentDelta) : null;
+  const latestWeight = entries[entries.length - 1].weightLbs;
+  const change30 = last30DayChange(entries);
 
   return {
     points,
     currentDelta,
-    last30DayDelta: last30DayDelta(points),
-    averageWeeklyDelta:
-      points.length >= 2 ? averageWeeklyDelta(firstDate, lastDate, currentDelta) : null,
+    last30DayDelta: change30?.lb ?? null,
+    averageWeeklyDelta: weeklyLbs,
+    last30DayDeltaPct: change30?.pct ?? null,
+    averageWeeklyDeltaPct:
+      weeklyLbs !== null && latestWeight > 0 ? round1((weeklyLbs / latestWeight) * 100) : null,
   };
 }

@@ -24,6 +24,8 @@ const emptyMass: PublicMassDeltaSeries = {
   currentDelta: null,
   last30DayDelta: null,
   averageWeeklyDelta: null,
+  last30DayDeltaPct: null,
+  averageWeeklyDeltaPct: null,
 };
 
 describe("computePublicDerivedTelemetry", () => {
@@ -122,6 +124,7 @@ describe("computePublicDerivedTelemetry", () => {
     const derived = computePublicDerivedTelemetry(dispatches, emptyMass);
     expect(derived.estLocomotionKcal).toBe(2000);
     expect(derived.locomotionMethod).toBe("distance-fallback");
+    expect(derived.totalMassDistanceLbMi).toBe(4000);
   });
 
   it("promotes to Minimum Mechanics when moving time is logged", () => {

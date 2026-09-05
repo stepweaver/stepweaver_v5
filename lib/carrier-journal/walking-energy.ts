@@ -153,6 +153,30 @@ export function estimateLocomotionEnergyFromDispatches(
   };
 }
 
+/**
+ * Cumulative body mass × distance. Absolute mass stays in this module.
+ */
+export function computeMassDistanceLbMi(dispatches: WeightDated[]): number | null {
+  let total = 0;
+  let contributing = 0;
+
+  for (const day of dispatches) {
+    if (day.milesWalked <= 0) continue;
+    const weightLbs = weightLbsAsOf(dispatches, day.date);
+    if (weightLbs === undefined || weightLbs <= 0) continue;
+    total += weightLbs * day.milesWalked;
+    contributing += 1;
+  }
+
+  if (contributing === 0) return null;
+  return Math.round(total);
+}
+
+export function formatMassDistanceLbMi(value: number | null): string {
+  if (value === null) return "n/a";
+  return `${value.toLocaleString("en-US")} LB-MI`;
+}
+
 export function formatLocomotionKcal(kcal: number | null): string {
   if (kcal === null) return "n/a";
   return `${kcal.toLocaleString("en-US")} Calories`;

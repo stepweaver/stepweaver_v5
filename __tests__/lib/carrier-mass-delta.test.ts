@@ -26,6 +26,8 @@ describe("toPublicMassDeltaSeries", () => {
     expect(series.currentDelta).toBeNull();
     expect(series.last30DayDelta).toBeNull();
     expect(series.averageWeeklyDelta).toBeNull();
+    expect(series.last30DayDeltaPct).toBeNull();
+    expect(series.averageWeeklyDeltaPct).toBeNull();
   });
 
   it("ignores non-Monday weight entries", () => {
@@ -108,6 +110,9 @@ describe("toPublicMassDeltaSeries", () => {
     ]);
     // Latest 2026-07-06; cutoff 2026-06-06; comparison 2026-06-01 is 5 days before cutoff
     expect(series.last30DayDelta).toBe(-8);
+    expect(series.last30DayDeltaPct).toBe(-3.2);
+    // 35 calendar days = 5 weeks, -8 lb → -1.6 lb/week; -1.6 / 242 = -0.7%
+    expect(series.averageWeeklyDeltaPct).toBe(-0.7);
   });
 
   it("returns n/a LAST 30D when the previous point is far from the cutoff", () => {

@@ -8,6 +8,7 @@ import {
   toPublicFieldDispatches,
   totalsToKpis,
 } from "@/lib/data/carrier-journal";
+import { computePublicAdaptationTelemetry } from "@/lib/data/carrier-adaptation";
 import { computePublicDerivedTelemetry } from "@/lib/data/carrier-derived-telemetry.server";
 import { computePublicFieldRecords } from "@/lib/data/carrier-field-records";
 import { toPublicMassDeltaSeries } from "@/lib/data/carrier-mass-delta.server";
@@ -49,6 +50,7 @@ export default async function Page() {
   const dispatches = toPublicFieldDispatches(serverDispatches);
   const massDelta = toPublicMassDeltaSeries(serverDispatches);
   const derived = computePublicDerivedTelemetry(serverDispatches, massDelta);
+  const adaptation = computePublicAdaptationTelemetry(dispatches);
   const records = computePublicFieldRecords(dispatches);
 
   return (
@@ -57,6 +59,7 @@ export default async function Page() {
       dispatches={dispatches}
       massDelta={massDelta}
       derived={derived}
+      adaptation={adaptation}
       records={records}
       footwearActive={footwearActive}
     />

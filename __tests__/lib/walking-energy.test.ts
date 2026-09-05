@@ -1,8 +1,10 @@
 import {
+  computeMassDistanceLbMi,
   estimateLocomotionEnergyFromDispatches,
   estimateLocomotionEnergyForDispatch,
   estimateWalkingEnergy,
   formatLocomotionKcal,
+  formatMassDistanceLbMi,
   locomotionMethodDetail,
   type WalkingEnergyInput,
 } from "@/lib/carrier-journal/walking-energy";
@@ -281,6 +283,7 @@ describe("estimateLocomotionEnergyFromDispatches", () => {
     ];
     const tuesday = estimateLocomotionEnergyForDispatch(series, series[1]);
     expect(tuesday).toEqual({ kcal: 800, method: "distance-fallback" });
+    expect(computeMassDistanceLbMi(series)).toBe(3600);
   });
 });
 
@@ -288,6 +291,8 @@ describe("locomotion display helpers", () => {
   it("formats public Calories with grouping and a unit", () => {
     expect(formatLocomotionKcal(1842)).toBe("1,842 Calories");
     expect(formatLocomotionKcal(null)).toBe("n/a");
+    expect(formatMassDistanceLbMi(161000)).toBe("161,000 LB-MI");
+    expect(formatMassDistanceLbMi(null)).toBe("n/a");
   });
 
   it("labels fallback vs modeled provenance", () => {

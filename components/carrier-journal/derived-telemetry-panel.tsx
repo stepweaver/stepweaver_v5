@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import {
   formatLocomotionKcal,
+  formatMassDistanceLbMi,
   locomotionMethodDetail,
 } from "@/lib/carrier-journal/walking-energy";
 import { CARRIER_KPI_EMPTY } from "@/lib/data/carrier-journal";
@@ -69,15 +70,28 @@ export function DerivedTelemetryPanel({ derived }: Props) {
       <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest">
         DERIVED TELEMETRY
       </div>
-      <div className="border border-[rgb(var(--border)/0.2)] bg-[rgb(var(--panel))] p-4 sm:p-5">
-        <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.18em] text-[rgb(var(--neon))]">
-          EST. LOCOMOTION ENERGY
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
+        <div className="bg-[rgb(var(--panel))] p-4 sm:p-5">
+          <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.18em] text-[rgb(var(--neon))]">
+            EST. LOCOMOTION ENERGY
+          </div>
+          <div className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--text-color))] leading-none tabular-nums mt-1">
+            {formatLocomotionKcal(derived.estLocomotionKcal)}
+          </div>
+          <div className="text-[rgb(var(--text-meta))] text-[10px] font-[var(--font-ocr)] tracking-wide mt-2">
+            {locomotionMethodDetail(derived.locomotionMethod)}
+          </div>
         </div>
-        <div className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--text-color))] leading-none tabular-nums mt-1">
-          {formatLocomotionKcal(derived.estLocomotionKcal)}
-        </div>
-        <div className="text-[rgb(var(--text-meta))] text-[10px] font-[var(--font-ocr)] tracking-wide mt-2">
-          {locomotionMethodDetail(derived.locomotionMethod)}
+        <div className="bg-[rgb(var(--panel))] p-4 sm:p-5">
+          <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.18em] text-[rgb(var(--neon))]">
+            TOTAL MASS-DISTANCE
+          </div>
+          <div className="font-[var(--font-ibm)] text-2xl sm:text-3xl text-[rgb(var(--text-color))] leading-none tabular-nums mt-1">
+            {formatMassDistanceLbMi(derived.totalMassDistanceLbMi)}
+          </div>
+          <div className="text-[rgb(var(--text-meta))] text-[10px] font-[var(--font-ocr)] tracking-wide mt-2">
+            DERIVED FIELD TELEMETRY // MASS TRANSPORTED × MILES
+          </div>
         </div>
       </div>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">

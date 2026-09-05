@@ -1,6 +1,6 @@
 import "server-only";
 
-import { estimateLocomotionEnergyFromDispatches } from "@/lib/carrier-journal/walking-energy";
+import { estimateLocomotionEnergyFromDispatches, computeMassDistanceLbMi } from "@/lib/carrier-journal/walking-energy";
 import { isDerivedHeatDay } from "@/lib/carrier-journal/weather-signals";
 import type { CarrierDispatch } from "@/lib/data/carrier-journal";
 import { round1 } from "@/lib/data/carrier-journal-dates";
@@ -75,5 +75,6 @@ export function computePublicDerivedTelemetry(
     fiveKEquivalents,
     estLocomotionKcal: locomotion.kcal,
     locomotionMethod: locomotion.method,
+    totalMassDistanceLbMi: computeMassDistanceLbMi(dispatches),
   };
 }

@@ -2,6 +2,7 @@
 
 import { useId, useState } from "react";
 import { formatCalendarDate } from "@/lib/data/carrier-calendar";
+import { formatSignedDelta } from "@/lib/data/carrier-adaptation";
 import { CARRIER_KPI_EMPTY } from "@/lib/data/carrier-journal";
 import type { PublicMassDeltaSeries, PublicMassPoint } from "@/lib/types/carrier-public-telemetry";
 
@@ -23,6 +24,10 @@ function formatSignedLbs(value: number): string {
 
 function formatNullableLbs(value: number | null): string {
   return value === null ? CARRIER_KPI_EMPTY : formatSignedLbs(value);
+}
+
+function formatSignedPct(value: number | null): string {
+  return formatSignedDelta(value, "%");
 }
 
 function dateMs(iso: string): number {
@@ -235,6 +240,23 @@ export function MassDeltaTrend({ series }: Props) {
         <CaptionStat label="LAST 30D" value={formatNullableLbs(series.last30DayDelta)} />
         <CaptionStat label="AVG/WEEK" value={formatNullableLbs(series.averageWeeklyDelta)} />
       </div>
+      <div className="grid grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
+        <CaptionStat
+          label="30D MASS VELOCITY"
+          value={formatSignedPct(series.last30DayDeltaPct)}
+        />
+        <CaptionStat
+          label="WEEKLY RATE"
+          value={
+            series.averageWeeklyDeltaPct === null
+              ? CARRIER_KPI_EMPTY
+              : `${formatSignedPct(series.averageWeeklyDeltaPct)} BM/WK`
+          }
+        />
+      </div>
+      <p className="font-[var(--font-ocr)] text-[9px] tracking-[0.16em] text-[rgb(var(--text-meta))]">
+        PERCENT OF BODY MASS · DESCRIPTIVE TELEMETRY, NOT A TARGET
+      </p>
     </section>
   );
 }
