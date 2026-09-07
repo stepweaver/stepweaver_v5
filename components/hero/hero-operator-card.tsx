@@ -3,7 +3,7 @@
 import { memo, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useTheme } from "@/components/theme-provider";
+import { useResolvedAppearance } from "@/lib/theme/use-resolved-appearance";
 import { MatrixSync } from "@/components/ui/matrix-sync";
 import { ROLE_LINE } from "@/lib/data/identity";
 
@@ -18,8 +18,8 @@ function portraitLayerStyle(visible: boolean): React.CSSProperties {
 }
 
 export const HeroOperatorCard = memo(function HeroOperatorCard() {
-  const { theme } = useTheme();
-  const isSkynet = theme === "skynet";
+  const { appearance } = useResolvedAppearance();
+  const isSkynet = appearance === "skynet";
   const [portraitGlitchBurst, setPortraitGlitchBurst] = useState(false);
   const skipNextGlitchRef = useRef(true);
 

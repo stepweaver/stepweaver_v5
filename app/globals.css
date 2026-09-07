@@ -3,5 +3,5 @@
 @import "../styles/tokens.css" layer(theme);
 @import "../styles/components.css" layer(components);
 @import "../styles/animations.css" layer(utilities);
-/* Theme variable blocks must not sit in a weaker cascade layer than :root (base), or data-theme stops applying. */
+/* Color tokens must share the base layer with :root so data-theme and light-dark() win. */
 @import "../styles/themes.css" layer(base);

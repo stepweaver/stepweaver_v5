@@ -14,7 +14,7 @@ import { DicePoolBuilder } from "@/components/dice-roller/dice-pool-builder";
 import { DiceResult, formatResultForDisplay } from "@/components/dice-roller/dice-result";
 import { RollHistory } from "@/components/dice-roller/roll-history";
 import { RollSessionModal } from "@/components/dice-roller/roll-session-modal";
-import { useTheme } from "@/components/theme-provider";
+import { useResolvedAppearance } from "@/lib/theme/use-resolved-appearance";
 
 function formatSessionTime(iso?: string) {
   if (!iso) return null;
@@ -35,7 +35,7 @@ const modalCmdBase =
   "font-[var(--font-ibm)] text-[10px] sm:text-[11px] tracking-[0.12em] uppercase px-3 sm:px-3.5 py-2 rounded-none transition-colors cursor-pointer disabled:opacity-40 disabled:pointer-events-none";
 
 export function DiceRoller() {
-  const { theme } = useTheme();
+  const { appearance: theme } = useResolvedAppearance();
   const [dicePool, setDicePool] = useState<DicePoolDie[]>([]);
   const [modifier, setModifier] = useState(0);
   const [comment, setComment] = useState("");

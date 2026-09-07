@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { usePathname } from "next/navigation";
-import { useTheme } from "@/components/theme-provider";
+import { useResolvedAppearance } from "@/lib/theme/use-resolved-appearance";
 import { useSafeScroll } from "@/hooks/use-safe-scroll";
 import { getDocumentScrollProgressY } from "@/lib/document-scroll-progress";
 import { COLOR_PALETTES, GLOW_FILTERS } from "@/lib/effects/background-constants";
@@ -29,7 +29,7 @@ export function BackgroundCanvas() {
         ? window.matchMedia("(prefers-reduced-motion: reduce)").matches
         : false
   );
-  const { theme, mounted } = useTheme();
+  const { appearance: theme, mounted } = useResolvedAppearance();
   const pathname = usePathname();
 
   useEffect(() => {

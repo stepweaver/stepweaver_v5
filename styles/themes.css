@@ -1,74 +1,232 @@
-/* Auto-generated theme definitions (must stay in @layer base; see globals.css). */
+/* Professional palettes are adaptive: color-scheme + light-dark().
+   RGB channel tokens remain so rgb(var(--token) / alpha) keeps working.
+   Novelty palettes stay on [data-theme] for /theme-audit and /play. */
 @layer base {
-  [data-theme="dark"] {
-    --window: 12 18 28;
-    --header: 18 28 40;
-    --border: 28 214 151;
-    --green: 28 214 151;
-    --yellow: 240 214 90;
-    --red: 232 98 98;
-    --blue: 84 170 255;
-    --text: 224 235 228;
-    --muted: 118 144 130;
-    --cyan: 87 220 255;
-    --dimmed: 72 92 82;
-    --magenta: 214 120 255;
-    --pink: 255 130 200;
-    --purple: 154 112 255;
-    --orange: 255 170 92;
-    --white: 245 249 246;
-    --bg: 5 11 18;
-    --panel: 8 14 22;
-    --text-color: 224 235 228;
-    --muted-color: 118 144 130;
-    --neon: 28 214 151;
-    --accent: 87 220 255;
-    --warn: 240 214 90;
-    --danger: 232 98 98;
-    --ring: 28 214 151;
-    --text-secondary: 175 194 182;
-    --text-meta: 108 130 117;
-    --text-label: 132 175 150;
-    --surface: 9 15 24;
-    --chrome: 12 20 30;
-    --identity: 28 214 151;
+  :root {
+    color-scheme: light dark;
+
+    --window--light: 244 247 250;
+    --window--dark: 12 18 28;
+    --header--light: 232 238 244;
+    --header--dark: 18 28 40;
+    --border--light: 36 112 89;
+    --border--dark: 28 214 151;
+    --green--light: 36 112 89;
+    --green--dark: 28 214 151;
+    --yellow--light: 181 137 0;
+    --yellow--dark: 240 214 90;
+    --red--light: 190 64 64;
+    --red--dark: 232 98 98;
+    --blue--light: 38 139 210;
+    --blue--dark: 84 170 255;
+    --text--light: 34 42 51;
+    --text--dark: 224 235 228;
+    --muted--light: 96 113 128;
+    --muted--dark: 118 144 130;
+    --cyan--light: 42 161 152;
+    --cyan--dark: 87 220 255;
+    --dimmed--light: 146 158 169;
+    --dimmed--dark: 72 92 82;
+    --magenta--light: 170 80 170;
+    --magenta--dark: 214 120 255;
+    --pink--light: 190 95 140;
+    --pink--dark: 255 130 200;
+    --purple--light: 108 113 196;
+    --purple--dark: 154 112 255;
+    --orange--light: 203 75 22;
+    --orange--dark: 255 170 92;
+    --white--light: 255 255 255;
+    --white--dark: 245 249 246;
+    --bg--light: 245 247 250;
+    --bg--dark: 5 11 18;
+    --panel--light: 236 240 245;
+    --panel--dark: 8 14 22;
+    --text-color--light: 34 42 51;
+    --text-color--dark: 224 235 228;
+    --muted-color--light: 96 113 128;
+    --muted-color--dark: 118 144 130;
+    --neon--light: 36 112 89;
+    --neon--dark: 28 214 151;
+    --accent--light: 38 139 210;
+    --accent--dark: 87 220 255;
+    --warn--light: 181 137 0;
+    --warn--dark: 240 214 90;
+    --danger--light: 190 64 64;
+    --danger--dark: 232 98 98;
+    --ring--light: 36 112 89;
+    --ring--dark: 28 214 151;
+    --text-secondary--light: 68 83 97;
+    --text-secondary--dark: 175 194 182;
+    --text-meta--light: 108 123 136;
+    --text-meta--dark: 108 130 117;
+    --text-label--light: 83 103 117;
+    --text-label--dark: 132 175 150;
+    --surface--light: 250 251 253;
+    --surface--dark: 9 15 24;
+    --chrome--light: 228 234 240;
+    --chrome--dark: 12 20 30;
+    --identity--light: 36 112 89;
+    --identity--dark: 28 214 151;
+
+    /* Dark channels as the no-JS / unknown-scheme fallback. */
+    --window: var(--window--dark);
+    --header: var(--header--dark);
+    --border: var(--border--dark);
+    --green: var(--green--dark);
+    --yellow: var(--yellow--dark);
+    --red: var(--red--dark);
+    --blue: var(--blue--dark);
+    --text: var(--text--dark);
+    --muted: var(--muted--dark);
+    --cyan: var(--cyan--dark);
+    --dimmed: var(--dimmed--dark);
+    --magenta: var(--magenta--dark);
+    --pink: var(--pink--dark);
+    --purple: var(--purple--dark);
+    --orange: var(--orange--dark);
+    --white: var(--white--dark);
+    --bg: var(--bg--dark);
+    --panel: var(--panel--dark);
+    --text-color: var(--text-color--dark);
+    --muted-color: var(--muted-color--dark);
+    --neon: var(--neon--dark);
+    --accent: var(--accent--dark);
+    --warn: var(--warn--dark);
+    --danger: var(--danger--dark);
+    --ring: var(--ring--dark);
+    --text-secondary: var(--text-secondary--dark);
+    --text-meta: var(--text-meta--dark);
+    --text-label: var(--text-label--dark);
+    --surface: var(--surface--dark);
+    --chrome: var(--chrome--dark);
+    --identity: var(--identity--dark);
+
+    /* Composed professional tokens. Follow the element's color-scheme. */
+    --canvas: light-dark(rgb(var(--bg--light)), rgb(var(--bg--dark)));
+    --panel-fill: light-dark(rgb(var(--panel--light)), rgb(var(--panel--dark)));
+    --surface-fill: light-dark(rgb(var(--surface--light)), rgb(var(--surface--dark)));
+    --chrome-fill: light-dark(rgb(var(--chrome--light)), rgb(var(--chrome--dark)));
+    --text-fill: light-dark(rgb(var(--text-color--light)), rgb(var(--text-color--dark)));
+    --text-secondary-fill: light-dark(
+      rgb(var(--text-secondary--light)),
+      rgb(var(--text-secondary--dark))
+    );
+    --text-muted-fill: light-dark(
+      rgb(var(--muted-color--light)),
+      rgb(var(--muted-color--dark))
+    );
+    --accent-fill: light-dark(rgb(var(--accent--light)), rgb(var(--accent--dark)));
+    --border-fill: color-mix(in srgb, var(--text-fill) 16%, transparent);
   }
 
-  [data-theme="light"] {
-    --window: 244 247 250;
-    --header: 232 238 244;
-    --border: 36 112 89;
-    --green: 36 112 89;
-    --yellow: 181 137 0;
-    --red: 190 64 64;
-    --blue: 38 139 210;
-    --text: 34 42 51;
-    --muted: 96 113 128;
-    --cyan: 42 161 152;
-    --dimmed: 146 158 169;
-    --magenta: 170 80 170;
-    --pink: 190 95 140;
-    --purple: 108 113 196;
-    --orange: 203 75 22;
-    --white: 255 255 255;
-    --bg: 245 247 250;
-    --panel: 236 240 245;
-    --text-color: 34 42 51;
-    --muted-color: 96 113 128;
-    --neon: 36 112 89;
-    --accent: 38 139 210;
-    --warn: 181 137 0;
-    --danger: 190 64 64;
-    --ring: 36 112 89;
-    --text-secondary: 68 83 97;
-    --text-meta: 108 123 136;
-    --text-label: 83 103 117;
-    --surface: 250 251 253;
-    --chrome: 228 234 240;
-    --identity: 36 112 89;
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme]) {
+      --window: var(--window--light);
+      --header: var(--header--light);
+      --border: var(--border--light);
+      --green: var(--green--light);
+      --yellow: var(--yellow--light);
+      --red: var(--red--light);
+      --blue: var(--blue--light);
+      --text: var(--text--light);
+      --muted: var(--muted--light);
+      --cyan: var(--cyan--light);
+      --dimmed: var(--dimmed--light);
+      --magenta: var(--magenta--light);
+      --pink: var(--pink--light);
+      --purple: var(--purple--light);
+      --orange: var(--orange--light);
+      --white: var(--white--light);
+      --bg: var(--bg--light);
+      --panel: var(--panel--light);
+      --text-color: var(--text-color--light);
+      --muted-color: var(--muted-color--light);
+      --neon: var(--neon--light);
+      --accent: var(--accent--light);
+      --warn: var(--warn--light);
+      --danger: var(--danger--light);
+      --ring: var(--ring--light);
+      --text-secondary: var(--text-secondary--light);
+      --text-meta: var(--text-meta--light);
+      --text-label: var(--text-label--light);
+      --surface: var(--surface--light);
+      --chrome: var(--chrome--light);
+      --identity: var(--identity--light);
+    }
+  }
+
+  :root[data-theme="light"] {
+    color-scheme: light;
+    --window: var(--window--light);
+    --header: var(--header--light);
+    --border: var(--border--light);
+    --green: var(--green--light);
+    --yellow: var(--yellow--light);
+    --red: var(--red--light);
+    --blue: var(--blue--light);
+    --text: var(--text--light);
+    --muted: var(--muted--light);
+    --cyan: var(--cyan--light);
+    --dimmed: var(--dimmed--light);
+    --magenta: var(--magenta--light);
+    --pink: var(--pink--light);
+    --purple: var(--purple--light);
+    --orange: var(--orange--light);
+    --white: var(--white--light);
+    --bg: var(--bg--light);
+    --panel: var(--panel--light);
+    --text-color: var(--text-color--light);
+    --muted-color: var(--muted-color--light);
+    --neon: var(--neon--light);
+    --accent: var(--accent--light);
+    --warn: var(--warn--light);
+    --danger: var(--danger--light);
+    --ring: var(--ring--light);
+    --text-secondary: var(--text-secondary--light);
+    --text-meta: var(--text-meta--light);
+    --text-label: var(--text-label--light);
+    --surface: var(--surface--light);
+    --chrome: var(--chrome--light);
+    --identity: var(--identity--light);
+  }
+
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --window: var(--window--dark);
+    --header: var(--header--dark);
+    --border: var(--border--dark);
+    --green: var(--green--dark);
+    --yellow: var(--yellow--dark);
+    --red: var(--red--dark);
+    --blue: var(--blue--dark);
+    --text: var(--text--dark);
+    --muted: var(--muted--dark);
+    --cyan: var(--cyan--dark);
+    --dimmed: var(--dimmed--dark);
+    --magenta: var(--magenta--dark);
+    --pink: var(--pink--dark);
+    --purple: var(--purple--dark);
+    --orange: var(--orange--dark);
+    --white: var(--white--dark);
+    --bg: var(--bg--dark);
+    --panel: var(--panel--dark);
+    --text-color: var(--text-color--dark);
+    --muted-color: var(--muted-color--dark);
+    --neon: var(--neon--dark);
+    --accent: var(--accent--dark);
+    --warn: var(--warn--dark);
+    --danger: var(--danger--dark);
+    --ring: var(--ring--dark);
+    --text-secondary: var(--text-secondary--dark);
+    --text-meta: var(--text-meta--dark);
+    --text-label: var(--text-label--dark);
+    --surface: var(--surface--dark);
+    --chrome: var(--chrome--dark);
+    --identity: var(--identity--dark);
   }
 
   [data-theme="monochrome"] {
+    color-scheme: dark;
     --window: 30 30 30;
     --header: 40 40 40;
     --border: 180 180 180;
@@ -103,6 +261,7 @@
   }
 
   [data-theme="monochrome-inverted"] {
+    color-scheme: light;
     --window: 230 230 230;
     --header: 220 220 220;
     --border: 80 80 80;
@@ -137,6 +296,7 @@
   }
 
   [data-theme="vintage"] {
+    color-scheme: dark;
     --window: 40 35 25;
     --header: 50 45 35;
     --border: 200 180 120;
@@ -171,6 +331,7 @@
   }
 
   [data-theme="apple"] {
+    color-scheme: light;
     --window: 245 245 247;
     --header: 233 233 236;
     --border: 120 124 130;
@@ -205,6 +366,7 @@
   }
 
   [data-theme="c64"] {
+    color-scheme: dark;
     --window: 46 40 120;
     --header: 58 51 146;
     --border: 136 126 203;
@@ -239,6 +401,7 @@
   }
 
   [data-theme="amber"] {
+    color-scheme: dark;
     --window: 30 25 10;
     --header: 40 35 15;
     --border: 255 180 50;
@@ -273,6 +436,7 @@
   }
 
   [data-theme="synthwave"] {
+    color-scheme: dark;
     --window: 30 15 50;
     --header: 40 20 60;
     --border: 255 100 220;
@@ -307,6 +471,7 @@
   }
 
   [data-theme="dracula"] {
+    color-scheme: dark;
     --window: 40 42 54;
     --header: 50 52 64;
     --border: 139 233 253;
@@ -341,6 +506,7 @@
   }
 
   [data-theme="solarized"] {
+    color-scheme: light;
     --window: 238 232 213;
     --header: 230 224 205;
     --border: 38 139 210;
@@ -375,6 +541,7 @@
   }
 
   [data-theme="nord"] {
+    color-scheme: dark;
     --window: 46 52 64;
     --header: 59 66 82;
     --border: 136 192 208;
@@ -409,6 +576,7 @@
   }
 
   [data-theme="cobalt"] {
+    color-scheme: dark;
     --window: 20 30 50;
     --header: 25 35 55;
     --border: 0 180 255;
@@ -443,6 +611,7 @@
   }
 
   [data-theme="skynet"] {
+    color-scheme: dark;
     --window: 40 10 10;
     --header: 50 15 15;
     --border: 255 0 0;

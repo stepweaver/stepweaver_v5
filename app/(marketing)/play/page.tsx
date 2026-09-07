@@ -36,6 +36,11 @@ const PLAY_ITEMS = [
     label: "Mail Sort Academy",
     description: "Unofficial mail-classification study drill from public educational material.",
   },
+  {
+    href: "/theme-audit",
+    label: "Appearance",
+    description: "Novelty palettes: amber CRT, skynet, nord. Light/dark comfort stays in the header.",
+  },
 ];
 
 export default function PlayPage() {

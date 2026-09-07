@@ -1,4 +1,4 @@
-import type { Theme } from "@/components/theme-provider";
+import type { Theme } from "@/lib/theme/themes";
 
 
 export const COLOR_PALETTES: Record<string, number[][]> = {

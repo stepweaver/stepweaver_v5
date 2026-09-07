@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
-import type { Theme } from "@/components/theme-provider";
+import type { Theme } from "@/lib/theme/themes";
 import {
   COLOR_PALETTES,
   SPRITE_COLORS,

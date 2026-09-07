@@ -1,8 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import localFont from "next/font/local";
 import { headers } from "next/headers";
-import { META_COLORS, THEMES, THEME_BOOTSTRAP_FALLBACK_META } from "@/lib/theme/themes";
-import { ThemeProvider } from "@/components/theme-provider";
+import {
+  COLOR_SCHEME_STORAGE_KEY,
+  LEGACY_THEME_STORAGE_KEY,
+} from "@/lib/theme/color-scheme";
+import { META_COLOR_DARK, META_COLOR_LIGHT } from "@/lib/theme/themes";
 import { AppChrome } from "@/components/app-chrome";
 import { ErrorBoundary } from "@/components/error-boundary";
 import { Analytics } from "@/components/analytics";
@@ -49,7 +52,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#050b12",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: META_COLOR_LIGHT },
+    { media: "(prefers-color-scheme: dark)", color: META_COLOR_DARK },
+  ],
   width: "device-width",
   initialScale: 1,
 };
@@ -64,8 +70,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="dark"
-      className={`${ocr.variable} ${ibm.variable} theme-loaded`}
+      className={`${ocr.variable} ${ibm.variable}`}
       suppressHydrationWarning
     >
       <head>
@@ -76,33 +81,28 @@ export default async function RootLayout({
             __html: `
               (function () {
                 try {
-                  var VALID_THEMES = ${JSON.stringify(THEMES)};
-                  var META_COLORS = ${JSON.stringify(META_COLORS)};
-
                   var stored = null;
                   try {
-                    stored = localStorage.getItem("theme");
+                    stored = localStorage.getItem(${JSON.stringify(COLOR_SCHEME_STORAGE_KEY)});
                   } catch (_) {}
 
-                  var theme = VALID_THEMES.indexOf(stored) >= 0
-                    ? stored
-                    : (window.matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark");
-
-                  document.documentElement.setAttribute("data-theme", theme);
-                  document.documentElement.classList.add("theme-loaded");
-
-                  var meta = document.querySelector('meta[name="theme-color"]');
-                  if (meta) {
-                    meta.setAttribute("content", META_COLORS[theme] || META_COLORS.dark);
+                  if (stored !== "light" && stored !== "dark") {
+                    try {
+                      var legacy = localStorage.getItem(${JSON.stringify(LEGACY_THEME_STORAGE_KEY)});
+                      if (legacy === "light" || legacy === "dark") stored = legacy;
+                    } catch (_) {}
                   }
-                } catch (_) {
-                  document.documentElement.setAttribute("data-theme", "dark");
-                  document.documentElement.classList.add("theme-loaded");
-                  var meta = document.querySelector('meta[name="theme-color"]');
-                  if (meta) {
-                    meta.setAttribute("content", ${JSON.stringify(THEME_BOOTSTRAP_FALLBACK_META)});
+
+                  if (stored === "light" || stored === "dark") {
+                    document.documentElement.setAttribute("data-theme", stored);
+                    var color = stored === "light"
+                      ? ${JSON.stringify(META_COLOR_LIGHT)}
+                      : ${JSON.stringify(META_COLOR_DARK)};
+                    document.querySelectorAll('meta[name="theme-color"]').forEach(function (meta) {
+                      meta.setAttribute("content", color);
+                    });
                   }
-                }
+                } catch (_) {}
               })();
             `,
           }}
@@ -113,11 +113,9 @@ export default async function RootLayout({
           Skip to main content
         </a>
         <ErrorBoundary>
-          <ThemeProvider>
-            <AppChrome>
-              <main id="main-content">{children}</main>
-            </AppChrome>
-          </ThemeProvider>
+          <AppChrome>
+            <main id="main-content">{children}</main>
+          </AppChrome>
         </ErrorBoundary>
         <Analytics />
       </body>

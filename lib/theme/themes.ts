@@ -1,6 +1,6 @@
-export type ThemeId =
-  | "dark"
-  | "light"
+export type ColorScheme = "light" | "dark";
+
+export type NoveltyThemeId =
   | "monochrome"
   | "monochrome-inverted"
   | "vintage"
@@ -14,13 +14,38 @@ export type ThemeId =
   | "cobalt"
   | "skynet";
 
-export const THEMES: ThemeId[] = [
-  "dark", "light", "monochrome", "monochrome-inverted",
-  "vintage", "apple", "c64", "amber", "synthwave",
-  "dracula", "solarized", "nord", "cobalt", "skynet",
+export type ThemeId = ColorScheme | NoveltyThemeId;
+
+/** @deprecated Use ThemeId. Kept so effects code can keep a short alias. */
+export type Theme = ThemeId;
+
+export const COLOR_SCHEMES: ColorScheme[] = ["light", "dark"];
+
+export const NOVELTY_THEMES: NoveltyThemeId[] = [
+  "monochrome",
+  "monochrome-inverted",
+  "vintage",
+  "apple",
+  "c64",
+  "amber",
+  "synthwave",
+  "dracula",
+  "solarized",
+  "nord",
+  "cobalt",
+  "skynet",
 ];
 
-/** Browser chrome / PWA theme-color (kept in sync with root layout bootstrap script). */
+export const THEMES: ThemeId[] = ["dark", "light", ...NOVELTY_THEMES];
+
+const LIGHT_APPEARANCES = new Set<ThemeId>([
+  "light",
+  "monochrome-inverted",
+  "apple",
+  "solarized",
+]);
+
+/** Browser chrome / PWA theme-color. */
 export const META_COLORS: Record<ThemeId, string> = {
   dark: "#050b12",
   light: "#f5f7fa",
@@ -38,4 +63,21 @@ export const META_COLORS: Record<ThemeId, string> = {
   skynet: "#0f0505",
 };
 
-export const THEME_BOOTSTRAP_FALLBACK_META = META_COLORS.dark;
+export const META_COLOR_LIGHT = META_COLORS.light;
+export const META_COLOR_DARK = META_COLORS.dark;
+
+export function isColorScheme(value: string | null | undefined): value is ColorScheme {
+  return value === "light" || value === "dark";
+}
+
+export function isNoveltyTheme(value: string | null | undefined): value is NoveltyThemeId {
+  return !!value && (NOVELTY_THEMES as readonly string[]).includes(value);
+}
+
+export function isThemeId(value: string | null | undefined): value is ThemeId {
+  return isColorScheme(value) || isNoveltyTheme(value);
+}
+
+export function isLightAppearance(value: ThemeId): boolean {
+  return LIGHT_APPEARANCES.has(value);
+}

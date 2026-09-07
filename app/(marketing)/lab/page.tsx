@@ -43,6 +43,11 @@ const LAB_ITEMS = [
     label: "λlambda",
     description: "Shared LLM agent behind the site and terminal, with guardrails and provider fallback.",
   },
+  {
+    href: "/theme-audit",
+    label: "Appearance",
+    description: "Novelty palettes for the lab: amber CRT, skynet, nord. Not a header control.",
+  },
 ] as const;
 
 const LADDER = [
