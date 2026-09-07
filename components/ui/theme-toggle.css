@@ -1,42 +1,101 @@
 .theme-toggle {
-  display: grid;
-  place-items: center;
-  inline-size: 2.5rem;
-  block-size: 2.5rem;
-  padding: 0;
-  border: 1px solid rgb(var(--border) / 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.5rem;
+  border: none;
   border-radius: 0;
-  background: rgb(var(--surface));
-  color: rgb(var(--text-color));
+  background: transparent;
+  color: rgb(var(--neon));
   cursor: pointer;
-  transition:
-    background-color 120ms ease,
-    border-color 120ms ease,
-    color 120ms ease;
+  user-select: none;
+  transition: filter 0.2s ease;
 }
 
 .theme-toggle:hover:not(:disabled) {
-  border-color: rgb(var(--accent));
-  color: rgb(var(--accent));
+  filter: brightness(1.2);
 }
 
 .theme-toggle:focus-visible {
-  outline: 2px solid rgb(var(--accent));
-  outline-offset: 3px;
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
 }
 
 .theme-toggle:disabled {
   cursor: default;
 }
 
-.theme-toggle svg {
-  width: 1.1rem;
-  height: 1.1rem;
-  inline-size: 1.1rem;
-  block-size: 1.1rem;
+.theme-toggle-lambda {
+  position: relative;
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  flex-shrink: 0;
 }
 
 .theme-placeholder {
-  inline-size: 1.1rem;
-  block-size: 1.1rem;
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.lambda-icon {
+  object-fit: contain;
+  transition: filter 0.2s ease;
+}
+
+.lambda-icon.dark {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(97%) saturate(2488%) hue-rotate(73deg) brightness(101%) contrast(101%) drop-shadow(0 0 6px rgba(0, 255, 0, 0.7));
+}
+
+.lambda-icon.light {
+  filter: brightness(0) saturate(100%) invert(33%) sepia(97%) saturate(6729%) hue-rotate(296deg) brightness(101%) contrast(101%) drop-shadow(0 0 6px rgba(255, 0, 255, 0.7));
+}
+
+.lambda-icon.monochrome {
+  filter: brightness(0) saturate(100%) invert(100%) drop-shadow(0 0 6px rgba(255, 255, 255, 0.7));
+}
+
+.lambda-icon.monochrome-inverted {
+  filter: brightness(0) saturate(100%) invert(0%) drop-shadow(0 0 6px rgba(0, 0, 0, 0.7));
+}
+
+.lambda-icon.vintage {
+  filter: brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(2076%) hue-rotate(130deg) brightness(104%) contrast(101%) drop-shadow(0 0 6px rgba(85, 255, 255, 0.7));
+}
+
+.lambda-icon.apple {
+  filter: brightness(0) saturate(100%) invert(81%) sepia(55%) saturate(2078%) hue-rotate(66deg) brightness(103%) contrast(101%) drop-shadow(0 0 6px rgba(51, 255, 51, 0.7));
+}
+
+.lambda-icon.c64 {
+  filter: brightness(0) saturate(100%) invert(87%) sepia(78%) saturate(2076%) hue-rotate(170deg) brightness(104%) contrast(101%) drop-shadow(0 0 6px rgba(163, 230, 255, 0.7));
+}
+
+.lambda-icon.amber {
+  filter: brightness(0) saturate(100%) invert(72%) sepia(78%) saturate(1000%) hue-rotate(360deg) brightness(105%) contrast(101%) drop-shadow(0 0 6px rgba(255, 176, 0, 0.7));
+}
+
+.lambda-icon.synthwave {
+  filter: brightness(0) saturate(100%) invert(25%) sepia(99%) saturate(7426%) hue-rotate(318deg) brightness(101%) contrast(101%) drop-shadow(0 0 6px rgba(255, 20, 147, 0.7));
+}
+
+.lambda-icon.dracula {
+  filter: brightness(0) saturate(100%) invert(75%) sepia(31%) saturate(1825%) hue-rotate(214deg) brightness(103%) contrast(96%) drop-shadow(0 0 6px rgba(189, 147, 249, 0.7));
+}
+
+.lambda-icon.solarized {
+  filter: brightness(0) saturate(100%) invert(56%) sepia(30%) saturate(1142%) hue-rotate(131deg) brightness(91%) contrast(86%) drop-shadow(0 0 6px rgba(42, 161, 152, 0.7));
+}
+
+.lambda-icon.nord {
+  filter: brightness(0) saturate(100%) invert(73%) sepia(16%) saturate(1142%) hue-rotate(153deg) brightness(95%) contrast(86%) drop-shadow(0 0 6px rgba(136, 192, 208, 0.7));
+}
+
+.lambda-icon.cobalt {
+  filter: brightness(0) saturate(100%) invert(83%) sepia(65%) saturate(2040%) hue-rotate(360deg) brightness(104%) contrast(101%) drop-shadow(0 0 6px rgba(255, 198, 0, 0.7));
+}
+
+.lambda-icon.skynet {
+  filter: brightness(0) saturate(100%) invert(22%) sepia(95%) saturate(5000%) hue-rotate(350deg) brightness(90%) contrast(110%) drop-shadow(0 0 6px rgba(204, 32, 32, 0.7));
 }

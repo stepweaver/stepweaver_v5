@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import Image from "next/image";
 import {
   applyColorSchemeOverride,
   readDocumentTheme,
@@ -10,6 +10,7 @@ import {
   resolveVisualScheme,
   type ColorScheme,
 } from "@/lib/theme/color-scheme";
+import { isThemeId } from "@/lib/theme/themes";
 import "./theme-toggle.css";
 
 export function ThemeToggle() {
@@ -53,6 +54,7 @@ export function ThemeToggle() {
   const label = `Switch to ${targetScheme} theme${
     targetIsSystem ? " (system default)" : ""
   }`;
+  const appearance = isThemeId(dataTheme) ? dataTheme : systemScheme;
 
   function toggleTheme() {
     const nextOverride = resolveNextOverride(effectiveScheme, systemScheme);
@@ -64,18 +66,22 @@ export function ThemeToggle() {
   return (
     <button
       type="button"
-      className="theme-toggle"
+      className={`theme-toggle ${appearance}`}
       onClick={toggleTheme}
       aria-label={label}
       title={label}
       disabled={!ready}
     >
       {ready ? (
-        targetScheme === "dark" ? (
-          <Moon aria-hidden="true" strokeWidth={1.75} />
-        ) : (
-          <Sun aria-hidden="true" strokeWidth={1.75} />
-        )
+        <span className="theme-toggle-lambda">
+          <Image
+            src="/images/lambda_stepweaver.png"
+            alt=""
+            fill
+            className={`lambda-icon ${appearance}`}
+            sizes="24px"
+          />
+        </span>
       ) : (
         <span className="theme-placeholder" aria-hidden="true" />
       )}
