@@ -17,17 +17,25 @@ type Props = {
 };
 
 function formatSignedLbs(value: number): string {
-  if (value === 0) return "0.0 LB";
+  if (value === 0) return "0.0 lb";
   const sign = value > 0 ? "+" : "";
-  return `${sign}${value.toFixed(1)} LB`;
+  return `${sign}${value.toFixed(1)} lb`;
 }
 
 function formatNullableLbs(value: number | null): string {
   return value === null ? CARRIER_KPI_EMPTY : formatSignedLbs(value);
 }
 
-function formatSignedPct(value: number | null): string {
-  return formatSignedDelta(value, "%");
+function formatTotalChange(delta: number | null): string {
+  if (delta === null) return CARRIER_KPI_EMPTY;
+  if (delta === 0) return "No net change";
+  if (delta < 0) return `${Math.abs(delta).toFixed(1)} lb lost`;
+  return `${delta.toFixed(1)} lb gained`;
+}
+
+function formatWeeklyRate(value: number | null): string {
+  if (value === null) return CARRIER_KPI_EMPTY;
+  return `${formatSignedDelta(value, "%")} / week`;
 }
 
 function dateMs(iso: string): number {
@@ -65,10 +73,10 @@ export function MassDeltaTrend({ series }: Props) {
     return (
       <section id="mass-trend" className="scroll-mt-28 space-y-4">
         <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest">
-          MASS TREND // WEEKLY
+          MASS TREND
         </div>
         <p className="text-sm text-[rgb(var(--text-secondary))]">
-          Log weight on Monday weigh-ins.
+          Log weight on journal start and Monday weigh-ins.
         </p>
       </section>
     );
@@ -107,10 +115,10 @@ export function MassDeltaTrend({ series }: Props) {
     <section id="mass-trend" className="scroll-mt-28 space-y-4">
       <div>
         <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest">
-          MASS TREND // WEEKLY
+          MASS TREND
         </div>
         <p className="font-[var(--font-ocr)] text-[9px] tracking-[0.18em] text-[rgb(var(--text-meta))] mt-1">
-          MASS DELTA FROM BASELINE (LB)
+          CHANGE FROM JOURNAL START (LB) · 0 AT THE STARTING POINT
         </p>
       </div>
 
@@ -121,7 +129,7 @@ export function MassDeltaTrend({ series }: Props) {
           aria-labelledby={titleId}
           className="w-full h-auto block"
         >
-          <title id={titleId}>Weekly body-mass delta from first Monday weigh-in, in pounds</title>
+          <title id={titleId}>Body-mass change from journal start, in pounds</title>
           {ticks.map((tick) => {
             const y = yOf(tick);
             const isZero = tick === 0;
@@ -211,7 +219,7 @@ export function MassDeltaTrend({ series }: Props) {
               {formatCalendarDate(active.date)}
             </div>
             <div className="font-[var(--font-ocr)] text-[10px] tracking-wide text-[rgb(var(--text-color))] mt-1">
-              Total delta: {active.deltaFromBaseline.toFixed(1)} lb
+              From start: {active.deltaFromBaseline.toFixed(1)} lb
             </div>
             <div className="font-[var(--font-ocr)] text-[10px] tracking-wide text-[rgb(var(--text-meta))]">
               Weekly delta:{" "}
@@ -234,34 +242,36 @@ export function MassDeltaTrend({ series }: Props) {
         </ol>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
-        <CaptionStat label="BASELINE" value="0.0 LB" />
-        <CaptionStat label="CURRENT" value={formatNullableLbs(series.currentDelta)} />
-        <CaptionStat label="LAST 30D" value={formatNullableLbs(series.last30DayDelta)} />
-        <CaptionStat label="AVG/WEEK" value={formatNullableLbs(series.averageWeeklyDelta)} />
-      </div>
-      <div className="grid grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
         <CaptionStat
-          label="30D MASS VELOCITY"
-          value={formatSignedPct(series.last30DayDeltaPct)}
+          label="TOTAL"
+          value={formatTotalChange(series.currentDelta)}
+          detail="Since journal start"
         />
         <CaptionStat
-          label="WEEKLY RATE"
-          value={
-            series.averageWeeklyDeltaPct === null
-              ? CARRIER_KPI_EMPTY
-              : `${formatSignedPct(series.averageWeeklyDeltaPct)} BM/WK`
-          }
+          label="LAST 30 DAYS"
+          value={formatNullableLbs(series.last30DayDelta)}
+          detail="Recent change"
+        />
+        <CaptionStat
+          label="% BODY MASS / WEEK"
+          value={formatWeeklyRate(series.averageWeeklyDeltaPct)}
+          detail="Recent average rate"
         />
       </div>
-      <p className="font-[var(--font-ocr)] text-[9px] tracking-[0.16em] text-[rgb(var(--text-meta))]">
-        PERCENT OF BODY MASS · DESCRIPTIVE TELEMETRY, NOT A TARGET
-      </p>
     </section>
   );
 }
 
-function CaptionStat({ label, value }: { label: string; value: string }) {
+function CaptionStat({
+  label,
+  value,
+  detail,
+}: {
+  label: string;
+  value: string;
+  detail?: string;
+}) {
   return (
     <div className="bg-[rgb(var(--panel))] px-4 py-3">
       <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.22em] text-[rgb(var(--text-meta))]">
@@ -270,6 +280,11 @@ function CaptionStat({ label, value }: { label: string; value: string }) {
       <div className="font-[var(--font-ibm)] text-lg sm:text-xl text-[rgb(var(--text-color))] mt-1 tabular-nums">
         {value}
       </div>
+      {detail ? (
+        <div className="font-[var(--font-ocr)] text-[9px] tracking-[0.16em] text-[rgb(var(--text-meta))] mt-1">
+          {detail}
+        </div>
+      ) : null}
     </div>
   );
 }

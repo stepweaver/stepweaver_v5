@@ -16,7 +16,12 @@ const LAB_ITEMS = [
   {
     href: "/field-journal",
     label: "Field Journal",
-    description: "Walking and fitness log: miles, weather, recovery, milestones.",
+    description: "Walking log: miles, mass, recovery, heat, hydration.",
+  },
+  {
+    href: "/field-journal/lab",
+    label: "Experimental Metrics",
+    description: "Derived walking telemetry kept off the main Field Journal.",
   },
   {
     href: "/meshtastic",

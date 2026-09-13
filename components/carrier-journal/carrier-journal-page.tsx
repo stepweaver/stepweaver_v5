@@ -1,17 +1,13 @@
 import Link from "next/link";
 import {
   isDispatchFeedWorthy,
-  type CarrierKpi,
   type PublicFieldDispatch,
 } from "@/lib/data/carrier-journal";
-import { CarrierKpiCard } from "./carrier-kpi-card";
 import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
 import { CarrierFieldCalendar } from "./carrier-field-calendar";
 import { CarrierMilestonePanel } from "./carrier-milestone-panel";
 import { CarrierProfileCard } from "./carrier-profile-card";
-import { AdaptationTelemetryPanel } from "./adaptation-telemetry-panel";
-import { ConditioningDeltaPanel } from "./conditioning-delta-panel";
-import { DerivedTelemetryPanel } from "./derived-telemetry-panel";
+import { DashboardReadout } from "./dashboard-readout";
 import { FieldRecordsPanel } from "./field-records-panel";
 import { MassDeltaTrend } from "./mass-delta-trend";
 import { SystemsCheck } from "./systems-check";
@@ -19,20 +15,19 @@ import { WalkingProtocol } from "./walking-protocol";
 import { FootwearActiveLoadoutCard } from "@/components/footwear/footwear-active-loadout-card";
 import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
 import {
-  EMPTY_ADAPTATION_TELEMETRY,
-  EMPTY_DERIVED_TELEMETRY,
+  EMPTY_DASHBOARD_TELEMETRY,
   EMPTY_MASS_DELTA_SERIES,
-  type PublicAdaptationTelemetry,
-  type PublicDerivedTelemetry,
+  type PublicDashboardTelemetry,
   type PublicFieldRecords,
   type PublicMassDeltaSeries,
 } from "@/lib/types/carrier-public-telemetry";
 
 const SECTION_NAV = [
-  { id: "body-telemetry", label: "TELEMETRY" },
+  { id: "workload", label: "WORKLOAD" },
   { id: "mass-trend", label: "MASS" },
-  { id: "adaptation", label: "ADAPTATION" },
-  { id: "derived-telemetry", label: "DERIVED" },
+  { id: "recovery", label: "RECOVERY" },
+  { id: "environment", label: "HEAT" },
+  { id: "hydration", label: "HYDRATION" },
   { id: "field-records", label: "RECORDS" },
   { id: "distance-qualification", label: "DISTANCE" },
   { id: "active-loadout", label: "LOADOUT" },
@@ -63,21 +58,17 @@ function FieldSectionNav() {
 }
 
 type Props = {
-  kpis?: CarrierKpi[];
   dispatches?: PublicFieldDispatch[];
   massDelta?: PublicMassDeltaSeries;
-  derived?: PublicDerivedTelemetry;
-  adaptation?: PublicAdaptationTelemetry;
+  dashboard?: PublicDashboardTelemetry;
   records?: PublicFieldRecords;
   footwearActive?: ShoeDerivedSummary | null;
 };
 
 export function CarrierJournalPage({
-  kpis = [],
   dispatches = [],
   massDelta = EMPTY_MASS_DELTA_SERIES,
-  derived = EMPTY_DERIVED_TELEMETRY,
-  adaptation = EMPTY_ADAPTATION_TELEMETRY,
+  dashboard = EMPTY_DASHBOARD_TELEMETRY,
   records = [],
   footwearActive = null,
 }: Props = {}) {
@@ -96,9 +87,8 @@ export function CarrierJournalPage({
               A Human Performance Log
             </h1>
             <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
-              Miles, environmental load, hydration, recovery, body mechanics, equipment wear,
-              and measurable evidence that the machine is adapting under high-mileage walking
-              days.
+              Walking volume, body mass, recovery, heat, and hydration — numbers a person or a
+              physician can read in a few seconds.
             </p>
           </div>
           <div className="lg:shrink-0">
@@ -108,25 +98,10 @@ export function CarrierJournalPage({
 
         <FieldSectionNav />
 
-        <div id="body-telemetry" className="scroll-mt-28 space-y-4">
-          <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest">
-            BODY TELEMETRY // CURRENT RECORD
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
-            {kpis.map((kpi, i) => (
-              <CarrierKpiCard key={kpi.systemLabel} kpi={kpi} index={i} />
-            ))}
-          </div>
-        </div>
-
-        <MassDeltaTrend series={massDelta} />
-
-        <section id="adaptation" className="scroll-mt-28 space-y-10">
-          <ConditioningDeltaPanel data={adaptation.conditioning} />
-          <AdaptationTelemetryPanel adaptation={adaptation} />
-        </section>
-
-        <DerivedTelemetryPanel derived={derived} />
+        <DashboardReadout
+          dashboard={dashboard}
+          afterWorkload={<MassDeltaTrend series={massDelta} />}
+        />
 
         <FieldRecordsPanel records={records} />
 
@@ -197,6 +172,24 @@ export function CarrierJournalPage({
             </Link>
           </div>
         ) : null}
+
+        <div className="border border-[rgb(var(--neon)/0.2)] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div>
+            <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-1">
+              LAB // EXPERIMENTAL METRICS
+            </p>
+            <p className="text-sm text-[rgb(var(--text-secondary))]">
+              Load delta, thermal penalty, mass-distance, and the other invented calculations live
+              here — off the main journal.
+            </p>
+          </div>
+          <Link
+            href="/field-journal/lab"
+            className="inline-flex shrink-0 border border-[rgb(var(--neon)/0.4)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)]"
+          >
+            OPEN THE LAB
+          </Link>
+        </div>
 
         <div className="surface-panel p-6 sm:p-8 text-center">
           <div className="font-[var(--font-ocr)] text-xs tracking-widest text-[rgb(var(--text-label))] mb-3">

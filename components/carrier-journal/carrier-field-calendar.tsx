@@ -226,7 +226,7 @@ function SelectedDayPanel({ day, onClose }: { day: DaySummary; onClose: () => vo
                   {day.estLocomotionKcal.toLocaleString("en-US")} Calories
                 </div>
                 <div className="font-[var(--font-ocr)] text-[9px] tracking-widest text-[rgb(var(--text-label))]">
-                  EST. LOCOMOTION
+                  ESTIMATED
                 </div>
               </div>
             )}

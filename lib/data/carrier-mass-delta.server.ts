@@ -16,14 +16,32 @@ import {
 const LAST_30D_WINDOW_DAYS = 30;
 const LAST_30D_PROXIMITY_DAYS = 7;
 
-function mondayWeightEntries(dispatches: CarrierDispatch[]): { date: string; weightLbs: number }[] {
+function recordedWeightEntries(
+  dispatches: CarrierDispatch[]
+): { date: string; weightLbs: number }[] {
   return [...dispatches]
     .filter(
       (d): d is CarrierDispatch & { weightLbs: number } =>
-        d.weightLbs !== undefined && Number.isFinite(d.weightLbs) && isMonday(d.date)
+        d.weightLbs !== undefined && Number.isFinite(d.weightLbs)
     )
-    .sort((a, b) => a.date.localeCompare(b.date))
+    .sort((a, b) => {
+      const dateCmp = a.date.localeCompare(b.date);
+      if (dateCmp !== 0) return dateCmp;
+      return a.id.localeCompare(b.id);
+    })
     .map((d) => ({ date: d.date, weightLbs: d.weightLbs }));
+}
+
+/** Journal-start + Monday samples + latest weigh-in. One baseline, one ending point. */
+function chartWeightEntries(
+  entries: { date: string; weightLbs: number }[]
+): { date: string; weightLbs: number }[] {
+  if (entries.length === 0) return [];
+  const firstDate = entries[0].date;
+  const lastDate = entries[entries.length - 1].date;
+  return entries.filter(
+    (entry) => entry.date === firstDate || entry.date === lastDate || isMonday(entry.date)
+  );
 }
 
 function averageWeeklyDelta(
@@ -57,18 +75,20 @@ function last30DayChange(entries: { date: string; weightLbs: number }[]): {
 }
 
 /**
- * Transform Monday weigh-ins into a relative public series.
+ * Transform weigh-ins into a relative public series.
+ * Baseline is the first recorded weight (journal start), not the first Monday.
  * Absolute lbs never leave this module.
  */
 export function toPublicMassDeltaSeries(
   dispatches: CarrierDispatch[]
 ): PublicMassDeltaSeries {
-  const entries = mondayWeightEntries(dispatches);
+  const entries = recordedWeightEntries(dispatches);
   if (entries.length === 0) return EMPTY_MASS_DELTA_SERIES;
 
   const baseline = entries[0].weightLbs;
-  const points: PublicMassPoint[] = entries.map((entry, index) => {
-    const prev = index > 0 ? entries[index - 1] : null;
+  const chartEntries = chartWeightEntries(entries);
+  const points: PublicMassPoint[] = chartEntries.map((entry, index) => {
+    const prev = index > 0 ? chartEntries[index - 1] : null;
     return {
       date: entry.date,
       deltaFromBaseline: round1(entry.weightLbs - baseline),

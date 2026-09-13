@@ -30,6 +30,61 @@ export const EMPTY_MASS_DELTA_SERIES: PublicMassDeltaSeries = {
   averageWeeklyDeltaPct: null,
 };
 
+export type PublicHottestWorkday = {
+  date: string;
+  heatF: number;
+};
+
+export type PublicDashboardTelemetry = {
+  asOf: string | null;
+  workload: {
+    totalMiles: number;
+    milesLast7Days: number | null;
+    fourWeekAvgMilesPerWeek: number | null;
+    vsRecentAvgPct: number | null;
+  };
+  recovery: {
+    soreness7d: number | null;
+    energy7d: number | null;
+    soreness30d: number | null;
+    energy30d: number | null;
+  };
+  environment: {
+    heatDaysThisMonth: number;
+    monthKey: string | null;
+    hottestRecent: PublicHottestWorkday | null;
+  };
+  hydration: {
+    avgWorkdayOz: number | null;
+    avgLast30dOz: number | null;
+  };
+};
+
+export const EMPTY_DASHBOARD_TELEMETRY: PublicDashboardTelemetry = {
+  asOf: null,
+  workload: {
+    totalMiles: 0,
+    milesLast7Days: null,
+    fourWeekAvgMilesPerWeek: null,
+    vsRecentAvgPct: null,
+  },
+  recovery: {
+    soreness7d: null,
+    energy7d: null,
+    soreness30d: null,
+    energy30d: null,
+  },
+  environment: {
+    heatDaysThisMonth: 0,
+    monthKey: null,
+    hottestRecent: null,
+  },
+  hydration: {
+    avgWorkdayOz: null,
+    avgLast30dOz: null,
+  },
+};
+
 export type PublicDerivedTelemetry = {
   milesPerLbDelta: number | null;
   lbDeltaPer100Mi: number | null;

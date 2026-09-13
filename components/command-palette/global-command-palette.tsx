@@ -45,6 +45,7 @@ const STATIC_GROUPS: { group: string; items: CmdItem[] }[] = [
       { id: "services", label: "Services", href: "/services", icon: Zap, meta: "selective consulting" },
       { id: "carrier-journal", label: "Field Journal", href: "/field-journal", icon: BookOpen, meta: "walking fitness log" },
       { id: "field-log", label: "Field Log", href: "/field-journal", icon: BookOpen, meta: "walking fitness log" },
+      { id: "field-journal-lab", label: "Experimental Metrics", href: "/field-journal/lab", icon: FlaskConical, meta: "derived walking telemetry" },
       { id: "meshtastic", label: "Meshtastic", href: "/meshtastic", icon: BookOpen },
       { id: "terminal", label: "Terminal", href: "/terminal", icon: Terminal },
       { id: "dice", label: "Dice Roller", href: "/dice-roller", icon: Terminal },

@@ -435,24 +435,24 @@ export function computeDpsStats(dispatches: CarrierDispatch[]): Partial<CarrierT
 export function formatPublicWeightTrend(totals: CarrierTotals): PublicWeightTrend {
   const change = totals.weightChangeLbs;
   if (change === undefined || totals.startingWeightLbs === undefined) {
-    return { value: CARRIER_KPI_EMPTY, detail: "Log weight on Monday weigh-ins" };
+    return { value: CARRIER_KPI_EMPTY, detail: "Log weight from journal start" };
   }
 
   if (change === 0) {
-    return { value: "No net change", detail: "Since first Monday weigh-in" };
+    return { value: "No net change", detail: "Since journal start" };
   }
 
   const lost = -change;
   if (lost > 0) {
     return {
       value: `${lost.toFixed(1)} lbs lost`,
-      detail: "Since first Monday weigh-in",
+      detail: "Since journal start",
     };
   }
 
   return {
     value: `${Math.abs(lost).toFixed(1)} lbs gained`,
-    detail: "Since first Monday weigh-in",
+    detail: "Since journal start",
   };
 }
 

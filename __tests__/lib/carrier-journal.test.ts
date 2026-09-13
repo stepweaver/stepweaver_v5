@@ -213,6 +213,7 @@ describe("formatPublicWeightTrend", () => {
     ]);
     const trend = formatPublicWeightTrend(totals);
     expect(trend.value).toBe("4.2 lbs lost");
+    expect(trend.detail).toBe("Since journal start");
     expect(trend.value).not.toMatch(/243/);
   });
 });

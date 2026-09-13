@@ -1,5 +1,5 @@
 import { toPublicMassDeltaSeries } from "@/lib/data/carrier-mass-delta.server";
-import type { CarrierDispatch } from "@/lib/data/carrier-journal";
+import { computeTotalsFromDispatches, type CarrierDispatch } from "@/lib/data/carrier-journal";
 
 function dispatch(
   overrides: Partial<CarrierDispatch> & Pick<CarrierDispatch, "id" | "date" | "title">
@@ -18,9 +18,9 @@ function dispatch(
 }
 
 describe("toPublicMassDeltaSeries", () => {
-  it("returns an empty series when there are no Monday weigh-ins", () => {
+  it("returns an empty series when there are no weigh-ins", () => {
     const series = toPublicMassDeltaSeries([
-      dispatch({ id: "a", date: "2026-05-05", title: "Tue", weightLbs: 248 }),
+      dispatch({ id: "a", date: "2026-05-05", title: "Tue" }),
     ]);
     expect(series.points).toEqual([]);
     expect(series.currentDelta).toBeNull();
@@ -30,14 +30,38 @@ describe("toPublicMassDeltaSeries", () => {
     expect(series.averageWeeklyDeltaPct).toBeNull();
   });
 
-  it("ignores non-Monday weight entries", () => {
+  it("uses the first recorded weight as journal-start baseline, even when it is not a Monday", () => {
+    const series = toPublicMassDeltaSeries([
+      dispatch({ id: "start", date: "2026-05-05", title: "Tue", weightLbs: 280 }),
+      dispatch({ id: "mon", date: "2026-05-11", title: "Mon", weightLbs: 262 }),
+      dispatch({ id: "late", date: "2026-06-08", title: "Mon", weightLbs: 233.8 }),
+    ]);
+    expect(series.points[0]).toEqual({
+      date: "2026-05-05",
+      deltaFromBaseline: 0,
+      deltaFromPrevious: null,
+    });
+    expect(series.points[1].deltaFromBaseline).toBe(-18);
+    expect(series.currentDelta).toBe(-46.2);
+  });
+
+  it("omits mid-week weigh-ins that are neither journal start nor latest", () => {
+    const series = toPublicMassDeltaSeries([
+      dispatch({ id: "a", date: "2026-05-04", title: "Mon", weightLbs: 248 }),
+      dispatch({ id: "mid", date: "2026-05-06", title: "Wed", weightLbs: 240 }),
+      dispatch({ id: "b", date: "2026-05-11", title: "Mon", weightLbs: 243.8 }),
+    ]);
+    expect(series.points.map((p) => p.date)).toEqual(["2026-05-04", "2026-05-11"]);
+    expect(series.currentDelta).toBe(-4.2);
+  });
+
+  it("includes a non-Monday latest weigh-in so the chart ends on total lost", () => {
     const series = toPublicMassDeltaSeries([
       dispatch({ id: "a", date: "2026-05-04", title: "Mon", weightLbs: 248 }),
       dispatch({ id: "b", date: "2026-05-06", title: "Wed", weightLbs: 240 }),
     ]);
-    expect(series.points).toHaveLength(1);
-    expect(series.points[0].deltaFromBaseline).toBe(0);
-    expect(series.currentDelta).toBe(0);
+    expect(series.points).toHaveLength(2);
+    expect(series.currentDelta).toBe(-8);
   });
 
   it("normalizes the first Monday to 0.0 and keeps signed deltas", () => {
@@ -130,5 +154,17 @@ describe("toPublicMassDeltaSeries", () => {
       dispatch({ id: "b", date: "2026-05-18", title: "B", weightLbs: 241 }),
     ]);
     expect(series.last30DayDelta).toBeNull();
+  });
+
+  it("keeps one authoritative total-lost number with the public totals", () => {
+    const dispatches = [
+      dispatch({ id: "start", date: "2026-05-05", title: "Tue", weightLbs: 280 }),
+      dispatch({ id: "mon", date: "2026-05-11", title: "Mon", weightLbs: 262 }),
+      dispatch({ id: "late", date: "2026-06-08", title: "Mon", weightLbs: 233.8 }),
+    ];
+    const totals = computeTotalsFromDispatches(dispatches);
+    const series = toPublicMassDeltaSeries(dispatches);
+    expect(series.currentDelta).toBe(totals.weightChangeLbs);
+    expect(series.currentDelta).toBe(-46.2);
   });
 });

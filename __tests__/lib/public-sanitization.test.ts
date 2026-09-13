@@ -5,6 +5,7 @@ import {
   type CarrierDispatch,
 } from "@/lib/data/carrier-journal";
 import { buildPublicSummary } from "@/lib/carrier-journal/helpers";
+import { computePublicDashboard } from "@/lib/data/carrier-dashboard";
 import { computePublicAdaptationTelemetry } from "@/lib/data/carrier-adaptation";
 import { computePublicDerivedTelemetry } from "@/lib/data/carrier-derived-telemetry.server";
 import { toPublicMassDeltaSeries } from "@/lib/data/carrier-mass-delta.server";
@@ -154,7 +155,8 @@ describe("public mass-delta and derived telemetry payloads", () => {
     const adaptation = computePublicAdaptationTelemetry(
       toPublicFieldDispatches([start, latest])
     );
-    const serialized = JSON.stringify({ mass, derived, adaptation });
+    const dashboard = computePublicDashboard(toPublicFieldDispatches([start, latest]));
+    const serialized = JSON.stringify({ mass, derived, adaptation, dashboard });
 
     expect(serialized).not.toContain("248");
     expect(serialized).not.toContain("241.2");

@@ -68,7 +68,7 @@ export function DerivedTelemetryPanel({ derived }: Props) {
   return (
     <section id="derived-telemetry" className="scroll-mt-28 space-y-4">
       <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest">
-        DERIVED TELEMETRY
+        DERIVED TELEMETRY // EXPERIMENTAL
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
         <div className="bg-[rgb(var(--panel))] p-4 sm:p-5">

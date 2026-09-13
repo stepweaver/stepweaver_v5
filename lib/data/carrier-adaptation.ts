@@ -1,8 +1,8 @@
 /**
- * Derived adaptation telemetry for the public Field Journal.
+ * Experimental adaptation telemetry for Field Journal lab.
  * Uses only public dispatch fields — no absolute mass, no operational volume.
  *
- * These are observed field comparisons, not clinical measurements.
+ * Observed field comparisons, not clinical measurements. Kept off the main journal.
  */
 
 import { effectiveHeatF, isDerivedHeatDay } from "@/lib/carrier-journal/weather-signals";
