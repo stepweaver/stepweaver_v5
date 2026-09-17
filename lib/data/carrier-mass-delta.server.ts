@@ -75,9 +75,9 @@ function last30DayChange(entries: { date: string; weightLbs: number }[]): {
 }
 
 /**
- * Transform weigh-ins into a relative public series.
+ * Transform weigh-ins into a public series.
  * Baseline is the first recorded weight (journal start), not the first Monday.
- * Absolute lbs never leave this module.
+ * That starting mass is published; later absolute lbs stay in this module.
  */
 export function toPublicMassDeltaSeries(
   dispatches: CarrierDispatch[]
@@ -112,5 +112,7 @@ export function toPublicMassDeltaSeries(
     last30DayDeltaPct: change30?.pct ?? null,
     averageWeeklyDeltaPct:
       weeklyLbs !== null && latestWeight > 0 ? round1((weeklyLbs / latestWeight) * 100) : null,
+    baselineWeightLbs: round1(baseline),
+    baselineDate: entries[0].date,
   };
 }

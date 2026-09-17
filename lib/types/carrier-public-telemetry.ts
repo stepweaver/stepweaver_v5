@@ -19,6 +19,9 @@ export type PublicMassDeltaSeries = {
   last30DayDeltaPct: number | null;
   /** Average weekly mass change as % of latest weigh-in. */
   averageWeeklyDeltaPct: number | null;
+  /** Journal-start mass. Later weigh-ins stay off the public payload. */
+  baselineWeightLbs: number | null;
+  baselineDate: string | null;
 };
 
 export const EMPTY_MASS_DELTA_SERIES: PublicMassDeltaSeries = {
@@ -28,6 +31,8 @@ export const EMPTY_MASS_DELTA_SERIES: PublicMassDeltaSeries = {
   averageWeeklyDelta: null,
   last30DayDeltaPct: null,
   averageWeeklyDeltaPct: null,
+  baselineWeightLbs: null,
+  baselineDate: null,
 };
 
 export type PublicHottestWorkday = {
@@ -95,12 +100,12 @@ export type PublicDerivedTelemetry = {
   highHeatMiles: number;
   marathonEquivalents: number | null;
   fiveKEquivalents: number | null;
-  /** Estimated walking energy. Absolute body mass never leaves the server. */
+  /** Estimated walking energy. Later absolute body mass stays on the server. */
   estLocomotionKcal: number | null;
   locomotionMethod: LocomotionEnergyMethod | null;
   /**
    * Cumulative body-mass × miles (lb-mi). Derived field telemetry.
-   * Absolute mass never leaves the server.
+   * Later absolute mass stays on the server.
    */
   totalMassDistanceLbMi: number | null;
 };

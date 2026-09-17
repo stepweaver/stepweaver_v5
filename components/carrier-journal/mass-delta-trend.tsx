@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { formatCalendarDate } from "@/lib/data/carrier-calendar";
 import { formatSignedDelta } from "@/lib/data/carrier-adaptation";
 import { CARRIER_KPI_EMPTY } from "@/lib/data/carrier-journal";
+import { formatFieldDateStamp } from "@/lib/data/carrier-journal-dates";
 import type { PublicMassDeltaSeries, PublicMassPoint } from "@/lib/types/carrier-public-telemetry";
 
 const MONTHS = ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"];
@@ -118,7 +119,9 @@ export function MassDeltaTrend({ series }: Props) {
           MASS TREND
         </div>
         <p className="font-[var(--font-ocr)] text-[9px] tracking-[0.18em] text-[rgb(var(--text-meta))] mt-1">
-          CHANGE FROM JOURNAL START (LB) · 0 AT THE STARTING POINT
+          {series.baselineWeightLbs !== null && series.baselineDate
+            ? `START ${series.baselineWeightLbs.toFixed(1)} LB · ${formatFieldDateStamp(series.baselineDate)} · CHANGE FROM THAT POINT`
+            : "CHANGE FROM JOURNAL START (LB) · 0 AT THE STARTING POINT"}
         </p>
       </div>
 
@@ -129,7 +132,11 @@ export function MassDeltaTrend({ series }: Props) {
           aria-labelledby={titleId}
           className="w-full h-auto block"
         >
-          <title id={titleId}>Body-mass change from journal start, in pounds</title>
+          <title id={titleId}>
+            {series.baselineWeightLbs !== null && series.baselineDate
+              ? `Body-mass change from ${series.baselineWeightLbs.toFixed(1)} lb on ${formatFieldDateStamp(series.baselineDate)}`
+              : "Body-mass change from journal start, in pounds"}
+          </title>
           {ticks.map((tick) => {
             const y = yOf(tick);
             const isZero = tick === 0;
@@ -242,7 +249,18 @@ export function MassDeltaTrend({ series }: Props) {
         </ol>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-px bg-[rgb(var(--border)/0.15)] border border-[rgb(var(--border)/0.2)]">
+        <CaptionStat
+          label="START"
+          value={
+            series.baselineWeightLbs === null
+              ? CARRIER_KPI_EMPTY
+              : `${series.baselineWeightLbs.toFixed(1)} lb`
+          }
+          detail={
+            series.baselineDate ? formatFieldDateStamp(series.baselineDate) : "Journal start"
+          }
+        />
         <CaptionStat
           label="TOTAL"
           value={formatTotalChange(series.currentDelta)}

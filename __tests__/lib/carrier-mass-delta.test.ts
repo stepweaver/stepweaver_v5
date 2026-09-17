@@ -28,6 +28,8 @@ describe("toPublicMassDeltaSeries", () => {
     expect(series.averageWeeklyDelta).toBeNull();
     expect(series.last30DayDeltaPct).toBeNull();
     expect(series.averageWeeklyDeltaPct).toBeNull();
+    expect(series.baselineWeightLbs).toBeNull();
+    expect(series.baselineDate).toBeNull();
   });
 
   it("uses the first recorded weight as journal-start baseline, even when it is not a Monday", () => {
@@ -43,6 +45,8 @@ describe("toPublicMassDeltaSeries", () => {
     });
     expect(series.points[1].deltaFromBaseline).toBe(-18);
     expect(series.currentDelta).toBe(-46.2);
+    expect(series.baselineWeightLbs).toBe(280);
+    expect(series.baselineDate).toBe("2026-05-05");
   });
 
   it("omits mid-week weigh-ins that are neither journal start nor latest", () => {
@@ -80,6 +84,8 @@ describe("toPublicMassDeltaSeries", () => {
       deltaFromPrevious: -4.2,
     });
     expect(series.currentDelta).toBe(-4.2);
+    expect(series.baselineWeightLbs).toBe(248);
+    expect(series.baselineDate).toBe("2026-05-04");
   });
 
   it("keeps a positive delta when mass increases", () => {

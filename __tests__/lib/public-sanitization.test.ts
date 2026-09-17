@@ -139,7 +139,7 @@ describe("toPublicFieldDispatch", () => {
 });
 
 describe("public mass-delta and derived telemetry payloads", () => {
-  it("serialize relative deltas without absolute weight literals", () => {
+  it("publishes journal-start mass and keeps later absolute weights off the payload", () => {
     const start = fullPrivateDispatch();
     start.date = "2026-06-01";
     start.weightLbs = 248;
@@ -158,7 +158,9 @@ describe("public mass-delta and derived telemetry payloads", () => {
     const dashboard = computePublicDashboard(toPublicFieldDispatches([start, latest]));
     const serialized = JSON.stringify({ mass, derived, adaptation, dashboard });
 
-    expect(serialized).not.toContain("248");
+    expect(mass.baselineWeightLbs).toBe(248);
+    expect(mass.baselineDate).toBe("2026-06-01");
+    expect(serialized).toContain("248");
     expect(serialized).not.toContain("241.2");
     expect(serialized).not.toMatch(/percent/i);
     expect(serialized).not.toContain("weightLbs");

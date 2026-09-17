@@ -72,7 +72,7 @@ export function CarrierJournalPage({
   records = [],
   footwearActive = null,
 }: Props = {}) {
-  // Public DTOs only. Absolute weight never enters this component.
+  // Public DTOs only. Starting mass is published; later absolute weights stay off this component.
   const feedDispatches = dispatches.filter(isDispatchFeedWorthy);
 
   return (

@@ -310,7 +310,7 @@ Public surface:
 - KPIs, field calendar, milestones, and published day notes
 - Shoe Ledger with per-shoe disclaimers next to reviews
 - Server-side public DTO projection before any data reaches client components
-- Aggregate "pounds lost" only — raw weight never enters the browser payload
+- Journal-start mass is published; later raw weigh-ins stay off the browser payload
 - Operational volume fields and private notes stay off the public surface
 
 Private logging features:
@@ -327,7 +327,7 @@ Publication / privacy rules:
 - Public reads only use rows where `Publish Public = true`.
 - `Private Note` is written to Notion but never read for public rendering.
 - Empty Notion responses fail closed (no demo/fallback narratives).
-- Before client components render, `toPublicFieldDispatch` strips private keys (`weightLbs`, volume counters, route identifiers, and related fields) and attaches a derived daily locomotion-energy estimate.
+- Before client components render, `toPublicFieldDispatch` strips private keys (`weightLbs`, volume counters, route identifiers, and related fields). Journal-start mass is published separately on the mass-trend DTO.
 
 Expected Field Journal Notion properties (public fitness + private daybook):
 
@@ -339,7 +339,7 @@ Expected Field Journal Notion properties (public fitness + private daybook):
 | `Miles Walked` | number | yes |
 | `Water Oz` | number | yes |
 | `Hydration Goal Oz` | number | yes |
-| `Weight Lbs` | number | no (server aggregate "lbs lost" + locomotion energy only) |
+| `Weight Lbs` | number | journal-start mass only (later weigh-ins stay server-side for "lbs lost" + locomotion energy) |
 | `Moving Minutes` | number | no (server locomotion model input; written from daybook when present) |
 | `Load Kg` | number | no (optional; read if present, not in daybook yet) |
 | `Grade Percent` | number | no (optional; read if present, not in daybook yet) |

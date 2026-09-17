@@ -26,6 +26,8 @@ const emptyMass: PublicMassDeltaSeries = {
   averageWeeklyDelta: null,
   last30DayDeltaPct: null,
   averageWeeklyDeltaPct: null,
+  baselineWeightLbs: null,
+  baselineDate: null,
 };
 
 describe("computePublicDerivedTelemetry", () => {

@@ -97,7 +97,7 @@ export type PublicFieldDispatch = {
   publicNote: string;
   waterOz?: number;
   hydrationGoalOz?: number;
-  /** Estimated walking energy for this day. Derived server-side; mass stays private. */
+  /** Estimated walking energy for this day. Derived server-side; later absolute mass stays private. */
   estLocomotionKcal?: number;
   locomotionMethod?: WalkingEnergyMethod;
 };
