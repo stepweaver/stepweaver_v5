@@ -5,6 +5,7 @@ import {
   COLOR_SCHEME_STORAGE_KEY,
   LEGACY_THEME_STORAGE_KEY,
 } from "@/lib/theme/color-scheme";
+import { PWA_DESCRIPTION, PWA_ICON_FILES, PWA_NAME, PWA_SHORT_NAME } from "@/lib/site/pwa";
 import { META_COLOR_DARK, META_COLOR_LIGHT } from "@/lib/theme/themes";
 import { AppChrome } from "@/components/app-chrome";
 import { ErrorBoundary } from "@/components/error-boundary";
@@ -28,8 +29,26 @@ export const metadata: Metadata = {
     default: "stepweaver.dev",
     template: "%s | stepweaver.dev",
   },
-  description: "Technical operator. Systems builder. Lambda architecture.",
+  description: PWA_DESCRIPTION,
+  applicationName: PWA_NAME,
   metadataBase: new URL(process.env.SITE_URL || "https://stepweaver.dev"),
+  appleWebApp: {
+    capable: true,
+    title: PWA_SHORT_NAME,
+    statusBarStyle: "black-translucent",
+  },
+  // Safari still reads this name. Next emits the standard tag, not the Apple one.
+  other: {
+    "apple-mobile-web-app-capable": "yes",
+  },
+  icons: {
+    icon: [
+      { url: PWA_ICON_FILES.icon32, sizes: "32x32", type: "image/png" },
+      { url: PWA_ICON_FILES.icon192, sizes: "192x192", type: "image/png" },
+      { url: PWA_ICON_FILES.icon512, sizes: "512x512", type: "image/png" },
+    ],
+    apple: [{ url: PWA_ICON_FILES.appleTouch, sizes: "180x180", type: "image/png" }],
+  },
   openGraph: {
     type: "website",
     locale: "en_US",

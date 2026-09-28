@@ -17,7 +17,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
-    "resume:pdf": "npx tsx scripts/render-resume-pdf.ts"
+    "resume:pdf": "npx tsx scripts/render-resume-pdf.ts",
+    "icons:render": "npx tsx scripts/render-app-icons.ts"
   },
   "dependencies": {
     "@marsidev/react-turnstile": "^1.5.2",
