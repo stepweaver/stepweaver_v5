@@ -40,6 +40,7 @@ import {
 import { LEGACY_PUBLIC_DISCLAIMER } from "@/lib/footwear/legacy";
 import { assignUnitNumbers } from "@/lib/footwear/unit";
 import { fetchCarrierDispatches } from "@/lib/notion/carrier-journal.repo";
+import { milesForSum } from "@/lib/data/carrier-measurements";
 
 export type ShoeDerivedSummary = {
   shoe: Shoe;
@@ -162,7 +163,7 @@ async function loadCarrierDaysForFootwear(): Promise<
     const dispatches = await fetchCarrierDispatches();
     return dispatches.map((d) => ({
       date: d.date,
-      miles: d.milesWalked,
+      miles: milesForSum(d.milesWalked),
     }));
   } catch {
     return [];

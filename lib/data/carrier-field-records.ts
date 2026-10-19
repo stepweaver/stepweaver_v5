@@ -1,7 +1,7 @@
 import { effectiveHeatF, isDerivedHeatDay } from "@/lib/carrier-journal/weather-signals";
+import { milesForSum } from "@/lib/data/carrier-measurements";
 import { addCalendarDays, round1 } from "@/lib/data/carrier-journal-dates";
-import type { PublicFieldDispatch } from "@/lib/data/carrier-journal";
-import { isDispatchFeedWorthy } from "@/lib/data/carrier-journal";
+import { isDispatchFeedWorthy, type PublicFieldDispatch } from "@/lib/data/carrier-journal";
 import type {
   PublicFieldRecord,
   PublicFieldRecordKey,
@@ -27,15 +27,15 @@ function byDate(dispatches: PublicFieldDispatch[]): PublicFieldDispatch[] {
 function longestRange(dispatches: PublicFieldDispatch[]): PublicFieldRecord {
   const label = "LONGEST RANGE";
   const ranked = [...dispatches].sort((a, b) => {
-    if (b.milesWalked !== a.milesWalked) return b.milesWalked - a.milesWalked;
+    if (milesForSum(b.milesWalked) !== milesForSum(a.milesWalked)) return milesForSum(b.milesWalked) - milesForSum(a.milesWalked);
     return a.date.localeCompare(b.date);
   });
   const winner = ranked[0];
-  if (!winner || winner.milesWalked <= 0) return emptyRecord("longest-range", label);
+  if (!winner || milesForSum(winner.milesWalked) <= 0) return emptyRecord("longest-range", label);
   return {
     key: "longest-range",
     label,
-    value: String(round1(winner.milesWalked)),
+    value: String(round1(milesForSum(winner.milesWalked))),
     unit: "MI",
     date: winner.date,
     dispatchId: noteLinkId(winner),
@@ -45,7 +45,7 @@ function longestRange(dispatches: PublicFieldDispatch[]): PublicFieldRecord {
 function milesByDate(dispatches: PublicFieldDispatch[]): Map<string, number> {
   const map = new Map<string, number>();
   for (const d of dispatches) {
-    map.set(d.date, (map.get(d.date) ?? 0) + d.milesWalked);
+    map.set(d.date, (map.get(d.date) ?? 0) + milesForSum(d.milesWalked));
   }
   return map;
 }
@@ -187,16 +187,16 @@ function heatRange(dispatches: PublicFieldDispatch[]): PublicFieldRecord {
   if (heatDays.length === 0) return emptyRecord("heat-range", label);
 
   heatDays.sort((a, b) => {
-    if (b.milesWalked !== a.milesWalked) return b.milesWalked - a.milesWalked;
+    if (milesForSum(b.milesWalked) !== milesForSum(a.milesWalked)) return milesForSum(b.milesWalked) - milesForSum(a.milesWalked);
     return a.date.localeCompare(b.date);
   });
   const winner = heatDays[0];
-  if (winner.milesWalked <= 0) return emptyRecord("heat-range", label);
+  if (milesForSum(winner.milesWalked) <= 0) return emptyRecord("heat-range", label);
 
   return {
     key: "heat-range",
     label,
-    value: String(round1(winner.milesWalked)),
+    value: String(round1(milesForSum(winner.milesWalked))),
     unit: "MI",
     date: winner.date,
     dispatchId: noteLinkId(winner),

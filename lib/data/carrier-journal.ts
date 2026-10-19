@@ -18,6 +18,13 @@ import {
   isDerivedHeatDay,
   isDerivedWeatherDay,
 } from "@/lib/carrier-journal/weather-signals";
+import {
+  isExplicitZeroMileage,
+  isMissingMileage,
+  isWalkingMileage,
+  meanObserved,
+  milesForSum,
+} from "@/lib/data/carrier-measurements";
 
 export type { WalkingEnergyMethod };
 
@@ -70,10 +77,14 @@ export type PublicFieldDispatch = {
   id: string;
   date: string;
   title: string;
-  milesWalked: number;
-  soreness: number; // 1–10
-  energy: number; // 1–10
-  mood: number; // 1–10
+  /** Present only when Miles Walked was stored, including an explicit 0. */
+  milesWalked?: number;
+  /** 1–10. Absent when the day has no soreness observation. */
+  soreness?: number;
+  /** 1–10. Absent when the day has no energy observation. */
+  energy?: number;
+  /** 1–10. Absent when the day has no mood observation. */
+  mood?: number;
   weather?: string;
   /** Peak air temperature (°F) during shift window (9 AM–7 PM). */
   temperatureF?: number;
@@ -158,10 +169,10 @@ export function toPublicFieldDispatch(
     id: dispatch.id,
     date: dispatch.date,
     title: dispatch.title,
-    milesWalked: dispatch.milesWalked,
-    soreness: dispatch.soreness,
-    energy: dispatch.energy,
-    mood: dispatch.mood,
+    ...(dispatch.milesWalked !== undefined && { milesWalked: dispatch.milesWalked }),
+    ...(dispatch.soreness !== undefined && { soreness: dispatch.soreness }),
+    ...(dispatch.energy !== undefined && { energy: dispatch.energy }),
+    ...(dispatch.mood !== undefined && { mood: dispatch.mood }),
     ...(dispatch.weather !== undefined && { weather: dispatch.weather }),
     ...(dispatch.temperatureF !== undefined && { temperatureF: dispatch.temperatureF }),
     ...(dispatch.heatIndexF !== undefined && { heatIndexF: dispatch.heatIndexF }),
@@ -210,9 +221,12 @@ export type CarrierTotals = {
   heatDays: number;
   weatherDays: number;
   heavyMailDays: number;
-  avgSoreness: number;
-  avgEnergy: number;
-  avgMood: number;
+  walkingDays: number;
+  zeroMileDays: number;
+  daysWithoutMileage: number;
+  avgSoreness: number | null;
+  avgEnergy: number | null;
+  avgMood: number | null;
   totalWaterOz: number;
   avgWaterOz: number;
   hydrationGoalHitDays: number;
@@ -245,9 +259,12 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
       heatDays: 0,
       weatherDays: 0,
       heavyMailDays: 0,
-      avgSoreness: 0,
-      avgEnergy: 0,
-      avgMood: 0,
+      walkingDays: 0,
+      zeroMileDays: 0,
+      daysWithoutMileage: 0,
+      avgSoreness: null,
+      avgEnergy: null,
+      avgMood: null,
       totalWaterOz: 0,
       avgWaterOz: 0,
       hydrationGoalHitDays: 0,
@@ -256,14 +273,17 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
   }
 
   const enriched = enrichDispatchesFields(dispatches);
-  const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
+  const totalMiles = dispatches.reduce((s, d) => s + milesForSum(d.milesWalked), 0);
+  const walkingDays = dispatches.filter((d) => isWalkingMileage(d.milesWalked)).length;
+  const zeroMileDays = dispatches.filter((d) => isExplicitZeroMileage(d.milesWalked)).length;
+  const daysWithoutMileage = dispatches.filter((d) => isMissingMileage(d.milesWalked)).length;
   const totalSteps = dispatches.reduce((s, d) => s + (d.steps ?? 0), 0);
   const heatDays = enriched.filter(isDerivedHeatDay).length;
   const weatherDays = enriched.filter(isDerivedWeatherDay).length;
   const heavyMailDays = enriched.filter((d) => d.mailLoadTier === "heavy").length;
-  const avgSoreness = dispatches.reduce((s, d) => s + d.soreness, 0) / count;
-  const avgEnergy = dispatches.reduce((s, d) => s + d.energy, 0) / count;
-  const avgMood = dispatches.reduce((s, d) => s + d.mood, 0) / count;
+  const avgSoreness = meanObserved(dispatches.map((d) => d.soreness));
+  const avgEnergy = meanObserved(dispatches.map((d) => d.energy));
+  const avgMood = meanObserved(dispatches.map((d) => d.mood));
 
   const waterEntries = dispatches.filter((d) => d.waterOz !== undefined);
   const totalWaterOz = waterEntries.reduce((s, d) => s + (d.waterOz ?? 0), 0);
@@ -301,15 +321,19 @@ export function computeTotalsFromDispatches(dispatches: CarrierDispatch[]): Carr
 
   return {
     daysLogged: count,
+    walkingDays,
+    zeroMileDays,
+    daysWithoutMileage,
     totalMiles: Math.round(totalMiles * 10) / 10,
-    avgMilesPerDay: Math.round((totalMiles / count) * 10) / 10,
+    avgMilesPerDay:
+      walkingDays > 0 ? Math.round((totalMiles / walkingDays) * 10) / 10 : 0,
     totalSteps,
     heatDays,
     weatherDays,
     heavyMailDays,
-    avgSoreness: Math.round(avgSoreness * 10) / 10,
-    avgEnergy: Math.round(avgEnergy * 10) / 10,
-    avgMood: Math.round(avgMood * 10) / 10,
+    avgSoreness,
+    avgEnergy,
+    avgMood,
     totalWaterOz,
     avgWaterOz,
     hydrationGoalHitDays,
@@ -471,7 +495,7 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
       systemLabel: "DAILY RANGE",
       label: "Avg miles / day",
       value: `${t.avgMilesPerDay} mi`,
-      detail: "Per logged day",
+      detail: "Per walking day",
     },
     {
       systemLabel: "COOLANT",
@@ -488,19 +512,19 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
     {
       systemLabel: "SYSTEM LOAD",
       label: "Avg soreness",
-      value: `${t.avgSoreness} / 10`,
+      value: t.avgSoreness === null ? CARRIER_KPI_EMPTY : `${t.avgSoreness} / 10`,
       detail: "Physical load marker",
     },
     {
       systemLabel: "POWER",
       label: "Avg energy",
-      value: `${t.avgEnergy} / 10`,
+      value: t.avgEnergy === null ? CARRIER_KPI_EMPTY : `${t.avgEnergy} / 10`,
       detail: "Self-reported end-of-day",
     },
     {
       systemLabel: "MORALE",
       label: "Avg mood",
-      value: `${t.avgMood} / 10`,
+      value: t.avgMood === null ? CARRIER_KPI_EMPTY : `${t.avgMood} / 10`,
       detail: "Morale signal",
     },
     {
@@ -513,7 +537,7 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
       systemLabel: "LOG DAYS",
       label: "Days logged",
       value: String(t.daysLogged),
-      detail: "Active walking days",
+      detail: "Journal records, including days without mileage",
     },
     {
       systemLabel: "COOLANT HIT RATE",
@@ -528,7 +552,7 @@ export function totalsToKpis(t: CarrierTotals): CarrierKpi[] {
 }
 
 export function dispatchHasPublicKpiData(d: CarrierDispatch): boolean {
-  return d.milesWalked > 0 || d.waterOz !== undefined || d.weightLbs !== undefined;
+  return isWalkingMileage(d.milesWalked) || d.waterOz !== undefined || d.weightLbs !== undefined;
 }
 
 export function isDispatchFeedWorthy(

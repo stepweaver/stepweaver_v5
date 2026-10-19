@@ -1,191 +1,61 @@
 import Link from "next/link";
-import {
-  isDispatchFeedWorthy,
-  type PublicFieldDispatch,
-} from "@/lib/data/carrier-journal";
-import { CarrierDispatchFeed } from "./carrier-dispatch-feed";
-import { CarrierFieldCalendar } from "./carrier-field-calendar";
-import { CarrierMilestonePanel } from "./carrier-milestone-panel";
-import { CarrierProfileCard } from "./carrier-profile-card";
-import { DashboardReadout } from "./dashboard-readout";
-import { FieldRecordsPanel } from "./field-records-panel";
-import { MassDeltaTrend } from "./mass-delta-trend";
-import { SystemsCheck } from "./systems-check";
-import { WalkingProtocol } from "./walking-protocol";
-import { FootwearActiveLoadoutCard } from "@/components/footwear/footwear-active-loadout-card";
+import { DistanceHistoryChart } from "@/components/carrier-journal/distance-history-chart";
+import { DistanceMilestone } from "@/components/carrier-journal/distance-milestone";
+import { FieldJournalDetails } from "@/components/carrier-journal/field-journal-details";
+import { FieldJournalFootwear } from "@/components/carrier-journal/field-journal-footwear";
+import { FieldJournalHero } from "@/components/carrier-journal/field-journal-hero";
+import { RecentWalks } from "@/components/carrier-journal/recent-walks";
+import { buildDistanceJournal } from "@/lib/data/carrier-distance";
+import type { PublicFieldDispatch } from "@/lib/data/carrier-journal";
 import type { ShoeDerivedSummary } from "@/lib/footwear/queries";
 import {
-  EMPTY_DASHBOARD_TELEMETRY,
   EMPTY_MASS_DELTA_SERIES,
-  type PublicDashboardTelemetry,
-  type PublicFieldRecords,
   type PublicMassDeltaSeries,
 } from "@/lib/types/carrier-public-telemetry";
-
-const SECTION_NAV = [
-  { id: "workload", label: "WORKLOAD" },
-  { id: "mass-trend", label: "MASS" },
-  { id: "recovery", label: "RECOVERY" },
-  { id: "environment", label: "HEAT" },
-  { id: "hydration", label: "HYDRATION" },
-  { id: "field-records", label: "RECORDS" },
-  { id: "distance-qualification", label: "DISTANCE" },
-  { id: "active-loadout", label: "LOADOUT" },
-  { id: "field-log", label: "FIELD LOG" },
-  { id: "systems-check", label: "SYSTEMS" },
-] as const;
-
-function FieldSectionNav() {
-  return (
-    <nav
-      aria-label="Field Journal sections"
-      className="carrier-section-nav sticky top-14 z-20 -mx-1 px-1 py-2 border-b border-[rgb(var(--neon)/0.12)] bg-[rgb(var(--bg)/0.92)] backdrop-blur-sm [@media(max-height:32rem)]:static"
-    >
-      <ul className="flex flex-wrap gap-x-1 gap-y-2 sm:gap-x-2 overflow-x-auto">
-        {SECTION_NAV.map((item) => (
-          <li key={item.id} className="shrink-0">
-            <a
-              href={`#${item.id}`}
-              className="inline-flex min-h-11 items-center px-2.5 py-2 font-[var(--font-ocr)] text-[10px] sm:text-[11px] tracking-widest text-[rgb(var(--text-meta))] border border-transparent hover:border-[rgb(var(--neon)/0.35)] hover:text-[rgb(var(--neon))] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
-            >
-              {item.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-  );
-}
 
 type Props = {
   dispatches?: PublicFieldDispatch[];
   massDelta?: PublicMassDeltaSeries;
-  dashboard?: PublicDashboardTelemetry;
-  records?: PublicFieldRecords;
   footwearActive?: ShoeDerivedSummary | null;
 };
 
 export function CarrierJournalPage({
   dispatches = [],
   massDelta = EMPTY_MASS_DELTA_SERIES,
-  dashboard = EMPTY_DASHBOARD_TELEMETRY,
-  records = [],
   footwearActive = null,
 }: Props = {}) {
-  // Public DTOs only. Starting mass is published; later absolute weights stay off this component.
-  const feedDispatches = dispatches.filter(isDispatchFeedWorthy);
+  const journal = buildDistanceJournal(dispatches);
+  const weightChangeLbs =
+    massDelta.points.length >= 2 && massDelta.currentDelta !== null
+      ? massDelta.currentDelta
+      : null;
 
   return (
     <div className="min-h-screen pt-20 pb-16">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-12">
-        <div className="flex flex-col lg:flex-row lg:items-start gap-8 lg:gap-12">
-          <div className="flex-1 min-w-0">
-            <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-sm tracking-wider mb-2">
-              FIELD JOURNAL // THE LONG WALK
-            </div>
-            <h1 className="font-[var(--font-ibm)] text-3xl sm:text-5xl text-[rgb(var(--text-color))] mb-3">
-              A Human Performance Log
-            </h1>
-            <p className="text-[rgb(var(--text-secondary))] text-sm sm:text-base max-w-3xl leading-relaxed">
-              Walking volume, body mass, recovery, heat, and hydration — numbers a person or a
-              physician can read in a few seconds.
-            </p>
-          </div>
-          <div className="lg:shrink-0">
-            <CarrierProfileCard />
-          </div>
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-14">
+        <FieldJournalHero journal={journal} weightChangeLbs={weightChangeLbs} />
+        <DistanceHistoryChart months={journal.months} weeks={journal.weeks} />
+        <RecentWalks dispatches={dispatches} />
+
+        <div className="grid gap-4 lg:grid-cols-2">
+          <DistanceMilestone dispatches={dispatches} />
+          <FieldJournalFootwear summary={footwearActive} />
         </div>
 
-        <FieldSectionNav />
+        <FieldJournalDetails dispatches={dispatches} massDelta={massDelta} />
 
-        <DashboardReadout
-          dashboard={dashboard}
-          afterWorkload={<MassDeltaTrend series={massDelta} />}
-        />
-
-        <FieldRecordsPanel records={records} />
-
-        <div id="operational-log" className="scroll-mt-28">
-          <CarrierFieldCalendar dispatches={dispatches} />
-        </div>
-
-        <div id="distance-qualification" className="scroll-mt-28">
-          <CarrierMilestonePanel dispatches={dispatches} />
-        </div>
-
-        <div id="active-loadout" className="scroll-mt-28">
-          {footwearActive ? (
-            <FootwearActiveLoadoutCard summary={footwearActive} />
-          ) : (
-            <div className="border border-[rgb(var(--neon)/0.2)] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-              <div>
-                <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-1">
-                  EQUIPMENT ROSTER // FOOTWEAR
-                </p>
-                <p className="text-sm text-[rgb(var(--text-secondary))]">
-                  Walking platforms under field testing. Brands, odometers, serviceability, and
-                  field notes.
-                </p>
-              </div>
-              <Link
-                href="/field-journal/footwear"
-                className="inline-flex shrink-0 border border-[rgb(var(--neon)/0.4)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)]"
-              >
-                OPEN EQUIPMENT ROSTER
-              </Link>
-            </div>
-          )}
-        </div>
-
-        <div id="field-log" className="scroll-mt-28">
-          <div className="font-[var(--font-ocr)] text-[rgb(var(--neon))] text-xs tracking-widest mb-4">
-            FIELD LOG // RECENT TRANSMISSIONS
-          </div>
-          {feedDispatches.length > 0 ? (
-            <CarrierDispatchFeed dispatches={feedDispatches} />
-          ) : (
-            <p className="text-sm text-[rgb(var(--text-secondary))]">
-              No published notes yet. Logged carrier days publish to Field Journal automatically.
-            </p>
-          )}
-        </div>
-
-        <SystemsCheck />
-
-        <WalkingProtocol />
-
-        {footwearActive ? (
-          <div className="border border-[rgb(var(--neon)/0.2)] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-1">
-                EQUIPMENT ROSTER
-              </p>
-              <p className="text-sm text-[rgb(var(--text-secondary))]">
-                Full footwear ledger: retired units, inspection path, and field notes.
-              </p>
-            </div>
-            <Link
-              href="/field-journal/footwear"
-              className="inline-flex shrink-0 border border-[rgb(var(--neon)/0.4)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)]"
-            >
-              ENTER ROSTER
-            </Link>
-          </div>
-        ) : null}
-
-        <div className="border border-[rgb(var(--neon)/0.2)] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="border border-[rgb(var(--border)/0.25)] p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
-            <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.25em] text-[rgb(var(--neon))] mb-1">
-              LAB // EXPERIMENTAL METRICS
+            <p className="font-[var(--font-ocr)] text-[10px] tracking-[0.22em] text-[rgb(var(--neon))] mb-1">
+              LAB
             </p>
             <p className="text-sm text-[rgb(var(--text-secondary))]">
-              Load delta, thermal penalty, mass-distance, and the other invented calculations live
-              here — off the main journal.
+              Experimental calculations stay off this page.
             </p>
           </div>
           <Link
             href="/field-journal/lab"
-            className="inline-flex shrink-0 border border-[rgb(var(--neon)/0.4)] px-4 py-2 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)]"
+            className="inline-flex min-h-11 items-center border border-[rgb(var(--neon)/0.4)] px-4 font-[var(--font-ocr)] text-[10px] tracking-[0.18em] text-[rgb(var(--neon))] hover:bg-[rgb(var(--neon)/0.1)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[rgb(var(--neon))]"
           >
             OPEN THE LAB
           </Link>

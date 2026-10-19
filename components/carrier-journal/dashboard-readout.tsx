@@ -81,7 +81,7 @@ export function DashboardReadout({ dashboard, afterWorkload }: Props) {
           <ReadoutStat
             label="LAST 7 DAYS"
             value={miles(workload.milesLast7Days)}
-            detail="Miles this week"
+            detail="Rolling 7 days ending on the latest logged date"
           />
           <ReadoutStat
             label="4-WEEK AVERAGE"
@@ -95,7 +95,7 @@ export function DashboardReadout({ dashboard, afterWorkload }: Props) {
         </div>
         {comparison ? (
           <p className="font-[var(--font-ocr)] text-[11px] sm:text-xs tracking-[0.14em] text-[rgb(var(--text-color))]">
-            Weekly walking: {miles(workload.milesLast7Days)} this week ·{" "}
+            Latest 7 logged days: {miles(workload.milesLast7Days)} ·{" "}
             {workload.fourWeekAvgMilesPerWeek === null
               ? CARRIER_KPI_EMPTY
               : `${workload.fourWeekAvgMilesPerWeek.toFixed(1)} mi/week 4-week average`}
@@ -150,7 +150,7 @@ export function DashboardReadout({ dashboard, afterWorkload }: Props) {
           <ReadoutStat
             label="WORKDAY AVERAGE"
             value={ounces(hydration.avgWorkdayOz)}
-            detail="Fluids on walking days"
+            detail="Recorded water on walking days"
           />
           <ReadoutStat
             label="LAST 30 DAYS"

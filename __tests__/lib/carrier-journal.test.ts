@@ -9,6 +9,7 @@ import {
 } from "@/lib/data/carrier-journal";
 import {
   getCarrierLevel,
+  getCompactMilestone,
 } from "@/lib/data/carrier-milestones";
 import { splitPublicNoteParagraphs } from "@/lib/data/carrier-note-formatting";
 
@@ -125,6 +126,18 @@ describe("getCarrierLevel", () => {
     ]);
     expect(level.title).toBe("ROAD CONDITIONED");
     expect(level.level).toBe(4);
+  });
+
+  it("shows the current rank, the next rank, and miles remaining", () => {
+    const milestone = getCompactMilestone([
+      dispatch({ id: "a", date: "2026-05-01", title: "A", milesWalked: 1124.6 }),
+    ]);
+    expect(milestone.title).toBe("DISTANCE VETERAN");
+    expect(milestone.nextTitle).toBe("HARDENED");
+    expect(milestone.nextMiles).toBe(2500);
+    expect(milestone.milesToNext).toBe(1375.4);
+    expect(milestone.progressToNext).toBeGreaterThan(0);
+    expect(milestone.progressToNext).toBeLessThan(100);
   });
 
   it("returns DISTANCE VETERAN at 1000+ miles with next rank", () => {

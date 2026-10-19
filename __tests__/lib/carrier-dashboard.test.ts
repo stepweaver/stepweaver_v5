@@ -128,7 +128,29 @@ describe("computePublicDashboard", () => {
     });
   });
 
-  it("averages fluids on workdays and over the last 30 days", () => {
+  it("ignores missing soreness and energy instead of treating them as scores", () => {
+    const days = [
+      dispatch({
+        id: "scored",
+        date: "2026-09-01",
+        milesWalked: 10,
+        soreness: 2,
+        energy: 8,
+      }),
+      dispatch({
+        id: "blank",
+        date: "2026-09-02",
+        milesWalked: 10,
+        soreness: undefined,
+        energy: undefined,
+      }),
+    ];
+    const dashboard = computePublicDashboard(days);
+    expect(dashboard.recovery.soreness7d).toBe(2);
+    expect(dashboard.recovery.energy7d).toBe(8);
+  });
+
+  it("averages recorded water on walking days and over the last 30 days", () => {
     const days = [
       dispatch({ id: "old", date: "2026-07-01", milesWalked: 10, waterOz: 40 }),
       dispatch({ id: "off", date: "2026-08-01", milesWalked: 0, waterOz: 200 }),

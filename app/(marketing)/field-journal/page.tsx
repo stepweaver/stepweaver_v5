@@ -4,8 +4,6 @@ import { CarrierJournalPage } from "@/components/carrier-journal/carrier-journal
 import { isFootwearDbConfigured } from "@/lib/db";
 import { getActiveShoeSummary } from "@/lib/footwear/queries";
 import { toPublicFieldDispatches } from "@/lib/data/carrier-journal";
-import { computePublicDashboard } from "@/lib/data/carrier-dashboard";
-import { computePublicFieldRecords } from "@/lib/data/carrier-field-records";
 import { toPublicMassDeltaSeries } from "@/lib/data/carrier-mass-delta.server";
 
 export const revalidate = 300;
@@ -16,11 +14,11 @@ const absoluteImageUrl = `${SITE_URL}/images/field_journal_og.png`;
 export const metadata: Metadata = {
   title: "Field Journal | Stephen Weaver",
   description:
-    "FIELD JOURNAL // THE LONG WALK: a human performance log — walking volume, body mass, recovery, heat, and hydration.",
+    "FIELD JOURNAL // THE LONG WALK: a record of distance, endurance, and progress.",
   openGraph: {
     title: "Field Journal // The Long Walk",
     description:
-      "Miles, body mass, recovery, heat, and hydration — human performance under field conditions.",
+      "A record of distance, endurance, and progress.",
     type: "website",
     url: `${SITE_URL}/field-journal`,
     images: [{ url: absoluteImageUrl, width: 1200, height: 630, alt: "Field Journal" }],
@@ -29,7 +27,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "Field Journal // The Long Walk",
     description:
-      "Miles, body mass, recovery, heat, and hydration — human performance under field conditions.",
+      "A record of distance, endurance, and progress.",
     images: [absoluteImageUrl],
   },
 };
@@ -42,15 +40,11 @@ export default async function Page() {
 
   const dispatches = toPublicFieldDispatches(serverDispatches);
   const massDelta = toPublicMassDeltaSeries(serverDispatches);
-  const dashboard = computePublicDashboard(dispatches);
-  const records = computePublicFieldRecords(dispatches);
 
   return (
     <CarrierJournalPage
       dispatches={dispatches}
       massDelta={massDelta}
-      dashboard={dashboard}
-      records={records}
       footwearActive={footwearActive}
     />
   );

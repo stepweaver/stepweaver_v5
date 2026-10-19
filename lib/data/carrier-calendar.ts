@@ -3,6 +3,7 @@
  * Derives logged walking days from public field dispatch entries.
  */
 
+import { milesForSum } from "@/lib/data/carrier-measurements";
 import {
   isDispatchFeedWorthy,
   type CarrierDispatch,
@@ -219,7 +220,7 @@ function buildDaySummary(date: string, dispatches: CalendarDispatch[]): DaySumma
     };
   }
 
-  const totalMiles = Math.round(dispatches.reduce((s, d) => s + d.milesWalked, 0) * 10) / 10;
+  const totalMiles = Math.round(dispatches.reduce((s, d) => s + milesForSum(d.milesWalked), 0) * 10) / 10;
   // Steps stay off the public DTO; keep the field for internal DaySummary shape.
   const totalSteps = dispatches.reduce(
     (s, d) => s + ("steps" in d ? (d.steps ?? 0) : 0),

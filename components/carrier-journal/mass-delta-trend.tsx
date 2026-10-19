@@ -229,7 +229,7 @@ export function MassDeltaTrend({ series }: Props) {
               From start: {active.deltaFromBaseline.toFixed(1)} lb
             </div>
             <div className="font-[var(--font-ocr)] text-[10px] tracking-wide text-[rgb(var(--text-meta))]">
-              Weekly delta:{" "}
+              Since previous weigh-in:{" "}
               {active.deltaFromPrevious === null
                 ? CARRIER_KPI_EMPTY
                 : `${active.deltaFromPrevious.toFixed(1)} lb`}
@@ -274,7 +274,7 @@ export function MassDeltaTrend({ series }: Props) {
         <CaptionStat
           label="% BODY MASS / WEEK"
           value={formatWeeklyRate(series.averageWeeklyDeltaPct)}
-          detail="Recent average rate"
+          detail="Average rate since journal start"
         />
       </div>
     </section>

@@ -1,11 +1,15 @@
 /**
  * Readable Field Journal dashboard.
  * Prefer raw, recognizable numbers over invented composite telemetry.
+ *
+ * milesLast7Days is the rolling 7 calendar days ending on the latest logged
+ * date. It is not the current Monday–Sunday week.
  */
 
 import { effectiveHeatF, isDerivedHeatDay } from "@/lib/carrier-journal/weather-signals";
 import type { PublicFieldDispatch } from "@/lib/data/carrier-journal";
 import { addCalendarDays, differenceInCalendarDays, round1 } from "@/lib/data/carrier-journal-dates";
+import { meanObserved, milesForSum } from "@/lib/data/carrier-measurements";
 import {
   EMPTY_DASHBOARD_TELEMETRY,
   type PublicDashboardTelemetry,
@@ -29,13 +33,12 @@ function milesInWindow(dispatches: PublicFieldDispatch[], start: string, end: st
   return round1(
     dispatches
       .filter((dispatch) => inWindow(dispatch, start, end))
-      .reduce((sum, dispatch) => sum + dispatch.milesWalked, 0)
+      .reduce((sum, dispatch) => sum + milesForSum(dispatch.milesWalked), 0)
   );
 }
 
-function meanRound1(values: number[]): number | null {
-  if (values.length === 0) return null;
-  return round1(values.reduce((sum, value) => sum + value, 0) / values.length);
+function meanRound1(values: Array<number | undefined>): number | null {
+  return meanObserved(values, 1);
 }
 
 function windowDays(dispatches: PublicFieldDispatch[], start: string, end: string): PublicFieldDispatch[] {
@@ -43,7 +46,7 @@ function windowDays(dispatches: PublicFieldDispatch[], start: string, end: strin
 }
 
 function isWorkday(dispatch: PublicFieldDispatch): boolean {
-  return dispatch.milesWalked > 0;
+  return milesForSum(dispatch.milesWalked) > 0;
 }
 
 function workdayFluids(dispatches: PublicFieldDispatch[]): number[] {
@@ -89,7 +92,9 @@ export function computePublicDashboard(
   const ordered = [...dispatches].sort(byDateThenId);
   const asOf = ordered[ordered.length - 1].date;
   const first = ordered[0].date;
-  const totalMiles = round1(ordered.reduce((sum, dispatch) => sum + dispatch.milesWalked, 0));
+  const totalMiles = round1(
+    ordered.reduce((sum, dispatch) => sum + milesForSum(dispatch.milesWalked), 0)
+  );
 
   const start7 = addCalendarDays(asOf, -6);
   const start28 = addCalendarDays(asOf, -27);

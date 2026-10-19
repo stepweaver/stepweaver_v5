@@ -17,22 +17,11 @@ export function CarrierDispatchCard({ dispatch: d }: Props) {
   const weather = deriveWeatherSignals(d);
   const weatherFlags = (["heat", "rain", "storm", "snow"] as const).filter((key) => weather[key]);
 
-  const chips: string[] = [
-    `${d.milesWalked} MI`,
-  ];
-  if (d.estLocomotionKcal !== undefined) {
-    chips.push(`EST. ${d.estLocomotionKcal.toLocaleString("en-US")} CALORIES`);
-  }
-  chips.push(
-    `ENERGY ${d.energy}`,
-    `LOAD ${d.soreness}`,
-    `MORALE ${d.mood}`,
-  );
+  const chips: string[] = [];
+  if (d.milesWalked !== undefined) chips.push(`${d.milesWalked} MI`);
+  if (d.energy !== undefined) chips.push(`ENERGY ${d.energy}`);
+  if (d.mood !== undefined) chips.push(`MOOD ${d.mood}`);
   if (d.temperatureF !== undefined) chips.push(`${d.temperatureF}°F`);
-  if (d.waterOz !== undefined) {
-    const goal = d.hydrationGoalOz;
-    chips.push(goal ? `${d.waterOz}/${goal} OZ` : `${d.waterOz} OZ`);
-  }
   for (const key of weatherFlags) {
     chips.push(WEATHER_FLAG_LABEL[key]);
   }

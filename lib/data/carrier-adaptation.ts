@@ -6,6 +6,7 @@
  */
 
 import { effectiveHeatF, isDerivedHeatDay } from "@/lib/carrier-journal/weather-signals";
+import { milesForSum } from "@/lib/data/carrier-measurements";
 import { CARRIER_KPI_EMPTY, type PublicFieldDispatch } from "@/lib/data/carrier-journal";
 import {
   addCalendarDays,
@@ -63,14 +64,25 @@ function withOdometer(dispatches: PublicFieldDispatch[]): DatedDispatch[] {
   let running = 0;
   return sorted.map((dispatch) => {
     const odometerBefore = round1(running);
-    running = round1(running + dispatch.milesWalked);
+    running = round1(running + milesForSum(dispatch.milesWalked));
     return { ...dispatch, odometerBefore, odometerAfter: running };
   });
 }
 
-function meanRound1(values: number[]): number | null {
-  if (values.length === 0) return null;
-  return round1(values.reduce((sum, value) => sum + value, 0) / values.length);
+function meanRaw(values: Array<number | undefined>): number | null {
+  const nums = values.filter(
+    (value): value is number => typeof value === "number" && Number.isFinite(value)
+  );
+  if (nums.length === 0) return null;
+  return nums.reduce((sum, value) => sum + value, 0) / nums.length;
+}
+
+function meanRound1(values: Array<number | undefined | null>): number | null {
+  const nums = values.filter(
+    (value): value is number => typeof value === "number" && Number.isFinite(value)
+  );
+  if (nums.length === 0) return null;
+  return round1(nums.reduce((sum, value) => sum + value, 0) / nums.length);
 }
 
 function percentChange(recent: number | null, early: number | null): number | null {
@@ -82,27 +94,27 @@ function waterOzPerMi(dispatch: PublicFieldDispatch): number | null {
   if (
     dispatch.waterOz === undefined ||
     !Number.isFinite(dispatch.waterOz) ||
-    dispatch.milesWalked <= 0
+    milesForSum(dispatch.milesWalked) <= 0
   ) {
     return null;
   }
-  return dispatch.waterOz / dispatch.milesWalked;
+  return dispatch.waterOz / milesForSum(dispatch.milesWalked);
 }
 
 function kcalPerMi(dispatch: PublicFieldDispatch): number | null {
   if (
     dispatch.estLocomotionKcal === undefined ||
     !Number.isFinite(dispatch.estLocomotionKcal) ||
-    dispatch.milesWalked <= 0
+    milesForSum(dispatch.milesWalked) <= 0
   ) {
     return null;
   }
-  return dispatch.estLocomotionKcal / dispatch.milesWalked;
+  return dispatch.estLocomotionKcal / milesForSum(dispatch.milesWalked);
 }
 
 function pooledOzPerMi(dispatches: PublicFieldDispatch[]): number | null {
   const eligible = dispatches.filter((dispatch) => waterOzPerMi(dispatch) !== null);
-  const miles = eligible.reduce((sum, dispatch) => sum + dispatch.milesWalked, 0);
+  const miles = eligible.reduce((sum, dispatch) => sum + milesForSum(dispatch.milesWalked), 0);
   if (miles <= 0) return null;
   const ounces = eligible.reduce((sum, dispatch) => sum + (dispatch.waterOz ?? 0), 0);
   return round1(ounces / miles);
@@ -165,7 +177,7 @@ function pickComparable(
   moderateOnly: boolean
 ): { early: DatedDispatch[]; recent: DatedDispatch[] } {
   const filter = (row: DatedDispatch) =>
-    inBand(row.milesWalked, band.min, band.max) && (!moderateOnly || isModerateWeather(row));
+    inBand(milesForSum(row.milesWalked), band.min, band.max) && (!moderateOnly || isModerateWeather(row));
   return {
     early: early.filter(filter),
     recent: recent.filter(filter),
@@ -218,8 +230,8 @@ function computeConditioningDelta(dispatches: PublicFieldDispatch[]): Conditioni
 
 type HeatMatch = {
   heat: PublicFieldDispatch;
-  normalEnergy: number;
-  normalSoreness: number;
+  normalEnergy: number | null;
+  normalSoreness: number | null;
   heatWater: number | null;
   normalWater: number | null;
   heatKcal: number | null;
@@ -227,7 +239,7 @@ type HeatMatch = {
 };
 
 function computeThermalPenalty(dispatches: PublicFieldDispatch[]): ThermalPenalty | null {
-  const operational = dispatches.filter((d) => d.milesWalked >= ADAPTATION.minOperationalMi);
+  const operational = dispatches.filter((d) => milesForSum(d.milesWalked) >= ADAPTATION.minOperationalMi);
   const heatDays = operational.filter(isDerivedHeatDay);
   const normalDays = operational.filter(hasMeasuredNonHeat);
   if (heatDays.length < ADAPTATION.minMatchedHeat || normalDays.length === 0) return null;
@@ -235,7 +247,7 @@ function computeThermalPenalty(dispatches: PublicFieldDispatch[]): ThermalPenalt
   const matches: HeatMatch[] = [];
   for (const heat of heatDays) {
     const normals = normalDays.filter(
-      (normal) => Math.abs(normal.milesWalked - heat.milesWalked) <= ADAPTATION.heatMatchToleranceMi
+      (normal) => Math.abs(milesForSum(normal.milesWalked) - milesForSum(heat.milesWalked)) <= ADAPTATION.heatMatchToleranceMi
     );
     if (normals.length === 0) continue;
 
@@ -247,10 +259,8 @@ function computeThermalPenalty(dispatches: PublicFieldDispatch[]): ThermalPenalt
     const normalKcalValues = normals
       .map(kcalPerMi)
       .filter((value): value is number => value !== null);
-    const normalEnergy =
-      normals.reduce((sum, day) => sum + day.energy, 0) / normals.length;
-    const normalSoreness =
-      normals.reduce((sum, day) => sum + day.soreness, 0) / normals.length;
+    const normalEnergy = meanRaw(normals.map((day) => day.energy));
+    const normalSoreness = meanRaw(normals.map((day) => day.soreness));
     const normalWater =
       normalWaterValues.length > 0
         ? normalWaterValues.reduce((sum, value) => sum + value, 0) / normalWaterValues.length
@@ -293,9 +303,19 @@ function computeThermalPenalty(dispatches: PublicFieldDispatch[]): ThermalPenalt
 
   return {
     matchedHeatDays: matches.length,
-    energyDelta: meanRound1(matches.map((match) => match.heat.energy - match.normalEnergy)),
+    energyDelta: meanRound1(
+      matches.map((match) =>
+        typeof match.heat.energy === "number" && match.normalEnergy !== null
+          ? match.heat.energy - match.normalEnergy
+          : undefined
+      )
+    ),
     sorenessDelta: meanRound1(
-      matches.map((match) => match.heat.soreness - match.normalSoreness)
+      matches.map((match) =>
+        typeof match.heat.soreness === "number" && match.normalSoreness !== null
+          ? match.heat.soreness - match.normalSoreness
+          : undefined
+      )
     ),
     waterOzPerMiDelta:
       waterPairs.length >= ADAPTATION.minMatchedHeat
@@ -339,7 +359,7 @@ function nextLoggedWithinGap(
 
 function recoveryFromTriggers(
   ordered: PublicFieldDispatch[],
-  isTrigger: (dispatch: PublicFieldDispatch) => boolean
+  isTrigger: (_dispatch: PublicFieldDispatch) => boolean
 ): {
   pairCount: number;
   energyDelta: number | null;
@@ -393,13 +413,13 @@ function computeRecoveryResponse(dispatches: PublicFieldDispatch[]): RecoveryRes
   const ordered = [...dispatches].sort(byDateThenId);
   const distance = recoveryFromTriggers(
     ordered,
-    (dispatch) => dispatch.milesWalked >= ADAPTATION.recoveryLoadMi
+    (dispatch) => milesForSum(dispatch.milesWalked) >= ADAPTATION.recoveryLoadMi
   );
   if (!distance) return null;
 
   const thermalRaw = recoveryFromTriggers(
     ordered,
-    (dispatch) => isDerivedHeatDay(dispatch) && dispatch.milesWalked >= ADAPTATION.recoveryThermalMinMi
+    (dispatch) => isDerivedHeatDay(dispatch) && milesForSum(dispatch.milesWalked) >= ADAPTATION.recoveryThermalMinMi
   );
 
   return {
@@ -428,7 +448,7 @@ function milesInWindow(
   return round1(
     dispatches
       .filter((dispatch) => dispatch.date >= start && dispatch.date <= end)
-      .reduce((sum, dispatch) => sum + dispatch.milesWalked, 0)
+      .reduce((sum, dispatch) => sum + milesForSum(dispatch.milesWalked), 0)
   );
 }
 
@@ -458,8 +478,10 @@ function computeLoadDelta(dispatches: PublicFieldDispatch[]): LoadDelta | null {
 
 function isResilientDay(dispatch: PublicFieldDispatch): boolean {
   return (
-    dispatch.milesWalked >= ADAPTATION.resilienceMiles &&
+    milesForSum(dispatch.milesWalked) >= ADAPTATION.resilienceMiles &&
+    typeof dispatch.energy === "number" &&
     dispatch.energy >= ADAPTATION.resilienceEnergyMin &&
+    typeof dispatch.soreness === "number" &&
     dispatch.soreness <= ADAPTATION.resilienceSorenessMax
   );
 }
@@ -474,7 +496,7 @@ function windowResilience(days: PublicFieldDispatch[]): { size: number; resilien
 
 function computeSystemResilience(dispatches: PublicFieldDispatch[]): SystemResilience | null {
   const tenPlus = [...dispatches]
-    .filter((dispatch) => dispatch.milesWalked >= ADAPTATION.resilienceMiles)
+    .filter((dispatch) => milesForSum(dispatch.milesWalked) >= ADAPTATION.resilienceMiles)
     .sort(byDateThenId);
   if (tenPlus.length === 0) return null;
 
@@ -499,7 +521,7 @@ function computeSystemResilience(dispatches: PublicFieldDispatch[]): SystemResil
 
 function computeHeatTolerance(dispatches: PublicFieldDispatch[]): HeatTolerance | null {
   const heatDays = [...dispatches]
-    .filter((dispatch) => isDerivedHeatDay(dispatch) && dispatch.milesWalked >= ADAPTATION.minOperationalMi)
+    .filter((dispatch) => isDerivedHeatDay(dispatch) && milesForSum(dispatch.milesWalked) >= ADAPTATION.minOperationalMi)
     .sort(byDateThenId);
   const n = Math.min(ADAPTATION.heatToleranceN, Math.floor(heatDays.length / 2));
   if (n < ADAPTATION.heatToleranceMinN) return null;
@@ -535,7 +557,7 @@ function coolantBandOf(
 }
 
 function computeCoolantDemand(dispatches: PublicFieldDispatch[]): CoolantDemand | null {
-  const walking = dispatches.filter((dispatch) => dispatch.milesWalked > 0);
+  const walking = dispatches.filter((dispatch) => milesForSum(dispatch.milesWalked) > 0);
   const grouped = {
     cool: walking.filter((dispatch) => coolantBandOf(dispatch) === "cool"),
     warm: walking.filter((dispatch) => coolantBandOf(dispatch) === "warm"),
@@ -583,7 +605,7 @@ function computeCoolantDemand(dispatches: PublicFieldDispatch[]): CoolantDemand 
 }
 
 function computeOperatorOutput(dispatches: PublicFieldDispatch[]): OperatorOutput | null {
-  const walking = dispatches.filter((dispatch) => dispatch.milesWalked > 0);
+  const walking = dispatches.filter((dispatch) => milesForSum(dispatch.milesWalked) > 0);
   if (walking.length === 0) return null;
 
   const defs = [
@@ -610,7 +632,7 @@ function computeOperatorOutput(dispatches: PublicFieldDispatch[]): OperatorOutpu
   ];
 
   const bands = defs.map((def) => {
-    const days = walking.filter((dispatch) => def.include(dispatch.milesWalked));
+    const days = walking.filter((dispatch) => def.include(milesForSum(dispatch.milesWalked)));
     return {
       key: def.key,
       label: def.label,

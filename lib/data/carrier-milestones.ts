@@ -1,3 +1,4 @@
+import { milesForSum } from "@/lib/data/carrier-measurements";
 import type { CarrierDispatch, PublicFieldDispatch } from "./carrier-journal";
 
 type MilestoneDispatch = PublicFieldDispatch | CarrierDispatch;
@@ -45,8 +46,31 @@ const LEVEL_THRESHOLDS: { miles: number; title: string; level: number }[] = [
 // Exported functions
 // ---------------------------------------------------------------------------
 
+export type CompactMilestone = {
+  title: string;
+  totalMiles: number;
+  nextTitle: string | null;
+  nextMiles: number | null;
+  milesToNext: number | null;
+  progressToNext: number;
+};
+
+export function getCompactMilestone(dispatches: MilestoneDispatch[]): CompactMilestone {
+  const level = getCarrierLevel(dispatches);
+  const nextMiles = level.nextMiles ?? null;
+  return {
+    title: level.title,
+    totalMiles: level.totalMiles,
+    nextTitle: level.nextTitle ?? null,
+    nextMiles,
+    milesToNext:
+      nextMiles === null ? null : Math.max(0, Math.round((nextMiles - level.totalMiles) * 10) / 10),
+    progressToNext: level.progressToNext,
+  };
+}
+
 export function getCarrierLevel(dispatches: MilestoneDispatch[]): CarrierLevel {
-  const totalMiles = dispatches.reduce((s, d) => s + d.milesWalked, 0);
+  const totalMiles = dispatches.reduce((s, d) => s + milesForSum(d.milesWalked), 0);
   const rounded = Math.round(totalMiles * 10) / 10;
 
   let currentIdx = 0;

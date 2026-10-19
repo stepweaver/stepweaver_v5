@@ -14,6 +14,8 @@
  * ordinary-speed approximation of the same model.
  */
 
+import { milesForSum } from "@/lib/data/carrier-measurements";
+
 export type WalkingEnergyMethod = "minimum-mechanics" | "distance-fallback";
 
 export type LocomotionEnergyMethod = WalkingEnergyMethod | "mixed";
@@ -39,7 +41,7 @@ export type LocomotionEnergySeries = {
 
 type WeightDated = {
   date: string;
-  milesWalked: number;
+  milesWalked?: number;
   weightLbs?: number;
   movingMinutes?: number;
   loadKg?: number;
@@ -97,13 +99,14 @@ export function estimateLocomotionEnergyForDispatch(
   series: WeightDated[],
   day: WeightDated
 ): WalkingEnergyEstimate | null {
-  if (day.milesWalked <= 0) return null;
+  const distanceMiles = milesForSum(day.milesWalked);
+  if (distanceMiles <= 0) return null;
   const weightLbs = weightLbsAsOf(series, day.date);
   if (weightLbs === undefined || weightLbs <= 0) return null;
 
   const estimate = estimateWalkingEnergy({
     weightKg: kgFromLbs(weightLbs),
-    distanceMiles: day.milesWalked,
+    distanceMiles,
     movingMinutes: day.movingMinutes,
     loadKg: day.loadKg,
     gradePercent: day.gradePercent,
@@ -116,7 +119,7 @@ export function estimateLocomotionEnergyForDispatch(
 export function estimateLocomotionEnergyFromDispatches(
   dispatches: WeightDated[]
 ): LocomotionEnergySeries {
-  const walkingDays = dispatches.filter((d) => d.milesWalked > 0);
+  const walkingDays = dispatches.filter((d) => milesForSum(d.milesWalked) > 0);
   if (walkingDays.length === 0) {
     return { kcal: null, method: null };
   }
@@ -161,10 +164,11 @@ export function computeMassDistanceLbMi(dispatches: WeightDated[]): number | nul
   let contributing = 0;
 
   for (const day of dispatches) {
-    if (day.milesWalked <= 0) continue;
+    const distanceMiles = milesForSum(day.milesWalked);
+    if (distanceMiles <= 0) continue;
     const weightLbs = weightLbsAsOf(dispatches, day.date);
     if (weightLbs === undefined || weightLbs <= 0) continue;
-    total += weightLbs * day.milesWalked;
+    total += weightLbs * distanceMiles;
     contributing += 1;
   }
 

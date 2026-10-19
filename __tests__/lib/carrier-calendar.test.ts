@@ -75,7 +75,7 @@ describe("groupDispatchesByDate", () => {
     // Verify grouping yields 2 entries on the same date
     const map = groupDispatchesByDate(dispatches);
     const group = map.get("2026-05-20") ?? [];
-    const totalMiles = Math.round(group.reduce((s, d) => s + d.milesWalked, 0) * 10) / 10;
+    const totalMiles = Math.round(group.reduce((s, d) => s + (d.milesWalked ?? 0), 0) * 10) / 10;
     const totalSteps = group.reduce(
       (s, d) => s + ("steps" in d ? (d.steps ?? 0) : 0),
       0
