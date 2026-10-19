@@ -58,57 +58,48 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
 
       <div className="relative z-10 flex flex-col gap-4">
         <div className="grid grid-cols-[144px_1fr] gap-4 items-start">
-          <div className="flex flex-col gap-3">
-            <div
+          <div
+            className={[
+              "hero-operator-portrait-bay relative w-36 h-36 overflow-hidden border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)]",
+              portraitGlitchBurst ? "hero-portrait-glitch-burst" : "",
+              isSkynet && !portraitGlitchBurst ? "hero-portrait-skynet-bay" : "",
+            ]
+              .filter(Boolean)
+              .join(" ")}
+          >
+            <div className="pointer-events-none absolute left-0 top-0 z-20 h-5 w-5 border-l border-t border-[rgb(var(--accent)/0.5)]" />
+            <div className="pointer-events-none absolute right-0 top-0 z-20 h-5 w-5 border-r border-t border-[rgb(var(--neon)/0.25)]" />
+            <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-5 w-5 border-b border-l border-[rgb(var(--neon)/0.25)]" />
+            <div className="pointer-events-none absolute bottom-0 right-0 z-20 h-5 w-5 border-b border-r border-[rgb(var(--accent)/0.5)]" />
+            <Image
+              src="/images/pixarMe-256.png"
+              alt="Stephen Weaver"
+              width={144}
+              height={144}
+              sizes="144px"
+              placeholder="empty"
+              style={portraitLayerStyle(!isSkynet)}
+              className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
+              priority
+              aria-hidden={isSkynet}
+            />
+            <Image
+              src="/images/pixarMe_terminator.png"
+              alt=""
+              width={144}
+              height={144}
+              sizes="144px"
+              placeholder="empty"
+              style={portraitLayerStyle(isSkynet)}
               className={[
-                "hero-operator-portrait-bay relative w-36 h-36 overflow-hidden border border-[rgb(var(--neon)/0.25)] bg-[rgb(var(--window)/0.3)]",
-                portraitGlitchBurst ? "hero-portrait-glitch-burst" : "",
-                isSkynet && !portraitGlitchBurst ? "hero-portrait-skynet-bay" : "",
+                "pointer-events-none absolute inset-0 z-10 h-full w-full object-cover",
+                isSkynet && !portraitGlitchBurst ? "hero-portrait-skynet-layer" : "",
               ]
                 .filter(Boolean)
                 .join(" ")}
-            >
-              <div className="pointer-events-none absolute left-0 top-0 z-20 h-5 w-5 border-l border-t border-[rgb(var(--accent)/0.5)]" />
-              <div className="pointer-events-none absolute right-0 top-0 z-20 h-5 w-5 border-r border-t border-[rgb(var(--neon)/0.25)]" />
-              <div className="pointer-events-none absolute bottom-0 left-0 z-20 h-5 w-5 border-b border-l border-[rgb(var(--neon)/0.25)]" />
-              <div className="pointer-events-none absolute bottom-0 right-0 z-20 h-5 w-5 border-b border-r border-[rgb(var(--accent)/0.5)]" />
-              <Image
-                src="/images/pixarMe-256.png"
-                alt="Stephen Weaver"
-                width={144}
-                height={144}
-                sizes="144px"
-                placeholder="empty"
-                style={portraitLayerStyle(!isSkynet)}
-                className="pointer-events-none absolute inset-0 z-0 h-full w-full object-cover"
-                priority
-                aria-hidden={isSkynet}
-              />
-              <Image
-                src="/images/pixarMe_terminator.png"
-                alt=""
-                width={144}
-                height={144}
-                sizes="144px"
-                placeholder="empty"
-                style={portraitLayerStyle(isSkynet)}
-                className={[
-                  "pointer-events-none absolute inset-0 z-10 h-full w-full object-cover",
-                  isSkynet && !portraitGlitchBurst ? "hero-portrait-skynet-layer" : "",
-                ]
-                  .filter(Boolean)
-                  .join(" ")}
-                loading="eager"
-                aria-hidden={!isSkynet}
-              />
-            </div>
-
-            <div>
-              <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Current chapter</p>
-              <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
-                Shipping production software
-              </p>
-            </div>
+              loading="eager"
+              aria-hidden={!isSkynet}
+            />
           </div>
 
           <div className="min-w-0 space-y-3">
@@ -134,6 +125,13 @@ export const HeroOperatorCard = memo(function HeroOperatorCard() {
               </div>
             </Link>
           </div>
+        </div>
+
+        <div>
+          <p className="text-xs tracking-[0.18em] text-[rgb(var(--text-label))] font-[var(--font-ocr)] uppercase">Current chapter</p>
+          <p className="mt-1 text-sm text-[rgb(var(--text-secondary))] font-[var(--font-ibm)] leading-snug">
+            Occupational Endurance Athlete
+          </p>
         </div>
 
         <div className="pt-3">
