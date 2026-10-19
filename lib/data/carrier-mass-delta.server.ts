@@ -14,7 +14,8 @@ import {
 } from "@/lib/types/carrier-public-telemetry";
 
 const LAST_30D_WINDOW_DAYS = 30;
-const LAST_30D_PROXIMITY_DAYS = 7;
+/** Nearest weigh-in may sit this far from the 30-day mark: a missed Monday, or a Tuesday weigh-in. */
+const LAST_30D_PROXIMITY_DAYS = 14;
 
 function recordedWeightEntries(
   dispatches: CarrierDispatch[]
@@ -62,11 +63,23 @@ function last30DayChange(entries: { date: string; weightLbs: number }[]): {
 
   const latest = entries[entries.length - 1];
   const cutoff = addCalendarDays(latest.date, -LAST_30D_WINDOW_DAYS);
-  const comparison = [...entries].reverse().find((entry) => entry.date <= cutoff);
-  if (!comparison || comparison.weightLbs <= 0) return null;
 
-  const proximity = differenceInCalendarDays(cutoff, comparison.date);
-  if (proximity > LAST_30D_PROXIMITY_DAYS) return null;
+  let comparison: { date: string; weightLbs: number } | null = null;
+  let bestDistance = Infinity;
+  for (const entry of entries) {
+    if (entry.date >= latest.date) continue;
+    const distance = Math.abs(differenceInCalendarDays(entry.date, cutoff));
+    const closer = distance < bestDistance;
+    const equallyCloseButEarlier =
+      distance === bestDistance && comparison !== null && entry.date < comparison.date;
+    if (closer || equallyCloseButEarlier) {
+      comparison = entry;
+      bestDistance = distance;
+    }
+  }
+
+  if (!comparison || comparison.weightLbs <= 0) return null;
+  if (bestDistance > LAST_30D_PROXIMITY_DAYS) return null;
 
   return {
     lb: round1(latest.weightLbs - comparison.weightLbs),

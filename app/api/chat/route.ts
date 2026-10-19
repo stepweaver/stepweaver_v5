@@ -26,7 +26,7 @@ const GROQ_API_KEY = process.env.GROQ_API_KEY;
 const OPENAI_API_KEY = process.env.OPENAI_API_KEY;
 const GROQ_URL = "https://api.groq.com/openai/v1/chat/completions";
 const OPENAI_URL = "https://api.openai.com/v1/responses";
-const DEFAULT_MODEL = process.env.GROQ_MODEL || "llama-3.3-70b-versatile";
+const DEFAULT_MODEL = process.env.GROQ_MODEL || "openai/gpt-oss-120b";
 const GROQ_VISION_MODEL =
   process.env.GROQ_VISION_MODEL || "meta-llama/llama-4-scout-17b-16e-instruct";
 const FALLBACK_MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";
@@ -230,17 +230,14 @@ export async function POST(request: NextRequest) {
       if (res.ok && data) {
         assistantText = extractAssistantTextFromResponses(data);
         provider = "openai";
-      } else {
-        if (process.env.NODE_ENV === "development") {
-          console.error("OpenAI error:", res.status, data);
-        }
-        const errBody = data as { error?: { message?: string }; message?: string };
-        const apiMessage = errBody?.error?.message || errBody?.message;
-        const userMessage =
-          process.env.NODE_ENV === "development" && apiMessage
-            ? `AI provider error: ${apiMessage}`
-            : "Failed to get response from AI. Please try again.";
-        return NextResponse.json({ error: userMessage }, { status: 502, headers: jsonHeaders() });
+      } else if (process.env.NODE_ENV === "development") {
+        console.error("OpenAI error:", res.status, data);
+      }
+      if (!assistantText && !groqErr) {
+        return NextResponse.json(
+          { error: "Failed to get response from AI. Please try again." },
+          { status: 502, headers: jsonHeaders() }
+        );
       }
     }
 

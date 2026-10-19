@@ -133,7 +133,7 @@ describe("toPublicMassDeltaSeries", () => {
     expect(withGap.averageWeeklyDelta).toBe(-3.5);
   });
 
-  it("publishes LAST 30D when the comparison Monday is within 7 days of the cutoff", () => {
+  it("publishes LAST 30D from the weigh-in nearest the 30-day mark", () => {
     const series = toPublicMassDeltaSeries([
       dispatch({ id: "a", date: "2026-06-01", title: "A", weightLbs: 250 }),
       dispatch({ id: "b", date: "2026-07-06", title: "B", weightLbs: 242 }),
@@ -145,12 +145,32 @@ describe("toPublicMassDeltaSeries", () => {
     expect(series.averageWeeklyDeltaPct).toBe(-0.7);
   });
 
-  it("returns n/a LAST 30D when the previous point is far from the cutoff", () => {
+  it("prefers a Tuesday-adjacent weigh-in just after the cutoff over a Monday two weeks earlier", () => {
+    const series = toPublicMassDeltaSeries([
+      dispatch({ id: "early", date: "2026-08-31", title: "Mon", weightLbs: 280 }),
+      dispatch({ id: "near", date: "2026-09-14", title: "Mon", weightLbs: 274 }),
+      dispatch({ id: "latest", date: "2026-10-13", title: "Tue", weightLbs: 262 }),
+    ]);
+    // Cutoff 2026-09-13. Sep 14 is 1 day later; Aug 31 is 13 days earlier.
+    expect(series.last30DayDelta).toBe(-12);
+    expect(series.last30DayDeltaPct).toBe(-4.4);
+  });
+
+  it("publishes LAST 30D when a missed week leaves the nearest weigh-in 13 days early", () => {
+    const series = toPublicMassDeltaSeries([
+      dispatch({ id: "a", date: "2026-08-31", title: "Mon", weightLbs: 280 }),
+      dispatch({ id: "b", date: "2026-10-13", title: "Tue", weightLbs: 266 }),
+    ]);
+    // Cutoff 2026-09-13; Aug 31 is 13 days before cutoff, inside the 14-day window
+    expect(series.last30DayDelta).toBe(-14);
+  });
+
+  it("returns n/a LAST 30D when the nearest weigh-in is more than 14 days from the cutoff", () => {
     const series = toPublicMassDeltaSeries([
       dispatch({ id: "a", date: "2026-05-04", title: "A", weightLbs: 250 }),
-      dispatch({ id: "b", date: "2026-06-15", title: "B", weightLbs: 240 }),
+      dispatch({ id: "b", date: "2026-07-06", title: "B", weightLbs: 240 }),
     ]);
-    // 42-day gap. Cutoff is 2026-05-16; May 4 is 12 days before cutoff (> 7)
+    // Cutoff 2026-06-06; May 4 is 33 days before cutoff
     expect(series.last30DayDelta).toBeNull();
   });
 
